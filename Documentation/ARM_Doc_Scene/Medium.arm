@@ -1,0 +1,418 @@
+/**
+ * SCENE FOR ART RENDERER
+ * **********************
+ * 
+ * Scene configurable to show different effects using participating medium
+ * The medium is contained in a Cornell Box like scene.
+ * In addition to the standard ART options, several options are available to
+ * configure the scene
+ * 
+ * Options are:
+ * ============
+ *      Rendering options:
+ *      ------------------
+ *          - <SAMPLES>                 Defines the number of samples to use for rendering
+ *          - <PATH_LENGTH>             Defines the maximum length for a path
+ *
+ *          - Path tracer mode:
+ *              - <ALG_DS>              Direction sampling (default)
+ *              - <ALG_LS>              Light sampling
+ *              - <ALG_MIS>             Multiple importance sampling
+ *
+ *      Medium selection:
+ *      -----------------
+ *          - <HETEROGENEOUS>           Homogeneous medium
+ *
+ *          - Heterogeneous volume:
+ *              - <FLOATING_CUBE>       Uses a floating cube as heterogeneous medium
+ *              - <HETERO_SCALE>         Set the scaling factor for the density
+ *              - default uses a smoke volume from an example scene in Mitsuba
+ *
+ *          - <EMPTY>                   No medium is used (usefull for reference)
+ *          - default is Heterogeneous medium
+ *
+ *      Distance tracking mode: (used only for homogeneous medium)
+ *      -----------------------
+ *          - <DISTANCE_EXP>            Standard exponential tracking mode
+ *          - <DISTANCE_MAX_EXP>        Take the maximum between the transmittance and the scattering
+ *          - default is scattering aware mode
+ *
+ *      Scatering colour definition:
+ *      ----------------------------
+ *          - <USE_NON_FLUO>            Uses a non fluorescent volume
+ *          - <REGULAR_SCATTERING>      Specifies the non fluorescent scattering part
+ *
+ *          - Fluorescent spectrum:
+ *              - <FLUO_ABSORB>         Specifies the absorption peak in nanometers (default: 360)
+ *              - <FLUO_ABSORB_SPREAD>  Specifies the absorption spread in nanometers (default: 40)
+ *              - <FLUO_EMIT>           Specifies the reemission peak in nanometers (default: 560)
+ *              - <FLUO_EMIT_SPREAD>    Specifies the reemission spread in nanometers (default: 50)
+ *              - <FLUO_INTENSITY>      Specifies the intensity of the fluorescence over the main reflectance
+ *
+ *          - default is fluorescent spectrum
+ *
+ *      Absorption definition:
+ *      ----------------------
+ *          - <ABSORPTION>              Specify the grey absorption to use (default: 0)
+ *
+ *      Lighting configuration:
+ *      -----------------------
+ *          - Lighting configuration:
+ *              - <USE_SHADE>           Small back and front light are used separated with a shade
+ *              - <LARGE_LIGHT>         The back light is filling the ceiling, no front light is used
+ *              - default:              Only middle sized back light is used
+ *              
+ *          - Illuminant:
+ *              - <MONO_450>            Sets a 450nm pure monochromatic spectrum emission for the back light
+ *              - <MONO_550>            Sets a 550nm pure monochromatic spectrum emission for the back light
+ *              - <LARGE_450>           Sets a 450nm dominant spectrum emission for the back light
+ *              - <LARGE_550>           Sets a 550nm dominant spectrum emission for the back light
+ *              - <SPECTRUM_D65>        Sets a D65 spectrum emission for the back light
+ *              - <VISIBLE_ONLY>        Sets a visible spectrum only emission for the back light
+ *              - <UV_ONLY>             Sets a uv spectrum only emission for the back light
+ *              - <FULL_ONLY>           Sets a full spectrum for the front light
+ *              - default:              Full spectrum for back light and visible spectrum for front light
+ *
+ *      Geometry configuration:
+ *      -----------------------
+ *          - Cornell box:
+ *              - <PLAIN_BOX>           Use a classical Cornell box with solid colors for walls
+ *              - default:              Cornell box with grid on the walls
+ *              
+ *     Material configuraiton:
+ *     -----------------------
+ *         - PLAIN_BRDF                 Discard fluorescent part for spheres
+ *         - default                    Use the complete re-radiation matrix
+ *
+ * Dependencies:
+ * =============
+ * This scene relies on other files:
+ *      - include/RadiosityBox.arm      Used to define the basic Cornell box
+ *      - smoke.vol                     Used for Heterogeneous medium when the 
+ *                                      floating cube isn't used
+ */
+
+#import "include/RadiosityBox.arm"
+
+#ifndef SAMPLES
+    #define SAMPLES UNLIMITED
+#endif
+
+#ifndef PATH_LENGTH
+    #define PATH_LENGTH 8
+#endif
+
+/*
+ * Select path tracer mode
+ */
+#if !(defined ALG_DS || defined ALG_LS || defined ALG_MIS)
+    #define ALG_DS
+#endif
+
+#ifdef ALG_DS
+    #define MODE arpathtracermode_direction_sampling
+#elif defined ALG_LS
+    #define MODE arpathtracermode_light_sampling
+#else
+    #define MODE arpathtracermode_mis
+#endif
+
+/*
+ * Select medium importance sampling tracking mode
+ */
+#if !(defined DISTANCE_EXP || defined DISTANCE_MAX_EXP || defined DISTANCE_ASYM)
+    #define DISTANCE_ASYM
+#endif
+
+#ifdef DISTANCE_EXP
+    #define DISTANCE_MODE ardistancetrackingmode_exponential
+#elif defined DISTANCE_MAX_EXP
+    #define DISTANCE_MODE ardistancetrackingmode_maximal_exponential
+#else
+    #define DISTANCE_MODE ardistancetrackingmode_scattering_aware
+#endif
+
+/*
+ * Colour specification
+ */
+#ifndef USE_NON_FLUO
+    #ifndef REGULAR_SCATTERING
+        #define REGULAR_SCATTERING 0
+    #endif
+
+    #ifndef FLUO_ABSORB
+        #define FLUO_ABSORB 360
+    #endif
+
+    #ifndef FLUO_ABSORB_SPREAD
+        #define FLUO_ABSORB_SPREAD 40
+    #endif
+
+    #ifndef FLUO_EMIT
+        #define FLUO_EMIT 560
+    #endif
+
+    #ifndef FLUO_EMIT_SPREAD
+        #define FLUO_EMIT_SPREAD 50
+    #endif
+
+    #ifndef FLUO_INTENSITY
+        #define FLUO_INTENSITY 0.025
+    #endif
+#endif
+
+#ifndef HETERO_SCALE
+    #define HETERO_SCALE 1.0
+#endif
+
+#ifndef ABSORPTION
+    #define ABSORPTION 0
+#endif
+
+ArNode * createLighting(ART_GV * art_gv)
+{
+    // Spectrums
+    ArObj spectrum450 =
+        CONST_COLOUR_PSSPECTRUM(1.0,
+                            PNT2D( 300.0 NANOMETER, 0.0 ),
+                            PNT2D( 440.0 NANOMETER, 0.0 ),
+                            PNT2D( 450.0 NANOMETER, 1.0 ),
+                            PNT2D( 460.0 NANOMETER, 0.0 ),
+                            PNT2D( 800.0 NANOMETER, 0.0 ),
+                            PSS_END
+                            );
+
+    ArObj spectrum550 =
+        CONST_COLOUR_PSSPECTRUM(1.0,
+                            PNT2D( 300.0 NANOMETER, 0.0 ),
+                            PNT2D( 540.0 NANOMETER, 0.0 ),
+                            PNT2D( 550.0 NANOMETER, 1.0 ),
+                            PNT2D( 560.0 NANOMETER, 0.0 ),
+                            PNT2D( 800.0 NANOMETER, 0.0 ),
+                            PSS_END
+                            );
+    ArObj spectrum450_l =
+        CONST_COLOUR_PSSPECTRUM(1.0,
+                            PNT2D( 300.0 NANOMETER, 0.0 ),
+                            PNT2D( 400.0 NANOMETER, 1.0 ),
+                            PNT2D( 470.0 NANOMETER, 1.0 ),
+                            PNT2D( 500.0 NANOMETER, 0.0 ),
+                            PNT2D( 800.0 NANOMETER, 0.0 ),
+                            PSS_END
+                            );
+
+    ArObj spectrum550_l =
+        CONST_COLOUR_PSSPECTRUM(1.0,
+                            PNT2D( 300.0 NANOMETER, 0.0 ),
+                            PNT2D( 500.0 NANOMETER, 0.0 ),
+                            PNT2D( 520.0 NANOMETER, 1.0 ),
+                            PNT2D( 570.0 NANOMETER, 1.0 ),
+                            PNT2D( 580.0 NANOMETER, 0.0 ),
+                            PNT2D( 800.0 NANOMETER, 0.0 ),
+                            PSS_END
+                            );
+
+    ArObj daylight = CIE_ILLUMINANT_D65;
+
+    ArObj fullSpectrum =
+        CONST_COLOUR_PSSPECTRUM(1.0,
+                            PNT2D( 300.0 NANOMETER, 1.0 ),
+                            PNT2D( 700.0 NANOMETER, 1.0 ),
+                            PSS_END
+                            );
+
+    ArObj visibleSpectrum =
+        CONST_COLOUR_PSSPECTRUM(1.0,
+            PNT2D( 300.0 NANOMETER, 0.0 ),
+            PNT2D( 379.9 NANOMETER, 0.0 ),
+            PNT2D( 380.0 NANOMETER, 1.0 ),
+            PNT2D( 700.0 NANOMETER, 1.0 ),
+            PSS_END
+        );
+
+    ArObj uvSpectrum =
+        CONST_COLOUR_PSSPECTRUM(1.0,
+            PNT2D( 300.0 NANOMETER, 1.0 ),
+            PNT2D( 382.9 NANOMETER, 1.0 ),
+            PNT2D( 383.0 NANOMETER, 0.0 ),
+            PNT2D( 700.0 NANOMETER, 0.0 ),
+            PSS_END
+        );
+
+    // Lighting
+    ArObj backLight = 
+    #if   defined MONO_450
+        planarLamp(art_gv, spectrum450, 0.2, 1.0);
+    #elif defined MONO_550
+        planarLamp(art_gv, spectrum550, 0.2, 1.0);
+    #elif defined LARGE_450
+        planarLamp(art_gv, spectrum450_l, 0.2, 1.0);
+    #elif defined LARGE_550
+        planarLamp(art_gv, spectrum550_l, 0.2, 1.0);
+    #elif defined SPECTRUM_D65
+        planarLamp(art_gv, daylight, 0.2, 1.0);
+    #elif defined VISIBLE_ONLY
+        planarLamp(art_gv, visibleSpectrum, 0.2, 1.0);
+	#elif defined UV_ONLY
+	    planarLamp(art_gv, uvSpectrum, 0.2, 1.0);
+    #else
+        planarLamp(art_gv, fullSpectrum, 0.2, 1.0);
+    #endif
+    
+    backLight =
+    #if   defined LARGE_LIGHT
+        [ backLight trafo: SCALE(1.0, 1.0, 0.2) : TRANSLATION(0.0,0.0,0.999)];
+    #elif defined USE_SHADE
+        [ backLight trafo: USCALE(0.2) : TRANSLATION(0.0,0.0,0.9)];
+    #elif defined SMALL_LIGHT
+        [ backLight trafo: USCALE(0.3) : TRANSLATION(0.0,0.0,0.999)];
+    #else
+        [ backLight trafo: USCALE(0.4) : TRANSLATION(0.0,0.0,0.99)];
+    #endif
+
+    ArObj frontLight = 
+    #if   defined FULL_ONLY
+        planarLamp(art_gv, fullSpectrum, 0.2, 1.0);
+    #else
+        planarLamp(art_gv, visibleSpectrum, 0.2, 1.0);
+    #endif
+
+    frontLight = [ frontLight trafo: USCALE(0.2) : TRANSLATION(0.0, 0.412, 0.9) ];
+
+    ArObj shade = [ CUBE apply
+            : SCALE(2.0, 0.01, 0.5)
+            : TRANSLATION(-1.0, -0.005 + 0.206, 0.5)
+            : LAMBERT_REFLECTOR(CONST_COLOUR_GREY(0.4))
+    ];
+
+    #ifdef USE_SHADE
+    return [[ frontLight or: backLight ] or: shade ];
+    #else
+    return backLight;
+    #endif
+}
+
+ARM_MAIN_FUNCTION(Medium)
+{
+    id scattering_colour = 
+    #ifdef USE_NON_FLUO
+        CONST_COLOUR_GREY(REGULAR_SCATTERING);
+    #else
+        CONST_FLUORESCENT_COLOUR(
+            CONST_COLOUR_GREY(REGULAR_SCATTERING),
+            (FLUO_INTENSITY),
+            PNT2D((FLUO_ABSORB)        NM, (FLUO_EMIT)        NM),
+            VEC2D((FLUO_ABSORB_SPREAD) NM, (FLUO_EMIT_SPREAD) NM)
+        );
+    #endif
+
+#ifdef HETEROGENEOUS
+    id heterogeneous_volume =
+    #ifdef FLOATING_CUBE
+        CONST_VOLUME_BOUNDED(
+            1.0,
+            PNT3D(-0.5, -0.5, -0.5),
+            PNT3D( 0.5,  0.5,  0.5)
+        );
+    #else
+        GRID_VOLUME("smoke.vol");    
+
+	heterogeneous_volume =
+		[ heterogeneous_volume apply
+			: ROT_Z(-90 DEGREES)
+			: ROT_X(90 DEGREES)
+			: SCALE(2, 2, 2)
+		  ];
+    #endif
+#endif
+
+
+    id scene_participating_medium =
+    #ifdef HETEROGENEOUS
+        HETEROGENEOUS_ISOTROPIC_MATERIAL_SCALE(
+            CONST_COLOUR_GREY((ABSORPTION)),   // Absorption
+            scattering_colour,                 // Scattering
+            heterogeneous_volume,              // Volume
+			HETERO_SCALE                       // Density scaling
+        );
+    #else
+        ISOTROPIC_MATERIAL(
+            CONST_COLOUR_GREY(1.0),             // IOR
+            CONST_COLOUR_GREY((ABSORPTION)),    // Absorption
+            scattering_colour                   // Scattering
+        );
+    #endif
+
+    id box = 
+    #ifdef PLAIN_BOX
+        radiosityBox_Plain(art_gv);
+    #else
+        radiosityBox_SimpleGrid(art_gv);
+    #endif
+
+    id scene_geometry = [ box or: createLighting(art_gv) ];
+
+    id camera =
+        [ CAMERA
+            imageSize : IVEC2D(128, 128)
+                ray   : RAY3D(PNT3D(0.0, 5.0, 0.0), VEC3D(0.0, -1.0, 0.0) )
+                zoom  : 1.42
+        ];
+
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D  : STANDARD_SAMPLER_2D
+                resolution : 5
+                type       : arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ SIMPLE_PATHTRACER
+                        rayCaster        : STANDARD_RAYCASTER
+                        maximalRecursion : PATH_LENGTH
+                        mode             : MODE
+                        distanceTracking : DISTANCE_MODE
+                    ]
+                sampleSplattingKernel : TENT_KERNEL
+                samplesPerPixel       : SAMPLES
+                randomValueGeneration : PSEUDORANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+            
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource   : YES
+                bitsPerChannel : 8
+            ],
+
+            ACTION_SEQUENCE_END
+        );
+
+    #ifdef EMPTY
+    return
+        [ SCENE
+            sceneGeometry       : scene_geometry
+            camera              : camera
+            actionSequence      : actionsequence
+        ];
+    #else
+    return
+        [ SCENE
+            sceneGeometry       : scene_geometry
+            environmentMaterial : 0
+            worldVolumeMaterial : scene_participating_medium
+            camera              : camera
+            actionSequence      : actionsequence
+        ];
+    #endif
+}

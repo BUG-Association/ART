@@ -1,0 +1,39 @@
+#import "Tender_Buffer.arm"
+#import "Tender_Wheels.arm"
+#import "Tender_LeftSide.arm"
+#import "Tender_LowerPart.arm"
+#import "Tender_UpperPart.arm"
+#import "Tender_FrontPlate.arm"
+#import "Tender_FrontPart.arm"
+#import "Tender_BackPart.arm"
+
+
+ArObj create_Tender(
+        ART_GV  * art_gv,
+        ArObj     black_surface,
+        ArObj     grey_surface,
+        ArObj     red_surface
+        )
+{
+    ArObj tender =
+        UNION(
+            [ [TENDER_LEFT_SIDE trafo: TRANSLATION (15, 0, 15.1)] trafo: ROT_Z(180 DEGREES)],
+            [  TENDER_LEFT_SIDE trafo: TRANSLATION (15, 0, 15.1)],
+
+            [ TENDER_FRONT_PLATE trafo: TRANSLATION (-15.05, 32.35, 12.6)],
+            [ TENDER_FRONT_PLATE trafo: TRANSLATION (-15.05, -32.3, 12.6)],
+            [ TENDER_FRONT_PART trafo: TRANSLATION (0, -32.35, 5.3)],
+            [ TENDER_BACK_PART trafo: TRANSLATION (0, 32.35, 5.3)],
+
+            [ TENDER_BUFFER_1 trafo: ROT_X (-90 DEGREES) :TRANSLATION (-8.75, 43.45, 10.3)],
+            [ TENDER_BUFFER_2 trafo: ROT_X (-90 DEGREES) :TRANSLATION (8.75, 43.45, 10.3)],
+            [ TENDER_WHEELS trafo: TRANSLATION_Z (5.17)],
+            [ TENDER_LOWER_PART trafo: TRANSLATION_Z (10.3)],
+            [ TENDER_UPPER_PART trafo: TRANSLATION_Z (22.6)],
+
+            UNION_END
+            );
+
+   return [ tender apply:black_surface ];
+
+}

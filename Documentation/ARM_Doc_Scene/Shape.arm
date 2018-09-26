@@ -1,0 +1,198 @@
+#ifndef SAMPLES
+    #define SAMPLES 256
+#endif
+
+#ifndef PATH_LENGTH
+    #define PATH_LENGTH 20
+#endif
+
+ARM_MAIN_FUNCTION(Shape)
+{   
+
+#ifdef TRIANGLE_
+    Pnt3D  * trianglePoints = ALLOC_ARRAY( Pnt3D, 4 );
+
+    trianglePoints[0] = PNT3D( -1.0, 0.0, -1.0);
+    trianglePoints[1] = PNT3D(  0.0, 0.0,  1.0);
+    trianglePoints[2] = PNT3D(  1.0, 0.0, -1.0);
+    trianglePoints[3] = PNT3D_HUGE;
+
+    ArNode * triangleIndexes = TRIANGLE(1, 0, 2);
+
+    ArNode * triangleVertices =
+        arnvertexset(
+            art_gv,
+            trianglePoints,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+        );
+
+    ArNode * triangle = [ triangleIndexes apply: triangleVertices ];
+#endif
+
+#ifdef QUADRANGLE_
+    Pnt3D  * quadranglePoints = ALLOC_ARRAY( Pnt3D, 5 );
+
+    quadranglePoints[0] = PNT3D(-1,  0, -1);
+    quadranglePoints[1] = PNT3D(-1,  0,  1);
+    quadranglePoints[2] = PNT3D( 1,  0,  1);
+    quadranglePoints[3] = PNT3D( 1,  0, -1);
+    quadranglePoints[4] = PNT3D_HUGE;
+
+    ArNode * quadrangleIndexes = QUADRANGLE(0, 1, 2, 3);
+
+    ArNode * quandrangleVertices =
+        arnvertexset(
+            art_gv,
+            quadranglePoints,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+        );
+
+    ArNode * quadrangle = [ quadrangleIndexes apply: quandrangleVertices ];
+#endif
+
+    id mainItem = 
+    #if defined CONE_
+        CONE;
+    #elif defined CONE_X_
+        CONE_X;
+    #elif defined CONE_Y_
+        CONE_Y;
+    #elif defined CONE_Z_
+        CONE_Z;
+    #elif defined CUBE_
+        CUBE;
+    #elif defined CYLINDER_
+        CYLINDER;
+    #elif defined CYLINDER_X_
+        CYLINDER_X;
+    #elif defined CYLINDER_Y_
+        CYLINDER_Y;
+    #elif defined CYLINDER_Z_
+        CYLINDER_Z;
+    #elif defined PARABOLOID_
+        PARABOLOID;
+    #elif defined SPHERE_
+        SPHERE;
+    #elif defined TRIANGLE_
+        triangle;
+    #elif defined QUADRANGLE_
+        quadrangle;
+    #elif defined HYPERBOLOID_
+        HYPERBOLOID(0.5);
+    #elif defined HYPERBOLOID_X_
+        HYPERBOLOID_X(0.5);
+    #elif defined HYPERBOLOID_Y_
+        HYPERBOLOID_Y(0.5);
+    #elif defined HYPERBOLOID_Z_
+        HYPERBOLOID_Z(0.5);    
+    #elif defined TORUS_
+        TORUS(0.5);
+    #elif defined TORUS_X_
+        TORUS_X(0.5);
+    #elif defined TORUS_Y_
+        TORUS_Y(0.5);
+    #elif defined TORUS_Z_
+        TORUS_Z(0.5);
+    #elif defined PLY_MESH_
+        [ PLY_MESH("dragon_vrip_res4.ply") apply 
+            : USCALE(15) 
+            : ROT_X(90 DEGREES) 
+            : TRANSLATION(0, 0, -1.7) 
+            ];
+    #elif defined HEIGHTFIELD_MESH_FROM_IMAGE_
+        [ HEIGHTFIELD_MESH_FROM_IMAGE("heightfield.tiff") apply
+            : TRANSLATION(-0.5, 0, -0.5)
+            : USCALE(3)
+            ];
+    #endif
+
+    id scene_geometry =
+        UNION(
+            mainItem,
+            UNION_END
+            );
+
+    id camera =
+        [ CAMERA
+            imageSize:  IVEC2D( 128, 128 )
+            ray:        RAY3D( PNT3D(0.0, -5.0, 0.0), VEC3D(0.0, 1.0, 0.0) )
+            zoom:       1
+            ];
+
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  6
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+                        maximalRecursion: PATH_LENGTH
+                #ifdef ALG_DS
+                    #ifdef WEIGHED
+                        mode:             arpathtracermode_weighed_direction_sampling
+                    #else
+                        mode:             arpathtracermode_direction_sampling
+                    #endif
+                #elif defined ALG_LS
+                    #ifdef WEIGHED
+                        mode:             arpathtracermode_weighed_light_sampling
+                    #else
+                        mode:             arpathtracermode_light_sampling
+                    #endif
+                #endif
+                    ]
+                sampleSplattingKernel:   TENT_KERNEL
+                samplesPerPixel:         SAMPLES
+                randomValueGeneration:   RANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    NO
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+    return
+        [ SCENE
+            sceneGeometry      : scene_geometry
+
+#if defined USE_DIFFUSE_ILLUMINATION
+            environmentMaterial: UNIFORM_ENVIRONMENT_MATERIAL( CONST_COLOUR_GREY(1.0), 1.0 )
+#else
+            skyModel :
+                [ HOSEK_SKYLIGHT
+                    elevation   : 45 DEGREES
+                    azimuth     : -90.0 DEGREES
+                    turbidity   : 2.0
+                    groundAlbedo: CONST_COLOUR_GREY(0.5)
+                ]
+#endif
+            camera        : camera
+            actionSequence: actionsequence
+            ];
+}
+
+// ===========================================================================

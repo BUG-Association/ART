@@ -1,0 +1,55 @@
+/* ===========================================================================
+
+    Copyright (c) 1996-2016 The ART Development Team
+    ------------------------------------------------
+
+    For a comprehensive list of the members of the development team, and a
+    desaription of their respective contributions, see the file
+    "ART_DeveloperList.txt" that is distributed with the libraries.
+
+    This file is part of the Advanced Rendering Toolkit (ART) libraries.
+
+    ART is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any
+    later version.
+
+    ART is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with ART.  If not, see <http://www.gnu.org/licenses/>.
+
+=========================================================================== */
+
+#define MACBETH_COLOUR(__name) \
+    EXTERNAL_NAMED_COLOUR("SpectralData/MacbethColourChecker.ark",(__name))
+
+#define MACBETH_DARKSKIN	MACBETH_COLOUR("darkskin")
+#define MACBETH_LIGHTSKIN	MACBETH_COLOUR("lightskin")
+#define MACBETH_BLUESKY		MACBETH_COLOUR("bluesky")
+#define MACBETH_FOLIAGE		MACBETH_COLOUR("foliage")
+#define MACBETH_BLUEFLOWER	MACBETH_COLOUR("blueflower")
+#define MACBETH_BLUISHGREEN	MACBETH_COLOUR("bluishgreen")
+#define MACBETH_ORANGE		MACBETH_COLOUR("orange")
+#define MACBETH_PURPLISHBLUE	MACBETH_COLOUR("purplishblue")
+#define MACBETH_MODERATERED	MACBETH_COLOUR("moderatered")
+#define MACBETH_PURPLE		MACBETH_COLOUR("purple")
+#define MACBETH_YELLOWGREEN	MACBETH_COLOUR("yellowgreen")
+#define MACBETH_ORANGEYELLOW	MACBETH_COLOUR("orangeyellow")
+#define MACBETH_BLUE		MACBETH_COLOUR("blue")
+#define MACBETH_GREEN		MACBETH_COLOUR("green")
+#define MACBETH_RED		MACBETH_COLOUR("red")
+#define MACBETH_YELLOW		MACBETH_COLOUR("yellow")
+#define MACBETH_MAGENTA		MACBETH_COLOUR("magenta")
+#define MACBETH_CYAN		MACBETH_COLOUR("cyan")
+#define MACBETH_WHITE		MACBETH_COLOUR("white")
+#define MACBETH_NEUTRAL8	MACBETH_COLOUR("neutral8")
+#define MACBETH_NEUTRAL65	MACBETH_COLOUR("neutral65")
+#define MACBETH_NEUTRAL5	MACBETH_COLOUR("neutral5")
+#define MACBETH_NEUTRAL35	MACBETH_COLOUR("neutral35")
+#define MACBETH_BLACK		MACBETH_COLOUR("black")
+
+// ===========================================================================

@@ -1,0 +1,201 @@
+#define TENDER_UPPER_PART \
+    createTenderUpperPart( art_gv, black_surface, grey_surface, red_surface )
+
+ArObj createTenderUpperPart(
+        ART_GV  * art_gv,
+        ArObj     black_surface,
+        ArObj     grey_surface,
+        ArObj     red_surface
+        )
+{
+
+  ArObj xx = [PARABOLOID trafo: ROT_Y (90 DEGREES) :SCALE (0.15, 0.15, 
+0.15)];
+  ArObj x2 = [PARABOLOID trafo: ROT_Y (-90 DEGREES) :SCALE (0.15, 0.15, 
+0.15)];
+
+
+  ArObj pile = 	[ CUBE trafo: SCALE (0.75, 0.75, 3.75)];
+
+  ArObj curve
+= [[[CYLINDER trafo: SCALE ( 6, 6, 0.05)] sub:
+		     [CYLINDER trafo: SCALE (2, 2, 0.05)]] and:
+                        [CUBE trafo: SCALE (6, 6, 0.05)]];
+
+
+  ArObj cyl = [curve sub: [CUBE trafo: SCALE (6, 6, 0.05) :ROT_Z (-70 
+DEGREES)]];
+  ArObj cube = [ CUBE trafo: SCALE (4, 3.42, 0.05) :TRANSLATION (2, -3.42, 0) 
+:ROT_Z (20 DEGREES)];
+  ArObj cyl2 = [CYLINDER trafo: SCALE (2, 2, 0.05) :TRANSLATION (4.93, -1.85, 0)];
+  ArObj part = [[[ CUBE trafo: SCALE (4.93, 5.85, 0.05) :TRANSLATION_Y (-3.85)]
+			sub: UNION(cyl, cube, cyl2, UNION_END)]
+				trafo: ROT_X (90 DEGREES) :ROT_Z (-90 DEGREES)];
+
+  ArObj c1
+= [[[CYLINDER trafo: SCALE ( 2, 2, 1)] sub:
+		     [CYLINDER trafo: SCALE (1.95, 1.95, 1)]] and:
+                        [CUBE trafo: SCALE (2, 2, 1)]];
+
+  ArObj c2
+= [[[CYLINDER trafo: SCALE ( 2.05, 2.05, 1)] sub:
+		     [CYLINDER trafo: SCALE (2, 2, 1)]] and:
+                        [CUBE trafo: SCALE (2.05, 2.05, 1)]];
+
+
+  ArObj p1 = [c1 sub: [CUBE trafo: SCALE (2, 2, 1) :ROT_Z (-70 DEGREES)]];
+  ArObj p2 = [ CUBE trafo: SCALE (0.05, 3.42, 1) :TRANSLATION (1.95, -3.42, 0) 
+:ROT_Z (20 DEGREES)];
+  ArObj p3 = [[c2 sub: [CUBE trafo: SCALE (2.05, 2.05, 1) :ROT_Z (-70 
+DEGREES)]]
+			 trafo: ROT_Z (180 DEGREES) :TRANSLATION (4.93, -1.85, 0)];
+  ArObj part2 = [ UNION(p1, p2, p3, UNION_END)
+			trafo: ROT_X (90 DEGREES) :ROT_Z (-90 DEGREES) :SCALE_X (21.5) :TRANSLATION_X 
+(10.75)];
+
+  ArObj l1 = [[[CYLINDER trafo: SCALE (2.5, 2.5, 3)] sub:
+		 [PARABOLOID trafo: SCALE (2.3, 2.3, 1.5) :TRANSLATION_Z (1.5)]]
+			trafo: ROT_X (-90 DEGREES) :TRANSLATION_Z (2.5)];
+
+  ArObj lamp1 = [[[CUBE trafo: SCALE (5, 2, 2)]
+			sub: [CUBE trafo: SCALE (5, 4, 1) :TRANSLATION_Y (-1) :ROT_X (-25 DEGREES)]]
+				trafo: TRANSLATION (-2.5, -2, -2.5) :ROT_Z (180 DEGREES)];
+
+  ArObj l2 = [[ CUBE trafo: SCALE ( 1, 2, 1)] sub:
+		[CUBE trafo: SCALE (3, 2, 1) :ROT_Y (65 DEGREES) : TRANSLATION_Z (1)]];
+
+  ArObj lamp = UNION( [[[CUBE trafo: SCALE (3, 1, 2) :TRANSLATION (-1.5, 2, 0)]
+			sub: [CYLINDER trafo: SCALE (2.5, 2.5, 3)]]
+				trafo: TRANSLATION_Y (-2.5) :ROT_X (-90 DEGREES)],
+			[l2 trafo: TRANSLATION (1.5, 0, -0.5)],
+			[l2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-2, 2.5, -0.5)],
+			l1,
+			lamp1,
+			UNION_END);
+
+  ArObj xs = UNION( [xx trafo: TRANSLATION (10.8, 0, 1.1)], [xx trafo: TRANSLATION 
+(10.8, 0, 1.9)], [xx trafo: TRANSLATION (10.8, 0, 2.7)], [xx trafo: TRANSLATION (10.8, 
+0, 3.5)], [xx trafo: TRANSLATION (10.8, 0, 4.3)], [xx trafo: TRANSLATION (10.8, 0, 
+5.1)], [xx trafo: TRANSLATION (10.8, 0, 5.9)], [xx trafo: TRANSLATION (10.8, 0, 6.7)], 
+[xx trafo: TRANSLATION (10.8, 0, 7.5)], [xx trafo: TRANSLATION (10.8, 0, 8.3)], [xx 
+trafo: TRANSLATION (10.8, 0, 9.1)],
+		[xx trafo: TRANSLATION (10.8, 25, 1.1)], [xx trafo: TRANSLATION (10.8, 25, 1.9)], [xx 
+trafo: TRANSLATION (10.8, 25, 2.7)], [xx trafo: TRANSLATION (10.8, 25, 3.5)], [xx trafo: 
+TRANSLATION (10.8, 25, 4.3)], [xx trafo: TRANSLATION (10.8, 25, 5.1)], [xx trafo: TRANSLATION 
+(10.8, 25, 5.9)], [xx trafo: TRANSLATION (10.8, 25, 6.7)], [xx trafo: TRANSLATION (10.8, 
+25, 7.5)], [xx trafo: TRANSLATION (10.8, 25, 8.3)], [xx trafo: TRANSLATION (10.8, 25, 
+9.1)],
+		[xx trafo: TRANSLATION (10.8, -25, 1.1)], [xx trafo: TRANSLATION (10.8, -25, 1.9)], 
+[xx trafo: TRANSLATION (10.8, -25, 2.7)], [xx trafo: TRANSLATION (10.8, -25, 3.5)], [xx 
+trafo: TRANSLATION (10.8, -25, 4.3)], [xx trafo: TRANSLATION (10.8, -25, 5.1)], [xx 
+trafo: TRANSLATION (10.8, -25, 5.9)], [xx trafo: TRANSLATION (10.8, -25, 6.7)], [xx 
+trafo: TRANSLATION (10.8, -25, 7.5)], [xx trafo: TRANSLATION (10.8, -25, 8.3)], [xx 
+trafo: TRANSLATION (10.8, -25, 9.1)],
+		[xx trafo: TRANSLATION (10.8, 32.1, 1.1)], [xx trafo: TRANSLATION (10.8, 32.1, 1.9)], 
+[xx trafo: TRANSLATION (10.8, 32.1, 2.7)], [xx trafo: TRANSLATION (10.8, 32.1, 3.5)], 
+[xx trafo: TRANSLATION (10.8, 32.1, 4.3)], [xx trafo: TRANSLATION (10.8, 32.1, 5.1)], 
+[xx trafo: TRANSLATION (10.8, 32.1, 5.9)], [xx trafo: TRANSLATION (10.8, 32.1, 6.7)], 
+[xx trafo: TRANSLATION (10.8, 32.1, 7.5)], [xx trafo: TRANSLATION (10.8, 32.1, 8.3)], 
+[xx trafo: TRANSLATION (10.8, 32.1, 9.1)],
+		[xx trafo: TRANSLATION (10.8, 32, 10.1)], [xx trafo: TRANSLATION (10.8, 31, 10.1)], 
+[xx trafo: TRANSLATION (10.8, 30, 10.1)], [xx trafo: TRANSLATION (10.8, 29, 10.1)], [xx 
+trafo: TRANSLATION (10.8, 28, 10.1)], [xx trafo: TRANSLATION (10.8, 27, 10.1)], [xx 
+trafo: TRANSLATION (10.8, 26, 10.1)], [xx trafo: TRANSLATION (10.8, 25, 10.1)], [xx 
+trafo: TRANSLATION (10.8, 24, 10.1)], [xx trafo: TRANSLATION (10.8, 23, 10.1)], [xx 
+trafo: TRANSLATION (10.8, 22, 10.1)], [xx trafo: TRANSLATION (10.8, 21, 10.1)], [xx 
+trafo: TRANSLATION (10.8, 20, 10.1)], [xx trafo: TRANSLATION (10.8, 19, 10.1)], [xx 
+trafo: TRANSLATION (10.8, 18, 10.1)], [xx trafo: TRANSLATION (10.8, 17, 10.1)], [xx 
+trafo: TRANSLATION (10.8, 16, 10.1)], [xx trafo: TRANSLATION (10.8, 15, 10.1)], [xx 
+trafo: TRANSLATION (10.8, 14, 10.1)], [xx trafo: TRANSLATION (10.8, 13, 10.1)], [xx 
+trafo: TRANSLATION (10.8, 12, 10.1)], [xx trafo: TRANSLATION (10.8, 11, 10.1)], [xx 
+trafo: TRANSLATION (10.8, 10, 10.1)], [xx trafo: TRANSLATION (10.8, 9, 10.1)], [xx 
+trafo: TRANSLATION (10.8, 8, 10.1)], [xx trafo: TRANSLATION (10.8, 7, 10.1)], [xx trafo: 
+TRANSLATION (10.8, 6, 10.1)], [xx trafo: TRANSLATION (10.8, 5, 10.1)], [xx trafo: TRANSLATION 
+(10.8, 4, 10.1)], [xx trafo: TRANSLATION (10.8, 3, 10.1)], [xx trafo: TRANSLATION (10.8, 
+2, 10.1)], [xx trafo: TRANSLATION (10.8, 1, 10.1)], [xx trafo: TRANSLATION (10.8, 0, 
+10.1)], [xx trafo: TRANSLATION (10.8, -1, 10.1)], [xx trafo: TRANSLATION (10.8, -2, 
+10.1)], [xx trafo: TRANSLATION (10.8, -3, 10.1)], [xx trafo: TRANSLATION (10.8, -4, 
+10.1)], [xx trafo: TRANSLATION (10.8, -5, 10.1)], [xx trafo: TRANSLATION (10.8, -6, 
+10.1)], [xx trafo: TRANSLATION (10.8, -7, 10.1)], [xx trafo: TRANSLATION (10.8, -8, 
+10.1)], [xx trafo: TRANSLATION (10.8, -9, 10.1)], [xx trafo: TRANSLATION (10.8, -10, 
+10.1)], [xx trafo: TRANSLATION (10.8, -11, 10.1)], [xx trafo: TRANSLATION (10.8, -12, 
+10.1)], [xx trafo: TRANSLATION (10.8, -13, 10.1)], [xx trafo: TRANSLATION (10.8, -14, 
+10.1)], [xx trafo: TRANSLATION (10.8, -15, 10.1)], [xx trafo: TRANSLATION (10.8, -16, 
+10.1)], [xx trafo: TRANSLATION (10.8, -17, 10.1)],
+	     UNION_END);
+  ArObj xs2 = UNION( [x2 trafo: TRANSLATION (-10.8, 0, 1.1)], [x2 trafo: TRANSLATION 
+(-10.8, 0, 1.9)], [x2 trafo: TRANSLATION (-10.8, 0, 2.7)], [x2 trafo: TRANSLATION 
+(-10.8, 0, 3.5)], [x2 trafo: TRANSLATION (-10.8, 0, 4.3)], [x2 trafo: TRANSLATION 
+(-10.8, 0, 5.1)], [x2 trafo: TRANSLATION (-10.8, 0, 5.9)], [x2 trafo: TRANSLATION 
+(-10.8, 0, 6.7)], [x2 trafo: TRANSLATION (-10.8, 0, 7.5)], [x2 trafo: TRANSLATION 
+(-10.8, 0, 8.3)], [x2 trafo: TRANSLATION (-10.8, 0, 9.1)],
+		[x2 trafo: TRANSLATION (-10.8, 25, 1.1)], [x2 trafo: TRANSLATION (-10.8, 25, 1.9)], 
+[x2 trafo: TRANSLATION (-10.8, 25, 2.7)], [x2 trafo: TRANSLATION (-10.8, 25, 3.5)], [x2 
+trafo: TRANSLATION (-10.8, 25, 4.3)], [x2 trafo: TRANSLATION (-10.8, 25, 5.1)], [x2 
+trafo: TRANSLATION (-10.8, 25, 5.9)], [x2 trafo: TRANSLATION (-10.8, 25, 6.7)], [x2 
+trafo: TRANSLATION (-10.8, 25, 7.5)], [x2 trafo: TRANSLATION (-10.8, 25, 8.3)], [x2 
+trafo: TRANSLATION (-10.8, 25, 9.1)],
+		[x2 trafo: TRANSLATION (-10.8, -25, 1.1)], [x2 trafo: TRANSLATION (-10.8, -25, 1.9)], 
+[x2 trafo: TRANSLATION (-10.8, -25, 2.7)], [x2 trafo: TRANSLATION (-10.8, -25, 3.5)], 
+[x2 trafo: TRANSLATION (-10.8, -25, 4.3)], [x2 trafo: TRANSLATION (-10.8, -25, 5.1)], 
+[x2 trafo: TRANSLATION (-10.8, -25, 5.9)], [x2 trafo: TRANSLATION (-10.8, -25, 6.7)], 
+[x2 trafo: TRANSLATION (-10.8, -25, 7.5)], [x2 trafo: TRANSLATION (-10.8, -25, 8.3)], 
+[x2 trafo: TRANSLATION (-10.8, -25, 9.1)],
+		[x2 trafo: TRANSLATION (-10.8, 32.1, 1.1)], [x2 trafo: TRANSLATION (-10.8, 32.1, 
+1.9)], [x2 trafo: TRANSLATION (-10.8, 32.1, 2.7)], [x2 trafo: TRANSLATION (-10.8, 32.1, 
+3.5)], [x2 trafo: TRANSLATION (-10.8, 32.1, 4.3)], [x2 trafo: TRANSLATION (-10.8, 32.1, 
+5.1)], [x2 trafo: TRANSLATION (-10.8, 32.1, 5.9)], [x2 trafo: TRANSLATION (-10.8, 32.1, 
+6.7)], [x2 trafo: TRANSLATION (-10.8, 32.1, 7.5)], [x2 trafo: TRANSLATION (-10.8, 32.1, 
+8.3)], [x2 trafo: TRANSLATION (-10.8, 32.1, 9.1)],
+		[x2 trafo: TRANSLATION (-10.8, 32, 10.1)], [x2 trafo: TRANSLATION (-10.8, 31, 10.1)], 
+[x2 trafo: TRANSLATION (-10.8, 30, 10.1)], [x2 trafo: TRANSLATION (-10.8, 29, 10.1)], 
+[x2 trafo: TRANSLATION (-10.8, 28, 10.1)], [x2 trafo: TRANSLATION (-10.8, 27, 10.1)], 
+[x2 trafo: TRANSLATION (-10.8, 26, 10.1)], [x2 trafo: TRANSLATION (-10.8, 25, 10.1)], 
+[x2 trafo: TRANSLATION (-10.8, 24, 10.1)], [x2 trafo: TRANSLATION (-10.8, 23, 10.1)], 
+[x2 trafo: TRANSLATION (-10.8, 22, 10.1)], [x2 trafo: TRANSLATION (-10.8, 21, 10.1)], 
+[x2 trafo: TRANSLATION (-10.8, 20, 10.1)], [x2 trafo: TRANSLATION (-10.8, 19, 10.1)], 
+[x2 trafo: TRANSLATION (-10.8, 18, 10.1)], [x2 trafo: TRANSLATION (-10.8, 17, 10.1)], 
+[x2 trafo: TRANSLATION (-10.8, 16, 10.1)], [x2 trafo: TRANSLATION (-10.8, 15, 10.1)], 
+[x2 trafo: TRANSLATION (-10.8, 14, 10.1)], [x2 trafo: TRANSLATION (-10.8, 13, 10.1)], 
+[x2 trafo: TRANSLATION (-10.8, 12, 10.1)], [x2 trafo: TRANSLATION (-10.8, 11, 10.1)], 
+[x2 trafo: TRANSLATION (-10.8, 10, 10.1)], [x2 trafo: TRANSLATION (-10.8, 9, 10.1)], [x2 
+trafo: TRANSLATION (-10.8, 8, 10.1)], [xx trafo: TRANSLATION (10.8, 7, 10.1)], [xx 
+trafo: TRANSLATION (10.8, 6, 10.1)], [x2 trafo: TRANSLATION (-10.8, 5, 10.1)], [x2 
+trafo: TRANSLATION (-10.8, 4, 10.1)], [x2 trafo: TRANSLATION (-10.8, 3, 10.1)], [x2 
+trafo: TRANSLATION (-10.8, 2, 10.1)], [x2 trafo: TRANSLATION (-10.8, 1, 10.1)], [x2 
+trafo: TRANSLATION (-10.8, 0, 10.1)], [x2 trafo: TRANSLATION (-10.8, -1, 10.1)], [x2 
+trafo: TRANSLATION (-10.8, -2, 10.1)], [x2 trafo: TRANSLATION (-10.8, -3, 10.1)], [x2 
+trafo: TRANSLATION (-10.8, -4, 10.1)], [x2 trafo: TRANSLATION (-10.8, -5, 10.1)], [x2 
+trafo: TRANSLATION (-10.8, -6, 10.1)], [x2 trafo: TRANSLATION (-10.8, -7, 10.1)], [x2 
+trafo: TRANSLATION (-10.8, -8, 10.1)], [x2 trafo: TRANSLATION (-10.8, -9, 10.1)], [x2 
+trafo: TRANSLATION (-10.8, -10, 10.1)], [x2 trafo: TRANSLATION (-10.8, -11, 10.1)], [x2 
+trafo: TRANSLATION (-10.8, -12, 10.1)], [x2 trafo: TRANSLATION (-10.8, -13, 10.1)], [x2 
+trafo: TRANSLATION (-10.8, -14, 10.1)], [x2 trafo: TRANSLATION (-10.8, -15, 10.1)], [x2 
+trafo: TRANSLATION (-10.8, -16, 10.1)], [x2 trafo: TRANSLATION (-10.8, -17, 10.1)],
+	     UNION_END);
+
+
+
+  return UNION ([ CUBE trafo: SCALE (21.6, 0.05, 4.45) :TRANSLATION (-10.8, 
+-32.35, 0)],
+		[ CUBE trafo: SCALE (21.6, 0.05, 10.3) :TRANSLATION (-10.8, 32.3, 0)],
+		[ CUBE trafo: SCALE (0.05, 6.5, 4.45) :TRANSLATION (-10.8, -32.3, 0)],
+		[ CUBE trafo: SCALE (0.05, 6.5, 4.45) :TRANSLATION (10.75, -32.3, 0)],
+		[ CUBE trafo: SCALE (0.05, 58.1, 10.3) :TRANSLATION (-10.8, -25.8, 0)],
+		[ CUBE trafo: SCALE (0.05, 58.1, 10.3) :TRANSLATION (10.75, -25.8, 0)],
+		[ pile trafo: TRANSLATION ( 3.05, -25.8, 11.05)],
+		[ pile trafo: TRANSLATION ( 3.05, -20.8, 11.05)],
+		[ pile trafo: TRANSLATION ( 10.05, -25.8, 11.05)],
+		[ pile trafo: TRANSLATION ( 10.05, -20.8, 11.05)],
+		[ CUBE trafo: SCALE ( 7.75, 6.75, 11.05) :TRANSLATION ( 3.05, -25.8, 0)],
+		[ CUBE trafo: SCALE ( 8.5, 6.5, 0.2) :TRANSLATION (2.675, -26.175, 14.8)],
+		[ part trafo: TRANSLATION (-10.75, -25.8, 8.3)],
+		[ part trafo: TRANSLATION ( 10.8, -25.8, 8.3)],
+		[ part2 trafo: TRANSLATION (0, -25.8, 8.3)],
+		[ CUBE trafo: SCALE (21.5, 1.57, 0.05) :TRANSLATION (-10.75, -32.3, 4.4)],
+		[lamp trafo: TRANSLATION (0, 32.35, 10.8)],
+		xs,
+		xs2,
+	     UNION_END);
+
+}

@@ -1,0 +1,70 @@
+/* ===========================================================================
+
+    Copyright (c) 1996-2016 The ART Development Team
+    ------------------------------------------------
+
+    For a comprehensive list of the members of the development team, and a
+    desaription of their respective contributions, see the file
+    "ART_DeveloperList.txt" that is distributed with the libraries.
+
+    This file is part of the Advanced Rendering Toolkit (ART) libraries.
+
+    ART is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any
+    later version.
+
+    ART is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with ART.  If not, see <http://www.gnu.org/licenses/>.
+
+=========================================================================== */
+
+#define SCHOTT_DATA(__name) \
+    EXTERNAL_NAMED_COLOUR("SpectralData/SchottOpticalGlass.arm",(__name))
+
+#define REFRACTION_SCHOTT_LaSF_35   SCHOTT_DATA("LaSF 35 dispersion")
+#define REFRACTION_SCHOTT_FK_3	    SCHOTT_DATA("FK 3 dispersion")
+#define REFRACTION_SCHOTT_LF_5	    SCHOTT_DATA("LF 5 dispersion")
+#define REFRACTION_SCHOTT_SF_11     SCHOTT_DATA("SF 11 dispersion")
+#define REFRACTION_SCHOTT_SF_59     SCHOTT_DATA("SF 59 dispersion")
+#define REFRACTION_SCHOTT_TiF_3     SCHOTT_DATA("TiF 3 dispersion")
+#define REFRACTION_SCHOTT_TiF_6     SCHOTT_DATA("TiF 6 dispersion")
+
+#define ABSORPTION_SCHOTT_LaSF_35   SCHOTT_DATA("LaSF 35 absorption")
+#define ABSORPTION_SCHOTT_FK_3	    SCHOTT_DATA("FK 3 absorption")
+#define ABSORPTION_SCHOTT_LF_5	    SCHOTT_DATA("LF 5 absorption")
+#define ABSORPTION_SCHOTT_SF_11     SCHOTT_DATA("SF 11 absorption")
+#define ABSORPTION_SCHOTT_SF_59     SCHOTT_DATA("SF 59 absorption")
+#define ABSORPTION_SCHOTT_TiF_3     SCHOTT_DATA("TiF 3 absorption")
+#define ABSORPTION_SCHOTT_TiF_6     SCHOTT_DATA("TiF 6 absorption")
+
+#define SCHOTT_LaSF_35      	    STANDARD_MATERIAL( \
+	    	    	    	    REFRACTION_SCHOTT_LaSF_35, \
+	    	    	    	    ABSORPTION_SCHOTT_LaSF_35 )
+
+#define SCHOTT_FK_3      	    STANDARD_MATERIAL( \
+	    	    	    	    REFRACTION_SCHOTT_FK_3, \
+	    	    	    	    ABSORPTION_SCHOTT_FK_3 )
+				    
+#define SCHOTT_LF_5      	    STANDARD_MATERIAL( \
+	    	    	    	    REFRACTION_SCHOTT_LF_5, \
+	    	    	    	    ABSORPTION_SCHOTT_LF_5 )
+				    
+#define SCHOTT_SF_11      	    STANDARD_MATERIAL( \
+	    	    	    	    REFRACTION_SCHOTT_SF_11, \
+	    	    	    	    ABSORPTION_SCHOTT_SF_11 )
+				    
+#define SCHOTT_TiF_35      	    STANDARD_MATERIAL( \
+	    	    	    	    REFRACTION_SCHOTT_TiF_3, \
+	    	    	    	    ABSORPTION_SCHOTT_TiF_3 )
+				    
+#define SCHOTT_TiF_6      	    STANDARD_MATERIAL( \
+	    	    	    	    REFRACTION_SCHOTT_TiF_6, \
+	    	    	    	    ABSORPTION_SCHOTT_TiF_6 )
+				    
+// ===========================================================================

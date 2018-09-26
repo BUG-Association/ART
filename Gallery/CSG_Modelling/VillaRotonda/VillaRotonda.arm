@@ -1,0 +1,598 @@
+#define EPS	0.001
+
+#define GREEN_LAWN
+//#define WHITE_WALLS
+
+//#define DIFFUSE_ILLUMINATION
+//#define SHOW_INTERIOR
+
+ArObj create_Figure(
+        ART_GV  * art_gv
+        )
+{
+    ArObj arm =		[ [ [ [ CYLINDER trafo: SCALE(0.3,0.3,1.5)
+					    : TRANSLATION(0,0,-1.5)
+					    : ROT_X(45 DEGREES) ]
+			    or: [ SPHERE trafo: SCALE(0.3,0.3,0.3) ] ]
+			    or: [ CYLINDER trafo: SCALE(0.3,0.3,1.5) ] ]
+			  trafo: TRANSLATION(0,0,-1.5) ];
+			
+    ArObj leftLeg =	[ [ [ [ CYLINDER trafo: SCALE(0.4,0.4,2)
+					    : TRANSLATION(0,0,-2)
+					    : ROT_Y(45 DEGREES) ]
+			    or: [ SPHERE trafo: SCALE(0.4,0.4,0.4) ] ]
+			    or: [ CYLINDER trafo: SCALE(0.4,0.4,2) ] ]
+			  trafo: TRANSLATION(0,0,-2) ];
+
+    ArObj figure =
+	UNION(
+	    [ SPHERE trafo: SCALE(0.5,1,1) : TRANSLATION(0,0,4) ],
+	    [ [ CYLINDER trafo: SCALE(0.5,1,3) : TRANSLATION(0,0,4) ]
+		and: [CONE trafo: SCALE(1,2,6) : TRANSLATION(0,0,3) ] ],
+	    [ SPHERE trafo: SCALE(0.5,1,0.5) : TRANSLATION(0,0,7) ],
+	    [ SPHERE trafo: SCALE(0.75,0.75,0.75) : TRANSLATION(0,0,8.25) ],
+	    [ CYLINDER trafo: SCALE(0.4,0.4,4) : TRANSLATION(0,-0.6,0) ],
+	    [ leftLeg trafo: ROT_Y(-22.5 DEGREES)
+			   : ROT_Z(22.5 DEGREES)
+			   : TRANSLATION(0,0.6,4) ],
+	    [ arm trafo: ROT_X(135 DEGREES) : TRANSLATION(0,0.6,7) ],
+	    [ arm trafo: ROT_X(-45 DEGREES) : TRANSLATION(0,-0.6,7) ],
+	    UNION_END);
+
+    ArObj base  = [CUBE trafo: SCALE(2.4,2.4,0.5) : TRANSLATION(-1.2,-1.2, 0)];
+
+    return [ [figure trafo: TRANSLATION(0,0,0.5 - EPS)] or: base];
+}
+
+
+ArObj create_Rotonda(
+        ART_GV  * art_gv
+        )
+{
+    ArObj   box221, box121, pyramid, cone, pult, figure, figures, tor, 
+	    toro, torn, cellarno, cellarn, cellaro, cellarm, cellar, stock1no, 
+	    stock1n, stock1o, stock1, stockzno, stockz, stiegen, stock2no, 
+	    stock2n, stock2o, stock2, wulst, saeule, saeulen, mauern, podeste, 
+	    gelaender, stufen, vordach, vorbau, giebel, galerie, sims, mitte, 
+	    vorbauzier, kante, leiste, leistex, leistey, ecke, zier, tafel, 
+	    dach, aussenform, innenraum, lawn, ways, coneroof, villa, 
+	    ellipse, schraege;
+
+#define ON_ANGLE 40 DEGREES
+//    ArObj green =	LAMBERT_REFLECTOR( MACBETH_LIGHTSKIN );
+#ifdef GREEN_LAWN
+    ArObj green =	LAMBERT_REFLECTOR( MUNSELL_075GY_04_06 );
+#else
+    ArObj green =	LAMBERT_REFLECTOR( MACBETH_NEUTRAL5 );
+#endif
+    ArObj darkGrey =	LAMBERT_REFLECTOR( MACBETH_SG_K7 );
+    ArObj darkRed =	LAMBERT_REFLECTOR( MACBETH_MODERATERED );
+#ifdef WHITE_WALLS
+    ArObj whiteGrey =	LAMBERT_REFLECTOR( MACBETH_SG_F5 );
+#else
+#ifdef ON_SURFACE
+    ArObj whiteGrey =   GENERAL_SURFACE(
+                      0.05, OREN_NAYAR_SURFACE_CONST( MACBETH_YELLOW, ON_ANGLE ),
+                      0.45, OREN_NAYAR_SURFACE_CONST( MACBETH_NEUTRAL8, ON_ANGLE ),
+                      0.5,  OREN_NAYAR_SURFACE_CONST( MACBETH_NEUTRAL35, ON_ANGLE ),
+                      0.0 );
+#else
+    ArObj whiteGrey =	GENERAL_SURFACE(
+                            0.05, LAMBERT_REFLECTOR( MACBETH_YELLOW ),
+                            0.45, LAMBERT_REFLECTOR( MACBETH_NEUTRAL8 ),
+			    0.5, LAMBERT_REFLECTOR( MACBETH_NEUTRAL35 ),
+			    0.0 );
+#endif
+#endif
+#ifdef SHOW_INTERIOR
+    ArObj subtraction_surface =	LAMBERT_REFLECTOR( MACBETH_RED );
+#endif
+//    ArObj brick =	LAMBERT_REFLECTOR( MACBETH_MODERATERED );
+/*
+    ArObj lights =
+	UNION(
+	    SPHERE_LIGHT(PNT3D(-80000,20000,60000), 0.1, COLOUR_GRAY(0.9)),
+	    SPHERE_LIGHT(PNT3D( -400, -300, 170 ), 0.1, COLOUR_GRAY(0.5)),
+	    SPHERE_LIGHT(PNT3D( -400, -300, 100 ), 0.1, COLOUR_GRAY(0.5)),
+	    UNION_END);
+*/
+    box221 =	[CUBE trafo: SCALE(2,2,1) : TRANSLATION(-1,-1, 0)];
+    box121 =	[CUBE trafo: SCALE(1,2,1) : TRANSLATION( 0,-1, 0)];
+
+    pyramid =	[ [ [ [ box221 trafo: SHEAR_XY(-1,0) ]
+		  and: [ box221 trafo: SHEAR_XY(1,0) ] ]
+		  and: [ box221 trafo: SHEAR_XY(0,-1) ] ]
+		  and: [ box221 trafo: SHEAR_XY(0,1) ] ];
+
+    cone =	[ CONE trafo: TRANSLATION(0,0,-1) : SCALE(1,1,-1) ];
+
+    pult =	[ box121 sub: [ [ box121 trafo: SCALE(2,2,1)
+					      : ROT_X(-45 DEGREES)
+					      : TRANSLATION(-0.5,0,1) ]
+				or: [ box121 trafo: SCALE(2,2,1)
+						  : ROT_X(45 DEGREES)
+						  : TRANSLATION(-0.5,0,1)]]];
+
+    ellipse =	[ CYLINDER trafo: SCALE(1,1.75,10) : ROT_Y(90 DEGREES) ];
+
+    leiste =	UNION(
+		    CYLINDER,
+		    [box121 trafo: TRANSLATION(1,0,0)],
+		    [box121 trafo: SCALE(0.5,0.75,1) : TRANSLATION(2,0,0)],
+		    [box121 trafo: SCALE(0.5,0.5,1) : TRANSLATION(2.5,0,0)],
+		    UNION_END);
+
+    leistex =	[ leiste trafo: ROT_Y(90 DEGREES) ];
+    leistey =	[ leistex trafo: ROT_Z(90 DEGREES) ];
+    
+    ecke =	[ [ leistex trafo: SCALE(4,1,1) : TRANSLATION(-2,0,0) ]
+		  and: [leistey trafo: SCALE(1,4,1) : TRANSLATION(0,-2,0)]];
+
+    zier = UNION(
+		[leistex trafo: SCALE(32.5,1,1) : TRANSLATION(30,62.5,55)],
+		[leistey trafo: SCALE(1,32.5,1) : TRANSLATION(62.5,30,55)],
+		[ecke trafo: TRANSLATION(62.5,62.5,55)],
+		[pult trafo: SCALE(1,6,3) : TRANSLATION(62,45.25,38.5)],
+		[pult trafo: ROT_Z(90 DEGREES)
+		           : SCALE(6,1,3)
+			   : TRANSLATION(49.75,62,38.5)],
+		UNION_END);
+
+    zier = [ [ zier or: [zier trafo: SCALE(1,-1,1)]]
+		 or: [zier trafo: SCALE(-1,1,1)]];
+
+    aussenform = UNION(
+		    [box221 trafo: SCALE(64,64,5)],
+		    [box221 trafo: SCALE(63.5,63.5,3) : TRANSLATION(0,0,5)],
+		    [box221 trafo: SCALE(63,63,8) : TRANSLATION(0,0,8)],
+		    [box221 trafo: SCALE(63.5,63.5,2) : TRANSLATION(0,0,16)],
+		    [box221 trafo: SCALE(63,63,2) : TRANSLATION(0,0,18)],
+		    [box221 trafo: SCALE(62.5,62.5,55) : TRANSLATION(0,0,20)],
+		    [box221 trafo: SCALE(63,63,2) : TRANSLATION(0,0,56)],
+		    [[pyramid trafo: SCALE(63.5,63.5,30) : TRANSLATION(0,0,58)]
+		      sub: [box221 trafo: SCALE(60,60,40) : TRANSLATION(0,0,55)]],
+		    zier,
+		    [pyramid trafo: SCALE(64,64,64)
+		                   : SCALE(1,1,-1)
+			           : TRANSLATION(0,0,74.5)],
+		    [[[pyramid trafo: SCALE(66.5,66.5,29) : TRANSLATION(0,0,74.5)] 
+		       sub: [pyramid trafo: SCALE(66.5,66.5,29)
+		                           : TRANSLATION(0,0,73)]]
+		     and: [pyramid trafo: SCALE(99,99,99)
+		                         : SCALE(1,1,-1)
+					 : TRANSLATION(0,0,109)]],
+		    [CYLINDER trafo: SCALE(31.8,31.8,95.0)],
+		    [CYLINDER trafo: SCALE(26.0,26.0,100.0)],
+		    [CYLINDER trafo: SCALE(23.6,23.6,103.0)],
+		    [CYLINDER trafo: SCALE(19.9,19.9,105.0)],
+		    [CYLINDER trafo: SCALE(16.6,16.6,106.7)],
+		    [CYLINDER trafo: SCALE(13.4,13.4,108.2)],
+		    [CYLINDER trafo: SCALE(10.0,10.0,109.9)],
+		    [CYLINDER trafo: SCALE( 7.0,7.0,112.0)],
+		    [CYLINDER trafo: SCALE( 2.3,2.3,117.0)],
+		    UNION_END);
+
+    gelaender =	UNION(
+		    [CUBE trafo: SCALE(66,7.25,5) : TRANSLATION(60,27.25,0)],
+		    [CUBE trafo: SCALE(65.5,6.25,3) : TRANSLATION(60,27.75,5)],
+		    [CUBE trafo: SCALE(65,5.25,8) : TRANSLATION(60,28.25,8)],
+		    [CUBE trafo: SCALE(65.5,6.25,2) : TRANSLATION(60,27.75,16)],
+		    UNION_END);
+
+    gelaender =	[gelaender or: [gelaender trafo: SCALE(1,-1,1)]];
+
+    stufen = [[CUBE trafo: TRANSLATION(1,0,0)]
+               or: [CUBE trafo: TRANSLATION(0,0,1)]];
+    stufen = [[stufen trafo: TRANSLATION(2,0,0)]
+              or: [stufen trafo: TRANSLATION(0,0,2)]];
+    stufen = [[[stufen trafo:  TRANSLATION(5,0,0)]
+	       or: [stufen trafo: TRANSLATION(1,0,4)]]
+	       or: [CUBE trafo: TRANSLATION(0,0,8)]];
+    stufen = [[stufen trafo: TRANSLATION(9,0,0)]
+              or: [stufen trafo: TRANSLATION(0,0,9)]];
+    stufen = [stufen trafo: SCALE(34/18.0,58,18/19.0) : TRANSLATION(91,-29,0)];
+	
+    wulst = [CYLINDER trafo: SCALE(0.75,0.75,3.5) : ROT_Y(90 DEGREES)];
+
+    saeule =	[ UNION(
+		    [cone trafo: SCALE(2,2,136)],
+		    [box221 trafo: SCALE(2.5,2.5,2)],
+		    [box221 trafo: SCALE(1.75,1.75,0.5) : TRANSLATION(0,0,33)],
+		    [box221 trafo: SCALE(1.5,1.5,0.5) : TRANSLATION(0,0,33.5)],
+		    [wulst trafo: TRANSLATION(-1.75,2,32.75)],
+		    [wulst trafo: TRANSLATION(-1.75,-2,32.75)],
+		    UNION_END)
+		  sub: [box221 trafo: SCALE(4,4,128) : TRANSLATION(0,0,34)]];
+
+    saeulen = [[[saeule trafo: TRANSLATION(88,31,18)]
+		or: [saeule trafo: TRANSLATION(88,19,18)]]
+		or: [saeule trafo: TRANSLATION(88,7,18)]];
+
+    saeulen = [saeulen or: [saeulen trafo: SCALE(1,-1,1)]];
+
+    mauern = [[[CUBE trafo: SCALE(23,4,34) : TRANSLATION(62,28.5,18)]
+               sub: [CUBE trafo: SCALE(11,11,23) : TRANSLATION(68,26,18)]
+              ]
+              sub: [CYLINDER trafo: ROT_X(-90 DEGREES) 
+				  : SCALE(5.5,11,5.5)
+				  : TRANSLATION(73.5,26,41)]];
+
+    mauern = [mauern or: [mauern  trafo: SCALE(1,-1,1)]];
+
+    podeste = [[[CUBE trafo: SCALE(3,65,4) : TRANSLATION(86.5,-32.5,59)]
+                 or: [CUBE trafo: SCALE(3,3,4) : TRANSLATION(86.5,-1.5,71.5)]
+	       ]
+		sub: [pult trafo: SCALE(5,38.3333,15) : TRANSLATION(85.5,0,57.5)]];
+
+    figure = create_Figure(art_gv);
+
+    figures = UNION(
+		[figure trafo: TRANSLATION(120,30.5,18)],
+		[figure trafo: TRANSLATION(88,30.5,63)],
+		[figure trafo: TRANSLATION(88,0,75.5)],
+		[figure trafo: TRANSLATION(88,-30.5,63)],
+		[figure trafo: TRANSLATION(120,-30.5,18)],
+		UNION_END);
+
+    vorbauzier = [[[leistex trafo: SCALE(27.5,1,1) : TRANSLATION(62,32.5,55)]
+                   or: [leistey trafo: SCALE(1,25.5,1) : TRANSLATION(89.5,7,55)]]
+		   or: [ecke trafo: TRANSLATION(89.5,32.5,55)]];
+
+    vorbauzier = [vorbauzier or: [vorbauzier trafo: SCALE(1,-1,1)]];
+
+    tafel = [[box121 trafo: SCALE(1.5,6.5,4) : TRANSLATION(89,0,52)]
+              sub: [box121 trafo: SCALE(1,6,3.5) : TRANSLATION(90,0,52.25)]];
+
+    schraege = [CUBE sub: [CUBE trafo: SCALE(3,3,3) : TRANSLATION(0,-1,0)
+				     : ROT_Y(-0.7498106) : SCALE(3,37.5,3)
+				     : ROT_X(0.3729877)]];
+
+    schraege = [[[schraege or: [schraege trafo: SCALE(1,-1,1)]]
+                  trafo: SCALE(-1,-1,-1) : TRANSLATION(91.5,0,71.5)]
+		sub:
+		[CUBE trafo: SCALE(10,80,10) : TRANSLATION(85,-40,48)]];
+
+    kante = [[[pyramid trafo: SCALE(34.5,34.5,34.5)]
+              sub:
+	      [box221 trafo: SCALE(32,32,35)]]
+	     sub:
+	     [CUBE trafo: SCALE(70,70,70) : TRANSLATION(-70,-35,0)
+		        : SCALE(1,1,-1) : TRANSLATION(57,0,58)]];
+
+    giebel = [[[[pult trafo: SCALE(30.5,38.3333,15) : TRANSLATION(61,0,57.5)]
+		 sub: [pult trafo: SCALE(32.5,38.3333,15) : TRANSLATION(60,0,56.5)]]
+		sub: [pult trafo: SCALE(32.5,4,4) : TRANSLATION(60,-36.5,56)]]
+	       sub: [pult trafo: SCALE(32.5,4,4) : TRANSLATION(60,36.5,56)]];
+    id temp = UNION(
+		    [pult trafo: SCALE(3,32.4,13.5)
+				:TRANSLATION(86.5,0,58)],
+		    [CUBE trafo: SCALE(27.5,65,6.25) 
+				:TRANSLATION(62,-32.5,52)],
+		    [box121 trafo: SCALE(30.5,34.5,0.5) 
+				:TRANSLATION(61,0,57.5)],
+		    vorbauzier, schraege, giebel, kante,
+		    UNION_END);
+
+    vorbau = UNION(
+		[CUBE trafo: SCALE(30,56,18) : TRANSLATION(61,-28,0)],
+		[ temp
+		  sub:
+		    [[[CUBE trafo: SCALE(24.5,56,5) : TRANSLATION(62,-28,51)]
+			or: [ellipse trafo: TRANSLATION(82,13,61)]]
+			or: [ellipse trafo: TRANSLATION(82,-13,61)]]],
+		tafel, podeste, figures, gelaender, stufen, saeulen, mauern,
+		UNION_END);
+
+    vorbau = [vorbau or: [vorbau trafo: ROT_Z(180 DEGREES)]];
+    vorbau = [vorbau or: [vorbau trafo: ROT_Z(90 DEGREES)]];
+
+    vordach = [[pult trafo: SCALE(31,38.3333,15) : TRANSLATION(61,0,58)]
+               sub:
+		[[[pult trafo: SCALE(33,38.3333,15) : TRANSLATION(60,0,57.5)]
+		 or: [pult trafo: SCALE(33,4,4) : TRANSLATION(60,-37,56)]]
+		 or: [pult trafo: SCALE(33,4,4) : TRANSLATION(60,37,56)]]];
+
+    vordach = [vordach or: [vordach trafo: SCALE(-1,1,1)]];
+    vordach = [vordach or: [vordach trafo: ROT_Z(90 DEGREES)]];
+
+    dach = [[[pyramid trafo: SCALE(66.5,66.5,29) : TRANSLATION(0,0,75)]
+             sub: [pyramid trafo: SCALE(66.5,66.5,29) : TRANSLATION(0,0,74.5)]]
+	    and:
+	    [pyramid trafo: SCALE(99,99,99) : SCALE(1,1,-1) 
+	                   : TRANSLATION(0,0,108.5)]];
+
+    coneroof =	UNION(
+		    [cone trafo: SCALE(32.5,32.5,14.0) : TRANSLATION(0,0,95.0)],
+		    [cone trafo: SCALE(27.0,27.0,10.0) : TRANSLATION(0,0,100.0)],
+		    [cone trafo: SCALE(24.0,24.0,8.0) : TRANSLATION(0,0,103.0)],
+		    [cone trafo: SCALE(20.5,20.5,7.0) : TRANSLATION(0,0,105.0)],
+		    [cone trafo: SCALE(17.5,17.5,6.0) : TRANSLATION(0,0,106.7)],
+		    [cone trafo: SCALE(14.5,14.5,4.5) : TRANSLATION(0,0,108.2)],
+		    [cone trafo: SCALE(11.0,11.0,3.0) : TRANSLATION(0,0,109.9)],
+		    [cone trafo: SCALE( 7.5,7.5,5.0) : TRANSLATION(0,0,112.0)],
+		    [cone trafo: SCALE( 3.0,3.0,2.0) : TRANSLATION(0,0,117.0)],
+		    UNION_END);
+
+    tor = [CYLINDER trafo: SCALE(10,10,10) : TRANSLATION(0,0,-5)];
+
+    toro = [[tor trafo: ROT_X(90 DEGREES) : TRANSLATION(0,0,3)]
+            and:
+	    [CUBE trafo: SCALE(11,11,14) : TRANSLATION(-5.5,-5.5,0)]];
+
+    torn = [[tor trafo: ROT_Y(90 DEGREES) : TRANSLATION(0,0,3)]
+            and:
+	    [CUBE trafo: SCALE(11,11,14) : TRANSLATION(-5.5,-5.5,0)]];
+
+    cellarno =	UNION(
+                    [CUBE trafo: SCALE(45,28,16) : TRANSLATION(15,31,0)],
+		    [CUBE trafo: SCALE(6.5,6.5,5.5) : TRANSLATION(46.5,59,9.5)],
+		    [CUBE trafo: SCALE(6.5,6.5,5.5) : TRANSLATION(59,42,9.5)],
+		    [CUBE trafo: SCALE(28,19,16) : TRANSLATION(32,9,0)],
+		    [CUBE trafo: SCALE(10,5,13) : TRANSLATION(25,19,0)],
+		    UNION_END);
+
+    cellaro =	UNION(
+		    [CUBE trafo: SCALE(21,56,16) : TRANSLATION(63,-28,0)],
+		    [toro trafo: TRANSLATION(73.5,30,0)],
+		    [toro trafo: TRANSLATION(73.5,-30,0)],
+		    [CUBE trafo: SCALE(40,12,16) : TRANSLATION(25,-6,0)],
+		    [CUBE trafo: SCALE(6,70,13) : TRANSLATION(47,-35,0)],
+		    UNION_END);
+
+    cellarn =	UNION(
+		    [CUBE trafo: SCALE(56,21,16) : TRANSLATION(-28,63,0)],
+		    [torn trafo: TRANSLATION(30,73.5,0)],
+		    [torn trafo: TRANSLATION(-30,73.5,0)],
+		    [CUBE trafo: SCALE(22,23,16) : TRANSLATION(-11,33,0)],
+		    [CUBE trafo: SCALE(36,6,13) : TRANSLATION(-18,42,0)],
+		    [CUBE trafo: SCALE(14,10,13) : TRANSLATION(-7,25,0)],
+		    [CUBE trafo: SCALE(10,10,13) : TRANSLATION(-5,55,0)],
+		    UNION_END);
+
+    cellarm =	UNION(
+		    [CUBE trafo: SCALE(6,20,16) : TRANSLATION(-3,-10,0)],
+		    [CUBE trafo: SCALE(20,6,16) : TRANSLATION(-10,-3,0)],
+		    [[CYLINDER trafo: SCALE(27,27,16)]
+		     sub: [CYLINDER trafo: SCALE(8,8,18) : TRANSLATION(0,0,-1)]],
+		    UNION_END);
+
+    cellarno =	[[cellarno trafo: SCALE(1,-1,1)] or: cellarno];
+    cellarno =	[[cellarno trafo: SCALE(-1,1,1)] or: cellarno];
+
+    cellaro =	[[cellaro trafo: SCALE(-1,1,1)] or: cellaro];
+
+    cellarn =	[[cellarn trafo: SCALE(1,-1,1)] or: cellarn];
+
+    cellar =	UNION( cellarm, cellarno, cellaro, cellarn, 0 );
+
+    stock1no =	UNION(
+		    [CUBE trafo: SCALE(46,29,37) : TRANSLATION(15,31.5,18)],
+		    [CUBE trafo: SCALE(6.5,6.5,13) : TRANSLATION(21,59,23)],
+		    [CUBE trafo: SCALE(6.5,6.5,13) : TRANSLATION(46.5,59,23)],
+		    [CUBE trafo: SCALE(6.5,6.5,13) : TRANSLATION(59,42,23)],
+		    [CUBE trafo: SCALE(29,20,25) : TRANSLATION(31.5,9,18)],
+		    [CUBE trafo: SCALE(5.5,5.5,13) : TRANSLATION(59,22,23)],
+		    [CUBE trafo: SCALE(5.5,5.5,13) : TRANSLATION(59,10,23)],
+		    [CUBE trafo: SCALE(6,6,13.5) : TRANSLATION(10,43,18)],
+		    [CUBE trafo: SCALE(6,6,13.5) : TRANSLATION(47,27,18)],
+		    [CUBE trafo: SCALE(6,6,13.5) : TRANSLATION(47,5,18)],
+		    [CUBE trafo: SCALE(10,7,13.5) : TRANSLATION(-5,-3.5,0)
+			        : ROT_Z(45 DEGREES) : TRANSLATION(20,20,18)],
+		    UNION_END);
+
+
+    stock1o =   UNION(
+		    [CUBE trafo: SCALE(40,13,27) : TRANSLATION(21,-6.5,18.01)],
+		    [CYLINDER trafo: SCALE(6.5,6.5,40) : ROT_Y(90 DEGREES)
+				   : TRANSLATION(21,0,45)],
+		    [CUBE trafo: SCALE(10,10,23) : TRANSLATION(55,-5,18.01)],
+		    UNION_END);
+
+    stock1n =	UNION(
+		    [CUBE trafo: SCALE(24,29,38) : TRANSLATION(-12,31.5,18.01)],
+		    [CUBE trafo: SCALE(13,13,27) : TRANSLATION(-6.5,25,18.01)],
+		    [CYLINDER trafo: SCALE(6.5,6.5,10) : ROT_X(-90 DEGREES)
+				   : TRANSLATION(0,25,45)],
+		    [CUBE trafo: SCALE(10,10,23) : TRANSLATION(-5,55,18.01)],
+		    UNION_END);
+
+    stock1no =	[[stock1no trafo: SCALE(1,-1,1)] or: stock1no];
+    stock1no =	[[stock1no trafo: SCALE(-1,1,1)] or: stock1no];
+    stock1o  =	[[stock1o trafo: SCALE(-1,1,1)] or: stock1o];
+    stock1n  =	[[stock1n trafo: SCALE(1,-1,1)] or: stock1n];
+
+    stock1 = [[stock1no or: stock1o] or: stock1n];
+
+    stockzno =	UNION(
+		    [CUBE trafo: SCALE(29,20,12.5) : TRANSLATION(31.5,9,44)],
+		    [CUBE trafo: SCALE(6,6,5.5) : TRANSLATION(59,22,48.5)],
+		    [CUBE trafo: SCALE(6,6,5.5) : TRANSLATION(59,10,48.5)],
+		    [CUBE trafo: SCALE(10,5,10) : TRANSLATION(25,23,44)],
+		    UNION_END);
+
+    stockzno =	[[stockzno trafo: SCALE(1,-1,1)] or: stockzno];
+    stockz =	[[stockzno trafo: SCALE(-1,1,1)] or: stockzno];
+
+    stock2no =	UNION(
+		    [CUBE trafo: SCALE(29,29,15.5) : TRANSLATION(31.5,31.5,58)],
+		    [CUBE trafo: SCALE(6.5,6.5,6.5) : TRANSLATION(46.5,59,64)],
+		    [CUBE trafo: SCALE(6.5,6.5,6.5) : TRANSLATION(59,42,64)],
+		    [CUBE trafo: SCALE(5.5,5.5,11) : TRANSLATION(28,47,58)],
+		    [CUBE trafo: SCALE(5.5,5.5,11) : TRANSLATION(47,28,58)],
+		    [CUBE trafo: SCALE(10,5,11) : TRANSLATION(25,22,58)],
+		    [[CUBE trafo: SCALE(9,7,11) : TRANSLATION(-4.5,-3.5,0)
+			        : ROT_Z(45 DEGREES)] trafo: TRANSLATION(22,22,58)],
+		    UNION_END);
+
+    stock2o =	[[CUBE trafo: SCALE(29,61,15.5) : TRANSLATION(31.5,-30.5,58)]
+		 or: [CUBE trafo: SCALE(5,5,9.5) : TRANSLATION(59,-2.5,59)]];
+
+    stock2n =	[[CUBE trafo: SCALE(61,29,15.5) : TRANSLATION(-30.5,31.5,58)]
+		 or: [CUBE trafo: SCALE(5,5,9.5) : TRANSLATION(-2.5,59,59)]];
+
+    stock2no =	[[stock2no trafo: SCALE(1,-1,1)] or: stock2no];
+    stock2no =	[[stock2no trafo: SCALE(-1,1,1)] or: stock2no];
+    stock2o  =	[[stock2o trafo: SCALE(-1,1,1)] or: stock2o];
+    stock2n  =	[[stock2n trafo: SCALE(1,-1,1)] or: stock2n];
+
+    stock2 =	[[stock2no or: stock2o] or: stock2n];
+
+    galerie =	[[[CYLINDER trafo: SCALE(25,25,10)]
+                 or: [CYLINDER trafo: SCALE(29,29,5)]]
+		sub: 
+		[[cone trafo: SCALE(30,30,30) : TRANSLATION(0,0,-1)] 
+		or: [CYLINDER trafo: SCALE(24,24,11)]]];
+
+    sims =  	[[CYLINDER trafo: SCALE(29,29,3)]
+		 sub: [cone trafo: SCALE(30,30,30) : TRANSLATION(0,0,-1)]];
+
+    mitte =	[[[[SPHERE trafo: SCALE(28.5,28.5,28.5) : TRANSLATION(0,0,80)]
+                   or: [CYLINDER trafo: SCALE(28.5,28.5,62) : TRANSLATION(0,0,18)]]
+		  sub: [galerie trafo: TRANSLATION(0,0,53)]]
+		 sub: [sims trafo: TRANSLATION(0,0,74)]];
+
+    stiegen =	UNION(
+		    [CYLINDER trafo: SCALE(6,5,75+EPS) : ROT_Z(45 DEGREES)
+				   : TRANSLATION(24.5,-24.5,0)],
+		    [CYLINDER trafo: SCALE(6,5,75+EPS) : ROT_Z(-45 DEGREES)
+				   : TRANSLATION(24.5,24.5,0)],
+		    [[[CUBE trafo: SCALE(11,11,75+EPS)]
+		      and: [CYLINDER trafo: SCALE(18,18,75+EPS)
+		      			  : TRANSLATION(-5,-5,0)]]
+		     trafo: TRANSLATION(-29,-29,0)],
+		    [[[CUBE trafo: SCALE(11,11,75+EPS)]
+		      and: [CYLINDER trafo: SCALE(18,18,75+EPS)
+		      			  : TRANSLATION(-5,16,0)]]
+		     trafo: TRANSLATION(-29,18,0)],
+		    UNION_END);
+
+    innenraum =	UNION( [cellar trafo: TRANSLATION(0,0,0.05)], stock1, stockz,
+                 stock2, mitte, stiegen, UNION_END);
+
+    lawn =	[ [ CYLINDER trafo: SCALE(10000,10000,1) : TRANSLATION(0,0,-0.9)]
+			surfaceMaterial: green ];
+    ways =      [ [ [ box221 trafo: SCALE(1000,28,1) : TRANSLATION(0,0,-0.8)]
+                 or: [ box221 trafo: SCALE(28,1000,1) : TRANSLATION(0,0,-0.8)]]
+		 	surfaceMaterial: darkGrey ];
+
+    villa =	[ UNION(
+		    [dach		surfaceMaterial: darkRed],
+		    [vordach	surfaceMaterial: darkRed],
+		    [coneroof	surfaceMaterial: darkRed],
+		    [aussenform	surfaceMaterial: whiteGrey],
+		    [vorbau		surfaceMaterial: whiteGrey],
+		    UNION_END)
+		  sub: [innenraum surfaceMaterial: whiteGrey] ];
+#ifdef SHOW_INTERIOR
+    villa = [ villa
+	      sub: [ [ CUBE trafo: SCALE(190,380,200)
+				:TRANSLATION(-190,-190,10) ] surfaceMaterial: subtraction_surface ] ];
+#endif
+
+    return UNION(lawn, ways, villa, UNION_END);
+}
+
+#define ELEVATED_OVERALL_VIEW
+//#define ELEVATED_OVERALL_CLOSEUP
+//#define GROUNDLEVEL_ZOOM
+
+ArNode <ArpCamera> * create_RotondaCamera(
+        ART_GV  * art_gv
+        )
+{
+    return
+    [ [ CAMERA
+//	imageSize:	IVEC2D( 1280, 1024 )
+//	imageSize:	IVEC2D( 1024, 768 )
+	imageSize:	IVEC2D( 640, 480 )
+#ifdef ELEVATED_OVERALL_VIEW
+	ray:		RAY3D(PNT3D( -1600, -1000, 300 ),VEC3D(160, 100, -26 ))
+	zoom:		5.0 // 5.5
+#endif
+#ifdef ELEVATED_OVERALL_CLOSEUP
+	ray:		RAY3D(PNT3D( -1600, -1000, 300 ),VEC3D(160, 105, -28 ))
+	zoom:		10.0 // 12.0
+#endif
+#ifdef GROUNDLEVEL_ZOOM
+	ray:		RAY3D(PNT3D( -1600, -1000, 30 ),VEC3D(160, 100, 2.8 ))
+	zoom:		8.5
+#endif
+      ] withNear:	1.0 ];
+}
+
+#ifndef SAMPLES
+#define SAMPLES 64
+#endif
+
+ArNode <ArpActionSequence> *  create_RotondaActionSequence(
+        ART_GV  * art_gv
+        )
+{
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  5
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+			maximalRecursion: 3
+                    ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       SAMPLES
+                randomValueGeneration: PSEUDORANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    YES
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+    return actionsequence;
+}
+
+
+ARM_MAIN_FUNCTION(VillaRotonda)
+{
+#ifdef DIFFUSE_ILLUMINATION
+    id environmentMaterial = UNIFORM_ENVIRONMENT_MATERIAL( CIE_ILLUMINANT_D65, 1.0 );
+#endif
+
+    id result =
+    [ SCENE
+    	sceneGeometry: create_Rotonda(art_gv)
+#ifdef DIFFUSE_ILLUMINATION
+        environmentMaterial   : environmentMaterial
+#else
+	skyModel:  [ HOSEK_SKYLIGHT
+            elevation   : 25 DEGREES
+            azimuth     : 160.0 DEGREES
+            turbidity   : 4.0
+            groundAlbedo: CONST_COLOUR_GREY(0.5)
+            ]
+#endif
+	camera:		create_RotondaCamera(art_gv)
+        actionSequence: create_RotondaActionSequence(art_gv)
+    ];
+
+    return result;
+}
+
+// ===========================================================================

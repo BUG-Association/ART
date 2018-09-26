@@ -1,0 +1,363 @@
+ArObj create_Biplane_Tail(
+        ART_GV  * art_gv,
+	ArObj  fuselageSurface,
+	ArObj  mainSurface,
+	ArObj  rudderSurface
+	)
+{
+    double  verticalTailplaneThickness    = 0.07; // main thickness
+    double  verticalTailplaneCurved       = 0.76; // curved edge length
+    double  verticalTailplaneHeight       = 2.50; // overall height of straight 
+                                                 // bit
+    double  verticalTailplaneNegative     = 0.70; // negative offset
+    double  verticalTailplaneEdgeRound    = 0.14; // radius of rounded bits
+                                                 // at the edges
+    double  verticalTailplaneMainStraight = 1.22; // vertical rudder front
+    double  verticalTailplaneRudderFront  = 0.10; // vertical rudder front
+    double  verticalTailplaneRudderRear   = 0.60; // vertical rudder rear part
+    double  verticalTailplaneSweep        = 0.98 / 2.20;
+    
+    double  horizontalTailplaneShift       =-0.05;
+    double  horizontalTailplaneThickness   = 0.07; // main thickness
+    double  horizontalTailplaneCurved      = 0.76; // curved edge length
+    double  horizontalTailplaneStraight    = 0.76; // straight part length
+    double  horizontalTailplaneWidth       = 2.40; 
+    double  horizontalTailplaneEdgeRound   = 0.18; // radius of rounded bits
+                                                   // at the edges
+    double  horizontalTailplaneRudderFront = 0.10; // rudder front
+    double  horizontalTailplaneRudderRear  = 0.60; // rudder rear part
+    double  horizontalTailplaneSweep       =   horizontalTailplaneStraight 
+                                             / horizontalTailplaneWidth;
+    
+    ArObj verticalTailplaneMain = UNION(
+	[
+	[[[[
+	 [CUBE trafo                : SCALE(  verticalTailplaneThickness * 2,  
+	                                      1.00,
+					       verticalTailplaneNegative
+					      +horizontalTailplaneShift)
+	                            : TRANSLATION( -verticalTailplaneThickness,
+				              0.00,
+					      0.00) ]
+	     surfaceMaterial: fuselageSurface ]
+	 or:
+         [CUBE trafo                : SCALE(  verticalTailplaneThickness * 2,  
+	                                      1.00,
+					      verticalTailplaneHeight
+					     -verticalTailplaneNegative
+					     -horizontalTailplaneShift)
+	                            : TRANSLATION( -verticalTailplaneThickness,
+				              0.00,
+					      verticalTailplaneNegative
+					     +horizontalTailplaneShift) ]]
+	 or:
+	 [CYLINDER_Y trafo          : SCALE(  verticalTailplaneThickness,  
+	                                      1.00,
+					      verticalTailplaneEdgeRound)
+	                            : TRANSLATION(  0.00,
+				              0.00,
+					      verticalTailplaneHeight) ]]
+	 or:
+	 [[ CYLINDER_Y trafo        : SCALE(  verticalTailplaneThickness,  
+	                                      1.00,
+					      verticalTailplaneEdgeRound) ]
+	     surfaceMaterial: fuselageSurface ] ]
+	sub:
+	[ CUBE trafo                : SCALE(    verticalTailplaneThickness * 2
+	                                      + meps2,
+					      1.00,
+					      verticalTailplaneHeight + meps2
+					      + verticalTailplaneEdgeRound * 2)
+				    : TRANSLATION( -verticalTailplaneThickness
+	                                      - meps,
+					      verticalTailplaneMainStraight,
+					     -verticalTailplaneEdgeRound
+					      - meps)
+				    : SHEAR_XY(  0.00,
+				                -verticalTailplaneSweep )]
+	],
+
+	[ [
+	[[CYLINDER_Z trafo          : SCALE(  verticalTailplaneThickness,
+	                                      verticalTailplaneCurved,
+					      verticalTailplaneHeight) ]
+	 or:
+	[ SPHERE trafo              : SCALE(  verticalTailplaneThickness,
+	                                      verticalTailplaneCurved,
+					      verticalTailplaneEdgeRound)
+	                            : TRANSLATION(  0.00,  0.00,
+				              verticalTailplaneHeight) ]
+	]
+
+	sub:
+	[ CUBE trafo                : SCALE(    verticalTailplaneThickness * 2
+	                                      + meps2,
+					        verticalTailplaneCurved + meps,
+					      verticalTailplaneHeight + meps2
+					      + verticalTailplaneEdgeRound * 2)
+				    : TRANSLATION( -verticalTailplaneThickness
+	                                      - meps,
+					     -verticalTailplaneCurved,
+					     -verticalTailplaneEdgeRound
+					      - meps) ]
+	] trafo                     : TRANSLATION(  0.00,
+	                                      verticalTailplaneMainStraight,
+					      0.00)
+				    : SHEAR_XY(  0.00,
+				                -verticalTailplaneSweep ) 
+	],
+
+	UNION_END
+	);
+				    				        
+    ArObj verticalTailplaneRudderBase = UNION(
+	[ CYLINDER_Z trafo          : SCALE(  verticalTailplaneThickness,
+	                                      1.00,
+					      verticalTailplaneHeight ) ],
+	[ SPHERE trafo              : SCALE(  verticalTailplaneThickness,
+	                                      1.00,
+					      verticalTailplaneEdgeRound ) ],
+	[ SPHERE trafo              : SCALE(  verticalTailplaneThickness,
+	                                      1.00,
+					      verticalTailplaneEdgeRound )
+	                            : TRANSLATION(  0.00,  0.00,  
+				              verticalTailplaneHeight) ],
+	UNION_END
+	);
+    
+    ArObj verticalTailplaneRudder = UNION(
+	[
+	[ verticalTailplaneRudderBase sub:
+	  [ CUBE trafo              : SCALE(    verticalTailplaneThickness * 2
+	                                      + 0.2,
+	                                      1.10,
+					        verticalTailplaneHeight
+					      + verticalTailplaneEdgeRound * 2
+					      + 0.2)
+				    : TRANSLATION( -verticalTailplaneThickness - 0.1,
+	                                     -1.10,
+					     -0.10
+					     - verticalTailplaneEdgeRound ) ]
+	] trafo:                    SCALE(  1.00,
+	                                    verticalTailplaneRudderFront,
+					    1.00)
+	],
+	[
+	[ verticalTailplaneRudderBase sub:
+	  [ CUBE trafo              : SCALE(    verticalTailplaneThickness * 2
+	                                      + 0.2,
+	                                      1.10,
+					        verticalTailplaneHeight
+					      + verticalTailplaneEdgeRound * 2
+					      + 0.2)
+				    : TRANSLATION( -verticalTailplaneThickness - 0.1,
+	                                      0.00,
+					     -0.10
+					     - verticalTailplaneEdgeRound ) ]
+	] trafo:                    SCALE(  1.00,
+	                                    verticalTailplaneRudderRear,
+					    1.00)
+	],
+
+	UNION_END
+	);
+	
+    ArObj horizontalTailplaneMain = UNION(
+	[
+	[ CUBE trafo                : SCALE(  horizontalTailplaneWidth,
+	                                      horizontalTailplaneStraight,
+					      horizontalTailplaneThickness * 2)
+	                            : TRANSLATION(  0.00,
+				              0.00,
+					     -horizontalTailplaneThickness) ]
+	sub:
+	[ CUBE trafo                : SCALE(  horizontalTailplaneWidth + meps2,
+	                                      horizontalTailplaneStraight+meps,  
+					      horizontalTailplaneThickness * 2
+					      + meps2)
+				    : TRANSLATION( -meps,
+				              horizontalTailplaneStraight+meps,
+					     -horizontalTailplaneThickness 
+					      - meps)
+				    : SHEAR_YZ( -horizontalTailplaneSweep,
+				                 0.00 ) ]
+	],
+	
+	[ [
+	[ CYLINDER_X trafo          : SCALE(  horizontalTailplaneWidth,
+	                                      horizontalTailplaneCurved,
+					      horizontalTailplaneThickness) ]
+	sub:
+	[ CUBE trafo                : SCALE(  horizontalTailplaneWidth + meps2
+	                                      + horizontalTailplaneEdgeRound,
+	                                      horizontalTailplaneCurved + meps,
+					      horizontalTailplaneThickness * 2
+					      + meps2)
+				    : TRANSLATION(  0.00,
+				             -horizontalTailplaneCurved - meps,
+					     -horizontalTailplaneThickness 
+					      - meps) ]
+	] trafo                     : TRANSLATION(  0.00,
+	                                      horizontalTailplaneStraight,
+					      0.00)
+				    : SHEAR_YZ( -horizontalTailplaneSweep,
+				                 0.00 ) 
+	],
+	
+	[
+	[ [ SPHERE trafo            : SCALE(  horizontalTailplaneEdgeRound,
+	                                      horizontalTailplaneCurved,
+					      horizontalTailplaneThickness) ]
+	sub:
+	[ CUBE trafo                : SCALE(  horizontalTailplaneEdgeRound * 2 
+	                                      + meps2,
+	                                      horizontalTailplaneCurved
+					      + meps,
+					      horizontalTailplaneThickness * 2
+					      + meps2)
+				    : TRANSLATION( -horizontalTailplaneEdgeRound 
+	                                      - meps,
+				             -horizontalTailplaneCurved - meps,
+					     -horizontalTailplaneThickness
+					      - meps) ]
+	] trafo                     : TRANSLATION(  horizontalTailplaneWidth,
+				              0.00,
+					      0.00) ],
+
+	UNION_END
+	);
+
+    ArObj horizontalTailplaneRudderPlus = UNION(
+	[
+	[ CYLINDER_X trafo          : SCALE(  horizontalTailplaneWidth,
+	                                      horizontalTailplaneRudderFront,
+					      horizontalTailplaneThickness) ]
+	sub:
+	[ CUBE trafo                : SCALE(  horizontalTailplaneWidth + meps2,
+	                                      horizontalTailplaneRudderFront
+					      + meps,
+					      horizontalTailplaneThickness * 2
+					      + meps2)
+				    : TRANSLATION( -meps,
+				             -horizontalTailplaneRudderFront
+					      - meps,
+					      -horizontalTailplaneThickness
+					      - meps) ]
+	],
+
+	[
+	[ CYLINDER_X trafo          : SCALE(  horizontalTailplaneWidth,
+	                                      horizontalTailplaneRudderRear,
+					      horizontalTailplaneThickness) ]
+	sub:
+	[ CUBE trafo                : SCALE(  horizontalTailplaneWidth + meps2,
+	                                      horizontalTailplaneRudderRear
+					      + meps,
+					      horizontalTailplaneThickness * 2
+					      + meps2)
+				    : TRANSLATION( -meps,
+				              0.00,
+					     -horizontalTailplaneThickness
+					      - meps) ]
+	],
+
+	[ [
+	[ SPHERE trafo              : SCALE(  horizontalTailplaneEdgeRound,
+	                                      horizontalTailplaneRudderFront,
+					      horizontalTailplaneThickness) ]
+	sub:
+	[ CUBE trafo                : SCALE(  horizontalTailplaneEdgeRound * 2
+	                                      + meps2,
+	                                      horizontalTailplaneRudderFront
+					      + meps,
+					      horizontalTailplaneThickness * 2
+					      + meps2)
+				    : TRANSLATION( -horizontalTailplaneEdgeRound
+	                                      - meps,
+				             -horizontalTailplaneRudderFront
+					      - meps,
+					     -horizontalTailplaneThickness
+					      - meps) ]
+	] trafo                     : TRANSLATION(  horizontalTailplaneWidth,
+	                                      0.00,
+					      0.00)
+	],
+
+	[ [
+	[ SPHERE trafo              : SCALE(  horizontalTailplaneEdgeRound,
+	                                      horizontalTailplaneRudderRear,
+					      horizontalTailplaneThickness) ]
+	sub:
+	[ CUBE trafo                : SCALE(  horizontalTailplaneEdgeRound * 2
+	                                      + meps2,
+	                                      horizontalTailplaneRudderRear
+					      + meps,
+					      horizontalTailplaneThickness * 2
+					      + meps2)
+				    : TRANSLATION( -horizontalTailplaneEdgeRound
+	                                      - meps,
+				              0.00,
+					     -horizontalTailplaneThickness
+					      - meps) ]
+	] trafo                     : TRANSLATION(  horizontalTailplaneWidth,
+	                                      0.00,
+					      0.00)
+	],
+
+	UNION_END
+	);
+	
+    ArObj horizontalTailplaneRudderMinus =
+	[ CUBE trafo                : SCALE(  0.70,  1.00,  0.20)
+				    : TRANSLATION( -0.50, -0.90, -0.10)
+				    : SHEAR_ZX(  0.00, -45 DEGREES) ];
+				    				    
+    ArObj horizontalTailplaneRudder =
+        [ horizontalTailplaneRudderPlus sub: horizontalTailplaneRudderMinus ];
+	
+    ArObj horizontalTailplane = UNION(
+        [   horizontalTailplaneMain
+	    surfaceMaterial:  mainSurface ],
+
+        [ [ horizontalTailplaneRudder trafo
+	                            : TRANSLATION(  0.00,
+	                                     -horizontalTailplaneRudderFront,  
+					      0.00) ]
+	    surfaceMaterial:  rudderSurface ],
+
+        [ [ horizontalTailplaneMain trafo
+	                            : ROT_Y(180 DEGREES) ]
+	    surfaceMaterial:  mainSurface ],
+
+        [ [ horizontalTailplaneRudder trafo
+	                            : ROT_Y(180 DEGREES)
+	                            : TRANSLATION(  0.00,
+				             -horizontalTailplaneRudderFront,
+					      0.00) ]
+	    surfaceMaterial:  rudderSurface ],
+
+	UNION_END
+	);
+	
+    ArObj tailplane = UNION(
+        [ [ verticalTailplaneMain trafo
+	                            : TRANSLATION(  0.00,
+				              0.00,
+	                                     -verticalTailplaneNegative) ]
+	    surfaceMaterial:  mainSurface ],
+
+        [ [ verticalTailplaneRudder trafo
+	                            : TRANSLATION(  0.00,
+				             -0.10,
+					     -verticalTailplaneNegative) ]
+	    surfaceMaterial:  rudderSurface ],
+
+	[ horizontalTailplane trafo : TRANSLATION(  meps,
+	                                      0.00,
+					      horizontalTailplaneShift) ],
+
+	UNION_END
+	);
+	
+    return tailplane;
+}

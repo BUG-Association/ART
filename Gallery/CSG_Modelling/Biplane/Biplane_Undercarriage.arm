@@ -1,0 +1,211 @@
+ArObj create_Biplane_Main_Wheels(
+        ART_GV  * art_gv,
+	ArObj  fuselageSurface,
+	ArObj  axisSurface,
+	ArObj  legSurface,
+	ArObj  tireSurface,
+	ArObj  hubcapSurface
+	)
+{
+    double  undercarriageCoverHeight	   = 1.40;
+    double  undercarriageHeight		   = 1.60;
+    double  undercarriageOutwardTilt	   =  30 DEGREES;
+    double  undercarriageForwardTilt	   = -14 DEGREES;
+    double  undercarriageThickness	   = 0.22;
+    double  undercarriageLegThickness	   = 0.07;
+    double  undercarriageSpacing           = 0.70;
+    double  undercarriageWidth             = 0.08;
+
+    double  undercarriageHubcapDiameter    = 0.35;
+    double  undercarriageHubcapThickness   = 0.05;
+    double  undercarriageTireTorus         = 0.05;
+    double  undercarriageTireHeight        = 0.11;
+    double  undercarriageTireWidth         = 0.12;
+    double  undercarriageHubcapWidth       = 0.10;
+    
+    double  undercarriageWheelbaseWidth    = 0.22;
+    double  undercarriageWheelbaseDiameter = 0.10;
+    double  undercarriageAxisDiameter      = 0.04;
+    double  undercarriageAxisLength        = 0.10;
+    double  undercarriageAxisOnHubcap      = 0.07;
+
+    ArObj  mainLegA = UNION(
+	[ [ 
+	  CYLINDER_Z trafo          : SCALE(  undercarriageWidth,
+	                                      undercarriageThickness,
+	                                      undercarriageCoverHeight)
+				    : TRANSLATION( -undercarriageSpacing,
+				              0.00,
+					     -undercarriageCoverHeight)
+				    : SHEAR_XY(  undercarriageOutwardTilt,
+				                 undercarriageForwardTilt) ]
+	    surfaceMaterial: fuselageSurface ],
+	[ [ 
+	  CYLINDER_Z trafo          : SCALE(  undercarriageLegThickness,
+	                                      undercarriageLegThickness,
+	                                      undercarriageHeight)
+				    : TRANSLATION( -undercarriageSpacing,
+				              0.00,
+					     -undercarriageHeight)
+				    : SHEAR_XY(  undercarriageOutwardTilt,
+				                 undercarriageForwardTilt) ]
+	    surfaceMaterial: legSurface ],
+	UNION_END
+	);
+	
+    ArObj  mainLegB = UNION(
+	[ [ 
+	  CYLINDER_Z trafo          : SCALE(  undercarriageWidth,
+	                                      undercarriageThickness,
+	                                      undercarriageCoverHeight)
+				    : TRANSLATION(  undercarriageSpacing,
+				              0.00,
+					     -undercarriageCoverHeight)
+				    : SHEAR_XY( -undercarriageOutwardTilt,
+				                 undercarriageForwardTilt) ]
+	    surfaceMaterial: fuselageSurface ],
+	[ [ 
+	  CYLINDER_Z trafo          : SCALE(  undercarriageLegThickness,
+	                                      undercarriageLegThickness,
+	                                      undercarriageHeight)
+				    : TRANSLATION(  undercarriageSpacing,
+				              0.00,
+					     -undercarriageHeight)
+				    : SHEAR_XY( -undercarriageOutwardTilt,
+				                 undercarriageForwardTilt) ]
+	    surfaceMaterial: legSurface ],
+	UNION_END
+	);
+	
+    ArObj  wheel = UNION(
+	[ [ 
+	  CYLINDER_X trafo          : SCALE(  undercarriageWheelbaseWidth,
+	                                      undercarriageWheelbaseDiameter,
+	                                      undercarriageWheelbaseDiameter)
+				    : TRANSLATION( -undercarriageWheelbaseWidth/2.0,
+				              0.00,
+					      0.00) ]
+	    surfaceMaterial: axisSurface ],
+	[ [ 
+	  CYLINDER_X trafo          : SCALE(    undercarriageAxisLength
+	                                      + undercarriageHubcapWidth
+	                                      + undercarriageAxisOnHubcap,
+	                                      undercarriageAxisDiameter,
+	                                      undercarriageAxisDiameter)
+				    : TRANSLATION(  undercarriageWheelbaseWidth/2.0,
+				              0.00,
+					      0.00) ]
+	    surfaceMaterial: axisSurface ],
+
+	[ [ 
+	  SPHERE trafo             : SCALE(  undercarriageHubcapThickness,
+	                                      undercarriageHubcapDiameter,
+	                                      undercarriageHubcapDiameter)
+				   : TRANSLATION(    undercarriageWheelbaseWidth/2.0
+				              + undercarriageAxisLength,
+				              0.00,
+					      0.00) ]
+	    surfaceMaterial: hubcapSurface ],
+	[ [ 
+	  SPHERE trafo             : SCALE(  undercarriageHubcapThickness,
+	                                     undercarriageHubcapDiameter,
+	                                     undercarriageHubcapDiameter)
+				   : TRANSLATION(     undercarriageWheelbaseWidth/2.0
+				              + undercarriageAxisLength
+					      + undercarriageHubcapWidth,
+				              0.00,
+					      0.00) ]
+	    surfaceMaterial: hubcapSurface ],
+
+	[ [ 
+	  TORUS_X(   undercarriageTireTorus
+	          / (undercarriageHubcapDiameter + undercarriageTireTorus/2.0)) 
+            trafo                  : SCALE(    undercarriageTireWidth 
+	                                     / (   undercarriageTireTorus
+	                                        / (undercarriageHubcapDiameter 
+						+ undercarriageTireTorus/2.0)),
+	                                       undercarriageHubcapDiameter
+					     + undercarriageTireTorus / 2.0,
+	                                       undercarriageHubcapDiameter
+					     + undercarriageTireTorus / 2.0)
+				   : TRANSLATION(     undercarriageWheelbaseWidth/2.0
+				              + undercarriageAxisLength
+					      + undercarriageHubcapWidth / 2.0,
+				              0.00,
+					      0.00) ]
+	    surfaceMaterial: tireSurface ],
+	[ [ 
+	  TORUS_X(   undercarriageTireTorus
+	          / (undercarriageHubcapDiameter + undercarriageTireHeight
+		     + undercarriageTireTorus/2.0)) 
+            trafo                  : SCALE(    undercarriageTireWidth 
+	                                     / (   undercarriageTireTorus
+	                                        / (undercarriageHubcapDiameter 
+						 + undercarriageTireHeight
+						 +undercarriageTireTorus/2.0)),
+	                                       undercarriageHubcapDiameter
+					      + undercarriageTireHeight
+					      + undercarriageTireTorus / 2.0,
+	                                       undercarriageHubcapDiameter
+					      + undercarriageTireHeight
+					      + undercarriageTireTorus / 2.0)
+				   : TRANSLATION(     undercarriageWheelbaseWidth/2.0
+				              + undercarriageAxisLength
+					      + undercarriageHubcapWidth / 2.0,
+				              0.00,
+					      0.00) ]
+	    surfaceMaterial: tireSurface ],
+	[ [ [
+	  CYLINDER_X trafo         : SCALE(   undercarriageTireWidth * 2,
+	                                        undercarriageHubcapDiameter
+					      + undercarriageTireHeight
+					      + undercarriageTireTorus / 2.0,
+	                                        undercarriageHubcapDiameter
+					      + undercarriageTireHeight
+					      + undercarriageTireTorus / 2.0)
+				   : TRANSLATION(     undercarriageWheelbaseWidth/2.0
+				              + undercarriageAxisLength
+					      + undercarriageHubcapWidth / 2.0
+					      - undercarriageTireWidth,
+				              0.00,
+					      0.00) ]
+	    surfaceMaterial: tireSurface ]
+	sub:
+	[ [
+	  CYLINDER_X trafo         : SCALE(   undercarriageTireWidth * 2+meps2,
+	                                        undercarriageHubcapDiameter
+					      + undercarriageTireTorus / 2.0,
+	                                        undercarriageHubcapDiameter
+					      + undercarriageTireTorus / 2.0)
+				   : TRANSLATION(     undercarriageWheelbaseWidth/2.0
+				              + undercarriageAxisLength
+					      + undercarriageHubcapWidth / 2.0
+					      - undercarriageTireWidth -meps,
+				              0.00,
+					      0.00) ]
+	    surfaceMaterial: tireSurface ]
+	],
+	UNION_END
+	);
+	
+    double  offsetX =   undercarriageHeight * tan( undercarriageOutwardTilt)
+                      + undercarriageSpacing - undercarriageWheelbaseWidth/2.0;
+    double  offsetY = - undercarriageHeight * tan( undercarriageForwardTilt);
+    
+    ArObj undercarriage = UNION(
+	mainLegA,
+	mainLegB,
+
+	[ wheel trafo               : ROT_Z( 180 DEGREES )
+	                            : TRANSLATION( -offsetX,
+				              offsetY,
+					     -undercarriageHeight) ],
+
+	[ wheel trafo               : TRANSLATION(  offsetX,
+				              offsetY,
+					     -undercarriageHeight) ],
+        UNION_END
+	);
+
+    return undercarriage;
+}

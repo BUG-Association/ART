@@ -1,0 +1,62 @@
+#define TENDER_BACK_PART \
+    createTenderBackPart( art_gv, black_surface, grey_surface, red_surface )
+
+ArObj createTenderBackPart(
+        ART_GV  * art_gv,
+        ArObj     black_surface,
+        ArObj     grey_surface,
+        ArObj     red_surface
+        )
+{
+
+   ArObj back_plate = [[[[CUBE trafo: SCALE ( 6.3, 10.85, 0.05 )] sub: 
+[CYLINDER trafo: SCALE ( 2.75, 5, 0.05)]]
+				sub: [CYLINDER trafo: SCALE ( 0.4, 0.4, 0.05) :TRANSLATION ( 6.3, 2.85, 0)]]
+					sub: [CUBE trafo: SCALE (0.6, 2.95, 0.05) :TRANSLATION ( 5.9, -0.1, 0)]];
+
+   ArObj low_step = [CUBE trafo: SCALE ( 3, 0.5, 2.5)];
+   ArObj mid_step = [CUBE trafo: SCALE ( 2.5, 0.5, 2)];
+   ArObj up_step = [CUBE trafo: SCALE ( 2.5, 0.5, 1.5)];
+
+
+  ArObj right_back_plate = UNION(back_plate,
+			[low_step trafo: TRANSLATION ( 2.75, 0, -2.5)],
+			[mid_step trafo: TRANSLATION ( 2.25, 3.65, -2)],
+			[up_step trafo: TRANSLATION (2.25, 7.3, -1.5)],UNION_END);
+
+   ArObj left_back_plate = UNION(back_plate,
+			[low_step trafo: TRANSLATION ( 2.75, 0, 0.05)],
+			[mid_step trafo: TRANSLATION ( 2.25, 3.65, 0.05)],
+			[up_step trafo: TRANSLATION (2.25, 7.3, 0.05)],UNION_END);
+
+  ArObj l1 = [[[CYLINDER trafo: SCALE (2.5, 2.5, 3)] sub:
+		 [PARABOLOID trafo: SCALE (2.3, 2.3, 1.5) :TRANSLATION_Z (1.5)]]
+			trafo: ROT_X (-90 DEGREES) :TRANSLATION_Z (2.5)];
+
+  ArObj l2 = [[ CUBE trafo: SCALE ( 1, 2, 1)] sub:
+		[CUBE trafo: SCALE (3, 2, 1) :ROT_Y (65 DEGREES) : TRANSLATION_Z (1)]];
+
+  ArObj lamp = UNION( [[[CUBE trafo: SCALE (3, 1, 2) :TRANSLATION (-1.5, 2, 0)]
+			sub: [CYLINDER trafo: SCALE (2.5, 2.5, 3)]]
+				trafo: TRANSLATION_Y (-2.5) :ROT_X (-90 DEGREES)],
+			[l2 trafo: TRANSLATION (1.5, 0, -0.5)],
+			[l2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-2, 2.5, -0.5)],
+			l1,
+			UNION_END);
+
+
+   return UNION( [right_back_plate trafo: ROT_X (90 DEGREES) :ROT_Z (90 
+DEGREES) :TRANSLATION_X (-12.55)],
+		 [left_back_plate trafo: ROT_X (90 DEGREES) :ROT_Z (90 DEGREES) :TRANSLATION_X 
+(12.5)],
+   		 [CUBE trafo: SCALE (25.1, 6.3, 0.05) :TRANSLATION (-12.55, 0, 10.85)],
+		 [CUBE trafo: SCALE (25.1, 0.05, 7.6) :TRANSLATION (-12.55, 6.3, 3.25)],
+		 [ lamp trafo: TRANSLATION (8.75, 5.75, 11.4)],
+		 [ lamp trafo: TRANSLATION (-8.75, 5.75, 11.4)],
+		 [ CYLINDER trafo: SCALE (0.25, 0.25, 8.5) :TRANSLATION (12, 6, 10.9)],
+		 [SPHERE trafo: SCALE (0.25, 0.25, 0.25) :TRANSLATION (12, 6, 19.65)],
+		 [ CYLINDER trafo: SCALE (0.25, 0.25, 8.5) :TRANSLATION (-12, 6, 10.9)],
+		 [SPHERE trafo: SCALE (0.25, 0.25, 0.25) :TRANSLATION (-12, 6, 19.65)],
+		 UNION_END);
+
+}

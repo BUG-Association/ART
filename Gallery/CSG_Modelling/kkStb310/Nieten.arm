@@ -1,0 +1,77 @@
+ArObj create_Nieten_vorne(ArObj Niete)
+{
+  double rot_v = 10;
+
+  ArObj Nieten_vorne = [ Niete trafo: SHIFT(-1365 MM, 0 MM, -822.5 MM) ];
+
+  while ( rot_v < 360 )
+  {
+    Nieten_vorne = [ Nieten_vorne
+                   or: [ Niete trafo: SHIFT(-1365 MM, 0 MM, -822.5 MM): ROT_X(rot_v DEGREES) ]];
+    rot_v = rot_v + 10;
+  }
+  Nieten_vorne = [ Nieten_vorne trafo: SHIFT_Z(-843.5 MM) ];
+  return Nieten_vorne;
+}
+
+ArObj create_Nieten_Zyl_unten(ArObj Niete)
+{
+  double rot_v = 20;
+
+  ArObj Nieten_Zyl_unten = [ Niete trafo: SHIFT(-1505 MM, 0 MM, -297.5 MM) ];
+
+  while ( rot_v < 360 )
+  {
+    Nieten_Zyl_unten = [ Nieten_Zyl_unten
+                       or: [ Niete trafo: SHIFT(-1505 MM, 0 MM, -297.5 MM) :
+                                          ROT_X(rot_v DEGREES) ]];
+    rot_v = rot_v + 20;
+  }
+  Nieten_Zyl_unten = [ Nieten_Zyl_unten trafo: SHIFT(-105 MM, 1120 MM,
+						     -3377.5 MM) ];
+  
+  return Nieten_Zyl_unten;
+}
+
+ArObj create_Nieten_Zyl_oben(ArObj Niete)
+{
+  double rot_v = 20;
+
+  ArObj Nieten_Zyl_oben = [ Niete trafo: SHIFT(-1592.5 MM, 0 MM, -192.5 MM) ];
+
+  while ( rot_v < 360 )
+  {
+    Nieten_Zyl_oben = [ Nieten_Zyl_oben
+                       or: [ Niete trafo: SHIFT(-1592.5 MM, 0 MM, -192.5 MM) :
+                                          ROT_X(rot_v DEGREES) ]];
+    rot_v = rot_v + 20;
+  }
+  Nieten_Zyl_oben = [ Nieten_Zyl_oben trafo: SHIFT(0 MM, 1225 MM, -2677.5 MM) ];
+  
+  return Nieten_Zyl_oben;
+}
+
+ArObj create_Nieten()
+{
+  ArObj Niete = [ SPHERE trafo: USCALE(17.5 MM) ];
+
+  ArObj Nieten_Zyl_unten = create_Nieten_Zyl_unten(Niete);
+
+  ArObj Nieten_Zyl_oben = create_Nieten_Zyl_oben(Niete);
+
+  ArObj Nieten_vorne = create_Nieten_vorne(Niete);
+
+  return Niete;
+}
+
+
+
+
+
+
+
+
+
+
+
+

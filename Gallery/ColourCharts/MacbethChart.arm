@@ -1,0 +1,177 @@
+ArNode * createMacbethChart(
+        ART_GV  * art_gv
+        )
+{
+    ArObj s03   = LAMBERT_MATERIAL( MACBETH_DARKSKIN );
+    ArObj s02   = LAMBERT_MATERIAL( MACBETH_ORANGE );
+    ArObj s01   = LAMBERT_MATERIAL( MACBETH_BLUE );
+    ArObj s00   = LAMBERT_MATERIAL( MACBETH_WHITE );
+
+    ArObj s13   = LAMBERT_MATERIAL( MACBETH_LIGHTSKIN );
+    ArObj s12   = LAMBERT_MATERIAL( MACBETH_PURPLISHBLUE );
+    ArObj s11   = LAMBERT_MATERIAL( MACBETH_GREEN );
+    ArObj s10   = LAMBERT_MATERIAL( MACBETH_NEUTRAL8 );
+
+    ArObj s23   = LAMBERT_MATERIAL( MACBETH_BLUESKY );
+    ArObj s22   = LAMBERT_MATERIAL( MACBETH_MODERATERED );
+    ArObj s21   = LAMBERT_MATERIAL( MACBETH_RED );
+    ArObj s20   = LAMBERT_MATERIAL( MACBETH_NEUTRAL65 );
+
+    ArObj s33   = LAMBERT_MATERIAL( MACBETH_FOLIAGE );
+    ArObj s32   = LAMBERT_MATERIAL( MACBETH_PURPLE );
+    ArObj s31   = LAMBERT_MATERIAL( MACBETH_YELLOW );
+    ArObj s30   = LAMBERT_MATERIAL( MACBETH_NEUTRAL5 );
+
+    ArObj s43   = LAMBERT_MATERIAL( MACBETH_BLUEFLOWER );
+    ArObj s42   = LAMBERT_MATERIAL( MACBETH_YELLOWGREEN );
+    ArObj s41   = LAMBERT_MATERIAL( MACBETH_MAGENTA );
+    ArObj s40   = LAMBERT_MATERIAL( MACBETH_NEUTRAL35 );
+
+    ArObj s53   = LAMBERT_MATERIAL( MACBETH_BLUISHGREEN );
+    ArObj s52   = LAMBERT_MATERIAL( MACBETH_ORANGEYELLOW );
+    ArObj s51   = LAMBERT_MATERIAL( MACBETH_CYAN );
+    ArObj s50   = LAMBERT_MATERIAL( MACBETH_BLACK );
+    
+    ArObj bgr_surface  = LAMBERT_MATERIAL( CONST_COLOUR_GRAY(0.042) );
+
+    ArObj cube = [ CUBE apply: SCALE(5.5,5.5,0.5) : TRANSLATION(-2.75,-2.75,0) ];
+    
+    double  dv = 0.0;
+    
+    ArObj obj00 = [ cube apply: TRANSLATION(-15, -9, dv) : s00 ];
+    ArObj obj01 = [ cube apply: TRANSLATION(-15, -3, dv) : s01 ];
+    ArObj obj02 = [ cube apply: TRANSLATION(-15,  3, dv) : s02 ];
+    ArObj obj03 = [ cube apply: TRANSLATION(-15,  9, dv) : s03 ];
+
+    ArObj obj10 = [ cube apply: TRANSLATION( -9, -9, dv) : s10 ];
+    ArObj obj11 = [ cube apply: TRANSLATION( -9, -3, dv) : s11 ];
+    ArObj obj12 = [ cube apply: TRANSLATION( -9,  3, dv) : s12 ];
+    ArObj obj13 = [ cube apply: TRANSLATION( -9,  9, dv) : s13 ];
+
+    ArObj obj20 = [ cube apply: TRANSLATION( -3, -9, dv) : s20 ];
+    ArObj obj21 = [ cube apply: TRANSLATION( -3, -3, dv) : s21 ];
+    ArObj obj22 = [ cube apply: TRANSLATION( -3,  3, dv) : s22 ];
+    ArObj obj23 = [ cube apply: TRANSLATION( -3,  9, dv) : s23 ];
+
+    ArObj obj30 = [ cube apply: TRANSLATION(  3, -9, dv) : s30 ];
+    ArObj obj31 = [ cube apply: TRANSLATION(  3, -3, dv) : s31 ];
+    ArObj obj32 = [ cube apply: TRANSLATION(  3,  3, dv) : s32 ];
+    ArObj obj33 = [ cube apply: TRANSLATION(  3,  9, dv) : s33 ];
+
+    ArObj obj40 = [ cube apply: TRANSLATION(  9, -9, dv) : s40 ];
+    ArObj obj41 = [ cube apply: TRANSLATION(  9, -3, dv) : s41 ];
+    ArObj obj42 = [ cube apply: TRANSLATION(  9,  3, dv) : s42 ];
+    ArObj obj43 = [ cube apply: TRANSLATION(  9,  9, dv) : s43 ];
+
+    ArObj obj50 = [ cube apply: TRANSLATION( 15, -9, dv) : s50 ];
+    ArObj obj51 = [ cube apply: TRANSLATION( 15, -3, dv) : s51 ];
+    ArObj obj52 = [ cube apply: TRANSLATION( 15,  3, dv) : s52 ];
+    ArObj obj53 = [ cube apply: TRANSLATION( 15,  9, dv) : s53 ];
+    
+    ArObj backG =
+        [ CUBE apply
+            :   SCALE(  38,  26,   0.5 )
+            :   TRANSLATION( -19, -13,  -0.001 )
+            :   bgr_surface 
+            ];
+
+    ArObj chart =
+	UNION( obj00, obj01, obj02, obj03,
+	       obj10, obj11, obj12, obj13,
+	       obj20, obj21, obj22, obj23,
+	       obj30, obj31, obj32, obj33,
+	       obj40, obj41, obj42, obj43,
+	       obj50, obj51, obj52, obj53,
+	       backG, UNION_END );
+
+    return chart;
+}
+
+#define MACBETH_CHART   createMacbethChart( art_gv )
+
+ARM_MAIN_FUNCTION(MacbethChart)
+{
+    id lambertBaseSurface = LAMBERT_MATERIAL( MACBETH_NEUTRAL8 );
+
+    id cylinder0   =
+        [ CYLINDER apply
+            :   SCALE( 4000.0, 4000.0, 1.0 )
+            :   TRANSLATION( 0.0, 0.0, -3.6)
+            :   lambertBaseSurface
+            ];
+
+    double tz = -0.7;
+    
+    id scene_geometry =
+        UNION(
+            [ MACBETH_CHART apply
+                :   ROT_Z( 180 DEGREES )
+                :   ROT_X( -67 DEGREES )
+                :   USCALE( 0.65 )
+                :   TRANSLATION( 0.0, 0.0 , 5.6 )
+                ],
+
+            cylinder0,
+
+            UNION_END
+            );
+            
+    id camera =
+        [ CAMERA
+            imageSize:  IVEC2D( 256 , 192 )
+            ray:        RAY3D( PNT3D(0.0,50.0,30.0),VEC3D(0.0,-50.0,-23) )
+            zoom:       1.4
+            ];
+
+#ifndef SAMPLES
+#define SAMPLES 64
+#endif
+
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  6
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+			maximalRecursion: 3
+                    ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       SAMPLES
+                randomValueGeneration: PSEUDORANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    YES
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+    id  environment_material =
+        UNIFORM_ENVIRONMENT_MATERIAL( CIE_ILLUMINANT_D65, 1.0 );
+
+    return
+        [ SCENE
+            sceneGeometry      : scene_geometry
+            environmentMaterial: environment_material
+            camera             : camera
+            actionSequence     : actionsequence
+            ];
+}

@@ -1,0 +1,1 @@
+There is only one showcase scene here now, but more will follow. The one that is here demonstrates various roughness grades of Torrance Sparrow with a Blinn distribution, both for metals and for dielectrics. The scene is illuminated by a skylight (which has a tiny solar disc), so it unfortunately converges extremely slowly.

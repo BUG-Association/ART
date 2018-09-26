@@ -1,0 +1,50 @@
+\chapter{Getting Started}
+\label{sec:beforeyoubegin}
+\section{System Requirements}
+ART can basically be built and run everywhere where one can get a
+modern Objective C compiler to build and run. The only real external dependencies are a
+\command{gcc} version $4.2$ or better\footnote{Currently, \command{gcc} 4.6 or better is desirable, since it fixes an annoying bug that generated lots of incorrect warnings about protocol support. But apart from the spurious warnings (which can be distracting if you are trying to debug something, and want to find real errors and warnings), \command{gcc} $4.2$ is also capable of building a working copy of ART.} or \command{llvm} with Objective-C support,
+\command{git}, \command{cmake} in version 2.8 or greater\footnote{On OS X, you actually need \command{cmake}~2.8.6 or greater - lower versions have broken Xcode support.}, Sam Leffler's TIFF library (\ie \textit{the} common \command{libtiff}), and version 2 or greater of the \command{litteCMS} library (\url{http://www.littlecms.com/}). On Linux, you will also need GNUStep (\url{http://www.gnustep.org/}) installed. 
+
+Optional but highly recommended is the OpenEXR library (\url{http://www.openexr.com/}). If the latter is not present, ART of course cannot read or write EXR images, but is otherwise functional. Note that ART has its own internal HDR image formats, so EXR capabilities are not a critical requirement for getting renderings done. However, if you want to share results with anyone outside the project, EXR is the de facto standard for HDR images.
+
+\section{Getting the Source}
+At the moment the standard way of obtaining the ART sources is via the
+git repository of the project. This method is greatly favoured over all
+others (in particular the distribution of source tarballs) since it
+makes both the incorporation of changes done by project collaborators
+much easier, and also provides an easy way for users to upgrade their
+installation to new versions.
+
+\subsection{Git Repository Clone}
+
+There are two ways to obtain the source: either via anonymous \command{git} access via
+
+\begin{verbatim}
+git clone git://cgg.mff.cuni.cz/ART.git
+\end{verbatim}
+
+which provides you with a local repository that you can work with: so you can even make local commits, and use the local git repo for your own experiments with the code. However, you cannot write anything back to our server.
+
+For our collaborators (and only those - see the FAQ on the project website), there is also an option to access the git repo via \command{ssh}. If you are one of those to whom we give such access, we will need your public ssh key identity to establish your credentials on the server. Once these are installed, you can interact with the server without any password entry. Once you have your account, you can check out the sources for ART via the following command:
+\begin{verbatim}
+git clone ssh://git@cgg.mff.cuni.cz/ART
+\end{verbatim}
+
+Either way, the first step of working with ART is now complete - you now have a local repository of
+the project.
+
+\subsection{Collaborators: working on your own Git Branch}
+\label{sec:forking}
+If you are going to do any sort of development work on ART, you are required to work on your own branch at all times. Making any direct changes to the master branch, and in particular, pushing such changes back to the project server, is strictly forbidden! So the very first thing you should do after cloning the repository is to change to your own branch via the command
+\begin{verbatim}
+git checkout -b <your branch name>
+\end{verbatim}
+This command has the issued from within the project directory you just cloned. Obviously, you have to replace \command{<your branch name>} with a suitable branch name of your own: a combination of username and and an acronym of the feature you are working on is a reasonable thing to use here.
+
+Merging any changes you make into the current project master requires explicit authorisation from the project maintainer, and is only permissible if the merged version passes the regression test suite.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "ARTforNewbies"
+%%% End:

@@ -1,0 +1,355 @@
+ART measurement archive version 1.1
+
+Archive content: pure rainbow spectra
+Archive copyright: Copyright (c) 1996-2016 The ART Development Team. For a comprehensive list of the members of the development team, and a description of their respective contributions, see the file "ART_DeveloperList.txt" that is distributed with the libraries.
+Archive license: This file is part of the Advanced Rendering Toolkit (ART) libraries. ART is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. ART is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with ART.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Entry ID:   red
+---------------------------------------------------------------------------
+Description           :  red rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0}
+
+
+
+Entry ID:   orange
+---------------------------------------------------------------------------
+Description           :  orange rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}
+
+
+
+Entry ID:   yellow
+---------------------------------------------------------------------------
+Description           :  yellow rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}
+
+
+
+Entry ID:   green
+---------------------------------------------------------------------------
+Description           :  green rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}
+
+
+
+Entry ID:   cyan
+---------------------------------------------------------------------------
+Description           :  cyan rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}
+
+
+
+Entry ID:   blue
+---------------------------------------------------------------------------
+Description           :  blue rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.0,0.0,0.0,0.0,1.0,1.1,1.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}
+
+
+
+Entry ID:   violet
+---------------------------------------------------------------------------
+Description           :  violet rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}
+
+
+
+Entry ID:   pink
+---------------------------------------------------------------------------
+Description           :  pink rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{1.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0}
+
+Entry ID:   red0975
+---------------------------------------------------------------------------
+Description           :  almost perfect red rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975}
+
+
+
+Entry ID:   orange0975
+---------------------------------------------------------------------------
+Description           :  almost perfect orange rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.0}
+
+
+
+Entry ID:   yellow0975
+---------------------------------------------------------------------------
+Description           :  almost perfect yellow rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025}
+
+
+
+Entry ID:   green0975
+---------------------------------------------------------------------------
+Description           :  almost perfect green rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025}
+
+
+
+Entry ID:   cyan0975
+---------------------------------------------------------------------------
+Description           :  almost perfect cyan rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025}
+
+
+
+Entry ID:   blue0975
+---------------------------------------------------------------------------
+Description           :  almost perfect blue rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.025,0.025,0.025,0.025,0.975,1.1,0.975,0.025,0.025,0.025,0.025,0.025,0.975,0.975,0.975,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025}
+
+
+
+Entry ID:   violet0975
+---------------------------------------------------------------------------
+Description           :  almost perfect violet rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025}
+
+
+
+Entry ID:   pink0975
+---------------------------------------------------------------------------
+Description           :  almost perfect pink rainbow spectrum 
+Type                  :  reflectance spectrum
+Fluorescence data     :  no
+Measurement device    :  
+Measured by           :  
+Measurement date      :  
+
+Sampling information
+--------------------
+Type	    	      :  regular
+Start                 :  380.0 nm
+Increment             :  10.0 nm
+Maximum sample value  :  1.0
+
+ASCII sample data
+-----------------
+{0.975,0.975,0.975,0.975,0.975,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.025,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975,0.975}

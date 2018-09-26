@@ -1,0 +1,93 @@
+ArObj create_Kuehlrippen(ART_GV  * art_gv,double Anzahl,
+                         double Groesse)
+{
+    double i = 1*35 MM;
+
+  ArObj Kuehlrippe = [ CYLINDER trafo: SCALE(Groesse, Groesse, 17.5 MM) ];
+
+  ArObj Kuehlrippen = Kuehlrippe;
+
+  ArObj Innenteil = [ CYLINDER trafo: SCALE(Groesse-35 MM, Groesse-35 MM,
+					    Anzahl*35 MM) ];
+
+  while (i < Anzahl*40 MM)
+  {
+
+    Kuehlrippen = [ Kuehlrippen
+		      or: [ Kuehlrippe trafo: TRANSLATION_Z(i) ]];
+
+    i = i + 1*40 MM;
+
+  }
+
+  return [ Kuehlrippen or: Innenteil ];
+
+};
+
+ArObj create_pneumatics(ART_GV  * art_gv,ArObj black_surface)
+{
+    ArObj Warmschmierung = UNION(
+		  [ CUBE trafo: SCALE(210 MM, 210 MM, 315 MM) :
+                                TRANSLATION_Z(105 MM) ],
+                  [ CUBE trafo: SCALE(105 MM, 175 MM, 70 MM) :
+			     TRANSLATION(52.5 MM, 17.5 MM, 35 MM) ],
+                  [ CUBE trafo: SCALE(175 MM, 225 MM, 35 MM) :
+			     TRANSLATION(17.5 MM, -17.5 MM, 0 MM) ],
+                  [ CUBE trafo: SCALE(225 MM, 225 MM, 35 MM) :
+			     TRANSLATION(-17.5 MM, -17.5 MM, 420 MM) ],
+                  [ CYLINDER trafo: SCALE(70 MM, 70 MM, 35 MM) :
+				 ROT_X(-90 DEGREES) :
+                                 TRANSLATION(105 MM, 210 MM, 350 MM) ],
+                  [ CUBE trafo: SCALE(52.5 MM, 17.5 MM, 70 MM) :
+			     ROT_Y(-20 DEGREES) :
+                             TRANSLATION(140 MM, 225 MM, 217 MM) ],
+                  UNION_END);
+
+  ArObj Warmschmierung_ganz = [[ Warmschmierung
+                                 trafo: TRANSLATION(525 MM, 952 MM, -2257.5 MM) ]
+                             or: [ Warmschmierung
+	                            trafo: SCALE(1, -1, 1) :
+		                           TRANSLATION(525 MM, -952 MM, -2257.5 MM) ]];
+
+  ArObj Pumpe_Mitte = create_Kuehlrippen(art_gv,10, 175 MM);
+
+  ArObj Pumpe_Unterteil = create_Kuehlrippen(art_gv,5, 140 MM);
+
+  ArObj Pumpenhalt = [ CUBE trafo: SCALE(140 MM, 350 MM, 140 MM) ];
+
+  ArObj Pumpenverbindung = [ CYLINDER trafo: SCALE(70 MM, 70 MM, 1050 MM) ];
+
+  ArObj Druckluftpumpe = UNION(
+                        [ CYLINDER trafo: SCALE(140 MM, 140 MM, 350 MM) :
+					TRANSLATION(0 MM, -980 MM, -1400 MM) ],
+                        [ Pumpe_Mitte trafo: TRANSLATION(0 MM, -1015 MM, -1855 MM) ],
+                        [ Pumpe_Unterteil trafo: TRANSLATION(0 MM, -980 MM, -2100
+						       MM) ],
+                        [ Pumpenhalt trafo: TRANSLATION(-70 MM, -1050 MM, -1295 MM) ],
+                        [ Pumpenverbindung trafo: TRANSLATION(0 MM, -980 MM,
+							-2100 MM) ],
+                               UNION_END);
+
+  ArObj Abdampfhalt = [ CUBE trafo: SCALE(420 MM, 350 MM, 350 MM) ];
+
+  ArObj Abdampfbehaelter = UNION(
+      [ CYLINDER trafo: SCALE(105 MM, 105 MM, 455 MM) :
+		     ROT_Y(90 DEGREES) ],
+      [ CONE trafo: USCALE(105 MM) :
+                    ROT_Y(90 DEGREES) :
+                    TRANSLATION_X(-105 MM) ],
+                                UNION_END);
+
+  ArObj Abdampf = UNION(
+		  [ Abdampfhalt trafo: TRANSLATION(-910 MM, -700 MM, -1260 MM) ],
+                  [ Abdampfbehaelter trafo: TRANSLATION(-1085 MM, -525 MM, -805 MM) ],
+                        UNION_END);
+
+  ArObj Druckluft_Warmschmierung = UNION(
+                     [ Warmschmierung_ganz surfaceMaterial: black_surface ],
+                     [ Druckluftpumpe surfaceMaterial: black_surface ],
+                     [ Abdampf surfaceMaterial: black_surface ],
+                                         UNION_END);
+
+    return Druckluft_Warmschmierung;
+}

@@ -1,0 +1,27 @@
+\section*{Introduction}
+\label{sec:introduction}
+
+In this document, we describe installation and operation of
+the 2.x series of the Advanced Rendering Toolkit (ART). ART is a
+Predictive Rendering research system developed mainly by the graphics group of Charles University, Prague, Czech Republic. ART is actually quite old: its development roots can be traced back to the year 1996, and the Institute of Computer Graphics in Vienna, Austria, where it was originally conceived by Robert F. Tobler\footnote{An outline of the development history of ART can be found in section~\ref{sect:arthistory}.}.
+
+The 1.x series of ART was never released to the public, but served as the base from which current ART 2.x was developed. ART 2.x shares many core features with ART 1.x, but is also a hopefully much more consistent and maintainable codebase than version 1.x. However, as part of the inevitable re-factoring that led to ART 2.x, a number of interesting features of ART 1.x have not been ported yet: hopefully, as time progresses, most of these will be added back.
+
+The document is composed of three main parts: 
+
+\begin{description}
+\item[Part I] a \emph{getting started} guide, which aims at describing how to install
+  and run ART,
+\item[Part II] which contains general information about some internal concepts and the design
+philosophy of ART, and
+\item[Part III] which specifically contains information about the spectral rendering and polarisation capabilities of ART.
+\end{description}
+
+
+Please report any typos, inaccuracies or problems to the project mail address:\\
+\mailto{art@cgg.mff.cuni.cz}
+
+
+A current version of this document can always be found in the Documentation
+directory of the ART source tree \filename{(\envvar{ART\_DIR}/Documentation)} under the name
+\filename{ARTforNewbies.tex}. Enter this directory and type \command{make pdf} to create a version of this PDF which matches the release you have on your computer.

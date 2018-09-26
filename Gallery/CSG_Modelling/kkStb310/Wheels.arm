@@ -1,0 +1,443 @@
+#define MEPS   0.0000000001
+#define MEPS2  0.0000000002
+#define MEPS3  0.0000000003
+
+//ArObj create_WheelsCamera()
+//{
+//    return
+//    [ CAMERA
+//	imageSize: IVEC2D( 512 , 512 )
+//	ray: RAY3D(PNT3D(80, 60, 50), VEC3D( 0, 0, 0 ))
+//	zoom: 0.0
+//    ];
+//}
+
+ArObj create_wheel_rim(
+        ART_GV  * art_gv,
+        double wheelRadius,
+        double wheelThickness,
+        double flangeHeight,
+        double flangeAngle,	
+	double outerRimWidth,
+	double rimFilletWidth,
+	double spokeThickness,
+	double hubRadius,
+	double hubThickness
+        )
+{
+    double flangeThickness =   ( wheelRadius + flangeHeight )
+                             * cos( flangeAngle );
+
+    ArObj mainDisc = [ CYLINDER trafo: SCALE( wheelRadius,
+                                              wheelRadius,
+                                              wheelThickness )];
+    ArObj flange = [ [ CONE trafo: SCALE( wheelRadius + flangeHeight,
+                                          wheelRadius + flangeHeight,
+                                         -flangeThickness )
+                               : TRANSLATION( 0, 0, flangeThickness - MEPS) ]
+                       and:
+                    [ CYLINDER trafo: SCALE(wheelRadius + flangeHeight + MEPS,
+                                            wheelRadius + flangeHeight + MEPS,
+                                            wheelThickness + MEPS )
+                                    : TRANSLATION( 0, 0, - MEPS2 )]
+                   ];
+
+    ArObj mainSubDisc = [ CYLINDER trafo: SCALE( wheelRadius - outerRimWidth,
+                                                 wheelRadius - outerRimWidth,
+                                                 wheelThickness + MEPS3 )
+                                        : TRANSLATION( 0, 0, - MEPS2) ];
+
+    ArObj outerFillet = [ TORUS( rimFilletWidth / ( wheelRadius - outerRimWidth ) )
+                          trafo: SCALE( wheelRadius - outerRimWidth,
+                                        wheelRadius - outerRimWidth,
+                                        spokeThickness *
+                                        ( wheelRadius - outerRimWidth )
+                                        / ( 2.0 * rimFilletWidth ) )
+                               : TRANSLATION( 0, 0, hubThickness / 2.0 )
+                        ];
+
+    ArObj outerWheel = [ [ UNION( mainDisc, flange, 0 ) sub: mainSubDisc ]
+                         or: outerFillet ];
+
+    ArObj hubDisc = [ CYLINDER trafo: SCALE( hubRadius,
+                                             hubRadius,
+                                             hubThickness) ];
+
+    ArObj hubFillet = [ TORUS( rimFilletWidth / hubRadius )
+                        trafo: SCALE( hubRadius,
+                                      hubRadius,
+                                      spokeThickness * hubRadius
+                                      / ( 2.0 * rimFilletWidth ) )
+                             : TRANSLATION( 0, 0, hubThickness / 2.0 )
+                             ];
+
+    ArObj hub = UNION( hubDisc, hubFillet, 0 );
+
+    return UNION( hub, outerWheel, 0 );
+}
+
+double large_wheel_radius =  1050.0 MM;
+double small_wheel_radius =   497.0 MM;
+double flange_height =         30.0 MM;
+double flange_angle =          45.0 DEGREES;
+double axle_radius =           80.0 MM;
+
+ArObj create_small_wheel(
+        ART_GV  * art_gv
+        )
+{
+    double  wheelThickness =  140.0 MM;
+    double  outerRimWidth =    76.0 MM;
+    double  rimFilletWidth =   20.0 MM;
+    double  spokeLength =    1760.0 MM;
+    double  spokeWidth =       52.5 MM;
+    double  spokeThickness =  120.0 MM;
+    double  hubRadius =       140.0 MM;
+    double  hubThickness =    140.0 MM;
+
+    ArObj rim =
+        create_wheel_rim(
+            art_gv,
+            small_wheel_radius,
+            wheelThickness,
+            flange_height,
+            flange_angle,
+            outerRimWidth,
+            rimFilletWidth,
+            spokeThickness,
+            hubRadius,
+            hubThickness
+            );
+
+    ArObj spoke =
+        [ CONE_X apply
+            : SCALE(
+                spokeLength,
+                spokeWidth / 2.0,
+                spokeThickness / 2.0 )
+            : TRANSLATION(
+                -spokeLength - hubRadius,
+                0,
+                hubThickness / 2.0 )
+            ];
+
+    ArObj spokeAndDisc =
+        [ CYLINDER apply
+            : SCALE(
+                small_wheel_radius - MEPS3,
+                small_wheel_radius - MEPS3,
+                wheelThickness
+                ) ];
+
+    ArObj spokes =
+        [ UNION(
+              spoke,
+            [ spoke apply: ROT_Z(   36 DEGREES ) ],
+            [ spoke apply: ROT_Z( 2*36 DEGREES ) ],
+            [ spoke apply: ROT_Z( 3*36 DEGREES ) ],
+            [ spoke apply: ROT_Z( 4*36 DEGREES ) ],
+            [ spoke apply: ROT_Z( 5*36 DEGREES ) ],
+            [ spoke apply: ROT_Z( 6*36 DEGREES ) ],
+            [ spoke apply: ROT_Z( 7*36 DEGREES ) ],
+            [ spoke apply: ROT_Z( 8*36 DEGREES ) ],
+            [ spoke apply: ROT_Z( 9*36 DEGREES ) ],
+            UNION_END )
+            and: spokeAndDisc
+            ];
+
+    return
+        [ UNION( rim, spokes, UNION_END ) apply
+            :   ROT_X( 90 DEGREES )
+            :   TRANSLATION( 0, 0, small_wheel_radius )
+            ];
+}
+
+ArObj create_large_wheel(
+        ART_GV  * art_gv,
+	double rotation
+	)
+{
+    double  wheelThickness =          140.0 MM;
+    double  outerRimWidth =            76.0 MM;
+    double  rimFilletWidth =           30.0 MM;
+    double  spokeLength =            1760.0 MM;
+    double  spokeWidth =               59.5 MM;
+    double  spokeThickness =          120.0 MM;
+    double  hubRadius =               183.75 MM;
+    double  hubThickness =            140.0 MM;
+    double  counterweight_distance =  820.0 MM;
+    double  leverbase_diameter =      200.0 MM;
+    double  leverbase_distance =      385.0 MM;
+    double  leverbase_pinwidth =      140.0 MM;
+    double  leverbase_pinheight =     200.0 MM;
+
+    ArObj basis = create_wheel_rim(art_gv,large_wheel_radius, wheelThickness,
+                                     flange_height, flange_angle, outerRimWidth,
+                                     rimFilletWidth, spokeThickness, hubRadius,
+                                     hubThickness );
+
+    ArObj counterweight = [[ CUBE trafo: SCALE( 2.0 * large_wheel_radius,
+                                               2.0 * large_wheel_radius,
+                                               ( wheelThickness
+                                                +spokeThickness ) / 2.0)
+                                      : TRANSLATION(-large_wheel_radius,
+                                               counterweight_distance,
+                                               ( wheelThickness
+                                                -spokeThickness ) / 4.0 ) ]
+                              trafo: ROT_Z(8 DEGREES) ];
+
+    ArObj leverbase = [ UNION(
+                        [ CYLINDER trafo: SCALE( leverbase_diameter / 2.0,
+                                                 leverbase_diameter / 2.0,
+                                                 ( wheelThickness
+                                                +spokeThickness ) / 2.0)
+                                        : TRANSLATION( 0, 0, ( wheelThickness
+                                                -spokeThickness ) / 4.0 ) ],
+                        [ CYLINDER trafo: SCALE( leverbase_pinwidth / 2.0,
+                                                 leverbase_pinwidth / 2.0,
+                                                 leverbase_pinheight)
+                                        : TRANSLATION( 0, 0, ( ( wheelThickness
+                                                -spokeThickness ) / 4.0 )
+                                                + MEPS ) ],
+/*
+                        [ TORUS( spokeThickness / (leverbase_diameter / 2.0))
+                                   trafo: SCALE( leverbase_diameter / 2.0,
+                                                 leverbase_diameter / 2.0,
+                                                 spokeThickness)
+                                        : TRANSLATION( 0, 0,spokeThickness / 2.0 ) ],
+*/
+                        UNION_END) trafo: TRANSLATION(  0,
+                                         -leverbase_distance,
+                                          ( wheelThickness
+                                                -spokeThickness ) / 4.0) ];
+
+    ArObj spoke = [ CONE_X trafo: SCALE(  spokeLength,
+                                          spokeWidth / 2.0,
+                                          spokeThickness / 2.0 )
+                                : TRANSLATION( -spokeLength - hubRadius,
+                                          0,
+                                          hubThickness / 2.0 ) ];
+
+    ArObj spokeAndDisc = [ CYLINDER trafo: SCALE( large_wheel_radius - MEPS3,
+                                                  large_wheel_radius - MEPS3,
+                                                  wheelThickness + MEPS) ];
+
+    ArObj spokes = [ UNION(  counterweight,
+                             spoke,
+                           [ spoke trafo: ROT_Z( 16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 2*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 3*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 4*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 5*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 6*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 7*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 8*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 9*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 10*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 11*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 12*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 13*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 14*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 15*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 16*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 17*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 18*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 19*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 20*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 21*16.36 DEGREES ) ],
+                           UNION_END ) and: spokeAndDisc ];
+
+    return [ UNION( basis, spokes, leverbase, UNION_END ) trafo: ROT_Z( rotation )
+                                            : ROT_X( -90 DEGREES )
+                                            : TRANSLATION( 0, 0, large_wheel_radius ) ];
+}
+
+ArObj create_central_wheel(
+        ART_GV  * art_gv,
+	double rotation
+	)
+{
+    double wheelThickness = 140.0 MM;
+	double outerRimWidth = 76.0 MM;
+	double rimFilletWidth = 30.0 MM;
+	double spokeLength = 1760.0 MM;
+	double spokeWidth = 59.5 MM;
+	double spokeThickness = 120.0 MM;
+	double hubRadius = 183.75 MM;
+	double hubThickness = 140.0 MM;
+	double counterweight_distance = 802.5 MM;
+	double leverbase_diameter = 200.0 MM;
+	double leverbase_distance = 385.0 MM;
+	double leverbase_pinwidth = 140.0 MM;
+	double leverbase_pinheight = 200.0 MM;
+
+    ArObj basis = create_wheel_rim(art_gv,large_wheel_radius, wheelThickness,
+                                     flange_height, flange_angle, outerRimWidth,
+                                     rimFilletWidth, spokeThickness, hubRadius,
+                                     hubThickness );
+
+    ArObj counterweight = [[ CUBE trafo: SCALE( 2.0 * large_wheel_radius,
+                                               2.0 * large_wheel_radius,
+                                               ( wheelThickness
+                                                +spokeThickness ) / 2.0)
+                                      : TRANSLATION(-large_wheel_radius,
+                                               counterweight_distance,
+                                               ( wheelThickness
+                                                -spokeThickness ) / 4.0 ) ]
+                             trafo: ROT_Z(61 DEGREES) ];
+
+    ArObj leverbase = [ UNION(
+                        [ CYLINDER trafo: SCALE( leverbase_diameter / 2.0,
+                                                 leverbase_diameter / 2.0,
+                                                 ( wheelThickness
+                                                +spokeThickness ) / 2.0)
+                                        : TRANSLATION( 0, 0, ( wheelThickness
+                                                -spokeThickness ) / 4.0 ) ],
+                        [ CYLINDER trafo: SCALE( leverbase_pinwidth / 2.0,
+                                                 leverbase_pinwidth / 2.0,
+                                                 leverbase_pinheight)
+                                        : TRANSLATION( 0, 0, ( ( wheelThickness
+                                                -spokeThickness ) / 4.0 )
+                                                + MEPS ) ],
+/*
+                        [ TORUS( spokeThickness / (leverbase_diameter / 2.0))
+                                   trafo: SCALE( leverbase_diameter / 2.0,
+                                                 leverbase_diameter / 2.0,
+                                                 spokeThickness)
+                                        : TRANSLATION( 0, 0,spokeThickness / 2.0 ) ],
+*/
+                        UNION_END) trafo: TRANSLATION(  0,
+                                         -leverbase_distance,
+                                          ( wheelThickness
+                                                -spokeThickness ) / 4.0) ];
+
+
+    ArObj spoke = [ CONE_X trafo: SCALE(  spokeLength,
+                                          spokeWidth / 2.0,
+                                          spokeThickness / 2.0 )
+                                : TRANSLATION( -spokeLength - hubRadius,
+                                          0,
+                                          hubThickness / 2.0 ) ];
+
+    ArObj spokeAndDisc = [ CYLINDER trafo: SCALE( large_wheel_radius - MEPS3,
+                                                  large_wheel_radius - MEPS3,
+                                                  wheelThickness + MEPS) ];
+
+    ArObj spokes = [ UNION(  counterweight,
+                             spoke,
+                           [ spoke trafo: ROT_Z( 16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 2*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 3*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 4*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 5*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 6*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 7*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 8*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 9*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 10*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 11*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 12*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 13*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 14*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 15*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 16*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 17*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 18*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 19*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 20*16.36 DEGREES ) ],
+                           [ spoke trafo: ROT_Z( 21*16.36 DEGREES ) ],
+                           UNION_END ) and: spokeAndDisc ];
+
+    return [ UNION( basis, spokes, leverbase, UNION_END ) trafo: ROT_Z( rotation )
+                                            : ROT_X( -90 DEGREES )
+                                            : TRANSLATION( 0, 0, large_wheel_radius ) ];
+}
+
+ArObj create_small_axle(
+        ART_GV  * art_gv,
+        double    track_width
+        )
+{
+    ArObj smallWheelR = [ create_small_wheel(art_gv) trafo: ROT_Z(180 DEGREES ) ];
+    ArObj smallWheelL = [ create_small_wheel(art_gv) trafo: ROT_Z(  0 DEGREES ) ];
+
+    return UNION(
+        [ CYLINDER_Y trafo: SCALE( axle_radius, -track_width, axle_radius )
+                          : TRANSLATION( 0, 0, small_wheel_radius ) ],
+        [ smallWheelR trafo: TRANSLATION( 0,            0, 0 ) ],
+        [ smallWheelL trafo: TRANSLATION( 0, -track_width, 0 ) ],
+        UNION_END);
+}
+
+ArObj create_large_axle(ART_GV  * art_gv,double track_width)
+{
+    ArObj largeWheelR = [ create_large_wheel(art_gv, 180 DEGREES )
+                          trafo: ROT_Z( 0 DEGREES ) ];
+    ArObj largeWheelL = [ create_large_wheel(art_gv, 90 DEGREES )
+                          trafo: SCALE( 1, -1, 1 ) ];
+
+    return UNION(
+        [ CYLINDER_Y trafo: SCALE( axle_radius, -track_width, axle_radius )
+                          : TRANSLATION( 0, 0, large_wheel_radius ) ],
+        [ largeWheelR trafo: TRANSLATION( 0,            0, 0 ) ],
+        [ largeWheelL trafo: TRANSLATION( 0, -track_width, 0 ) ],
+        UNION_END);
+}
+
+ArObj create_central_axle(ART_GV  * art_gv,double track_width)
+{
+    ArObj largeWheelR = [ create_central_wheel(art_gv, 180 DEGREES )
+                          trafo: ROT_Z( 0 DEGREES ) ];
+    ArObj largeWheelL = [ create_central_wheel(art_gv, 90 DEGREES )
+                          trafo: SCALE( 1, -1, 1 ) ];
+
+    return UNION(
+        [ CYLINDER_Y trafo: SCALE( axle_radius, -track_width, axle_radius )
+                          : TRANSLATION( 0, 0, large_wheel_radius ) ],
+        [ largeWheelR trafo: TRANSLATION( 0,            0, 0 ) ],
+        [ largeWheelL trafo: TRANSLATION( 0, -track_width, 0 ) ],
+        UNION_END);
+}
+
+ArObj create_wheelset(
+        ART_GV  * art_gv,
+        ArObj     wheel_surface,
+        double    track_width
+        )
+{
+    double  axleDistance1 = -2190 MM;
+    double  axleDistance2 = axleDistance1 + 2835 MM;
+    double  axleDistance3 = axleDistance2 + 2200 MM;
+    double  axleDistance4 = axleDistance3 + 2200 MM;
+    double  axleDistance5 = axleDistance4 + 1640 MM;
+    double  axleDistance6 = axleDistance5 + 1580 MM;
+
+    return
+        [ UNION(
+            [ create_small_axle(art_gv,track_width) trafo: TRANSLATION(axleDistance1, track_width/2, 0) ],
+            [ create_large_axle(art_gv,track_width) trafo: TRANSLATION(axleDistance2, track_width/2, 0) ],
+            [ create_central_axle(art_gv,track_width) trafo: TRANSLATION(axleDistance3, track_width/2, 0) ],
+            [ create_large_axle(art_gv,track_width) trafo: TRANSLATION(axleDistance4, track_width/2, 0) ],
+            [ create_small_axle(art_gv,track_width) trafo: TRANSLATION(axleDistance5, track_width/2, 0) ],
+            [ create_small_axle(art_gv,track_width) trafo: TRANSLATION(axleDistance6, track_width/2, 0) ],
+        UNION_END )
+        surfaceMaterial: wheel_surface
+        ];
+}
+
+ArObj create_Wheels(
+        ART_GV  * art_gv,
+        ArObj     wheel_surface,
+        double    track_width
+        )
+{
+    return
+        [ create_wheelset(art_gv,wheel_surface, track_width)
+            trafo: ROT_Z( -20 DEGREES)
+            ];
+}
+
+
+
+
+

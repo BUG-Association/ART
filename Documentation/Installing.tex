@@ -1,0 +1,120 @@
+\chapter{Building ART}
+\label{sec:installing}
+
+The actions you have to take to obtain a running installation of ART can be
+split into three categories: things which have to be done only once (regardless
+how many checkouts of ART you perform), stuff you have to repeat only if you
+obtain a completely new copy of ART (\emph{not} after each git pull in an existing repository clone), and
+things you have to do each time you make changes to the libraries (the recompile
+which is necessary to update the executables).
+
+For users who just use ART to generate images, all these steps only have to be
+performed once.
+
+\section{Stuff You Only Have to Do Once}
+
+
+\subsection{Making Sure the Executable Path is Correct}
+
+For ART to work properly, the place where the executables will be installed has to be on the search path. If you work locally with ART (\ie within your user account), this amounts to having \filename{\textasciitilde/bin} in your path. Many people already have that anyway, but if you have not, add something like
+
+\begin{verbatim}
+path=(~/bin/ $path)
+\end{verbatim}
+
+to your shell startup file (the exact syntax will depend on the shell you use). If you install ART in any of the canonical system-wide locations, you do not have to do anything in pretty much all modern Unices.
+
+\subsection{Specifying the Results Viewer}
+
+There is one more environment variable you might want to consider setting. It controls which viewing program is used to display the results of a rendering job or tone mapping operation, \ie open the resulting picture. ART has sensible defaults built in for the various platforms it can be compiled on, but you might still want to override those to use the viewer program of your choice, especially on Linux. On OS X, ART defaults to using the \command{open} command, which already uses the GUI preferences for each filetype; changing this does not make much sense. You still can, of course -- even on OS X, the environment variable is read. But on Linux (and other Unices), directly specifying an alternate viewer executable can be desirable. You can do that by putting
+
+\begin{verbatim}
+export ART_VIEWER=<exectuable of your choice>
+\end{verbatim}
+
+in your shell startup file.
+
+\subsection{Specifying ART environment variables}
+In case you're choosing to build ART in a different path than \verb?~? or \verb?\usr?, you need to specify some environment variables to enable ART to run: \verb?ART_RESOURCE_PATH? and \verb?ART_LIBRARY_PATH?.
+
+For example, if you've chose to run CMake with \verb?-DCMAKE_INSTALL_PATH=~/art?, your should set the following environment variable like so:
+
+\begin{verbatim}
+export ART_RESOURCE_PATH=~/art/lib/ART_Resources                                                                                                                              
+export ART_LIBRARY_PATH=~/art/lib
+\end{verbatim}
+%export LD_LIBRARY_PATH=~/art/lib:$LD_LIBRARY_PATH
+%export PATH=~/art/bin:$PATH 
+
+\subsection{Issues specific to Linux}
+
+\subsubsection{Setting the Dynamic Library Path}
+
+If you install ART in a system-wide fashion, you are set -- nothing else needs to be done. If you are using Linux, and the finished ART is going to live in your home directory, though, you have to set one environment variable so that the dynamic linker finds the shared library you build:
+
+\begin{verbatim}
+export LD_LIBRARY_PATH=~/lib:$LD_LIBRARY_PATH
+\end{verbatim}
+
+\subsubsection{If Needed: Override the Command Line Locale Setting}
+
+Linux comes in many flavours, and some of them have less than sensible ways of handling localisation. One potential issue in this regard is that for European or other non-US locations, alternate floating point number formats are sometimes used even for command line applications. Whether this affects you depends on your locale settings and your particular Linux: what you should check for is whether floating point numbers are printed using dots ("{\tt 1.0}" - US/EN) or commas ("{\tt 1,0}" - DE, CZ, and others) as decimal delimiters. ART expects the decimal delimiter to be a dot, and does not work correctly if commas are used. So if you see commas in floating point numbers, please override the locale settings for the command line environment you are in:
+
+\begin{verbatim}
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
+\end{verbatim}
+
+\section{Stuff You Only Have to Do Once for Each New Source Check-Out}
+
+\subsection{Run CMake}
+
+The only decisions you have to make at this point is whether you want to install the finished ART binaries globally for all users (which usually requires you to have \command{sudo} rights), or if you want to keep ART within your home directory. The latter option is the sensible choice for active developers. To make the choice, go to the source directory, and type either
+
+\begin{verbatim}
+cmake .
+\end{verbatim}
+
+to configure ART for eventual system-wide installation, or
+
+\begin{verbatim}
+cmake . -DCMAKE_INSTALL_PREFIX=~
+\end{verbatim}
+
+to build and install it in your home directory. CMake does all the rest for you.
+
+\subsection{Issues specific to OS X}
+
+On OS X, you have to create an Xcode project from the sources; this builds a framework that is again either installed globally (see above -- requiring you to have \command{sudo} rights), or locally within your account. Create the project file for a local installation with
+
+\begin{verbatim}
+cmake . -G Xcode -DCMAKE_INSTALL_PREFIX=~
+\end{verbatim}
+
+Global installations of ART under OS X of course omit the \command{-DCMAKE\_INSTALL\_PREFIX}. Open the resulting Xcode project, and take it from there.
+
+\section{The Actual (Re-)Building of ART}
+\label{sec:Installing:Building}
+\label{sec:Installing:Building:Rebuilding}
+Under Linux, compilation of the entire ART sources, either from scratch, or after changes have been made to the sources, is straightforward:
+\begin{verbatim}
+cd <ART source directory>
+make
+make install
+\end{verbatim}
+On machines with two or more processors the compilation can be speeded up
+significantly by specifying the option \option{-j<n>} to use $n$ processors in
+parallel, e.g.
+\begin{verbatim}
+make -j2 
+\end{verbatim}
+on a dual processor workstation. In any case the compilation should be expected to take a bit of time -- but on fast multiple processor workstations a complete build takes a few minutes at the most.
+
+On OS X, you use Xcode to build the Advanced Rendering Toolkit framework, and the associated binaries. Make sure you use the target "install", and that you have added the target directory to the executable path of your shell.
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "ARTforNewbies"
+%%% End: 

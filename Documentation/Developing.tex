@@ -1,0 +1,93 @@
+%\section{Developing for ART}
+%\label{sec:developing}
+If you have a development task on ART to do, your supervisor / contact person
+will tell you the details of what and where you will have to modify the
+code. Make sure that you read any available background information in this
+document about the modules you are about to modify.
+
+\chapter{Modifying the Project Source Tree}
+\section{Working with Git}
+\label{sec:Developing:commit}
+If you are working with git access, the very first thing you should do is to fork a local branch for your work. If you keep working on \command{master}, and accidentally do an unwarranted \command{git push} to \command{master}, your access gets permanently revoked on first offence.
+
+Once you are on your local branch, you should frequently use \command{git commit}
+---basically, a commit is a good idea whenever you reach some sort of stable milestone you might want to roll back to later. Note that  \command{git commit} only commits to the local repository on your disk: changes on your branch are only pushed to the server by an explicit \command{git push} command! 
+
+Due to the very lightweight nature of branching in git, you should also consider creating further branches from your branch if you want to try out specific things that might affect the stability of your project. As long as you do not affect the project master or anyone else's branches, you are pretty much free to do what you want with git.
+\section{Creating Patches}
+If you do not have git access to the main project sources, you can still submit patches to the project e-mail.
+\chapter{Coding Style}
+\label{sec:Developing:style}
+There is more to come here, but for the meantime three key points have to be
+mentioned before all others:
+
+
+\section{Comment Your Code}
+
+ART suffers from being uncommented over large sections. We
+are going to change that, time permitting. Document your code through personalised comments! For an example of both
+  style and content, look at
+  \filename{\$ART\_DIR/Libs/Graphics/ArPolarisableLight.c}---and that is not a
+  particularly excessive amount of comments for such a module!
+
+  
+\section{Name Conventions}
+ Obey the project naming conventions! For a start, see the
+  background section~\ref{sec:Background:Naming} about type names;
+  more information on this will be added soon.
+
+  
+\section{Coding Style}
+
+Obey the project coding style! ART has grown over the years, and even
+though different programmers have different styles it helps a lot if
+all gravitate around a given sample style (instead of a random
+selection).
+
+\subsection{Indentation}
+In ART the indentation is by spaces \emph{only} (four of them at each
+level, to be precise) with good reason: indentation can be crucial for
+the understanding of complex code, and no two editors seem to agree on
+how wide a tabstop actually is, so in the end they create more
+confusion than they do good. \command{NEdit} appears to have sometimes
+replaced 8~spaces with a TAB, which has caused a \emph{big headache}
+when editing \command{NEdit} files with another editor with a TAB
+width of~4. Currently, still many files contain tabs for indentation,
+this is historic ballast that should go away, also with your help.
+Usage of TABs vs.\ spaces should be configurable in the editor
+settings, so make sure to get it right.
+
+\paragraph{Note on Emacs:}
+If you use \command{Emacs} for programming ART, be aware that its
+default settings may introduce tabs mixed with spaces, which made
+sense to keep files small, but is still a \emph{Bad
+  Idea\texttrademark{}} in respect to what has been said above.  To
+avoid this, please add the following lines at the end of your
+\filename{\textasciitilde{}/.emacs} file.  These change the C mode
+(and derivatives like C++/ObjC/Java) to obviously set tab width to 4
+and prohibit usage of TAB instead of 4 spaces where this would be
+applicable. Finally, the prefabricated indentation rules of style
+``java'' seem to reflect better the indentation of 4 at all places.
+
+To then properly indent a file with \command{Emacs}, press
+\command{C-h} (Control-h) to select all, then
+\command{C-M-\textbackslash} (Control-Alt-Backslash; short for
+\command{M-x indent-region}).  Note that this applies \command{Emacs}
+indentation rules, but not the complete ART style! You will have to
+change the colon alignment of method parameters, type alignment of
+function parameters, etc.
+%
+\begin{verbatim}
+;;; Emacs indentation rules for ART.
+(defun ART-indent-setup ()
+  (setq tab-width 4)
+  (setq indent-tabs-mode nil)
+  (c-set-style "java"))
+(add-hook 'c-mode-common-hook 'ART-indent-setup)
+\end{verbatim}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "ARTforNewbies"
+%%% End: 
+

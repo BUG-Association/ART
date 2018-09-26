@@ -1,0 +1,1 @@
+The scenes in this directory show head on renderings of the two Macbeth Colour Checkers.

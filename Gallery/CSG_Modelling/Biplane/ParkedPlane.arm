@@ -1,0 +1,247 @@
+#import "Biplane.arm"
+
+//#define DIFFUSE_ILLUMINATION
+
+/* ---------------------------------------------------------------------------
+    'createSymetricLinesExpression'
+--------------------------------------------------------------------------- */
+id createSymetricLinesExpression(
+        ART_GV  * art_gv,
+        id        inputValue,
+        double    frequency,
+        double    thickness
+        )
+{
+    // R -> [0, 1]
+    id periodicExpr =
+            DD_XMOD_D( 
+                    DD_MUL_D( inputValue, CONST_D( frequency ) ),
+                    CONST_D( 1.0 )
+                    );
+            
+    // lines
+    id gridExpr =
+        DD_SUB_D(
+            CONST_D( 1.0 ),
+            DDD_PULSE_D(
+                CONST_D( thickness / 2.0 ),
+                CONST_D( 1.0 - thickness / 2.0 ),
+                periodicExpr
+                )
+            );
+
+    return gridExpr;
+}
+
+/* ---------------------------------------------------------------------------
+    'createXYGridSurface'
+--------------------------------------------------------------------------- */
+id createXYGridSurface(
+        ART_GV  * art_gv,
+        id        coordinates,
+        id        mainSurface,
+        id        gridSurface,
+        double    thickness,        // portion of the periodic interval
+        double    frequency
+        )
+{
+    id xLinesExpr =
+        createSymetricLinesExpression(
+            art_gv,
+            P3_X( coordinates ),
+            frequency,
+            thickness
+            );
+    id yLinesExpr =
+        createSymetricLinesExpression(
+            art_gv,
+            P3_Y( coordinates ),
+            frequency,
+            thickness
+            );
+    
+    id xyGridExpr =
+        DD_MAX_D(
+            xLinesExpr,
+            yLinesExpr
+            );
+    
+    return
+        MAPPED_SURFACE( 
+            xyGridExpr,
+            SURFACE_MAP(
+                0.0, mainSurface,
+                1.0, gridSurface,
+                MAP_END
+                )
+            );
+}
+
+/* ---------------------------------------------------------------------------
+    'createXYGridSurface2Levels'
+--------------------------------------------------------------------------- */
+id createXYGridSurface2Levels(
+        ART_GV  * art_gv,
+        id        coordinates,
+        id        mainSurface,
+        id        gridSurfaceLevel1,
+        id        gridSurfaceLevel2,
+        double    level1Frequency,
+        int       level2SubCount,
+        double    thickness         // portion of the whole periodic interval
+        )
+{
+    id gridSurface2 =
+        createXYGridSurface(
+            art_gv,
+            coordinates,
+            mainSurface,
+            gridSurfaceLevel2,
+            thickness * level2SubCount / 2.0,
+            level1Frequency * level2SubCount
+            );
+
+    id gridSurface1 =
+        createXYGridSurface(
+            art_gv,
+            coordinates,
+            gridSurface2,
+            gridSurfaceLevel1,
+            thickness,
+            level1Frequency
+            );
+    
+    return gridSurface1;
+}
+
+
+ArNode * create_ParkedPlaneObjects(
+        ART_GV  * art_gv
+        )
+{
+    ArObj plane = [ create_BiplaneObject(art_gv)
+                   trafo: USCALE(1.5)
+                        : ROT_X(15 DEGREES)
+                        //: ROT_Y(25 DEGREES)
+                        //: ROT_Y(-22 DEGREES)
+                        : ROT_Z(240 DEGREES)
+ 			: TRANSLATION(-3,2,2.95) ];
+//    return plane;
+
+    id whiteLambertSurface =
+        LAMBERT_REFLECTOR( MACBETH_NEUTRAL8 );
+//        LAMBERT_REFLECTOR( CONST_COLOUR_RGB(1,0,0) );
+
+    id lightGreyLambertSurface =
+        LAMBERT_REFLECTOR( MACBETH_NEUTRAL65 );
+
+    id pinkLambertSurface =
+        LAMBERT_REFLECTOR( MACBETH_MODERATERED );
+
+    id baseSurface =
+        createXYGridSurface2Levels(
+              art_gv,
+              WORLDSPACE_COORDS,
+              whiteLambertSurface,
+              pinkLambertSurface,
+              lightGreyLambertSurface,
+              1.0 / 7.7,
+              10,
+              0.018
+            );
+
+    ArObj base =
+        [ CUBE apply
+            :   SCALE(200 ,200 , 1 )
+            :   TRANSLATION(-100 ,-100 , -1.0 )
+            :   baseSurface
+            ];
+
+    return UNION( base, plane, 0 );
+}
+
+ArNode <ArpCamera> * create_ParkedPlaneCamera(
+        ART_GV  * art_gv
+        )
+{
+    return
+    [ CAMERA
+	imageSize: IVEC2D( 1280, 1024 )
+	ray:       RAY3D(PNT3D(12.74,-41.90,26.96),VEC3D(-2.84,8.56,-5.00))
+	zoom:      2.3
+    ];
+}
+
+#ifndef SAMPLES
+#define SAMPLES 32
+#endif
+
+ARM_MAIN_FUNCTION(ParkedPlane)
+{
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  5
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+			maximalRecursion: 10
+#ifdef ALG_LS
+                        mode:             arpathtracermode_light_sampling
+#elif defined ALG_DS
+                        mode:             arpathtracermode_direction_sampling
+#endif
+                    ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       SAMPLES
+                randomValueGeneration: RANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    YES
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+#ifdef DIFFUSE_ILLUMINATION
+    id  environment_material =
+        UNIFORM_ENVIRONMENT_MATERIAL( CIE_ILLUMINANT_D65, 1.0 );
+#endif
+
+    id result =
+        [ SCENE
+            sceneGeometry:       create_ParkedPlaneObjects(art_gv)
+#ifdef DIFFUSE_ILLUMINATION
+            environmentMaterial: environment_material
+#else
+            skyModel:
+                [ HOSEK_SKYLIGHT
+                    elevation   : 20 DEGREES
+                    azimuth     : 360.0 DEGREES
+                    turbidity   : 4.0
+                    groundAlbedo: CONST_COLOUR_GREY(0.5)
+                    ]
+#endif
+            camera:		create_ParkedPlaneCamera(art_gv)
+            actionSequence: actionsequence
+    ];
+
+    return result;
+}

@@ -1,0 +1,382 @@
+ArObj create_Federung_ganz(ART_GV *art_gv,ArObj Federung)
+{
+  double move = 3342.5 MM;
+  ArObj Federung_ganz = [ Federung trafo: TRANSLATION(700 MM, 17.5 MM, 840 MM) ];
+
+  while ( move < 7770 MM)
+  {
+    Federung_ganz = [ Federung_ganz
+                    or: [ Federung trafo: TRANSLATION(move, 17.5 MM, 1190 MM) ]];
+    move = move + 2187.5 MM;
+  }
+  return Federung_ganz;
+}
+
+ArObj create_frame(ART_GV *art_gv,ArObj black_surface)
+{
+  ArObj Federung = [[[ CUBE trafo: SCALE(805 MM, 70 MM, 175 MM) :
+                                   TRANSLATION_X(-402.5 MM) ]
+                   sub: [ CUBE trafo: SCALE(420 MM, 70 MM, 175 MM) :
+                                      TRANSLATION_X(-210 MM) :
+                                      ROT_Y(-20 DEGREES) : 
+                                      TRANSLATION(280 MM, 0 MM, -105 MM) ]]
+                   sub: [ CUBE trafo: SCALE(420 MM, 70 MM, 175 MM) :
+                                      TRANSLATION_X(-210 MM) :
+                                      ROT_Y(20 DEGREES) :
+                                      TRANSLATION(-280 MM, 0 MM, -105 MM) ]];
+
+  ArObj Federung_ganz = create_Federung_ganz(art_gv,Federung);
+
+  ArObj Rahmen = UNION([[[[[[[[[[[[[[[[[[[[[[[[ CUBE trafo: SCALE(12250 MM,
+								  105 MM,
+								  1120 MM) ]
+                 sub: [ CUBE trafo: SCALE(3675 MM, 105 MM, 420 MM) :
+                                    TRANSLATION(8750 MM, 0 MM, 717.5 MM) ]]
+                 sub: [ CYLINDER trafo: SCALE(402.5 MM, 402.5 MM, 210 MM) :
+                                        ROT_X(-90 DEGREES) :
+                                        TRANSLATION(8872.5 MM, -35 MM, 1120 MM) ]]
+                 sub: [ CUBE trafo: SCALE(10850 MM, 105 MM, 280 MM) :
+                                    TRANSLATION(1540 MM, 0 MM, -35 MM) ]]
+                 sub: [ CUBE trafo: SCALE(3850 MM, 105 MM, 525 MM) :
+                                    TRANSLATION_X(8540 MM) ]]
+                 sub: [ CUBE trafo: SCALE(805 MM, 105 MM, 385 MM) :
+                                    TRANSLATION(2152.5 MM, 0 MM, -35 MM) ]]
+                 sub: [ CUBE trafo: SCALE(1540 MM, 105 MM, 385 MM) : 
+                                    TRANSLATION(3727.5 MM, 0 MM, -35 MM) ]]
+                 sub: [ CUBE trafo: SCALE(1592.5 MM, 105 MM, 385 MM) :
+                                    TRANSLATION(5810 MM, 0 MM, -35 MM) ]]
+                 sub: [ CUBE trafo: SCALE(490 MM, 105 MM, 385 MM) :
+                                    TRANSLATION(8085 MM, 0 MM, -35 MM) ]]
+                 sub: [ CUBE trafo: SCALE(700 MM, 105 MM, 175 MM) :
+                                    ROT_Y(-14.5 DEGREES) :
+                                    TRANSLATION(927.5 MM, 0 MM, -175 MM) ]]
+                 sub: [ CUBE trafo: SCALE(455 MM, 105 MM, 420 MM) :
+                                    TRANSLATION(3097.5 MM, 0 MM, 455 MM) ]]
+                 sub: [ CUBE trafo: SCALE(385 MM, 105 MM, 420 MM) :
+                                    TRANSLATION(5337.5 MM, 0 MM, 455 MM) ]]
+                 sub: [ CUBE trafo: SCALE(385 MM, 105 MM, 420 MM) :
+                                    TRANSLATION(7542.5 MM, 0 MM, 455 MM) ]]
+                 sub: [ CUBE trafo: SCALE(385 MM, 105 MM, 315 MM) :
+                                    TRANSLATION(2467.5 MM, 0 MM, 525 MM) ]]
+                 sub: [ CUBE trafo: SCALE(455 MM, 105 MM, 315 MM) :
+                                    TRANSLATION(3762.5 MM, 0 MM, 525 MM) ]]
+                 sub: [ CUBE trafo: SCALE(385 MM, 105 MM, 315 MM) :
+                                    TRANSLATION(4812.5 MM, 0 MM, 490 MM) ]]
+                 sub: [ CUBE trafo: SCALE(525 MM, 105 MM, 175 MM) :
+                                    TRANSLATION(5932.5 MM, 0 MM, 630 MM) ]]
+                 sub: [ CUBE trafo: SCALE(350 MM, 105 MM, 315 MM) :
+                                    TRANSLATION(5932.5 MM, 0 MM, 490 MM) ]]
+                 sub: [ CUBE trafo: SCALE(245 MM, 105 MM, 105 MM) :
+                                    ROT_Y(-40 DEGREES) :
+                                    TRANSLATION(6282.5 MM, 0 MM, 490 MM) ]]
+                 sub: [ CUBE trafo: SCALE(455 MM, 105 MM, 280 MM) :
+                                    TRANSLATION(6912.5 MM, 0 MM, 525 MM) ]]
+                 sub: [ CUBE trafo: SCALE(1190 MM, 105 MM, 350 MM) :
+                                    TRANSLATION(-35 MM, 0 MM, 787.5 MM) ]]
+                 sub: [ CUBE trafo: SCALE(700 MM, 105 MM, 350 MM) :
+                                    ROT_Y(-58.5 DEGREES) :
+                                    TRANSLATION_Z(210 MM) ]]
+                 sub: [[[ CUBE trafo: SCALE(280 MM, 105 MM, 350 MM) ]
+                      sub: [ CUBE trafo: SCALE(385 MM, 105 MM, 175 MM) :
+                                         ROT_Y(-50 DEGREES) :
+                                         TRANSLATION_Z(105 MM) ]]
+                      trafo: TRANSLATION_X(7 MM) ]]
+                 sub: [ CUBE trafo: SCALE(280 MM, 105 MM, 122.5 MM) :
+                                    TRANSLATION_Z(-17.5 MM) ]],
+                 [ CUBE trafo: SCALE(105 MM, 105 MM, 262.5 MM) :
+                               TRANSLATION(630 MM, 0 MM, 787.5 MM) ],
+                 [ CUBE trafo: SCALE(105 MM, 105 MM, 262.5 MM) :
+                               TRANSLATION(3290 MM, 0 MM, 1120 MM) ],
+                 [ CUBE trafo: SCALE(105 MM, 105 MM, 262.5 MM) :
+                               TRANSLATION(5477.5 MM, 0 MM, 1120 MM) ],
+                 [ CUBE trafo: SCALE(105 MM, 105 MM, 262.5 MM) :
+                               TRANSLATION(7665 MM, 0 MM, 1120 MM) ],
+                 Federung_ganz,
+                 UNION_END);
+
+  ArObj Federung_hinten = [[ CUBE trafo: SCALE(455 MM, 70 MM, 175 MM) :
+                                        ROT_Y(10 DEGREES) ]
+                          and: [ CUBE trafo: SCALE(455 MM, 70 MM, 175 MM) :
+                                             ROT_Y(-10 DEGREES) ]];
+
+  ArObj Federung_hinten_ganz = UNION([ Federung_hinten trafo: TRANSLATION(1260
+								    MM, 0
+								    MM, 560
+								    MM) ],
+                                     [ Federung_hinten trafo: SCALE(-1, 1, 1) :
+                                                              TRANSLATION(1365
+								    MM, 0
+								    MM, 560
+								    MM) ],
+                                     [ Federung_hinten trafo: TRANSLATION(2905
+								    MM, 0
+								    MM, 560
+								    MM) ],
+                                     [ Federung_hinten trafo: SCALE(-1, 1, 1) :
+                                                              TRANSLATION(3010
+								    MM, 0
+								    MM, 560
+								    MM) ],
+                                     UNION_END);
+
+  ArObj Rahmen_hinten = [[[[[[[[[[[[[[[[[[ CUBE trafo: SCALE(3325 MM, 105
+							     MM, 560 MM) ]
+                        sub: [ CUBE trafo: SCALE(1032.5 MM, 105 MM, 70 MM) :
+                                           TRANSLATION(-17.5 MM, 0 MM, 507.5 MM) ]]
+                        sub: [ CUBE trafo: SCALE(805 MM, 105 MM, 70 MM) :
+                                           TRANSLATION(1680 MM, 0 MM, 507.5 MM) ]]
+                        sub: [ CUBE trafo: SCALE(402.5 MM, 105 MM, 402.5 MM) :
+                                           TRANSLATION(-17.5 MM, 0 MM, -17.5 MM) ]]
+                        sub: [ CUBE trafo: SCALE(1032.5 MM, 105 MM, 87.5 MM) :
+                                           TRANSLATION(-17.5 MM, 0 MM, -17.5 MM) ]]
+                        sub: [ CUBE trafo: SCALE(910 MM, 105 MM, 87.5 MM) :
+                                           TRANSLATION(1610 MM, 0 MM, -17.5 MM) ]]
+                        sub: [ CUBE trafo: SCALE(525 MM, 105 MM, 350 MM) :
+                                           ROT_Y(45 DEGREES) :
+                                           TRANSLATION(140 MM, 0 MM, 140 MM) ]]
+                        sub: [ CUBE trafo: SCALE(35 MM, 105 MM, 507.5 MM) :
+                                           TRANSLATION(1155 MM, 0 MM, -17.5 MM) ]]
+                        sub: [ CUBE trafo: SCALE(35 MM, 105 MM, 507.5 MM) :
+                                           TRANSLATION(1470 MM, 0 MM, -17.5 MM) ]]
+                        sub: [ CUBE trafo: SCALE(35 MM, 105 MM, 507.5 MM) :
+                                           TRANSLATION(2800 MM, 0 MM, -17.5 MM) ]]
+                        sub: [ CUBE trafo: SCALE(35 MM, 105 MM, 507.5 MM) :
+                                           TRANSLATION(3115 MM, 0 MM, -17.5 MM) ]]
+                        sub: [ CUBE trafo: SCALE(280 MM, 105 MM, 157.5 MM) :
+                                           TRANSLATION(1190 MM, 0 MM, -17.5 MM) ]]
+                        sub: [ CUBE trafo: SCALE(280 MM, 105 MM, 157.5 MM) :
+                                           TRANSLATION(2835 MM, 0 MM, -17.5 MM) ]]
+                        or: [ CUBE trafo: SCALE(70 MM, 105 MM, 175 MM) :
+                                          TRANSLATION(1260 MM, 0 MM, 560 MM) ]]
+                        or: [ CUBE trafo: SCALE(70 MM, 105 MM, 175 MM) :
+                                          TRANSLATION(2905 MM, 0 MM, 560 MM) ]]
+                        or: [ CUBE trafo: SCALE(455 MM, 105 MM, 700 MM) :
+                                          TRANSLATION(1925 MM, 70 MM, 70 MM) ]]
+                        or: Federung_hinten_ganz ]
+                        trafo: TRANSLATION(8050 MM, 0 MM, -245 MM) ];
+
+  ArObj Rahmen_Abschluss_h = [[[[[[ CUBE trafo: SCALE(105 MM, 2520 MM, 770 MM) :
+                                           TRANSLATION_Y(-1260 MM) ]
+                             sub: [ CUBE trafo: SCALE(105 MM, 840 MM, 210 MM) :
+                                                TRANSLATION_Y(-420 MM) ]]
+                             sub: [ CUBE trafo: SCALE(105 MM, 385 MM, 245 MM) :
+                                                TRANSLATION(0 MM, 105 MM, 455 MM) ]]
+                             sub: [ CUBE trafo: SCALE(105 MM, 385 MM, 245 MM) :
+                                                TRANSLATION(0 MM, -490 MM, 455 MM) ]]
+                             sub: [[[ CUBE trafo: SCALE(105 MM, 385 MM, 385
+							MM) ]
+                                  and: [ CUBE trafo: SCALE(105 MM, 700 MM,
+							   700 MM) :
+                                                    ROT_X(40 DEGREES) :
+                                                    TRANSLATION(0 MM, 280 MM,
+							  -140 MM) ]]
+                                  trafo: TRANSLATION(0 MM, 770 MM, 262.5 MM) ]]
+                             sub: [[[ CUBE trafo: SCALE(105 MM, 385 MM, 385
+							MM) ]
+                                  and: [ CUBE trafo: SCALE(105 MM, 700 MM,
+							   700 MM) :
+                                                     ROT_X(-40 DEGREES) :
+                                                     TRANSLATION(0 MM, -455 MM,
+							   297.5 MM) ]]
+                                  trafo: TRANSLATION(0 MM, -1155 MM, 262.5 MM) ]];
+
+  ArObj Stossdaempfer = [[[[[[[[[[[[[[[[ CONE trafo: SCALE(175 MM, 175 MM,
+							   735 MM) ]
+                        sub: [ CYLINDER trafo: SCALE(175 MM, 175 MM, 315 MM) ]]
+                        sub: [ CUBE trafo: SCALE(70 MM, 420 MM, 315 MM) :
+                                           TRANSLATION(-35 MM, -210 MM, 385 MM) ]]
+                        sub: [ CUBE trafo: SCALE(420 MM, 70 MM, 315 MM) :
+                                           TRANSLATION(-210 MM, -35 MM, 385 MM) ]]
+                        sub: [ CUBE trafo: SCALE(87.5 MM, 420 MM, 315 MM) :
+                                           TRANSLATION(-52.5 MM, -210 MM, 0 MM) :
+                                           ROT_Y(15 DEGREES) :
+                                           TRANSLATION_Z(385 MM) ]]
+                        sub: [ CUBE trafo: SCALE(87.5 MM, 420 MM, 315 MM) :
+                                           TRANSLATION(-35 MM, -210 MM, 0 MM) :
+                                           ROT_Y(-15 DEGREES) :
+                                           TRANSLATION_Z(385 MM) ]]
+                        or: [ CYLINDER trafo: SCALE(35 MM, 35 MM, 105 MM) :
+                                              TRANSLATION_Z(210 MM) ]]
+                        or: [ CYLINDER trafo: SCALE(52.5 MM, 52.5 MM, 35 MM) :
+                                              TRANSLATION_Z(210 MM) ]]
+                        or: [ TORUS (607.5 MM) trafo: USCALE(70 MM) :
+                                                 TRANSLATION_Z(630 MM) ]]
+                        or: [ TORUS (604.875 MM) trafo: USCALE(70 MM) :
+                                                   TRANSLATION_Z(560 MM) ]]
+                        or: [ TORUS (604 MM) trafo: USCALE(70 MM) :
+                                                 TRANSLATION_Z(490 MM) ]]
+                        or: [ CYLINDER trafo: SCALE(87.5 MM, 87.5 MM, 70 MM) :
+                                              TRANSLATION_Z(385 MM) ]]
+                        or: [ TORUS (11.375 MM) trafo: USCALE(70 MM) :
+                                                   TRANSLATION_Z(420 MM) ]]
+                        or: [ CONE trafo: USCALE(105 MM) :
+                                          ROT_Y(180 DEGREES) :
+                                          TRANSLATION_Z(245 MM) ]]
+                        or: [ CYLINDER trafo: SCALE(175 MM, 175 MM, 35 MM) :
+                                              TRANSLATION_Z(105 MM) ]]
+                        trafo: ROT_Y(90 DEGREES) :
+                               TRANSLATION(-367.5 MM, 0 MM, 175 MM) ];
+
+  ArObj Haken = UNION([[[[ CYLINDER trafo: SCALE(105 MM, 105 MM, 35 MM) ]
+                      sub: [ CYLINDER trafo: SCALE(35 MM, 52.5 MM, 105 MM) :
+                                             TRANSLATION(0 MM, -17.5 MM, -52.5 MM) ]]
+                      sub: [ CUBE trafo: SCALE(140 MM, 87.5 MM, 105 MM) :
+                                         TRANSLATION(0 MM, -105 MM, -52.5 MM) ]]
+                      trafo: ROT_X(-90 DEGREES) ],
+                      [ CYLINDER trafo: USCALE(35 MM) :
+                                        ROT_Y(90 DEGREES) :
+                                        TRANSLATION_X(105 MM) ],
+                      [ CUBE trafo: SCALE(17.5 MM, 210 MM, 315 MM) :
+                                    TRANSLATION(140 MM, -105 MM, -157.5 MM) ],
+                      UNION_END);
+
+  ArObj Auftritt_v = UNION([ CUBE trafo: SCALE(105 MM, 35 MM, 350 MM) :
+                                   TRANSLATION(0 MM, 1015 MM, 455 MM) ],
+                         [ CUBE trafo: SCALE(315 MM, 175 MM, 35 MM) :
+				    TRANSLATION(-105 MM, 1050 MM, 455 MM) ],
+                           UNION_END);
+
+ArObj Loch = [ CYLINDER trafo: SCALE(122.5 MM, 122.5 MM, 210 MM) :
+                                   ROT_Y(90 DEGREES) :
+                                   TRANSLATION(-105 MM, -280 MM, 717.5 MM) ];
+
+  ArObj Rahmen_Abschluss_v = UNION(
+				   [[[[[[[[[[[[ CUBE 
+				    trafo: SCALE(105 MM, 2100 MM, 1155 MM) :
+	                                   TRANSLATION_Y(-1050 MM) ]
+                                   sub: [ CUBE trafo: SCALE(105 MM, 630 MM,
+				   		    245 MM) :
+                                               TRANSLATION(0 MM, -315 MM, 595 MM) ]]
+                                   sub: [ Loch trafo: SCALE(1, -1, 1) ]]
+                                   sub: Loch ]
+                                   sub: [ CUBE trafo: SCALE(105 MM, 1050
+				   		    MM, 437.5 MM) :
+                                            TRANSLATION(0 MM, -525 MM, -17.5 MM) ]]
+                                   sub: [ CUBE trafo: SCALE(105 MM, 262.5
+				   		    MM, 682.5 MM) :
+                                            TRANSLATION(0 MM, 822.5 MM, -17.5 MM) ]]
+                                   sub: [ CUBE trafo: SCALE(105 MM, 262.5
+				   		    MM, 682.5 MM) :
+                                          TRANSLATION(0 MM, -1067.5 MM, -17.5 MM) ]]
+                                   sub: [ CUBE trafo: SCALE(105 MM, 280 MM,
+				   		    140 MM) :
+                                          ROT_X(28 DEGREES) :
+                                          TRANSLATION(0 MM, 875 MM, 542.5 MM) ]]
+                                   sub: [ CUBE trafo: SCALE(105 MM, 280 MM,
+				   		    140 MM) :
+                                          ROT_X(-28 DEGREES) :
+                                          TRANSLATION(0 MM, -1137.5 MM, 682.5 MM) ]]
+                                   sub: [ CUBE trafo: SCALE(105 MM, 175 MM,
+				   		    455 MM) :
+                                          ROT_X(22 DEGREES) :
+                                          TRANSLATION(0 MM, 525 MM, -70 MM) ]]
+                                   sub: [ CUBE trafo: SCALE(105 MM, 175 MM,
+				   		    455 MM) :
+                                          ROT_X(-22 DEGREES) :
+                                          TRANSLATION(0 MM, -700 MM, -35 MM) ]]
+                                     surfaceMaterial: black_surface ],
+                                   [ Auftritt_v surfaceMaterial: black_surface ],
+                                   [[ Auftritt_v trafo: SCALE(1, -1, 1) ]
+                                               surfaceMaterial: black_surface ], 
+                                   [[ Stossdaempfer trafo: TRANSLATION(-315 MM,
+								 840 MM,
+								 770 MM) ]
+                                     surfaceMaterial: black_surface ],
+                                   [[ Stossdaempfer trafo: TRANSLATION(-315 MM,
+								 -840 MM,
+								 770 MM) ]
+                                     surfaceMaterial: black_surface ],
+                                   [[ Haken trafo: TRANSLATION(-157.5 MM, 0 MM,
+							 735 MM) ]
+                                     surfaceMaterial: black_surface ],
+                                   UNION_END);
+
+  ArObj Stuetzblech = [[ CUBE trafo: SCALE(35 MM, 1260 MM, 1225 MM) ]
+      surfaceMaterial: black_surface ];
+
+  ArObj Sandbehaelter = [[[[ CYLINDER trafo: SCALE(210 MM, 210 MM, 1190 MM) :
+				       ROT_X(90 DEGREES) ]
+                        or: [ CYLINDER trafo: SCALE(35 MM, 35 MM, 1260 MM) :
+                                       ROT_X(90 DEGREES) :
+                                       TRANSLATION_Y(35 MM) ]]
+                        or: [ CUBE trafo: SCALE(175 MM, 35 MM, 175 MM) :
+                                          TRANSLATION(-210 MM, -385 MM, -87.5 MM) ]]
+                        or: [ CUBE trafo: SCALE(175 MM, 35 MM, 175 MM) :
+                                          TRANSLATION(-210 MM, -980 MM, -87.5 MM) ]];
+
+  ArObj Rahmen_ganz = UNION([ Rahmen trafo: TRANSLATION_Y(595 MM) ],
+                            [ Rahmen trafo: SCALE(1, -1, 1) :
+                                            TRANSLATION_Y(-595 MM) ],
+                            [ Rahmen_hinten trafo: TRANSLATION_Y(595 MM) ],
+                            [ Rahmen_hinten trafo: SCALE(1, -1, 1) :
+                                                   TRANSLATION_Y(-595 MM) ],
+                            [[[[ CUBE trafo: SCALE(3220 MM, 1190 MM, 210 MM) :
+                                          TRANSLATION(8225 MM, -595 MM, 525 MM) ]
+                            sub: [ CUBE trafo: SCALE(385 MM, 490 MM, 210 MM) :
+                                               TRANSLATION(8680 MM, -245 MM, 525 MM) ]]
+                            sub: [ CUBE trafo: SCALE(560 MM, 490 MM, 210 MM) :
+                                               TRANSLATION(9380 MM, -245 MM, 525 MM) ]]
+                            sub: [ CUBE trafo: SCALE(560 MM, 490 MM, 210 MM) :
+                                               TRANSLATION(10570 MM, -245 MM, 525
+						     MM) ]],
+                            [[[[[[[ CUBE trafo: SCALE(2625 MM, 1190 MM, 210
+						      MM) :
+                                          TRANSLATION(105 MM, -595 MM, 315 MM) ]
+                            sub: [ CUBE trafo: SCALE(595 MM, 630 MM, 210 MM) :
+                                               TRANSLATION(420 MM, -315 MM, 315 MM) ]]
+                            sub: [ CYLINDER trafo: SCALE(140 MM, 140 MM,
+							 210 MM) :
+                                                   TRANSLATION(1575 MM, -245 MM,
+							 315 MM) ]]
+                            sub: [ CYLINDER trafo: SCALE(140 MM, 140 MM,
+							 210 MM) :
+                                                   TRANSLATION(1575 MM, 245 MM,
+							 315 MM) ]]
+                            sub: [ CUBE trafo: SCALE(315 MM, 630 MM, 210 MM) :
+                                               TRANSLATION(2415 MM, -315 MM, 315 MM) ]]
+                            sub: [ CUBE trafo: SCALE(350 MM, 175 MM, 210 MM):
+                                               ROT_Z(-20 DEGREES) :
+                                               TRANSLATION(2415 MM, -315 MM, 315 MM) ]]
+                            sub: [ CUBE trafo: SCALE(350 MM, 175 MM, 210 MM) :
+                                               TRANSLATION_Y(-175 MM) :
+                                               ROT_Z(20 DEGREES) :
+                                               TRANSLATION(2415 MM, 315 MM, 315 MM) ]],
+                            [[[[ CUBE trafo: SCALE(700 MM, 1190 MM, 140 MM) :
+                                          TRANSLATION(5950 MM, -595 MM, 315 MM) ]
+                            sub: [ CUBE trafo: SCALE(455 MM, 490 MM, 140 MM) :
+                                               TRANSLATION(5915 MM, -245 MM, 315 MM) ]]
+                            sub: [ CUBE trafo: SCALE(525 MM, 175 MM, 140 MM) :
+                                               ROT_Z(33 DEGREES) :
+                                               TRANSLATION(5915 MM, -490 MM, 315 MM) ]]
+                            sub: [ CUBE trafo: SCALE(525 MM, 175 MM, 140 MM) :
+                                               TRANSLATION_Y(-175 MM) :
+                                               ROT_Z(-33 DEGREES) :
+                                               TRANSLATION(5915 MM, 490 MM, 315 MM) ]],
+                            [ Rahmen_Abschluss_h trafo: TRANSLATION(12145 MM, 0
+							      MM, 490 MM) ],
+                            [ Rahmen_Abschluss_v trafo: TRANSLATION_Z(-245 MM) ],
+                            [ Stuetzblech trafo: TRANSLATION(6475 MM, -630 MM,
+						       700 MM) ],
+                            [ Stuetzblech trafo: TRANSLATION(8400 MM, -630 MM,
+						       700 MM) ],
+                            [ Sandbehaelter trafo: TRANSLATION(6720 MM, 595 MM,
+							 1330 MM) ],
+                            UNION_END);
+
+  ArObj Rahmen_mit_Farbe = [ Rahmen_ganz surfaceMaterial: black_surface ];
+
+  return Rahmen_mit_Farbe;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

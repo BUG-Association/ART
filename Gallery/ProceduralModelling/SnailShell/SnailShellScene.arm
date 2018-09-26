@@ -1,0 +1,223 @@
+#import "SnailShell.arm"
+
+ArObj create_ShellOnCheckerboardTable(
+        ART_GV  * art_gv
+        )
+{
+    ArObj field = [ CUBE trafo: SCALE(2.0,2.0,0.2) : TRANSLATION(-1,-1, 0) ];
+
+    id clearCoating = STANDARD_MATERIAL(CONST_COLOUR_GREY(1.5), CONST_COLOUR_GREY(0.0));
+    ArObj blue =
+        LAYERED_SURFACE(
+            TORRANCE_SPARROW_BLINN_SURFACE_CONST( 0.1 DEGREES ),
+                clearCoating, CONST_DOUBLE(1.25),
+                LAMBERT_REFLECTOR(MUNSELL_050PB_07_08)
+                );
+    ArObj yellow =
+        LAYERED_SURFACE(
+            TORRANCE_SPARROW_BLINN_SURFACE_CONST( 0.1 DEGREES ),
+                clearCoating, CONST_DOUBLE(1.25),
+                LAMBERT_REFLECTOR(MUNSELL_050Y_085_10)
+                );
+
+    ArObj yfield = [ field apply: yellow ];
+    ArObj bfield = [ field apply: blue ];
+
+    ArObj eighth =
+        UNION(
+            [ bfield trafo: TRANSLATION(-1,-1,0) ],
+            [ yfield trafo: TRANSLATION(-1, 1,0) ],
+            [ yfield trafo: TRANSLATION( 1,-1,0) ],
+            [ bfield trafo: TRANSLATION( 1, 1,0) ],
+            UNION_END
+            );
+
+    ArObj quarter =
+        UNION(
+            [ eighth trafo: TRANSLATION(-2,-2,0) ],
+            [ eighth trafo: TRANSLATION(-2, 2,0) ],
+            [ eighth trafo: TRANSLATION( 2,-2,0) ],
+            [ eighth trafo: TRANSLATION( 2, 2,0) ],
+            UNION_END
+            );
+
+    ArObj half =
+        UNION(
+            [ quarter trafo: TRANSLATION(-4,-4,0) ],
+            [ quarter trafo: TRANSLATION(-4, 4,0) ],
+            [ quarter trafo: TRANSLATION( 4,-4,0) ],
+            [ quarter trafo: TRANSLATION( 4, 4,0) ],
+            UNION_END
+            );
+
+    ArObj board =
+        UNION(
+            [ half trafo: TRANSLATION(-8,-8,0) ],
+            [ half trafo: TRANSLATION(-8, 8,0) ],
+            [ half trafo: TRANSLATION( 8,-8,0) ],
+            [ half trafo: TRANSLATION( 8, 8,0) ],
+            UNION_END
+            );
+
+    board =
+        [ board apply
+            :   USCALE(1.5)
+            :   TRANSLATION( 1.6, 0.9, 0.65)
+            ];
+
+    ArObj wood = LAMBERT_REFLECTOR( MACBETH_NEUTRAL65 );
+
+    ArObj table =
+        [ CUBE apply
+            :   SCALE(90,90,0.5)
+            :   TRANSLATION(-45,-45, 0.3)
+            :   wood
+            ];
+    id noiseExpr =
+//        P3_PERLIN_NOISE(WORLDSPACE_COORDS);
+
+        P3_FBM_NOISE(
+            WORLDSPACE_COORDS,
+            CONST_L( 6 ),
+            CONST_D( 2.0 ),
+            CONST_D( 0.5 )
+            );
+
+    id betaExpr =
+        DD_ADD_D(
+            DD_MUL_D(
+                noiseExpr,
+                CONST_DOUBLE(0.6)
+                ),
+            CONST_DOUBLE(0.02)
+            );
+/*
+    id betaExpr =
+        DD_ADD_D(
+            DD_MUL_D(
+                noiseExpr,
+                CONST_DOUBLE(0.25)
+                ),
+            CONST_DOUBLE(0.10)
+            );
+
+*/
+    id shiny = TORRANCE_SPARROW_BLINN_SURFACE_WITH_MATERIAL_CONST(0.05,PLATINUM_MATERIAL);
+    id rim = TORRANCE_SPARROW_BLINN_SURFACE_WITH_MATERIAL_CONST(0.18,GOLD_MATERIAL);
+    id notsoshiny = TORRANCE_SPARROW_BLINN_SURFACE_WITH_MATERIAL_CONST(0.35,SELENIUM_MATERIAL);
+    id othershiny = TORRANCE_SPARROW_BLINN_SURFACE_WITH_MATERIAL_CONST(0.05,PLATINUM_MATERIAL);
+    id surface =
+        MAPPED_SURFACE(
+            noiseExpr,
+            SURFACE_MAP(
+                0.0, shiny,
+                0.25, shiny,
+                0.45, rim,
+                0.5, notsoshiny,
+                0.6, notsoshiny,
+                0.65, rim,
+                0.75, othershiny,
+                1.0, othershiny,
+                MAP_END
+                )
+            );
+
+    ArObj shell =
+        [ create_Shell(art_gv) apply
+//        [ SPHERE apply
+            :   USCALE(1.5)
+            :   ROT_Z(150 DEGREES)
+            :   TRANSLATION(0.1, -6.6, 5.5)
+            :   surface
+//            :   TORRANCE_SPARROW_BLINN_SURFACE_WITH_MATERIAL(noiseExpr,SELENIUM_MATERIAL)
+            ];
+
+    return UNION( shell, table, board, UNION_END );
+}
+
+
+ArNode <ArpCamera> * create_ShellCamera(
+        ART_GV  * art_gv
+        )
+{
+    return
+    [ CAMERA
+	imageSize: IVEC2D( 320, 240 )
+	ray:       RAY3D(PNT3D(12.74,-41.90,26.96),VEC3D(-2.84,8.56,-5.80))
+	zoom:      4.48
+    ];
+}
+
+#ifndef SAMPLES
+#define SAMPLES 32
+#endif
+
+ArNode <ArpActionSequence> *  create_ShellActionSequence(
+        ART_GV  * art_gv
+        )
+{
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  5
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+			maximalRecursion: 10
+                    ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       SAMPLES
+                randomValueGeneration: PSEUDORANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    YES
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+    return actionsequence;
+}
+
+ARM_MAIN_FUNCTION(SnailShellScene)
+{
+#ifdef DIFFUSE_ILLUMINATION
+    id environmentMaterial = UNIFORM_ENVIRONMENT_MATERIAL( CIE_ILLUMINANT_D65, 1.0 );
+#endif
+
+    id result =
+    [ SCENE
+    	sceneGeometry: create_ShellOnCheckerboardTable(art_gv)
+#ifdef DIFFUSE_ILLUMINATION
+        environmentMaterial   : environmentMaterial
+#else
+	skyModel:  [ HOSEK_SKYLIGHT
+            elevation   : 25 DEGREES
+            azimuth     : 220.0 DEGREES //was:220
+            turbidity   : 4.0
+            groundAlbedo: CONST_COLOUR_GREY(0.5)
+            ]
+#endif
+	camera:		create_ShellCamera(art_gv)
+        actionSequence: create_ShellActionSequence(art_gv)
+    ];
+
+    return result;
+}

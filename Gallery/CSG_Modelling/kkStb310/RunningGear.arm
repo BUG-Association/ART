@@ -1,0 +1,425 @@
+ArObj create_running_gear(
+        ART_GV  * art_gv,
+        ArObj     black_surface,
+        ArObj     gold_surface,
+        ArObj     red_surface,
+        double    angle
+        )
+{
+    ArObj Kolbenstange = [ CYLINDER trafo: SCALE(35 MM, 35 MM, 1575 MM) :
+				  ROT_Y(90 DEGREES) :
+                                  TRANSLATION(-1417.5 MM, 465.5 MM, 0) ];
+//                   or: [ CYLINDER trafo: SCALE(78.75 MM, 78.75 MM, 70 MM) :
+//                                  ROT_Y(90 DEGREES) :
+//                                  TRANSLATION(105 MM, 1120 MM, -3377.5 MM) ]];
+
+
+				 //Verbindung zw. Steuerstange & Schieberschubstange
+
+    ArObj Verbindung = UNION(
+                            [[[ CONE trafo: SCALE(105 MM, 17.5 MM, 1500 MM) ]
+			       sub: [ CYLINDER trafo: SCALE(105 MM, 105 MM,
+							    700 MM) ]]
+                            trafo: TRANSLATION_Z(-700 MM) :
+			           ROT_Y(180 DEGREES) :
+				     TRANSLATION(1645 MM, 1295 MM, -1715 MM) ],
+                            [ CYLINDER trafo: SCALE(61.25 MM, 61.25 MM,
+						    2730 MM) :
+				     ROT_X(90 DEGREES) :
+						 TRANSLATION(1662.5 MM, 1365 MM,
+						       -2572.5 MM) ],
+                            [ CYLINDER trafo: SCALE(105 MM, 105 MM, 35 MM) :
+					   ROT_X(90 DEGREES) :
+					    TRANSLATION(1662.5 MM, 1347.5 MM,
+						  -2572.5 MM) ],
+                            [ CYLINDER trafo: SCALE(105 MM, 105 MM, 35 MM) :
+					   ROT_X(90 DEGREES) :
+					    TRANSLATION(1662.5 MM, -1312.5 MM,
+						  -2572.5 MM) ],
+                            [[[ CONE trafo: SCALE(105 MM, 17.5 MM, 700 MM) ]
+			       sub: [ CYLINDER trafo: SCALE(105 MM, 105 MM,
+							    280 MM) ]]
+			    trafo: TRANSLATION_Z(-280 MM) :
+			           ROT_Y(90 DEGREES) :
+				     TRANSLATION(1260 MM, 1347.5 MM, -2572.5 MM) ],
+                            [[[ CONE trafo: SCALE(105 MM, 17.5 MM, 700 MM) ]
+			       sub: [ CYLINDER trafo: SCALE(105 MM, 105 MM,
+							    280 MM) ]]
+			    trafo: TRANSLATION_Z(-280 MM) : //<- ? AW
+			           ROT_Y(90 DEGREES) :
+				     TRANSLATION(1260 MM, -1347.5 MM, -2572.5 MM) ],
+			     [ CYLINDER trafo: SCALE(35 MM, 35 MM, 140 MM) :
+					    ROT_X(90 DEGREES) :
+					     TRANSLATION(1330 MM, 1400 MM,
+						   -2572.5 MM) ],
+                             [ CYLINDER trafo: SCALE(35 MM, 35 MM, 140 MM) :
+					    ROT_X(-90 DEGREES) :
+					     TRANSLATION(1330 MM, -1400 MM,
+						   -2572.5 MM) ],
+			      [ CUBE trafo: SCALE(70 MM, 35 MM, 490 MM) :
+					  TRANSLATION(1295 MM, 1347.5 MM, -3027.5
+						MM) ],
+                              [ CUBE trafo: SCALE(70 MM, 35 MM, 490 MM) :
+					  TRANSLATION(1295 MM, -1382.5 MM,
+						-3027.5 MM) ],
+			     UNION_END);
+
+//alt:
+//  ArObj Schieberschubstange = UNION([ CUBE trafo: SCALE(1435 MM, 35 MM, 70 MM) :
+//					  TRANSLATION(35 MM, 1295 MM, -3045 MM) ],
+//			      [ CYLINDER trafo: SCALE(35 MM, 35 MM, 140 MM) :
+//						ROT_X(90 DEGREES) :
+//					      TRANSLATION(1330 MM, 1400 MM, -3010
+//						    MM) ],
+//                              [ CUBE trafo: SCALE(70 MM, 35 MM, 490 MM) :
+//					  TRANSLATION(1295 MM, 1277.5 MM, -3027.5
+//						MM) ],
+//				    UNION_END);
+
+
+//liegt auf (0, -1/2, 0)
+//wird in Vorwaertsfahrstellung rotiert
+  ArObj Schieberschubstange = [ UNION(
+                        [ CUBE trafo: SCALE(1470 MM, 70 MM, 70 MM) :
+                                      TRANSLATION_Y(-35 MM) ],
+			[ CYLINDER trafo: SCALE(35 MM, 35 MM, 175 MM) :
+                                          TRANSLATION(1575 MM, 0, -52.5 MM) ],
+                        [ CUBE trafo: SCALE(35 MM, 70 MM, 140 MM) :
+                                      TRANSLATION(1435 MM, -35 MM, -35 MM) ],
+			[ CUBE trafo: SCALE(175 MM, 70 MM, 35 MM) :
+				      TRANSLATION(1435 MM, -35 MM, 70 MM) ],
+       			[ CUBE trafo: SCALE(175 MM, 70 MM, 35 MM) :
+				      TRANSLATION(1435 MM, -35 MM, -35 MM) ],
+				    UNION_END) trafo: ROT_Z(8 DEGREES) ];
+
+//alt:				
+//  ArObj Schwinge = UNION([[[[ CUBE trafo: SCALE(560 MM, 175 MM, 70 MM) ]
+//				   or: [ CYLINDER 
+//                                            trafo: SCALE(35 MM, 87.5 MM, 70
+//							 MM) :
+//						TRANSLATION(0 MM, 87.5 MM, 0 MM) ]]
+//				 sub: [ CUBE trafo: SCALE(455 MM, 70 MM,
+//							  140 MM) :
+//						     TRANSLATION(17.5 MM, 52.5
+//							   MM, -35 MM) ]]
+//				 trafo: ROT_X(-90 DEGREES) :
+//				        ROT_Y(70 DEGREES) :
+//				        TRANSLATION(1575 MM, 1277.5 MM, -2695 MM) ],
+//			     UNION_END);
+
+  
+  ArObj Schwinge = [[[[ CUBE trafo: SCALE(175 MM, 560 MM, 70 MM) ]
+		            or: [ CYLINDER 
+                                     trafo: SCALE(87.5 MM, 35 MM, 70 MM) :
+				            TRANSLATION_X(87.5 MM) ]]
+			    sub: [ CUBE trafo: SCALE(70 MM, 455 MM, 140 MM) :
+					    TRANSLATION(52.5 MM, 17.5 MM, -35 MM) ]]
+                            trafo: TRANSLATION(1470 MM, -260 MM, 0) ];
+
+				
+//alt:
+//  ArObj Voreilhebel = UNION([ CUBE trafo: SCALE(70 MM, 35 MM, 70 MM) :
+//					    TRANSLATION(1610 MM, 1365 MM, -3045 MM) ],
+//                                 [ CUBE trafo: SCALE(70 MM, 35 MM, 140 MM) :
+//					    ROT_Y(-20 DEGREES) :
+//                                            TRANSLATION(1645 MM, 1365 MM, -3080 MM) ],
+//			      [[[ CONE trafo: SCALE(70 MM, 17.5 MM, 1470 MM) ]
+//				 sub: [ CYLINDER trafo: SCALE(70 MM, 70 MM,
+//							      560 MM) ]]
+//				  trafo: TRANSLATION(35 MM, 1330 MM, -4445 MM) ],
+//			    [ CYLINDER trafo: USCALE(70 MM) :
+//						ROT_X(-90 DEGREES) :
+//                                                TRANSLATION(35 MM, 1417.5 MM,
+//						      -2730 MM) ],
+//			      [ CYLINDER trafo: SCALE(35 MM, 35 MM, 70 MM) :
+//						ROT_X(-90 DEGREES) :
+//                                                TRANSLATION(35 MM, 1312.5 MM,
+//						      -3027.5 MM) ],
+//			    UNION_END);
+
+
+  ArObj Voreilhebel = UNION(
+			      [[[ CONE trafo: SCALE(70 MM, 17.5 MM, 1470 MM) ]
+				 sub: [ CYLINDER trafo: SCALE(70 MM, 70 MM,
+							      560 MM) ]]
+				  trafo: ROT_X(90 DEGREES) :
+                                         TRANSLATION(70 MM, 1452.5 MM, 17.5 MM) ],
+
+			    [ CYLINDER trafo: SCALE(35 MM, 35 MM, 70 MM) :
+                                                TRANSLATION(70 MM, 0, 25 MM) ],
+      		            [ CYLINDER trafo: SCALE(35 MM, 35 MM, 70 MM) :
+                                              TRANSLATION(70 MM, 875 MM, 0) ],
+                            [ CUBE trafo: SCALE(385 MM, 70 MM, 35 MM) :
+                                          ROT_Z(7 DEGREES) :
+                                          TRANSLATION(70 MM, 857.5 MM, 0) ],
+			    UNION_END);
+
+			  
+  ArObj Steuerstangengelenk = UNION(
+                                [ CUBE trafo: SCALE(210 MM, 35 MM, 70 MM) :
+                                              TRANSLATION(0, 565 MM, -35 MM) ],
+                                [ CYLINDER trafo: SCALE(17.5 MM, 17.5 MM, 70 MM) :
+                                                  ROT_X(90 DEGREES) :
+                                                  TRANSLATION_Y(35 DEGREES) ],
+                                [ CYLINDER trafo: SCALE(61.25 MM, 61.25 MM,
+                                                        70 MM) :
+                                                  ROT_X(90 DEGREES) :
+                                                  TRANSLATION_Y(35 DEGREES) ],
+                                UNION_END);
+
+  ArObj Steuerstange = UNION([ Steuerstangengelenk trafo:
+					 TRANSLATION(1680 MM, 712.5 MM, -1785 MM) ],
+			     [ CYLINDER trafo: SCALE(17.5 MM, 17.5 MM,
+						     1855 MM) :
+						ROT_Y(90 DEGREES) :
+					    TRANSLATION(1715 MM, 1295 MM, -1785 MM) ],
+                             [ Steuerstangengelenk trafo:
+                                         SCALE(-1, 1, 1) :
+                                         TRANSLATION(3727.5 MM, 712.5 MM, -1785 MM) ],
+                             [ CYLINDER trafo: SCALE(17.5 MM, 17.5 MM, 6125 MM) :
+                                               ROT_Y(90 DEGREES) :
+                                           TRANSLATION(1800 MM, 1295 MM, -1785 MM) ],
+                            UNION_END);
+
+// alt:
+//  ArObj Schwingenstange = [ UNION(
+//                          [[ CYLINDER trafo: SCALE(35 MM, 35 MM, 70 MM) :
+//					 ROT_X(-90 DEGREES) :
+//                                         TRANSLATION(2412.5 MM, 1295 MM, -2750 MM) ]
+//                                surfaceMaterial: gold_surface ],
+//                          [[ CUBE trafo: SCALE(1225 MM, 35 MM, 70 MM) :
+//                                     TRANSLATION(2412.5 MM, 1260 MM, -2785 MM) ]
+//			      surfaceMaterial: gold_surface ],
+//                          [[ CYLINDER trafo: SCALE(87.5 MM, 87.5 MM, 35 MM) :
+//					 ROT_X(-90 DEGREES) :
+//                                         TRANSLATION(3725 MM, 1260 MM, -2750 MM) ]
+//                              surfaceMaterial: gold_surface ],
+//				0) 
+//                        trafo: ROT_Y(12 DEGREES) ];
+
+    ArObj sub_object = UNION(
+                          [[ CUBE trafo: SCALE(1120 MM, 70 MM, 70 MM) :
+                                     TRANSLATION(1715 MM, 0 MM, 0) ]
+			      surfaceMaterial: gold_surface ],
+                          [[ CYLINDER trafo: SCALE(35 MM, 35 MM, 105 MM) :
+                                         TRANSLATION(2917 MM, 35 MM, 0 MM) ]
+                              surfaceMaterial: gold_surface ],
+                          [[ CYLINDER trafo: SCALE(87.5 MM, 87.5 MM, 70 MM) :
+                                         TRANSLATION(2917 MM, 35 MM, 0 MM) ]
+                              surfaceMaterial: gold_surface ],
+                              UNION_END);
+
+  ArObj Schwingenstange = UNION(
+                          [[ CUBE trafo: SCALE(70 MM, 140 MM, 70 MM) :
+                                         TRANSLATION(1645 MM, 160 MM, 0 MM) ]
+                                surfaceMaterial: gold_surface ],
+                          [ sub_object trafo: ROT_Z(9 DEGREES) ],
+                          [[ CYLINDER trafo: SCALE(35 MM, 35 MM, 105 MM) :
+                                             TRANSLATION(1680 MM, 230 MM, 0 MM) ]
+                              surfaceMaterial: gold_surface ],
+				UNION_END);
+
+//alt:
+//  ArObj Pleuelstange = UNION([[[[ CUBE trafo: SCALE(2135 MM, 70 MM, 140 MM) ]
+//		         sub: [ CUBE trafo: SCALE(2135 MM, 70 MM, 70 MM) :
+//				     TRANSLATION(0 MM, 28 MM, 35 MM) ]]
+//			 trafo: ROT_Y(12 DEGREES) :
+//                                TRANSLATION(630 MM, 1155 MM, -3467.5 MM) ]
+//			              surfaceMaterial: gold_surface ],
+//                     [[ CUBE trafo: SCALE(2135 MM, 17.5 MM, 70 MM) :
+//				TRANSLATION(0 MM, 31.5 MM, 35 MM) :
+//                                ROT_Y(12 DEGREES) :
+//                                TRANSLATION(630 MM, 1155 MM, -3467.5 MM) ]
+//		              surfaceMaterial: red_surface ],
+//		     [[ CUBE trafo: SCALE(280 MM, 70 MM, 315 MM) :
+//				     ROT_Y(12 DEGREES) :
+//                                     TRANSLATION(2700 MM, 1155 MM, -3992.5 MM) ]
+//			      surfaceMaterial: gold_surface ],
+//                          0);
+
+  ArObj Pleuelstange = UNION([[[[ CUBE trafo: SCALE(2030 MM, 140 MM, 70 MM) ]
+		         sub: [ CUBE trafo: SCALE(2030 MM, 70 MM, 70 MM) :
+				     TRANSLATION(0 MM, 35 MM, 28 MM) ]]
+			 trafo: TRANSLATION(725 MM, 305 MM, 0 MM) ]
+			              surfaceMaterial: gold_surface ],
+                     [[ CUBE trafo: SCALE(2030 MM, 70 MM, 17.5 MM) :
+				TRANSLATION(0 MM, 35 MM, 31.5 MM) :
+                                TRANSLATION(725 MM, 305 MM, 0 MM) ]
+		              surfaceMaterial: red_surface ],
+		     [[ CUBE trafo: SCALE(280 MM, 315 MM, 70 MM) :
+				    TRANSLATION(2755 MM, 217.5 MM, 0 MM) ]
+			      surfaceMaterial: gold_surface ],
+                          UNION_END);
+
+//alt:
+//  ArObj Kreuzkopf = UNION([[ CUBE trafo: SCALE(280 MM, 175 MM, 210 MM) :
+//				     TRANSLATION(225 MM, 1085 MM, -3465 MM) ]
+//			      surfaceMaterial: black_surface ],
+//                     [[ CUBE trafo: SCALE(350 MM, 175 MM, 87.5 MM) :
+//				     TRANSLATION(192.5 MM, 1085 MM, -3255 MM) ]
+//			      surfaceMaterial: gold_surface ],
+//                     [[ CYLINDER trafo: USCALE(70 MM) :
+//				     ROT_Y(90 DEGREES) :
+//				    TRANSLATION(175 MM, 1120 MM, -3377.5 MM) ]
+//			      surfaceMaterial: black_surface ],
+//                     [[ CYLINDER trafo: SCALE(87.5 MM, 87.5 MM, 70 MM) :
+//				    ROT_X(-90 DEGREES) :
+//                                    TRANSLATION(560 MM, 1155 MM, -3377.5 MM) ]
+//			      surfaceMaterial: gold_surface ],
+//                     [[ CYLINDER trafo: SCALE(26.25 MM, 26.25 MM, 70 MM) :
+//				    ROT_X(-90 DEGREES) :
+//                                    TRANSLATION(570.5 MM, 1190 MM, -3377.5 MM) ]
+//		              surfaceMaterial: gold_surface ],
+//                     [[ CUBE trafo: SCALE(140 MM, 35 MM, 157.5 MM) :
+//				TRANSLATION(315 MM, 1260 MM, -3465 MM) ]
+//		              surfaceMaterial: gold_surface ],
+//                     [[ CYLINDER trafo: SCALE(52.5 MM, 52.5 MM, 35 MM) :
+//				    ROT_X(-90 DEGREES) :
+//                                    TRANSLATION(385 MM, 1295 MM, -3377.5 MM) ]
+//		              surfaceMaterial: gold_surface ],
+//                     [[[[ CONE trafo: SCALE(70 MM, 17.5 MM, 910 MM) ]
+//		        sub: [ CYLINDER trafo: SCALE(70 MM, 70 MM, 525 MM) ]]
+//		              trafo: TRANSLATION(385 MM, 1295 MM, -4375 MM) ]
+//		              surfaceMaterial: gold_surface ],
+//                     0);
+
+  ArObj Kreuzkopf = UNION([[ CUBE trafo: SCALE(280 MM, 210 MM, 164.5 MM) :
+				     TRANSLATION(280 MM, 350 MM, 0) ]
+			      surfaceMaterial: black_surface ],
+                     [[ CUBE trafo: SCALE(402.5 MM, 105 MM, 210 MM) :
+				     TRANSLATION(245 MM, 262.5 MM, -22.75 MM) ]
+			      surfaceMaterial: gold_surface ],
+                     [[ CYLINDER trafo: SCALE(70 MM, 70 MM, 87.5 MM) :
+				     ROT_Y(90 DEGREES) :
+				    TRANSLATION(210 MM, 465.5 MM, 82.25 MM) ]
+			      surfaceMaterial: black_surface ],
+                     [[ CYLINDER trafo: SCALE(87.5 MM, 87.5 MM, 52.5 MM) :
+				    ROT_Y(90 DEGREES) :
+                                    TRANSLATION(157.5 MM, 465.5 MM, 82.25 MM) ]
+			      surfaceMaterial: gold_surface ],
+                     [[ CYLINDER trafo: SCALE(52.5 MM, 52.5 MM, 227.5 MM) :
+                                    TRANSLATION(437.5 MM, 465.5 MM, 0) ]
+		              surfaceMaterial: gold_surface ],
+                     [[ CUBE trafo: SCALE(140 MM, 157.5 MM, 35 MM) :
+				TRANSLATION(367.5 MM, 402.5 MM, 157.5 MM) ]
+		              surfaceMaterial: gold_surface ],
+
+                     [[ CYLINDER trafo: SCALE(35 MM, 35 MM, 70 MM) :
+                                    TRANSLATION(444.5 MM, 903 MM, 144.5 MM) ]
+		              surfaceMaterial: gold_surface ],
+
+                     [[[[ CONE trafo: SCALE(70 MM, 17.5 MM, 910 MM) ]
+		        sub: [ CYLINDER trafo: SCALE(70 MM, 70 MM, 525 MM) ]]
+		              trafo: ROT_X(90 DEGREES) :
+                                     TRANSLATION(437.5 MM, 1435 MM, 175 MM) ]
+		              surfaceMaterial: gold_surface ],
+                     [[ CYLINDER trafo: SCALE(78.75 MM, 78.75 MM, 70 MM) :
+                                        TRANSLATION(595 MM, 479.5 MM, 47.25 MM) ]
+                              surfaceMaterial: black_surface ],
+                     UNION_END);
+
+  ArObj Kuppelst_vorne = UNION([[[[ CUBE trafo: SCALE(1645 MM, 140 MM, 70 MM) ]
+		         sub: [ CUBE trafo: SCALE(1575 MM, 70 MM, 70 MM) :
+				     TRANSLATION(0 MM, 35 MM, 28 MM) ]]
+			              surfaceMaterial: gold_surface ]
+                         trafo: TRANSLATION_X(385 MM) ],
+                     [[[ CUBE trafo: SCALE(1575 MM, 70 MM, 17.5 MM) :
+				TRANSLATION(0 MM, 35 MM, 31.5 MM) ]
+                         trafo: TRANSLATION_X(385 MM) ]
+		              surfaceMaterial: red_surface ],
+                        [[ CUBE trafo: SCALE(385 MM, 280 MM, 70 MM) :
+                                TRANSLATION_Y(-70 MM) ]
+                              surfaceMaterial: gold_surface ],
+                        [[ CYLINDER trafo: SCALE(87.5 MM, 87.5 MM, 70 MM) :
+                                TRANSLATION(2082.5 MM, 70 MM, 0) ]
+                              surfaceMaterial: gold_surface ],
+                        [[ CYLINDER trafo: SCALE(87.5 MM, 87.5 MM, 315 MM) :
+                                TRANSLATION(192.5 MM, 70 MM, -227.5 MM) ]
+                              surfaceMaterial: gold_surface ],
+                        UNION_END);
+
+  ArObj Kuppelst_Gelenk = UNION(
+                          [ CYLINDER trafo: SCALE(52.5 MM, 52.5 MM, 350 MM) :
+                                            ROT_X(90 DEGREES) :
+                                            TRANSLATION(0, 175 MM, 52.5 MM) ],
+                          [ CUBE trafo: SCALE(420 MM, 280 MM, 70 MM) :
+                                        TRANSLATION(52.5 MM, -140 MM, 0) ],
+                          [ CYLINDER trafo: SCALE(87.5 MM, 87.5 MM, 507.5 MM) :
+                                        TRANSLATION(210 MM, 0, -227.5 MM) ],
+                          UNION_END);
+
+  ArObj Kuppelst_hinten = UNION(
+                          [[[ CUBE trafo: SCALE(1785 MM, 140 MM, 70 MM) ]
+		         sub: [ CUBE trafo: SCALE(1785 MM, 70 MM, 70 MM) :
+				     TRANSLATION(0 MM, 35 MM, 28 MM) ]]
+			              surfaceMaterial: gold_surface ],
+                     [[ CUBE trafo: SCALE(1785 MM, 70 MM, 17.5 MM) :
+				TRANSLATION(0 MM, 35 MM, 31.5 MM) ]
+		              surfaceMaterial: red_surface ],
+                        [[ CUBE trafo: SCALE(420 MM, 280 MM, 70 MM) :
+                                TRANSLATION(1785 MM, -70 MM, 0) ]
+                              surfaceMaterial: gold_surface ],
+                        [[ CYLINDER trafo: SCALE(87.5 MM, 87.5 MM, 315 MM) :
+                                TRANSLATION(1942.5 MM, 70 MM, -210 MM) ]
+                              surfaceMaterial: gold_surface ],
+                        UNION_END);
+
+  ArObj Kuppelstange = UNION([ Kuppelst_vorne 
+                                 trafo: TRANSLATION(420 MM, 840 MM, 0) ],
+                             [[ Kuppelst_Gelenk
+                                 trafo: TRANSLATION(2635 MM, 910 MM, 0) ]
+                                 surfaceMaterial: gold_surface ],
+                             [ Kuppelst_hinten
+                                 trafo: TRANSLATION(3055 MM, 840 MM, 0) ],
+                             0);
+
+  ArObj Gegenkurbel = [ UNION(
+                       [ CYLINDER trafo: SCALE(113.75 MM, 280 MM, 35 MM) ],
+                       [ CYLINDER trafo: SCALE(52.5 MM, 52.5 MM, 105 MM) :
+                                         TRANSLATION_Y(-227.5 MM) ],
+                       UNION_END)
+                       trafo: TRANSLATION(2852.5 MM, 717.5 MM, 0) ];
+
+  ArObj Fahrwerk_r = UNION([[ Kolbenstange trafo: TRANSLATION_Z(220.5 MM) ]
+                                        surfaceMaterial: gold_surface ],
+                           [[ Schieberschubstange trafo: TRANSLATION_Z(385 MM) ]
+                                                 surfaceMaterial: gold_surface ],
+			 [[ Schwinge trafo: TRANSLATION_Z(385 MM) ]
+                                    surfaceMaterial: gold_surface ],
+			 [[ Voreilhebel trafo: TRANSLATION_Z(315 MM) ]
+                                       surfaceMaterial: gold_surface ],
+			 [ Schwingenstange trafo: TRANSLATION_Z(385 MM) ],
+			 [ Pleuelstange trafo: TRANSLATION_Z(192.5 MM) :
+                                               ROT_Z(9 DEGREES) ],
+                           [ Kreuzkopf trafo: TRANSLATION_Z(140 MM) ],
+                           Kuppelstange,
+                           [[ Gegenkurbel trafo: TRANSLATION_Z(280 MM) ]
+                                         surfaceMaterial: gold_surface ],
+                           UNION_END);
+  ArObj Fahrwerk_l = [ Fahrwerk_r trafo: SCALE(1, -1, 1) ];
+
+  ArObj Fahrwerk = UNION(
+                         [[ Verbindung surfaceMaterial: gold_surface ]
+                               trafo: SCALE(1, -1, 1) ],
+                         [ Verbindung surfaceMaterial: gold_surface ],
+                         [ Steuerstange surfaceMaterial: gold_surface ],
+                       [[ Fahrwerk_r trafo: ROT_X(-90 DEGREES) ]
+                             trafo: TRANSLATION(0, 945 MM, -2922.5 MM) ],
+                       [[ Fahrwerk_l trafo: ROT_X(90 DEGREES) ]
+                             trafo: TRANSLATION(0, -945 MM, -2922.5 MM) ],
+                       UNION_END);
+
+    return Fahrwerk;
+
+}
+
+
+
+
+
+
+
+
+
+
+

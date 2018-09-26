@@ -1,0 +1,95 @@
+\documentclass{art}
+\usepackage{pict2e}
+\usepackage{shorttoc}
+\usepackage{xspace}
+\usepackage{color}
+
+%Stuff I'm using you may want to redefine in the style
+% \emph, \begin{verbatim},
+% section names
+% sec:introduction
+% sec:quickstart
+% sec:beforeyoubegin
+% sec:installing
+% sec:usingart
+% sec:background
+% sec:developing
+% sec:gnustep
+
+%\title{ART \\
+%\small\emph{The Advanced Rendering Toolkit Installation and Operation Manual} \\
+%Version 1.6}
+%\date{$ $Date: 2006/03/31 13:03:02 $ $} % date entry will come from CVS
+
+%\author{%
+%  \begin{tabular}{ll}
+%    Alexander Wilkie     & Christiane Ulbricht  \\
+%    Caroline Larboulette & Georg Zotti
+%  \end{tabular}
+%}
+
+% keep this up-to-date!
+\newcommand{\rem}[1]{\texttt{[#1]}}
+\newcommand{\term}[1]{\textit{#1}} %was: without number, simple  {\emph}
+%\newcommand{\textcircle}[1]{\textbf{(#1)}}
+\newcommand{\textcircle}[1]{\textcircled{\small{#1}}}
+%\newcommand{\textcircle}[1]{$\hspace*{1pt}$ $\put(2.1,3.075){\circle{9}} #1 $  $\hspace*{1pt}$}
+\newcommand{\vs}{vs.\@\xspace}
+\newcommand{\ie}{i.e.\@\xspace}
+\newcommand{\eg}{e.g.\@\xspace}
+\newcommand{\ea}{et~al.\@\xspace}
+\newcommand{\aso}{aso.\@\xspace}
+\newcommand{\etc}{etc.\@\xspace}
+\newcommand{\resp}{resp.\@\xspace}
+\newcommand{\eae}{\ea\xspace}
+\newcommand{\cf}{cf.\@\xspace}
+\newcommand{\mycite}{~\cite}
+\newcommand{\luv}{ $L^*u^*v^*$ }
+\newcommand{\rgb}{RGB }
+\newcommand{\xyz}{XYZ }
+\newcommand{\ciexyz}{CIE XYZ }
+\newcommand{\cielch}{CIE LCH }
+\newcommand{\cielab}{CIE $L^*a^*b^*$ }
+\newcommand{\UnivProf}{Univ.~Prof.\@\xspace}
+\newcommand{\UnivAss}{Univ.~Ass.\@\xspace}
+\newcommand{\Dr}{Dr.\@\xspace}
+\newcommand{\DI}{Dipl.--Ing.\@\xspace}
+\newcommand{\Nr}{Nr.\@\xspace}
+\newcommand{\zB}{z.B.\@\xspace}
+
+\newcommand{\Part}[1]{\clearemptydoublepage\part{#1}}
+\bibliographystyle{alpha}
+\begin{document}
+
+\input{CoverPage}
+%\maketitle
+%\shorttableofcontents{Overview}{0}
+\thispagestyle{empty}
+
+\clearemptydoublepage
+\input{Introduction}\thispagestyle{empty}
+
+\clearemptydoublepage
+\tableofcontents
+
+\setcounter{page}{-1}
+\Part{Getting Started With ART}
+\input{BeforeYouBegin}
+\input{Installing}
+\input{UsingART}
+
+%\Part{Developing For ART}
+%\input{Developing}
+
+\Part{Miscellaneous ART Background Information}
+\input{Background}
+
+\Part{Colour, Spectra, Light and Attenuation}
+\input{ColourAndSpectra}
+
+
+\clearemptydoublepage
+\bibliography{ARTforNewbies}
+%\clearemptydoublepage
+%\listoftables
+\end{document}

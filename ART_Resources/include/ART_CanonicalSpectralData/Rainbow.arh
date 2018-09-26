@@ -1,0 +1,55 @@
+/* ===========================================================================
+
+    Copyright (c) 1996-2016 The ART Development Team
+    ------------------------------------------------
+
+    For a comprehensive list of the members of the development team, and a
+    desaription of their respective contributions, see the file
+    "ART_DeveloperList.txt" that is distributed with the libraries.
+
+    This file is part of the Advanced Rendering Toolkit (ART) libraries.
+
+    ART is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any
+    later version.
+
+    ART is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with ART.  If not, see <http://www.gnu.org/licenses/>.
+
+=========================================================================== */
+
+#define RAINBOW_COLOUR(__name) \
+    EXTERNAL_NAMED_COLOUR("SpectralData/Rainbow.ark",(__name))
+
+//   Unrealistically perfect rainbow spectra: values are either 0.o or 1.0
+
+#define RAINBOW_RED             RAINBOW_COLOUR("red")
+#define RAINBOW_ORANGE          RAINBOW_COLOUR("orange")
+#define RAINBOW_YELLOW          RAINBOW_COLOUR("yellow")
+#define RAINBOW_GREEN           RAINBOW_COLOUR("green")
+#define RAINBOW_CYAN            RAINBOW_COLOUR("cyan")
+#define RAINBOW_BLUE            RAINBOW_COLOUR("blue")
+#define RAINBOW_VIOLET          RAINBOW_COLOUR("violet")
+
+//   Slightly imperfect versions of the above: 0.025 and 0.975 instead
+
+#define RAINBOW_RED_0975        RAINBOW_COLOUR("red0975")
+#define RAINBOW_ORANGE_0975     RAINBOW_COLOUR("orange0975")
+#define RAINBOW_YELLOW_0975     RAINBOW_COLOUR("yellow0975")
+#define RAINBOW_GREEN_0975      RAINBOW_COLOUR("green0975")
+#define RAINBOW_CYAN_0975       RAINBOW_COLOUR("cyan0975")
+#define RAINBOW_BLUE_0975       RAINBOW_COLOUR("blue0975")
+#define RAINBOW_VIOLET_0975     RAINBOW_COLOUR("violet0975")
+
+// Computer graphics nerds need 2^3 colours in their rainbow...
+
+#define RAINBOW_PINK            RAINBOW_COLOUR("pink")
+#define RAINBOW_PINK_0975       RAINBOW_COLOUR("pink0975")
+
+// ===========================================================================

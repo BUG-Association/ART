@@ -1,0 +1,658 @@
+ArObj create_Nieten_vorne(ART_GV *art_gv,ArObj Niete)
+{
+  double rot_v = 10;
+
+  ArObj Nieten_vorne = [ Niete trafo: TRANSLATION(-1365 MM, 0 MM, -822.5 MM) ];
+
+  while ( rot_v < 360 )
+  {
+    Nieten_vorne = [ Nieten_vorne
+                   or: [ Niete trafo: TRANSLATION(-1365 MM, 0 MM, -822.5 MM): ROT_X(rot_v DEGREES) ]];
+    rot_v = rot_v + 10;
+  }
+  return [ Nieten_vorne trafo: TRANSLATION_Z(-843.5 MM) ];
+}
+
+ArObj create_locomotive_body(
+        ART_GV  * art_gv,
+        ArObj     black_surface,
+        ArObj     grey_surface,
+        ArObj     red_surface
+        )
+{
+  ArObj Niete = [ SPHERE trafo: USCALE(17.5 MM) ];
+
+  ArObj Nieten_vorne = create_Nieten_vorne(art_gv,Niete);
+
+  ArObj Rauchfang_Kegel = [ CONE trafo: SCALE(227.5 MM, 227.5 MM, 1925 MM) ];
+
+  ArObj Abschluss = [[ CYLINDER trafo: SCALE(262.5 MM, 262.5 MM, 70 MM) ]
+                    sub: [ CYLINDER trafo: SCALE(199.5 MM, 199.5 MM, 70 MM) ]]; 
+                      
+  ArObj Oberer_Kegel = [[ Rauchfang_Kegel trafo: TRANSLATION_Z(-1925 MM) ]
+                       sub: [ CYLINDER trafo: SCALE(262.5 MM, 262.5 MM,
+						    1575 MM):
+                                              TRANSLATION_Z(-1925 MM) ]];
+
+  ArObj Unterer_Kegel = [[ Rauchfang_Kegel trafo: ROT_Y(180 DEGREES) :
+                                                 TRANSLATION_Z(1050 MM) ]
+                        sub: [ CYLINDER trafo: SCALE(262.5 MM, 262.5 MM,
+						     1575 MM) :
+                                               TRANSLATION_Z(-472.5 MM) ]];
+
+  ArObj Mittelring = [ CYLINDER trafo: SCALE(199.5 MM, 199.5 MM, 122.5 MM) :
+                                       TRANSLATION_Z(-472.5 MM) ];
+
+  ArObj Spiralenteil = [[ TORUS(183.75 MM) trafo: USCALE(35 MM) ]
+                       sub: [ CUBE trafo: SCALE(105 MM, 70 MM, 35 MM) :
+                                          TRANSLATION(-52.5 MM, 0 MM, -17.5 MM) ]];
+
+  ArObj Spirale = UNION( Spiralenteil,
+                         [ Spiralenteil trafo: ROT_Z(180 DEGREES) :
+                                               ROT_Y(-10 DEGREES) :
+                                               TRANSLATION_Z(6.3 MM) ],
+                         [ Spiralenteil trafo: TRANSLATION_Z(6.3 MM+6.3 MM) ],
+                         [ CYLINDER trafo: SCALE(5.25 MM, 5.25 MM, 52.5 MM) :
+                                           ROT_Y(90 DEGREES) :
+                                           ROT_Z(90 DEGREES) :
+                                           TRANSLATION(-35 MM, 0 MM, 6.3 MM+6.3 MM) ],
+                         [[[ Spiralenteil trafo: ROT_Z(180 DEGREES) ]
+                         sub: [ CUBE trafo: SCALE(70 MM, 70 MM, 35 MM) :
+                                           TRANSLATION_Z(-17.5 MM) ]]
+                         trafo: TRANSLATION_X(70 MM) ],
+                         UNION_END);
+  
+  ArObj Wegstehend = UNION([ CYLINDER trafo: SCALE(42 MM, 42 MM, 35 MM) :
+                                             ROT_X(90 DEGREES) :
+                                             TRANSLATION(0 MM, 217 MM, -245 MM) ],
+                           [ CYLINDER trafo: SCALE(5.25 MM, 5.25 MM, 350 MM) :
+                                             ROT_Y(180 DEGREES) :
+                                             ROT_X(-90 DEGREES) :
+                                             TRANSLATION(0 MM, 525 MM, -245 MM) ],
+                           [ Spirale trafo: ROT_Z(90 DEGREES) :
+                                            ROT_Y(90 DEGREES) :
+                                            ROT_Z(180 DEGREES) :
+                                            TRANSLATION(0 MM, 595 MM, -280 MM) ],
+                           UNION_END);
+
+  ArObj Basis = [[[[[ CYLINDER trafo: SCALE(787.5 MM, 787.5 MM, 700 MM) ]
+                sub: [ CYLINDER trafo: SCALE(763 MM, 763 MM, 700 MM) ]]
+                and: [ CYLINDER trafo: SCALE(350 MM, 350 MM, 1400 MM) :
+                                      ROT_Y(90 DEGREES) :
+                                      TRANSLATION_Z(350 MM) ]]
+                trafo: ROT_Y(-90 DEGREES) :
+                       TRANSLATION_X(350 MM) :
+                       TRANSLATION_Z(-787.5 MM-735 MM) ]
+                or: [[[ CONE trafo: SCALE(252 MM, 252 MM, 1750 MM) ]
+                    sub: [ CYLINDER trafo: SCALE(252 MM, 252 MM, 1627.5 MM) ]] 
+                    trafo: ROT_Y(180 DEGREES) :
+                    TRANSLATION_Z(945 MM) ]];
+
+  ArObj Rauchfang = UNION([ Abschluss surfaceMaterial: black_surface ],
+                          [ Oberer_Kegel surfaceMaterial: black_surface ], 
+                          [ Unterer_Kegel surfaceMaterial: black_surface ],
+                          [ Mittelring surfaceMaterial: grey_surface ],
+                          [ Basis surfaceMaterial: black_surface ],  
+                          [ Wegstehend surfaceMaterial: black_surface ],
+                          UNION_END);
+  
+  ArObj G_v_Verbindung = [[[ Spiralenteil trafo: ROT_Z(180 DEGREES) ]
+                         sub: [ CUBE trafo: SCALE(70 MM, 70 MM, 35 MM) :
+                                           TRANSLATION_Z(-17.5 MM) ]]
+                         trafo: USCALE(2800 MM)];
+ 
+  ArObj G_v_Seitenteil_rund = [[[ TORUS(18.9875 MM) trafo: USCALE(910 MM) ]
+                              sub: [ CUBE trafo: SCALE(1890 MM, 1750 MM, 70
+						       MM) :
+                                                 TRANSLATION(-945 MM, -980 MM,
+						       -35 MM) ]]
+                              trafo: ROT_Y(90 DEGREES) ];
+
+  ArObj Befestigung_Kugel = [ SPHERE trafo: USCALE(21 MM) ];
+
+  ArObj Befestigung_Stange = [ CYLINDER trafo: SCALE(10.5 MM, 10.5 MM, 245 MM) ];
+
+  ArObj Gestaenge_seite = UNION([ G_v_Verbindung trafo: TRANSLATION(-1435 MM, 630
+							      MM, -980 MM) ],
+                                [ G_v_Verbindung trafo: ROT_Z(-90 DEGREES) :
+                                                        ROT_X(140 DEGREES) : 
+                                                        TRANSLATION(-1400 MM,
+							      815.5 MM,
+							      -1050 MM) ],
+                                [ CYLINDER trafo: SCALE(15.75 MM, 15.75 MM,
+							35 MM) :
+                                                  ROT_Y(90 DEGREES) :
+                                                  TRANSLATION(-1435 MM, 735 MM,
+							-980 MM) ],
+                                [ Befestigung_Kugel trafo: TRANSLATION(-1540 MM,
+								 455 MM,
+								 -980 MM) ],
+                                [ Befestigung_Stange trafo: ROT_Y(90 DEGREES) :
+                                                            TRANSLATION(-1540 MM,
+								  456.75
+								  MM, -980 MM) ],
+                                [ G_v_Seitenteil_rund
+                                           trafo: ROT_X(8 DEGREES) :
+                                                  TRANSLATION(-1295 MM, 105 MM,
+							-1617 MM) ],
+                                [ Befestigung_Kugel trafo: TRANSLATION(-1295 MM,
+								 892.5 MM,
+								 -1155 MM) ],
+                                [ Befestigung_Kugel trafo: TRANSLATION(-1295 MM,
+								 987 MM,
+								 -1855 MM) ],    
+                                [ Befestigung_Stange trafo: ROT_X(-54 DEGREES) :
+                                                            TRANSLATION(-1295 MM,
+								  682.5 MM,
+								  -1305.5 MM) ],
+                                [ Befestigung_Stange trafo: ROT_X(-115 DEGREES) :
+                                                            TRANSLATION(-1295 MM,
+								  756 MM,
+								  -1753.5 MM) ],
+                                UNION_END);
+
+  ArObj Gestaenge_vorne = UNION([[ CYLINDER trafo: SCALE(14 MM, 14 MM,
+							 1312.5 MM) :
+                                                  ROT_X(90 DEGREES) :
+                                                  TRANSLATION(-1540 MM, 656.25
+							MM, -980 MM) ]
+                                   surfaceMaterial: grey_surface ],
+                                [ Gestaenge_seite surfaceMaterial: grey_surface ],
+                                [[ Gestaenge_seite trafo: SCALE(1, -1, 1) ]
+                                   surfaceMaterial: grey_surface ],
+                                UNION_END);
+
+  ArObj Streifen = [[ CUBE trafo: SCALE(52.5 MM, 735 MM, 17.5 MM) ]
+                      surfaceMaterial: grey_surface ];
+
+  ArObj Abschlussstueck = [ CYLINDER trafo: SCALE(28 MM, 28 MM, 105 MM) :
+                                            ROT_Y(90 DEGREES) ];
+
+  ArObj Abschlussstange = [ CYLINDER trafo: SCALE(12.25 MM, 12.25 MM, 450 MM) :
+                                            ROT_Y(90 DEGREES) ];
+
+  ArObj Verschluss_rund = [[[ CYLINDER trafo: SCALE(94.5 MM, 94.5 MM, 35 MM) ]
+                          sub: [ CYLINDER trafo: SCALE(52.5 MM, 52.5 MM, 35
+						       MM) ]]
+                          sub: [ CUBE trafo: SCALE(94.5 MM, 192.5 MM, 35 MM) :
+                                             TRANSLATION_Y(-94.5 MM) ]];
+
+  ArObj Verschluss_Hebel = [ CYLINDER trafo: SCALE(10.5 MM, 10.5 MM, 140 MM) :
+                                             ROT_Y(90 DEGREES) ];
+
+  ArObj M_Cube1 = [ CUBE trafo: SCALE(735 MM, 1470 MM, 70 MM) ];
+
+  ArObj M_Cube2 = [ CUBE trafo: SCALE(700 MM, 350 MM, 70 MM) ];
+
+  ArObj Rauchkammertuer_aufsatz = 
+                     UNION([ Abschlussstueck trafo: TRANSLATION(140 MM, 735 MM,
+							  42 MM) ],
+                           [ Abschlussstueck trafo: TRANSLATION(-269.5 MM, 735
+							  MM, 42 MM) ],
+                           [ Abschlussstange trafo: TRANSLATION(-210 MM, 735 MM,
+							  42 MM) ],
+                           [ Verschluss_rund trafo: TRANSLATION(385 MM, 350 MM,
+							  45.5 MM) ],
+                           [ Verschluss_rund trafo: ROT_Z(143 DEGREES) :
+                                                    TRANSLATION(-567 MM, 462 MM,
+							  45.5 MM) ],
+                           [ Befestigung_Kugel trafo: TRANSLATION(371 MM, 350 MM,
+							    84 MM) ],
+                           [ Befestigung_Kugel trafo: TRANSLATION(-560 MM, 455
+							    MM, 84 MM) ],
+                           [ Verschluss_Hebel trafo: TRANSLATION(231 MM, 350 MM,
+							   91 MM) ],
+                           [ Verschluss_Hebel trafo: ROT_Z(-45 DEGREES) :
+                                                     TRANSLATION(-560 MM, 455 MM,
+							   91 MM) ],
+                           UNION_END);
+
+  ArObj Rauchkammertuer = UNION([[[[[[ CYLINDER trafo: SCALE(735 MM, 735
+							     MM, 70 MM) ]
+                                sub: [ M_Cube1 trafo: TRANSLATION(385 MM, -735
+							    MM, 0 MM) ]]
+                                sub: [ M_Cube1 trafo: TRANSLATION(-1365 MM, -735
+							    MM, 0 MM) ]]
+                                sub: [ M_Cube2 trafo: TRANSLATION(-350 MM, 700
+							    MM, 0 MM) ]]
+                                sub: [ M_Cube2 trafo: TRANSLATION(-350 MM, -1050
+							    MM, 0 MM) ]]
+                                surfaceMaterial: black_surface ],
+                                [[ CUBE trafo: SCALE(945 MM, 70 MM, 70 MM) :
+                                              TRANSLATION(-595 MM, -35 MM, 17.5 MM) ]
+                                   surfaceMaterial: grey_surface ],
+                                [ Streifen trafo: TRANSLATION(175 MM, 35 MM, 70 MM) ],
+                                [ Streifen trafo: TRANSLATION(175 MM, -770 MM, 70
+							MM) ],
+                                [ Streifen trafo: TRANSLATION(-245 MM, 35 MM, 70 MM) ],
+                                [ Streifen trafo: TRANSLATION(-245 MM, -770 MM,
+							70 MM) ],
+                                [ Rauchkammertuer_aufsatz
+                                  surfaceMaterial: grey_surface ],
+                                [[ Rauchkammertuer_aufsatz trafo:
+                                              SCALE(1, -1, 1) ]
+                                   surfaceMaterial: grey_surface ],
+                                UNION_END);
+
+  ArObj Deckel = [[ CYLINDER trafo: SCALE(140 MM, 140 MM, 35 MM) ]
+                    surfaceMaterial: black_surface ];
+
+
+
+
+  ArObj Rauchkammer = UNION(
+                            [[ CYLINDER trafo: SCALE(822.5 MM, 822.5
+							    MM, 2327.5 MM) :
+                                               ROT_Y(90 DEGREES) :
+                                               TRANSLATION(-1417.5 MM, 0 MM,
+						     -822.5 MM-759.5 MM)]
+                                      surfaceMaterial: black_surface ],
+                                  Gestaenge_vorne,
+                                  [ Rauchkammertuer trafo: 
+                                                     ROT_Y(-90 DEGREES) :
+                                                     TRANSLATION(-1382.5 MM, 0
+							   MM, -787.5
+							   MM-759.5 MM)],
+                                  [ Deckel trafo: ROT_Y(90 DEGREES) :
+                                                  TRANSLATION(-1435 MM, 0 MM,
+							-1015 MM) ],
+                                  [[ Nieten_vorne trafo: TRANSLATION_Z(-735 MM) ]
+                                          surfaceMaterial: black_surface ],
+                                  UNION_END);
+
+  ArObj Kessel_Ring = [[ CYLINDER trafo: ROT_Y(90 DEGREES) ]
+                                   surfaceMaterial: grey_surface ];
+
+  ArObj Kessel = UNION([[[[[ CONE trafo: SCALE(1015 MM, 1015
+							   MM, 21000 MM) ]
+                                   sub: [ CYLINDER trafo: SCALE(1015 MM,
+								1015 MM,
+								17500 MM) ]]
+                                   trafo: TRANSLATION_Z(-17500 MM) :
+                                          ROT_Y(90 DEGREES) ]
+                                   trafo: TRANSLATION(910 MM, 0 MM, -1015
+						MM-542.5 MM) ]
+                                   surfaceMaterial: black_surface ],
+                                   [ Kessel_Ring
+                                             trafo: SCALE(52.5 MM, 875 MM,
+							  875 MM) :
+                                                    TRANSLATION(980 MM, 0 MM,
+							  -875 MM-682.5 MM) ],
+                                   [ Kessel_Ring
+                                             trafo: SCALE(52.5 MM, 927.5
+							  MM, 927.5 MM) :
+                                                    TRANSLATION(2100 MM, 0, -927.5 MM-630 MM) ],
+                                   [ Kessel_Ring
+                                             trafo: SCALE(52.5 MM, 980 MM,
+							  980 MM) :
+                                                    TRANSLATION(3248 MM, 0 MM,
+							  -980 MM-577.5 MM) ],
+                                   [ Kessel_Ring
+                                             trafo: SCALE(52.5 MM, 1050 MM,
+							  1050 MM) :
+                                                   TRANSLATION(4368 MM, 0 MM,
+							 -1050 MM-497 MM) ],
+                                   UNION_END);
+
+  ArObj Brennkammerputzloch_r = [[ CYLINDER trafo: SCALE(105 MM, 105 MM, 140 MM) :
+                                              ROT_X(-45 DEGREES) ]
+                               surfaceMaterial: black_surface ];
+
+  ArObj Brennkammerputzloch_l = [[ CYLINDER trafo: SCALE(105 MM, 105 MM, 140 MM) :
+                                              ROT_X(45 DEGREES) ]
+                               surfaceMaterial: black_surface ];
+
+  ArObj Aufsatz = UNION([ CYLINDER trafo: SCALE(70 MM, 70 MM, 175 MM) :
+                                          TRANSLATION_Z(315 MM) ],
+                        [ TORUS(122.5 MM) trafo: USCALE(70 MM) :
+                                            TRANSLATION_Z(385 MM) ],
+                        [ CONE trafo: SCALE(70 MM, 70 MM, 52.5 MM) :
+                                      ROT_Y(180 DEGREES) :
+                                      TRANSLATION_Z(542.5 MM) ],
+                        UNION_END);
+
+  ArObj Ueberdruckventil = UNION([ CYLINDER trafo: SCALE(472.5 MM, 472.5 MM, 245 MM) ],
+                     [ TORUS(122.5 MM) trafo: USCALE(430.5 MM) :
+                                         TRANSLATION_Z(245 MM) ],
+                     [[ CONE trafo: SCALE(462 MM, 462 MM, 175 MM) :
+                                   ROT_Y(180 DEGREES) :
+                                   TRANSLATION_Z(455 MM) ]
+                       sub: [ CYLINDER trafo: SCALE(462 MM, 462 MM, 175 MM) :
+                                              TRANSLATION_Z(350 MM) ]],
+                     [ TORUS(61.25 MM) trafo: SCALE(280 MM, 280 MM, 70 MM) :
+                                   TRANSLATION_Z(350 MM) ],
+                     [ Aufsatz trafo: TRANSLATION_Y(105 MM) ],
+                     [ Aufsatz trafo: TRANSLATION_Y(-105 MM) ],
+                     UNION_END);
+
+  ArObj Brennkammer_Seitenwand_r = UNION([[[ CUBE trafo: SCALE(2765 MM, 350 MM,
+							   1400 MM) ]
+                               sub: [ CUBE trafo: SCALE(2170 MM, 1050 MM,
+							350 MM) :
+                                                  ROT_Y(-8 DEGREES) :
+                                                  TRANSLATION(700 MM, 0 MM, -350 MM) ]]
+                               trafo: ROT_X(10 DEGREES) :
+                                      TRANSLATION(6165 MM, 910 MM, -3150 MM) ],
+                               [[[ CYLINDER trafo: SCALE(700 MM, 700 MM,
+							 2520 MM) :
+                                                   ROT_Y(90 DEGREES) :
+                                                   TRANSLATION_Z(-665 MM) ]
+                               sub: [ CUBE trafo: SCALE(2590 MM, 1470 MM,
+							1400 MM) :
+                                                  TRANSLATION(-35 MM, -735 MM,
+							-700 MM) ]]
+                               trafo: TRANSLATION(6265 MM, 490 MM, -2012.5 MM) ],
+                               UNION_END);
+
+  ArObj Brennkammer_Seitenwand_l = UNION([[[ CUBE trafo: SCALE(2765 MM, 350 MM,
+							   1715 MM) ]
+                               sub: [ CUBE trafo: SCALE(2170 MM, 1050 MM,
+							350 MM) :
+                                                  ROT_Y(-8 DEGREES) :
+                                                  TRANSLATION(700 MM, -70 MM,
+							-350 MM) ]]
+                               trafo: ROT_X(-13 DEGREES) :
+                                      TRANSLATION(6165 MM, -1365 MM, -2975 MM) ],
+                               [[[ CYLINDER trafo: SCALE(700 MM, 700 MM,
+							 2520 MM) :
+                                                 ROT_Y(90 DEGREES) :
+                                                 TRANSLATION_Z(-665 MM) ]
+                               sub: [ CUBE trafo: SCALE(2590 MM, 1470 MM,
+							1400 MM) :
+                                                  TRANSLATION(-35 MM, -735 MM,
+							-700 MM) ]]
+                               trafo: TRANSLATION(6265 MM, -595 MM, -2012.5 MM) ],
+                               UNION_END);
+
+  ArObj Brennkammer_Seitenwand_r_surf = [ Brennkammer_Seitenwand_r 
+                                          surfaceMaterial: black_surface ];
+
+  ArObj Brennkammer_Seitenwand_l_surf = [ Brennkammer_Seitenwand_l
+                                          surfaceMaterial: black_surface ];
+
+  ArObj Brennkammer = UNION([[ CYLINDER trafo: SCALE(1015 MM, 1015
+							    MM, 3552.5 MM) :
+                                                     ROT_Y(90 DEGREES) :
+                                                     TRANSLATION(4410 MM, 0 MM,
+							   -1015 MM-542.5 MM) ]
+                                      surfaceMaterial: black_surface ],
+                                   [ Brennkammerputzloch_r
+                                              trafo: TRANSLATION(7350 MM, 595 MM,
+							   -350 MM-542.5 MM)],
+                                   [ Brennkammerputzloch_r
+                                              trafo: TRANSLATION(7000 MM, 595 MM,
+							   -350 MM-542.5 MM)],
+                                   [ Brennkammerputzloch_l
+                                              trafo: TRANSLATION(7700 MM, -595
+							   MM, -350
+							   MM-542.5 MM)],
+                                   [ Brennkammerputzloch_l
+                                              trafo: TRANSLATION(6825 MM, -595
+							   MM, -350
+							   MM-542.5 MM)],
+                                   [ Brennkammerputzloch_l
+                                              trafo: TRANSLATION(5950 MM, -595
+							   MM, -350
+							   MM-542.5 MM)],
+                                   [[ Ueberdruckventil 
+                                              trafo: TRANSLATION(4935 MM, 0 MM, -665
+							MM) ]
+                                      surfaceMaterial: black_surface ],
+                                   Brennkammer_Seitenwand_r_surf,
+                                   Brennkammer_Seitenwand_l_surf,
+                                   UNION_END);
+
+  ArObj Dach_Seitenteil = [[[[[ CYLINDER trafo: SCALE(245 MM, 245 MM,
+						      1977.5 MM) ]
+                          sub: [ CYLINDER trafo: SCALE(234.5 MM, 234.5 MM,
+						       1977.5 MM) ]] 
+                          sub: [ CUBE trafo: SCALE(490 MM, 490 MM, 1977.5 MM) :
+                                             TRANSLATION_Y(-245 MM) ]]
+                          sub: [ CUBE trafo: SCALE(490 MM, 490 MM, 1977.5 MM) :
+                                             TRANSLATION(-245 MM, -140 MM, 0 MM) ]]
+                          trafo: TRANSLATION(-2341.5 MM, -1071 MM, 0 MM) ];
+
+  ArObj Dach = UNION([[[ CYLINDER trafo: SCALE(2817.5 MM, 2817.5 MM, 1977.5
+					       MM) ]
+                     sub: [ CYLINDER trafo: SCALE(2807 MM, 2807 MM, 1977.5 MM) ]]
+                     sub: [ CUBE trafo: SCALE(5670 MM, 5670 MM, 1977.5 MM) :
+                                        TRANSLATION(-2817.5 MM+280 MM, -2817.5
+					      MM, 0 MM) ]],
+                     [[[[[[ CYLINDER trafo: SCALE(2817.5 MM, 2817.5 MM, 35 MM) ]
+                     sub: [ CYLINDER trafo: SCALE(3692.5 MM, 3692.5 MM, 35 MM) :
+                                            TRANSLATION_X(1120 MM) ]]
+                     sub: [ CUBE trafo: SCALE(1400 MM, 1400 MM, 35 MM) :
+                                            TRANSLATION(-2817.5 MM, 1225 MM, 0 MM) ]]
+                     sub: [ CUBE trafo: SCALE(1400 MM, 1400 MM, 35 MM) :
+                                            TRANSLATION(-2817.5 MM, -2625 MM, 0 MM) ]]
+                     sub: [ CUBE trafo: SCALE(7105 MM, 7105 MM, 35 MM) :
+                                        TRANSLATION(-2341.5 MM, -3552.5 MM, 0 MM) ]]
+                     trafo: TRANSLATION_Z(1977.5 MM) ],
+
+                     [[[[[ CYLINDER trafo: SCALE(245 MM, 245 MM, 35 MM) :
+                                       TRANSLATION(-2341.5 MM, 1071 MM, 0 MM) ]
+                     or: [ CYLINDER trafo: SCALE(245 MM, 245 MM, 35 MM) :
+                                           TRANSLATION(-2341.5 MM, -1071 MM, 0 MM) ]]
+                     sub: [ CYLINDER trafo: SCALE(3692.5 MM, 3692.5 MM, 35 MM) :
+                                            TRANSLATION_X(1120 MM) ]]
+                     sub: [ CUBE trafo: SCALE(7105 MM, 7105 MM, 35 MM) :
+                                        TRANSLATION(-2341.5 MM, -2341.5 MM, 0 MM) ]]
+                     trafo: TRANSLATION_Z(1977.5 MM) ],
+
+                     Dach_Seitenteil,
+                     [ Dach_Seitenteil trafo: SCALE(1, -1, 1) ],
+                     UNION_END);
+
+  ArObj Fenster = [[[ CYLINDER trafo: SCALE(210 MM, 210 MM, 35 MM) ]
+                  and: [ CUBE trafo: SCALE(472.5 MM, 280 MM, 35 MM) :
+                                     TRANSLATION(-210 MM, -140 MM, 0 MM) ]]
+                  or: [ CUBE trafo: SCALE(262.5 MM, 280 MM, 35 MM) :
+                                    TRANSLATION_Y(-140 MM) ]];
+
+  ArObj Vorderwandteil = [ CUBE trafo: SCALE(1907.5 MM, 245 MM, 35 MM) ];
+
+  ArObj Vorderwand = UNION([[[[ CYLINDER trafo: SCALE(2817.5 MM, 2817.5 MM,
+						      35 MM) ]
+                           sub: [ CUBE trafo: SCALE(5600 MM, 5600 MM, 35 MM) :
+                                              TRANSLATION(-2800 MM, 1225 MM, 0 MM) ]]
+                           sub: [ CUBE trafo: SCALE(5600 MM, 5600 MM, 35 MM) :
+                                              TRANSLATION(-2800 MM, -6825 MM, 0 MM) ]]
+                           sub: [ CUBE trafo: SCALE(5600 MM, 5600 MM, 35 MM) :
+                                              TRANSLATION(-437.5 MM, -2800 MM, 0 MM) ]],
+                           
+                           [ CYLINDER trafo: SCALE(245 MM, 245 MM, 35 MM) :
+                                             TRANSLATION(-2341.5 MM, 1071 MM, 0 MM) ],
+                           [ CYLINDER trafo: SCALE(245 MM, 245 MM, 35 MM) :
+                                             TRANSLATION(-2341.5 MM, -1074.5 MM,
+						   0 MM) ],
+
+                           [ Vorderwandteil trafo: TRANSLATION(-2345 MM, 1050 MM,
+							 0 MM) ],
+                           [ Vorderwandteil trafo: TRANSLATION(-2345 MM, -1330
+							 MM, 0 MM) ],
+                           UNION_END);
+                           
+
+  ArObj Vorderwand_mit_Fenster = [[[[ Vorderwand
+                                 sub: [ Fenster trafo: TRANSLATION(-2240 MM, 1120
+							     MM, 0 MM) ]]
+                                 sub: [ Fenster trafo: TRANSLATION(-2240 MM,
+							     -1120 MM, 0 MM) ]]
+                                 
+                                 sub: [ CUBE trafo: SCALE(595, 5600, 140) :
+                                                    TRANSLATION(-577.5-437.5, -2800, -70) ]]
+                                 trafo: TRANSLATION_Z(280 MM) ];
+
+  ArObj Ausschnitt_hinten = [[[[ CUBE trafo: SCALE(245 MM, 840 MM, 35 MM) :
+                                          TRANSLATION(1151.5 MM, 1015 MM, 0 MM) ]
+                            or: [ CUBE trafo: SCALE(280 MM, 560 MM, 35 MM) :
+                                              TRANSLATION(906.5 MM, 1295 MM, 0 MM) ]]
+                            or: [ CYLINDER trafo: SCALE(210 MM, 210 MM, 35 MM) :
+                                                  TRANSLATION(910 MM, 1645 MM, 0 MM) ]]
+                            or: [[[[ CYLINDER trafo: SCALE(665 MM, 665 MM,
+							   35 MM) ]
+                                sub: [ CUBE trafo: SCALE(1330 MM, 1330 MM,
+							 35 MM) :
+                                                   TRANSLATION(-210 MM, -665 MM,
+							 0 MM) ]]
+                                sub: [ CUBE trafo: SCALE(1330 MM, 1330 MM,
+							 35 MM) :
+                                                   TRANSLATION_X(-665 MM) ]]
+                                trafo: TRANSLATION(1365 MM, 1645 MM, 0 MM) ]];
+
+  ArObj Haltestange_K = UNION([ CYLINDER trafo: SCALE(26.25 MM, 26.25 MM,
+						    1015 MM) :
+                                        ROT_X(90 DEGREES) :
+                                        TRANSLATION(1347.5 MM, 1015 MM, 87.5 MM) ],
+                            [ TORUS(306.25 MM) trafo: USCALE(70 MM) :
+                                                ROT_Y(90 DEGREES) :
+                                                TRANSLATION(1347.5 MM, 1099 MM,
+						      87.5 MM) ],
+                            [ CYLINDER trafo: SCALE(17.5 MM, 17.5 MM, 542.5
+						    MM) :
+                                        ROT_X(90 DEGREES) :
+                                        TRANSLATION(1347.5 MM, 1715 MM, 87.5 MM) ],
+                            [[[[ TORUS(116.7425 MM) trafo: USCALE(183.75 MM) ]
+                              sub: [ CUBE trafo: SCALE(420 MM, 420 MM, 70 MM) :
+                                                 TRANSLATION(-210 MM, -420 MM,
+						       -35 MM) ]]
+                              sub: [ CUBE trafo: SCALE(420 MM, 420 MM, 70 MM) :
+                                                 TRANSLATION(-105 MM, 0 MM, -35 MM) ]]
+                                          trafo: ROT_Y(90 DEGREES) :
+                                                 TRANSLATION(1347.5 MM, 1715 MM,
+						       -96.25 MM) ],
+                            [ CUBE trafo: SCALE(70 MM, 17.5 MM, 35 MM) :
+                                          TRANSLATION(1305.5 MM, 1837.5 MM, 0 MM) ],
+                            [ CUBE trafo: SCALE(35 MM, 10.5 MM, 35 MM) :
+                                          TRANSLATION(1326.5 MM, 1827 MM, 0 MM) ],
+                            [ CYLINDER trafo: SCALE(31.5 MM, 31.5 MM, 28 MM) :
+                                              ROT_X(90 DEGREES) :
+                                              TRANSLATION(1347.5 MM, 1225 MM,
+						    87.5 MM) ], 
+                            [[[[ TORUS(79.625 MM) trafo: USCALE(105 MM) ]
+                              sub: [ CUBE trafo: SCALE(315 MM, 315 MM, 35 MM) :
+                                                 TRANSLATION(-315 MM, -157.5 MM,
+						       -17.5 MM)]]
+                              sub: [ CUBE trafo: SCALE(315 MM, 315 MM, 35 MM) :
+                                                 TRANSLATION(0 MM, -315 MM, -17.5
+						       MM) ]]
+                                          trafo: ROT_X(-90 DEGREES) :
+                                                 TRANSLATION(1242.5 MM, 1212.75
+						       MM, 87.5 MM) ],
+                            [ CYLINDER trafo: SCALE(7 MM, 7 MM, 1085 MM) :
+                                              ROT_Y(90 DEGREES) :
+                                              TRANSLATION(157.5 MM, 1212.75 MM,
+						    -17.5 MM) ],
+                            [[[[ TORUS(122.5 MM) trafo: USCALE(70 MM) ]
+                              sub: [ CUBE trafo: SCALE(315 MM, 315 MM, 35 MM) :
+                                                 TRANSLATION(0 MM, -157.5 MM,
+						       -17.5 MM) ]]
+                              sub: [ CUBE trafo: SCALE(315 MM, 315 MM, 35 MM) :
+                                                 TRANSLATION(-157.5 MM, 0 MM,
+						       -17.5 MM) ]]
+                                          trafo: TRANSLATION(157.5 MM, 1282.75
+						       MM, -17.5 MM) ],
+                            [ CYLINDER trafo: SCALE(7 MM, 7 MM, 490 MM) :
+                                              ROT_X(90 DEGREES) :
+                                              TRANSLATION(87.5 MM, 1767.5 MM,
+						    -17.5 MM) ],
+                            [ CYLINDER trafo: SCALE(10.5 MM, 10.5 MM, 17.5 MM) :
+                                              ROT_Y(90 DEGREES) :
+                                              TRANSLATION(770 MM, 1212.75 MM,
+						    -17.5 MM) ],
+                            [ CYLINDER trafo: SCALE(5.25 MM, 5.25 MM, 35 MM) :
+                                              TRANSLATION(773.5 MM, 1214.5 MM,
+						    -17.5 MM) ],
+                            [[[[ TORUS(122.5 MM) trafo: USCALE(70 MM) ]
+                              sub: [ CUBE trafo: SCALE(315 MM, 315 MM, 35 MM) :
+                                                 TRANSLATION(0 MM, -157.5 MM,
+						       -17.5 MM) ]]
+                              sub: [ CUBE trafo: SCALE(315 MM, 315 MM, 35 MM) :
+                                                 TRANSLATION(-157.5 MM, -315 MM,
+						       -17.5 MM) ]]
+                                          trafo: ROT_Y(-90 DEGREES) :
+                                                 TRANSLATION(87.5 MM, 1758.75 MM,
+						       52.5 MM) ],
+                            UNION_END);
+
+  ArObj Seitenwand = UNION([[[[[ CUBE trafo: SCALE(1365 MM, 1904 MM, 35 MM) ]
+                     sub: [ CUBE trafo: SCALE(770 MM, 595 MM, 35 MM) :
+                                        TRANSLATION(-70 MM, -17.5 MM, 0 MM) ]]
+                     sub: [ Fenster trafo: SCALE_X(31.5 MM) :
+                                           ROT_Z(-90 DEGREES) :
+                                           TRANSLATION(350 MM, 1575 MM, 0 MM) ]]
+                     sub: [ Fenster trafo: SCALE_X(31.5 MM) :
+                                           ROT_Z(-90 DEGREES) : 
+                                           TRANSLATION(350 MM, -1575 MM, 0 MM) ]]
+                     sub: Ausschnitt_hinten ],
+                     [ CUBE trafo: SCALE(35 MM, 1015 MM, 87.5 MM) :
+                                   TRANSLATION_X(1330 MM) ],
+                     [ Haltestange_K surfaceMaterial: grey_surface ],
+                     UNION_END);
+
+  ArObj Seitenwand_r = UNION(Seitenwand,
+                             [ CUBE trafo: SCALE(420 MM, 665 MM, 1050 MM) :
+                                           TRANSLATION(-420 MM, 577.5 MM, 0 MM) ],
+                             UNION_END);
+                            
+  ArObj Seitenwand_l = [ Seitenwand trafo: SCALE(1, -1, 1) ];
+
+  ArObj Seitenwand_r_rot = [ Seitenwand_r trafo: ROT_X(90 DEGREES) :
+                                             TRANSLATION(280 MM, 1316 MM, 441 MM) ];
+
+  ArObj Seitenwand_l_rot = [ Seitenwand_l trafo: ROT_X(-90 DEGREES) :
+                                             TRANSLATION(280 MM, -1316 MM, 441 MM) ];
+
+  ArObj Aufstieg = [[[[[[[[[ CUBE trafo: SCALE(875 MM, 70 MM, 1050 MM) ]
+                   sub: [ CUBE trafo: SCALE(385 MM, 70 MM, 455 MM) :
+                                      TRANSLATION(245 MM, 0 MM, 350 MM) ]]
+                   sub: [ CUBE trafo: SCALE(420 MM, 70 MM, 157.5 MM) :
+                                      TRANSLATION_Z(-17.5 MM) ]]
+                   sub: [ CUBE trafo: SCALE(35 MM, 70 MM, 350 MM) ]]
+                   sub: [ CUBE trafo: SCALE(70 MM, 70 MM, 367.5 MM) :
+                                      TRANSLATION(822.5 MM, 0 MM, -17.5 MM) ]]
+                   sub: [ CYLINDER trafo: SCALE(140 MM, 140 MM, 140 MM) :
+                                          ROT_X(90 DEGREES) :
+                                          TRANSLATION(420 MM, 70 MM, 0 MM) ]]
+                   or: [ CUBE trafo: SCALE(262.5 MM, 175 MM, 35 MM) :
+                                     TRANSLATION(560 MM, 70 MM, 0 MM) ]]
+                   or: [ CUBE trafo: SCALE(245 MM, 140 MM, 35 MM) :
+                                     TRANSLATION(630 MM, 70 MM, 350 MM) ]]
+                   or: [ CUBE trafo: SCALE(245 MM, 105 MM, 35 MM) : 
+                                     TRANSLATION(630 MM, 70 MM, 700 MM) ]];
+
+  ArObj Kabine = UNION([[ Dach trafo: ROT_Y(90 DEGREES) ]
+                          surfaceMaterial: red_surface ],
+                       [[ Vorderwand_mit_Fenster trafo: ROT_Y(90 DEGREES) :
+                                           TRANSLATION_Z(-15 MM) ]
+                          surfaceMaterial: black_surface ],
+                       [ Seitenwand_r_rot
+                          surfaceMaterial: black_surface ],
+                       [ Seitenwand_l_rot
+                          surfaceMaterial: black_surface ],
+                       [[ Aufstieg trafo: TRANSLATION(945 MM, 1190 MM, -542.5 MM) ]
+                          surfaceMaterial: black_surface ],
+                       [[ Aufstieg trafo: SCALE(1, -1, 1) :
+                                         TRANSLATION(945 MM, -1190 MM, -542.5 MM) ]
+                          surfaceMaterial: black_surface ],
+                       UNION_END);
+
+
+  ArObj Rest = UNION([ Kabine trafo: TRANSLATION(7700 MM, 0 MM, -3342.5 MM) ],
+                     Brennkammer,
+                     Kessel,
+                     Rauchkammer,
+                     Rauchfang,
+                     UNION_END);
+
+
+  return Rest;
+}
+
+
+
+
+
+
+
+

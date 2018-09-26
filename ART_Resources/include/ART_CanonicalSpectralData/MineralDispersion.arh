@@ -1,0 +1,41 @@
+/* ===========================================================================
+
+    Copyright (c) 1996-2016 The ART Development Team
+    ------------------------------------------------
+
+    For a comprehensive list of the members of the development team, and a
+    desaription of their respective contributions, see the file
+    "ART_DeveloperList.txt" that is distributed with the libraries.
+
+    This file is part of the Advanced Rendering Toolkit (ART) libraries.
+
+    ART is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any
+    later version.
+
+    ART is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with ART.  If not, see <http://www.gnu.org/licenses/>.
+
+=========================================================================== */
+
+#define MINERAL_DISPERSION(__name) \
+    EXTERNAL_NAMED_COLOUR("SpectralData/MineralDispersion.arm",(__name))
+
+#define REFRACTION_DIAMOND		MINERAL_DISPERSION("Diamond")
+#define REFRACTION_Al2O3_1		MINERAL_DISPERSION("Al2O3 1")
+#define REFRACTION_Al2O3_2		MINERAL_DISPERSION("Al2O3 2")
+#define REFRACTION_SiO2_1		MINERAL_DISPERSION("SiO2 1")
+#define REFRACTION_SiO2_2		MINERAL_DISPERSION("SiO2 2")
+#define REFRACTION_HgS_1		MINERAL_DISPERSION("HgS 1")
+#define REFRACTION_HgS_2		MINERAL_DISPERSION("HgS 2")
+#define REFRACTION_Ba2NaNb5O15_1	MINERAL_DISPERSION("Ba2NaNb5O15 1")
+#define REFRACTION_Ba2NaNb5O15_2	MINERAL_DISPERSION("Ba2NaNb5O15 2")
+#define REFRACTION_Ba2NaNb5O15_3	MINERAL_DISPERSION("Ba2NaNb5O15 3")
+
+// ===========================================================================

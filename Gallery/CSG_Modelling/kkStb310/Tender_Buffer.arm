@@ -1,0 +1,40 @@
+#define TENDER_BUFFER_1 \
+    createTenderBuffer1( art_gv, black_surface, grey_surface, red_surface )
+#define TENDER_BUFFER_2 \
+    createTenderBuffer2( art_gv, black_surface, grey_surface, red_surface )
+
+ArObj createTenderBuffer1(
+        ART_GV  * art_gv,
+        ArObj     black_surface,
+        ArObj     grey_surface,
+        ArObj     red_surface
+        )
+{
+
+   ArObj buf1 = [HYPERBOLOID(0.25) sub: [CUBE trafo: SCALE (3, 3, 1.5) 
+:TRANSLATION (-1.5, -1.5, -1.5)]];
+   ArObj buf2 = [[CONE trafo: SCALE (1.75, 1.75, 5)] sub:
+		    [CUBE trafo: SCALE (3, 3, 1.7) :TRANSLATION (-1.5, -1.5, 0)]];
+   return UNION ([CYLINDER trafo: SCALE ( 2, 2, 0.2) :TRANSLATION_Z (0.5)],
+			[buf1 trafo: SCALE (2, 2, 0.5)],
+			[CYLINDER trafo: SCALE (0.5, 0.5, 0.5) :TRANSLATION_Z (-0.5)],
+			[CYLINDER trafo: SCALE ( 0.6, 0.6, 0.25) :TRANSLATION_Z (-0.75)],
+			[CYLINDER trafo: SCALE ( 0.35, 0.35, 0.75) :TRANSLATION_Z (-1.5)],
+			[buf2 trafo: ROT_Y (180 DEGREES) :TRANSLATION_Z (0.2)],
+			UNION_END);
+
+}
+
+ArObj createTenderBuffer2(
+        ART_GV  * art_gv,
+        ArObj     black_surface,
+        ArObj     grey_surface,
+        ArObj     red_surface
+        )
+{
+
+  ArObj buffer = createTenderBuffer1(art_gv,black_surface,grey_surface,red_surface);
+  return [buffer or: [PARABOLOID trafo: ROT_Y (180 DEGREES) :SCALE (2, 2, 
+0.4) :TRANSLATION_Z (1.1)]];
+
+}

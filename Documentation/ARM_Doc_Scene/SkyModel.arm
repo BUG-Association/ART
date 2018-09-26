@@ -1,0 +1,171 @@
+#ifndef SAMPLES
+    #define SAMPLES 256
+#endif
+
+#ifndef PATH_LENGTH
+    #define PATH_LENGTH 20
+#endif
+
+#ifndef ELEV
+    #define ELEV 5
+#endif
+
+#ifndef AZIM
+    #define AZIM 0
+#endif
+
+#ifndef TURB
+    #define TURB 2.0
+#endif
+
+
+
+#ifndef ELEV_A
+    #define ELEV_A 5
+#endif
+
+#ifndef AZIM_A
+    #define AZIM_A 0
+#endif
+
+#ifndef TEMP_A
+    #define TEMP_A 6400
+#endif
+
+
+#ifndef ELEV_B
+    #define ELEV_B 25
+#endif
+
+#ifndef AZIM_B
+    #define AZIM_B 30
+#endif
+
+#ifndef TEMP_B
+    #define TEMP_B 2400
+#endif
+
+#ifndef INTENSITY
+    #define INTENSITY 1.0
+#endif
+
+#ifndef REL_INTENSITY_A
+    #define REL_INTENSITY_A 0.8
+#endif
+
+
+ARM_MAIN_FUNCTION(SkyModel)
+{   
+    id scene_geometry =
+        UNION(
+            UNION_END
+            );
+
+    id camera =
+        [ FISHEYE_CAMERA
+            imageSize:  IVEC2D( 256, 256 )
+            ray:        RAY3D( PNT3D(0.0, 0.0, 0.0), VEC3D(0.0, 0.0, 1.0) )
+            zoom:       1
+            ];
+
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  6
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+                        maximalRecursion: PATH_LENGTH
+                #ifdef ALG_DS
+                    #ifdef WEIGHED
+                        mode:             arpathtracermode_weighed_direction_sampling
+                    #else
+                        mode:             arpathtracermode_direction_sampling
+                    #endif
+                #elif defined ALG_LS
+                    #ifdef WEIGHED
+                        mode:             arpathtracermode_weighed_light_sampling
+                    #else
+                        mode:             arpathtracermode_light_sampling
+                    #endif
+                #endif
+                    ]
+                sampleSplattingKernel:   TENT_KERNEL
+                samplesPerPixel:         SAMPLES
+                randomValueGeneration:   RANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    NO
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+    return
+        [ SCENE
+            sceneGeometry      : scene_geometry
+
+#if defined DIFFUSE_INFINITESPHERE_
+            skyModel: [ DIFFUSE_INFINITESPHERE ]
+#elif defined HOSEK_SKYLIGHT_
+            skyModel :
+                [ HOSEK_SKYLIGHT
+                    elevation   : ELEV DEGREES
+                    azimuth     : AZIM DEGREES
+                    turbidity   : TURB
+                    groundAlbedo: CONST_COLOUR_GREY(0.5)
+                ]
+#elif defined HOSEK_BINARY_SKYLIGHT_
+            skyModel :
+                [ HOSEK_BINARY_SKYLIGHT
+                    elevationA  : ELEV_A DEGREES
+                    azimuthA    : AZIM_A DEGREES
+                    solColourA  : TEMP_A KELVIN
+                    elevationB  : ELEV_B DEGREES
+                    azimuthB    : AZIM_B DEGREES
+                    solColourB  : TEMP_B KELVIN
+                    solIntensity: INTENSITY
+                    intensityOfA: REL_INTENSITY_A
+                    turbidity   : TURB
+                    groundAlbedo: CONST_COLOUR_GREY(0.5)
+                ]
+#elif defined PRAGUE_SKYLIGHT_
+            skyModel :
+                [ PRAGUE_SKYLIGHT
+                    elevation   : ELEV DEGREES
+                    azimuth     : AZIM DEGREES
+                    turbidity   : TURB
+                    groundAlbedo: CONST_COLOUR_GREY(0.5)
+                ]
+#elif defined PREETHAM_SKYLIGHT_
+            skyModel :
+                [ PREETHAM_SKYLIGHT
+                    elevation   : ELEV DEGREES
+                    azimuth     : AZIM DEGREES
+                    turbidity   : TURB
+                    polarised   : YES
+                ]
+#endif     
+            camera        : camera
+            actionSequence: actionsequence
+            ];
+}
+
+// ===========================================================================

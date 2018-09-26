@@ -1,0 +1,128 @@
+/* ===========================================================================
+
+    Copyright (c) 1996-2016 The ART Development Team
+    ------------------------------------------------
+
+    For a comprehensive list of the members of the development team, and a
+    desaription of their respective contributions, see the file
+    "ART_DeveloperList.txt" that is distributed with the libraries.
+
+    This file is part of the Advanced Rendering Toolkit (ART) libraries.
+
+    ART is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any
+    later version.
+
+    ART is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with ART.  If not, see <http://www.gnu.org/licenses/>.
+
+=========================================================================== */
+
+#define CIE_ILLUMINANT(__name) \
+    EXTERNAL_NAMED_COLOUR("SpectralData/CIEIlluminant.ark",(__name))
+
+
+// =========   A: incandescent light   =======================================
+
+
+#define CIE_ILLUMINANT_A	CIE_ILLUMINANT("A")
+
+
+// =========   C: old daylight standard, deprecated   ========================
+
+
+#define CIE_ILLUMINANT_C	CIE_ILLUMINANT("C")
+
+
+// =========   Dxx: current CIE daylight standards   =========================
+
+
+#define CIE_ILLUMINANT_D50	CIE_ILLUMINANT("D50")
+#define CIE_ILLUMINANT_D55	CIE_ILLUMINANT("D55")
+#define CIE_ILLUMINANT_D65	CIE_ILLUMINANT("D65")
+#define CIE_ILLUMINANT_D75	CIE_ILLUMINANT("D75")
+
+
+// =========   FLxx and Fl3.xx: fluorescent illuminants   ====================
+
+
+//  Normal series: two semi-broadband emissions of antimony and manganese
+//  activations in calcium halophosphate phosphor.
+
+#define CIE_ILLUMINANT_FL1	CIE_ILLUMINANT("FL1")
+#define CIE_ILLUMINANT_FL2	CIE_ILLUMINANT("FL2")
+#define CIE_ILLUMINANT_FL3	CIE_ILLUMINANT("FL3")
+#define CIE_ILLUMINANT_FL4	CIE_ILLUMINANT("FL4")
+#define CIE_ILLUMINANT_FL5	CIE_ILLUMINANT("FL5")
+#define CIE_ILLUMINANT_FL6	CIE_ILLUMINANT("FL6")
+
+//  Broad-band series: full-spectrum light fluorescent lamps with multiple
+//  phosphors, and higher colour rendering indexes.
+
+#define CIE_ILLUMINANT_FL7	CIE_ILLUMINANT("FL7")
+#define CIE_ILLUMINANT_FL8	CIE_ILLUMINANT("FL8")
+#define CIE_ILLUMINANT_FL9	CIE_ILLUMINANT("FL9")
+
+//  Three-band illuminants: three narrow-band emissions caused by
+//  ternary compositions of rare-earth phosphors.
+
+#define CIE_ILLUMINANT_FL10	CIE_ILLUMINANT("FL10")
+#define CIE_ILLUMINANT_FL11	CIE_ILLUMINANT("FL11")
+#define CIE_ILLUMINANT_FL12	CIE_ILLUMINANT("FL12")
+
+//  Halophosphate lamps
+
+#define CIE_ILLUMINANT_FL3_1	CIE_ILLUMINANT("FL3_1")
+#define CIE_ILLUMINANT_FL3_2	CIE_ILLUMINANT("FL3_2")
+#define CIE_ILLUMINANT_FL3_3	CIE_ILLUMINANT("FL3_3")
+
+//  DeLuxe lamps
+
+#define CIE_ILLUMINANT_FL3_4	CIE_ILLUMINANT("FL3_4")
+#define CIE_ILLUMINANT_FL3_5	CIE_ILLUMINANT("FL3_5")
+#define CIE_ILLUMINANT_FL3_6	CIE_ILLUMINANT("FL3_6")
+
+//  Three-Band
+
+#define CIE_ILLUMINANT_FL3_7	CIE_ILLUMINANT("FL3_7")
+#define CIE_ILLUMINANT_FL3_8	CIE_ILLUMINANT("FL3_8")
+#define CIE_ILLUMINANT_FL3_9	CIE_ILLUMINANT("FL3_9")
+#define CIE_ILLUMINANT_FL3_10	CIE_ILLUMINANT("FL3_10")
+#define CIE_ILLUMINANT_FL3_11	CIE_ILLUMINANT("FL3_11")
+
+//  Multi-Band
+
+#define CIE_ILLUMINANT_FL3_12	CIE_ILLUMINANT("FL3_12")
+#define CIE_ILLUMINANT_FL3_13	CIE_ILLUMINANT("FL3_13")
+#define CIE_ILLUMINANT_FL3_14	CIE_ILLUMINANT("FL3_14")
+
+//  Fluorescent D65 Simulator
+
+#define CIE_ILLUMINANT_FL3_15	CIE_ILLUMINANT("FL3_15")
+
+
+// =========   HPx: high pressure discharge lamps   ==========================
+
+
+//  A standard high pressure sodium lamp
+
+#define CIE_ILLUMINANT_HP1	CIE_ILLUMINANT("HP1")
+
+//  A colour enhanced high pressure sodium lamp
+
+#define CIE_ILLUMINANT_HP2	CIE_ILLUMINANT("HP2")
+
+//  Three types of high pressure metal halide lamps
+
+#define CIE_ILLUMINANT_HP3	CIE_ILLUMINANT("HP3")
+#define CIE_ILLUMINANT_HP4	CIE_ILLUMINANT("HP4")
+#define CIE_ILLUMINANT_HP5	CIE_ILLUMINANT("HP5")
+
+
+// ===========================================================================

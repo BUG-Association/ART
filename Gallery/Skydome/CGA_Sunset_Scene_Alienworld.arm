@@ -1,0 +1,533 @@
+#ifndef SAMPLES
+#define SAMPLES UNLIMITED
+#endif
+
+ArNode * createMacbethChart(
+        ART_GV  * art_gv
+        )
+{
+    ArObj s03   = LAMBERT_REFLECTOR( MACBETH_DARKSKIN );
+    ArObj s02   = LAMBERT_REFLECTOR( MACBETH_ORANGE );
+    ArObj s01   = LAMBERT_REFLECTOR( MACBETH_BLUE );
+    ArObj s00   = LAMBERT_REFLECTOR( MACBETH_WHITE );
+
+    ArObj s13   = LAMBERT_REFLECTOR( MACBETH_LIGHTSKIN );
+    ArObj s12   = LAMBERT_REFLECTOR( MACBETH_PURPLISHBLUE );
+    ArObj s11   = LAMBERT_REFLECTOR( MACBETH_GREEN );
+    ArObj s10   = LAMBERT_REFLECTOR( MACBETH_NEUTRAL8 );
+
+    ArObj s23   = LAMBERT_REFLECTOR( MACBETH_BLUESKY );
+    ArObj s22   = LAMBERT_REFLECTOR( MACBETH_MODERATERED );
+    ArObj s21   = LAMBERT_REFLECTOR( MACBETH_RED );
+    ArObj s20   = LAMBERT_REFLECTOR( MACBETH_NEUTRAL65 );
+
+    ArObj s33   = LAMBERT_REFLECTOR( MACBETH_FOLIAGE );
+    ArObj s32   = LAMBERT_REFLECTOR( MACBETH_PURPLE );
+    ArObj s31   = LAMBERT_REFLECTOR( MACBETH_YELLOW );
+    ArObj s30   = LAMBERT_REFLECTOR( MACBETH_NEUTRAL5 );
+
+    ArObj s43   = LAMBERT_REFLECTOR( MACBETH_BLUEFLOWER );
+    ArObj s42   = LAMBERT_REFLECTOR( MACBETH_YELLOWGREEN );
+    ArObj s41   = LAMBERT_REFLECTOR( MACBETH_MAGENTA );
+    ArObj s40   = LAMBERT_REFLECTOR( MACBETH_NEUTRAL35 );
+
+    ArObj s53   = LAMBERT_REFLECTOR( MACBETH_BLUISHGREEN );
+    ArObj s52   = LAMBERT_REFLECTOR( MACBETH_ORANGEYELLOW );
+    ArObj s51   = LAMBERT_REFLECTOR( MACBETH_CYAN );
+    ArObj s50   = LAMBERT_REFLECTOR( MACBETH_BLACK );
+    
+    ArObj bgr_surface  = LAMBERT_REFLECTOR( CONST_COLOUR_GRAY(0.042) );
+
+    ArObj cube = [ CUBE apply: SCALE(5.5,5.5,0.5) : TRANSLATION(-2.75,-2.75,0) ];
+    
+    double  dv = 0.0;
+    
+    ArObj obj00 = [ cube apply: TRANSLATION(-15, -9, dv) : s00 ];
+    ArObj obj01 = [ cube apply: TRANSLATION(-15, -3, dv) : s01 ];
+    ArObj obj02 = [ cube apply: TRANSLATION(-15,  3, dv) : s02 ];
+    ArObj obj03 = [ cube apply: TRANSLATION(-15,  9, dv) : s03 ];
+
+    ArObj obj10 = [ cube apply: TRANSLATION( -9, -9, dv) : s10 ];
+    ArObj obj11 = [ cube apply: TRANSLATION( -9, -3, dv) : s11 ];
+    ArObj obj12 = [ cube apply: TRANSLATION( -9,  3, dv) : s12 ];
+    ArObj obj13 = [ cube apply: TRANSLATION( -9,  9, dv) : s13 ];
+
+    ArObj obj20 = [ cube apply: TRANSLATION( -3, -9, dv) : s20 ];
+    ArObj obj21 = [ cube apply: TRANSLATION( -3, -3, dv) : s21 ];
+    ArObj obj22 = [ cube apply: TRANSLATION( -3,  3, dv) : s22 ];
+    ArObj obj23 = [ cube apply: TRANSLATION( -3,  9, dv) : s23 ];
+
+    ArObj obj30 = [ cube apply: TRANSLATION(  3, -9, dv) : s30 ];
+    ArObj obj31 = [ cube apply: TRANSLATION(  3, -3, dv) : s31 ];
+    ArObj obj32 = [ cube apply: TRANSLATION(  3,  3, dv) : s32 ];
+    ArObj obj33 = [ cube apply: TRANSLATION(  3,  9, dv) : s33 ];
+
+    ArObj obj40 = [ cube apply: TRANSLATION(  9, -9, dv) : s40 ];
+    ArObj obj41 = [ cube apply: TRANSLATION(  9, -3, dv) : s41 ];
+    ArObj obj42 = [ cube apply: TRANSLATION(  9,  3, dv) : s42 ];
+    ArObj obj43 = [ cube apply: TRANSLATION(  9,  9, dv) : s43 ];
+
+    ArObj obj50 = [ cube apply: TRANSLATION( 15, -9, dv) : s50 ];
+    ArObj obj51 = [ cube apply: TRANSLATION( 15, -3, dv) : s51 ];
+    ArObj obj52 = [ cube apply: TRANSLATION( 15,  3, dv) : s52 ];
+    ArObj obj53 = [ cube apply: TRANSLATION( 15,  9, dv) : s53 ];
+    
+    ArObj backG =
+        [ CUBE apply
+            :   SCALE(  38,  26,   0.5 )
+            :   TRANSLATION( -19, -13,  -0.001 )
+            :   bgr_surface 
+            ];
+
+    ArObj chart =
+	UNION( obj00, obj01, obj02, obj03,
+	       obj10, obj11, obj12, obj13,
+	       obj20, obj21, obj22, obj23,
+	       obj30, obj31, obj32, obj33,
+	       obj40, obj41, obj42, obj43,
+	       obj50, obj51, obj52, obj53,
+	       backG, UNION_END );
+
+    return chart;
+//    return [ chart apply: USCALE( 1.0 / 38.0 ) ];
+}
+
+#define MACBETH_CHART   createMacbethChart( art_gv )
+
+ArNode * createGroovedSphere(
+        ART_GV  * art_gv,
+        double    angle,
+        double    secondaryRadius
+        )
+{
+    double  deltaAngle = atan( secondaryRadius );
+    double  angleA = angle - deltaAngle;
+    double  angleB = angle + deltaAngle;
+	
+    id mainTorus = 
+        [ TORUS( ( 1.0 / cos(angle) ) * secondaryRadius ) apply
+            : USCALE( cos(angle) )
+            : TRANSLATION( 0.0, 0.0, sin(angle) ) 
+            ];
+
+    double  torusFactorA = 
+        ( 1.0 / ( ( 1.0 - secondaryRadius ) * cos(angleA) ) ) * secondaryRadius;
+        
+    id subTorusA = 
+        [ TORUS( torusFactorA ) apply
+            : USCALE( ( 1.0 - secondaryRadius ) * cos(angleA) )
+            : TRANSLATION( 0.0, 0.0, ( 1.0 - secondaryRadius ) * sin(angleA) ) 
+            ];
+
+
+    double  torusFactorB = 
+        ( 1.0 / ( ( 1.0 - secondaryRadius ) * cos(angleB) ) ) * secondaryRadius;
+
+    id subTorusB = 
+        [ TORUS( torusFactorB ) apply
+            : USCALE( ( 1.0 - secondaryRadius ) * cos(angleB) )
+            : TRANSLATION( 0.0, 0.0, ( 1.0 - secondaryRadius ) * sin(angleB) ) 
+            ];
+
+    id grooveObj =  [ mainTorus sub : [ subTorusA or : subTorusB ] ];
+    id groovePair = [ grooveObj or : [ grooveObj apply : ROT_X( 180 DEGREES )]];
+        
+    id  allGrooves =
+        UNION(
+            groovePair,
+            [ groovePair apply: ROT_X( 90 DEGREES ) ],
+            [ groovePair apply: ROT_Y( 90 DEGREES ) ],
+            UNION_END
+            );
+
+    return [ SPHERE sub: allGrooves ];
+}
+
+/* ---------------------------------------------------------------------------
+    'createSymetricLinesExpression'
+--------------------------------------------------------------------------- */
+id createSymetricLinesExpression(
+        ART_GV  * art_gv,
+        id        inputValue,
+        double    frequency,
+        double    thickness
+        )
+{
+    // R -> [0, 1]
+    id periodicExpr =
+            DD_XMOD_D( 
+                    DD_MUL_D( inputValue, CONST_D( frequency ) ),
+                    CONST_D( 1.0 )
+                    );
+            
+    // lines
+    id gridExpr =
+        DD_SUB_D(
+            CONST_D( 1.0 ),
+            DDD_PULSE_D(
+                CONST_D( thickness / 2.0 ),
+                CONST_D( 1.0 - thickness / 2.0 ),
+                periodicExpr
+                )
+            );
+
+    return gridExpr;
+}
+
+/* ---------------------------------------------------------------------------
+    'createXYGridSurface'
+--------------------------------------------------------------------------- */
+id createXYGridSurface(
+        ART_GV  * art_gv,
+        id        coordinates,
+        id        mainSurface,
+        id        gridSurface,
+        double    thickness,        // portion of the periodic interval
+        double    frequency
+        )
+{
+    id xLinesExpr =
+        createSymetricLinesExpression(
+            art_gv,
+            P3_X( coordinates ),
+            frequency,
+            thickness
+            );
+    id yLinesExpr =
+        createSymetricLinesExpression(
+            art_gv,
+            P3_Y( coordinates ),
+            frequency,
+            thickness
+            );
+    
+    id xyGridExpr =
+        DD_MAX_D(
+            xLinesExpr,
+            yLinesExpr
+            );
+    
+    return
+        MAPPED_SURFACE(
+            xyGridExpr,
+            SURFACE_MAP(
+                0.0, mainSurface,
+                1.0, gridSurface,
+                MAP_END
+                )
+            );
+}
+
+/* ---------------------------------------------------------------------------
+    'createXYGridSurface'
+--------------------------------------------------------------------------- */
+id createNoiseSurface(
+        ART_GV  * art_gv,
+        id        coordinates,
+        id        mainSurface,
+        id        gridSurface,
+        id        blobsurface
+        )
+{
+    id noiseExpr =
+    //P3_PERLIN_NOISE( coordinates );
+    P3_FBM_NOISE(
+                    coordinates,
+                    CONST_L( 6 ),
+                    CONST_D( 2.0 ),
+                    CONST_D( 0.5 ) );
+                     //DD_MUL_D(,CONST_DOUBLE(1.0));
+    //noiseExpr = DDD_PULSE_D( CONST_D( 0.5 ), CONST_D( 0.6 ), noiseExpr );
+
+    return
+        MAPPED_SURFACE(
+            noiseExpr,
+            SURFACE_MAP(
+                0.0, blobsurface,
+                0.25, blobsurface,
+                0.45, mainSurface,
+                0.5, gridSurface,
+                0.6, gridSurface,
+                0.65, mainSurface,
+                0.75, blobsurface,
+                1.0, blobsurface,
+                MAP_END
+                )
+            );
+}
+
+/* ---------------------------------------------------------------------------
+    'createXYGridSurface2Levels'
+--------------------------------------------------------------------------- */
+id createXYGridSurface2Levels(
+        ART_GV  * art_gv,
+        id        coordinates,
+        id        mainSurface,
+        id        gridSurfaceLevel1,
+        id        gridSurfaceLevel2,
+        double    level1Frequency,
+        int       level2SubCount,
+        double    thickness         // portion of the whole periodic interval
+        )
+{
+    id gridSurface2 =
+        createXYGridSurface(
+            art_gv,
+            coordinates,
+            mainSurface,
+            gridSurfaceLevel2,
+            thickness * level2SubCount / 2.0,
+            level1Frequency * level2SubCount
+            );
+
+    id gridSurface1 =
+        createXYGridSurface(
+            art_gv,
+            coordinates,
+            gridSurface2,
+            gridSurfaceLevel1,
+            thickness,
+            level1Frequency
+            );
+    
+    return gridSurface1;
+}
+
+ARM_MAIN_FUNCTION(CGA_Sunset_Scene_Alienworld)
+{
+    id  groovedSphere = createGroovedSphere( art_gv, 22 DEGREES, 0.1 );
+
+    id  material = SILVER_MATERIAL;
+
+    id  base_sphereA =
+        [ groovedSphere apply
+            :   USCALE( 2.4 )
+            :   TRANSLATION( -6, 0.0, 0.6 )
+            ];
+
+    id  base_sphere =
+        [ SPHERE apply
+            :   USCALE( 2.4 )
+            :   TRANSLATION( -6, 0.0, 0.6 )
+            ];
+
+    id base_sphere2 =
+        [ groovedSphere apply
+            :   USCALE( 2.4 )
+            :   TRANSLATION( -12, 0.0, 0.6 )
+            ];
+            
+    id synthFluoA =
+        CONST_FLUORESCENT_COLOUR(
+            FLUORESCENT_RED_PLAIN,
+            0.000000000000000000025,
+            PNT2D( 370 NM, 620 NM ),
+            VEC2D(  40 NM,  50 NM )
+            ); 
+
+    id synthFluoB =
+        CONST_FLUORESCENT_COLOUR(
+            FLUORESCENT_YELLOW_PLAIN,
+            0.000000000000000000025,
+            PNT2D( 370 NM, 560 NM ),
+            VEC2D(  40 NM,  50 NM )
+            ); 
+
+    id bunnySurface =
+        createNoiseSurface(
+            art_gv,
+            WORLDSPACE_COORDS,
+            LAMBERT_REFLECTOR( MUNSELL_050YR_06_04 ),
+            LAMBERT_REFLECTOR( MUNSELL_050YR_03_04 ),
+            LAMBERT_REFLECTOR( MACBETH_NEUTRAL8 )
+            );
+
+    id  bunny = PLY_MESH("bun_zipper_res2.ply");
+
+    bunny = 
+        [ bunny apply
+            :   bunnySurface
+            :   USCALE( 76.0 )
+            :   ROT_X( 90 DEGREES )
+            :   ROT_Z( 330 )
+            :   TRANSLATION( -10, -22, -5 )
+            ];
+
+    int  num_spheres = 6;
+    id   sphere[num_spheres];
+    id   sphere2[num_spheres];
+    id   surface[num_spheres];
+    id   surface2[num_spheres];
+
+    surface[0] = LAMBERT_REFLECTOR( synthFluoA );
+    surface[1] = LAMBERT_REFLECTOR( synthFluoB );
+//    surface[0] = LAMBERT_REFLECTOR( FLUORESCENT_RED );
+//    surface[1] = LAMBERT_REFLECTOR( FLUORESCENT_YELLOW );
+    surface[2] = LAMBERT_REFLECTOR( GREEN_POSTIT_FLUORESCENT );
+    surface[3] = LAMBERT_REFLECTOR( YELLOW_POSTIT_FLUORESCENT );
+    surface[4] = LAMBERT_REFLECTOR( PINK_POSTIT_FLUORESCENT );
+    surface[5] = SMOOTH_FRESNEL_SURFACE;
+
+    surface2[0] = LAMBERT_REFLECTOR( FLUORESCENT_RED_PLAIN );
+    surface2[1] = LAMBERT_REFLECTOR( FLUORESCENT_YELLOW_PLAIN );
+    surface2[2] = LAMBERT_REFLECTOR( GREEN_POSTIT_PLAIN );
+    surface2[3] = LAMBERT_REFLECTOR( YELLOW_POSTIT_PLAIN );
+    surface2[4] = LAMBERT_REFLECTOR( PINK_POSTIT_PLAIN );
+
+    double  angle_start = 150 DEGREES;
+    double  angle_increment = 60 DEGREES;
+
+    double  temp_start = 750;
+    double  temp_increment = -150;
+
+    for ( int i = 0; i < num_spheres; i++ )
+    {
+        if ( i == 5 )
+            sphere[i] = 
+                [ base_sphere apply
+                    :   surface[i]
+                    :   ROT_Z( angle_start + i * angle_increment )
+                    :   material
+                    ];
+        else
+            sphere[i] = 
+                [ base_sphereA apply
+                    :   surface[i]
+                    :   ROT_Z( angle_start + i * angle_increment )
+                    :   material
+                    ];        
+    }
+
+    for ( int i = 0; i < (num_spheres - 1); i++ )
+    {
+        sphere2[i] = 
+            [ base_sphere2 apply
+                :   surface2[i]
+                :   ROT_Z( angle_start + i * angle_increment )
+		:   material
+                ];
+    }
+
+    id whiteLambertSurface =
+        LAMBERT_REFLECTOR( MACBETH_WHITE );
+
+    id lightGreyLambertSurface =
+        LAMBERT_REFLECTOR( MACBETH_NEUTRAL65 );
+
+    id pinkLambertSurface =
+        LAMBERT_REFLECTOR( PINK_POSTIT_PLAIN );
+
+    id baseSurface =
+        createXYGridSurface2Levels(
+            art_gv,
+            WORLDSPACE_COORDS,
+            whiteLambertSurface,
+            pinkLambertSurface,
+            lightGreyLambertSurface,
+            1.0 / 7.7,
+            10,
+            0.018
+            );
+
+    id cylinder0   =
+        [ CYLINDER apply
+            :   SCALE( 4000.0, 4000.0, 1.0 )
+            :   TRANSLATION( 0.0, 0.0, -3.6)
+            :   baseSurface
+            ];
+
+    double tz = -0.7;
+    
+    id scene_geometry =
+        UNION(
+            [ sphere[0] apply: TRANSLATION_Z(tz) ],
+            [ sphere[1] apply: TRANSLATION_Z(tz) ],
+            [ sphere[2] apply: TRANSLATION_Z(tz) ],
+            [ sphere[3] apply: TRANSLATION_Z(tz) ],
+            [ sphere[4] apply: TRANSLATION_Z(tz) ],
+
+            [ sphere[5] apply: USCALE(1.4) ],
+
+            [ sphere2[0] apply: TRANSLATION_Z(tz) ],
+            [ sphere2[1] apply: TRANSLATION_Z(tz) ],
+            [ sphere2[2] apply: TRANSLATION_Z(tz) ],
+            [ sphere2[3] apply: TRANSLATION_Z(tz) ],
+            [ sphere2[4] apply: TRANSLATION_Z(tz) ],
+            
+            bunny,
+            
+            [ MACBETH_CHART apply
+                :   ROT_Z( 180 DEGREES )
+                :   ROT_X( -60 DEGREES )
+                :   USCALE( 0.35 )
+                :   TRANSLATION( 8.0, -26.0 , 1.6 )
+                ],
+
+            cylinder0,
+
+            UNION_END
+            );
+            
+    id camera =
+        [ CAMERA
+            imageSize:  IVEC2D( 500 , 500 )
+           // ray:        RAY3D( PNT3D(0.0,50.0,3.0),VEC3D(0.0,-50.0,-3) )
+            ray:        RAY3D( PNT3D(0.0,50.0,30.0),VEC3D(0.0,-50.0,-27) )
+            zoom:       1.4
+            ];
+
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  5
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+			maximalRecursion: 3
+                    ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       SAMPLES
+                randomValueGeneration: PSEUDORANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    YES
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+    id skylight =
+        [ HOSEK_SKYLIGHT
+            elevation   : 26 DEGREES
+            azimuth     : 55.0 DEGREES
+            solColour   : 9600 KELVIN
+            solIntensity: 1.0
+            turbidity   : 2.0
+            groundAlbedo: CONST_COLOUR_GREY(0.5)
+            ];
+
+    return
+        [ SCENE
+            sceneGeometry : scene_geometry
+            skyModel      : skylight
+            camera        : camera
+            actionSequence: actionsequence
+            ];
+}

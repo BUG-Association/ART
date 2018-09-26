@@ -1,0 +1,63 @@
+add_library (
+	AdvancedRenderingToolkit
+	SHARED
+	${art_header_files}
+	${art_sources}
+	)
+
+@source_group_commands@
+
+if ( APPLE )
+
+	set_target_properties(
+		AdvancedRenderingToolkit
+		PROPERTIES
+			FRAMEWORK TRUE
+			FRAMEWORK_VERSION 2.0
+		)
+
+# This gets rid of a stupid warning in Xcode > 4.4 - but only for this one
+# target. Which is almost useless, since we still get warnings about the 
+# in-built targets provided by cmake, which we seemingly cannot access...
+
+	set_target_properties(
+		AdvancedRenderingToolkit
+		PROPERTIES
+		XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES "YES"
+		XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES_DEBUG "YES"
+		)
+
+	target_link_libraries(
+		AdvancedRenderingToolkit
+		${art_other_link_libraries}
+		)
+
+	install (
+		TARGETS
+			AdvancedRenderingToolkit
+		FRAMEWORK DESTINATION
+			Library/Frameworks
+		)
+
+else ( APPLE )
+
+	set_target_properties(
+		AdvancedRenderingToolkit 
+		PROPERTIES
+			VERSION    2.0
+			SOVERSION  2
+  		)
+
+	target_link_libraries(
+		AdvancedRenderingToolkit
+		${art_other_link_libraries}
+		)
+
+	install (
+		TARGETS
+			AdvancedRenderingToolkit
+		DESTINATION
+			lib
+		)
+
+endif ( APPLE )

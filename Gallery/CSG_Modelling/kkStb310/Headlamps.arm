@@ -1,0 +1,141 @@
+ArObj create_headlamps(ART_GV  *art_gv,ArObj black_surface,
+                     ArObj red_surface,
+                     ArObj spiegel)
+{
+  ArObj Abschluss_Scheinw = [[[[[[[[[[[[[[[[[[[ CUBE trafo: SCALE(455 MM,
+								  2100 MM,
+								  35 MM) :
+                                           TRANSLATION(-2730 MM, -1050 MM, -3220 MM) ]
+                            or: [ CUBE trafo: SCALE(910 MM, 1400 MM, 35 MM) :
+                                              TRANSLATION(-2275 MM, -700 MM,
+						    -2625 MM) ]]
+                            or: [ CUBE trafo: SCALE(910 MM, 315 MM, 35 MM) :
+                                              ROT_X(-74 DEGREES) :
+                                              TRANSLATION(-2275 MM, 665 MM, -2597
+						    MM) ]]
+                            or: [ CUBE trafo: SCALE(910 MM, 315 MM, 35 MM) :
+                                              TRANSLATION_Y(-315 MM) :
+                                              ROT_X(74 DEGREES) : 
+                                              TRANSLATION(-2275 MM, -665 MM,
+						    -2597 MM) ]]
+                            or: [ CUBE trafo: SCALE(910 MM, 140 MM, 35 MM) :
+                                              TRANSLATION(-2275 MM, 749 MM, -2905
+						    MM) ]]
+                            or: [ CUBE trafo: SCALE(910 MM, 140 MM, 35 MM) :
+                                              TRANSLATION(-2275 MM, -889 MM,
+						    -2905 MM) ]]
+                            or: [ CUBE trafo: SCALE(840 MM, 1190 MM, 700 MM) :
+                                              TRANSLATION(-2205 MM, -595 MM,
+						    -3325 MM) ]]
+                            or: [ CUBE trafo: SCALE(840 MM, 1400 MM, 420 MM) :
+                                              TRANSLATION(-2205 MM, -700 MM,
+						    -3045 MM) ]]
+                            or: [ CUBE trafo: SCALE(840 MM, 1470 MM, 280 MM) :
+                                              TRANSLATION(-2205 MM, -735 MM,
+						    -3045 MM) ]]
+                            sub: [ CUBE trafo: SCALE(840 MM, 105 MM, 245 MM) :
+                                               TRANSLATION(-2275 MM, 210 MM,
+						     -2870 MM) ]]
+                            sub: [ CUBE trafo: SCALE(840 MM, 105 MM, 245 MM) :
+                                               TRANSLATION(-2275 MM, -297.5 MM,
+						     -2870 MM) ]]
+                            or: [ CYLINDER trafo: SCALE(52.5 MM, 52.5 MM,
+							700 MM) :
+                                                  ROT_Y(100 DEGREES) :
+                                                  TRANSLATION(-2450 MM, 262.5 MM,
+							-2835 MM) ]]
+                            or: [ CYLINDER trafo: SCALE(52.5 MM, 52.5 MM,
+							700 MM) :
+                                                  ROT_Y(100 DEGREES) :
+                                                  TRANSLATION(-2450 MM, -247.5
+							MM, -2835 MM) ]]
+                            or: [ CUBE trafo: SCALE(350 MM, 2275 MM, 525 MM) :
+                                              TRANSLATION(-1330 MM, -1137.5 MM,
+						    -2800 MM) ]]
+                            or: [ CUBE trafo: SCALE(350 MM, 245 MM, 245 MM) :
+                                              ROT_X(40 DEGREES) :
+                                              TRANSLATION(-1330 MM, 577.5 MM,
+						    -2450 MM) ]]
+                            or: [ CUBE trafo: SCALE(350 MM, 245 MM, 245 MM) :
+                                              TRANSLATION_Y(-245 MM) :
+                                              ROT_X(-40 DEGREES) :
+                                              TRANSLATION(-1330 MM, -577.5 MM,
+						    -2450 MM) ]]
+                            or: [ CYLINDER trafo: SCALE(140 MM, 140 MM, 105
+							MM) :
+                                                  ROT_Y(90 DEGREES) :
+                                                  TRANSLATION(-1365 MM, 910 MM,
+							-2432.5 MM) ]]
+                            or: [ CYLINDER trafo: SCALE(140 MM, 140 MM, 105
+							MM) :
+                                                  ROT_Y(90 DEGREES) :
+                                                  TRANSLATION(-1365 MM, -910 MM,
+							-2432.5 MM) ]]
+                            surfaceMaterial: black_surface ];
+
+  ArObj Scheinwerfer_Halterung = [[ CUBE trafo: SCALE(280 MM, 210 MM, 175 MM) ]
+                                 surfaceMaterial: red_surface ];
+
+  ArObj Scheinwerfer_h = UNION([ Scheinwerfer_Halterung
+                                       trafo: TRANSLATION(70 MM, -105 MM, -350 MM) ],
+                               [[ CYLINDER trafo: SCALE(210 MM, 210 MM, 280
+							MM) :
+                                                  ROT_Y(90 DEGREES) :
+                                                  TRANSLATION_X(70 MM) ]
+                                  surfaceMaterial: red_surface ],
+                               [[ CUBE trafo: SCALE(280 MM, 210 MM, 210 MM) :
+                                             TRANSLATION(70 MM, -105 MM, 35 MM) ]
+                                  surfaceMaterial: red_surface ],
+                               [[ CUBE trafo: SCALE(140 MM, 105 MM, 210 MM) :
+                                              TRANSLATION(140 MM, -52.5 MM, 140 MM) ]
+                                  surfaceMaterial: red_surface ],
+                               UNION_END);
+
+  ArObj Scheinwerfer = UNION([ Scheinwerfer_h
+                               sub: [ SPHERE trafo: SCALE(262.5 MM, 202.7
+							  MM, 202.7 MM) ]],
+                             [[[[ SPHERE trafo: SCALE(262.5 MM, 199.5 MM,
+						      199.5 MM) ]
+                               sub: [ CUBE trafo: SCALE(350 MM, 560 MM, 560
+							MM) :
+                                                  TRANSLATION(-357 MM, -280 MM,
+							-280 MM) ]]
+                               sub: [ SPHERE trafo: SCALE(245 MM, 189 MM,
+							  189 MM) ]]
+                               surfaceMaterial: spiegel ],
+                             UNION_END);
+
+  ArObj Haltestange = UNION([[[ CYLINDER trafo: SCALE(17.5 MM, 17.5 MM, 700 MM) ]
+                           or: [ CYLINDER trafo: USCALE(35 MM) ]]
+                           surfaceMaterial: red_surface ],
+                           [[[ CYLINDER trafo: SCALE(26.25 MM, 26.25 MM, 35
+						     MM) :
+                                             TRANSLATION_Z(700 MM) ]
+                           or: [ SPHERE trafo: USCALE(26.25 MM) :
+                                               TRANSLATION_Z(756 MM) ]]
+                           surfaceMaterial: spiegel ],
+                           UNION_END);
+
+  ArObj Scheinwerfer_mit_Abschluss = UNION(Abschluss_Scheinw,
+                                           [ Scheinwerfer trafo:
+                                                 TRANSLATION(-2730 MM, 665 MM,
+						       -2870 MM) ],
+                                           [ Scheinwerfer trafo:
+                                                 TRANSLATION(-2730 MM, -665 MM,
+						       -2870 MM) ],
+                                           [ Haltestange trafo:
+                                                 TRANSLATION(-2660 MM, 1015 MM,
+						       -3185 MM) ],
+                                           [ Haltestange trafo:
+                                                 TRANSLATION(-2660 MM, -1015 MM,
+						       -3185 MM) ],
+                                           UNION_END);
+
+  return Scheinwerfer_mit_Abschluss;
+}
+
+
+
+
+
+

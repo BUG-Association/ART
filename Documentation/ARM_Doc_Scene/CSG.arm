@@ -1,0 +1,126 @@
+#ifndef SAMPLES
+    #define SAMPLES 256
+#endif
+
+#ifndef PATH_LENGTH
+    #define PATH_LENGTH 8
+#endif
+
+ARM_MAIN_FUNCTION(CSG)
+{   
+    id mainItem = 
+        [ CUBE apply
+            : TRANSLATION(0, 0, -0.5)
+            //: ROT_Y(45 DEGREES)
+            //: ROT_Z(45 DEGREES)
+            : USCALE(2.0)
+            : LAMBERT_REFLECTOR(CONST_COLOUR_GREY(0.2))
+            ];
+
+    id operatorItem = 
+        [ SPHERE apply
+            : TRANSLATION(0.0, 0.0, 1.0)
+            : LAMBERT_REFLECTOR(CONST_COLOUR_RGB(1.0, 0.0, 0.0))
+            ];
+
+#if (defined SUB) || (defined OR) || (defined AND)
+    id combinedItem = 
+#if defined SUB
+    [ mainItem sub: operatorItem ];
+#elif defined OR
+    [ mainItem or: operatorItem ];
+#elif defined AND
+    [ mainItem and: operatorItem ];
+#endif
+#endif
+
+    id scene_geometry =
+#if (defined SUB) || (defined OR) || (defined AND)
+        combinedItem;
+#elif defined MAIN_ITEM
+        mainItem;
+#elif defined OPERATOR_ITEM
+        operatorItem;
+#endif
+        
+    id camera =
+        [ CAMERA
+            imageSize:  IVEC2D( 128, 128 )
+            ray:        RAY3D( PNT3D(-2.5, -2.5, 3.2), VEC3D(1.0, 1.0, -1.0) )
+            zoom:       1
+            ];
+
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  6
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+                        maximalRecursion: PATH_LENGTH
+                        mode:             arpathtracermode_light_sampling
+/*
+                #ifdef ALG_DS
+                    #ifdef WEIGHED
+                        mode:             arpathtracermode_weighed_direction_sampling
+                    #else
+                        mode:             arpathtracermode_direction_sampling
+                    #endif
+                #elif defined ALG_LS
+                    #ifdef WEIGHED
+                        mode:             arpathtracermode_weighed_light_sampling
+                    #else
+                        mode:             arpathtracermode_light_sampling
+                    #endif
+                #endif
+*/
+                    ]
+                sampleSplattingKernel:   TENT_KERNEL
+                samplesPerPixel:         SAMPLES
+                randomValueGeneration:   RANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    NO
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+    return
+        [ SCENE
+            sceneGeometry      : scene_geometry
+
+#if defined USE_DIFFUSE_ILLUMINATION
+            environmentMaterial: UNIFORM_ENVIRONMENT_MATERIAL( CONST_COLOUR_GREY(1.0), 1.0 )
+#else
+            skyModel :
+                [ HOSEK_SKYLIGHT
+                    elevation   : 45 DEGREES
+                    azimuth     : -45.0 DEGREES
+                    turbidity   : 2.0
+                    groundAlbedo: CONST_COLOUR_GREY(0.5)
+                ]
+#endif
+            camera        : camera
+            actionSequence: actionsequence
+            ];
+}
+
+// ===========================================================================

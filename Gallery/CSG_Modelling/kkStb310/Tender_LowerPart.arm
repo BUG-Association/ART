@@ -1,0 +1,21 @@
+#define TENDER_LOWER_PART \
+    createTenderLowerPart( art_gv, black_surface, grey_surface, red_surface )
+
+ArObj createTenderLowerPart(
+        ART_GV  * art_gv,
+        ArObj     black_surface,
+        ArObj     grey_surface,
+        ArObj     red_surface
+        )
+{
+
+  return UNION ( [CUBE trafo: SCALE (0.05, 64.6, 2.3) :TRANSLATION (-12.55, -32.3, 
+0)],
+		 [CUBE trafo: SCALE (0.05, 64.6, 2.3) :TRANSLATION ( 12.5, -32.3, 0)],
+		 [CUBE trafo: SCALE (25.1, 0.05, 2.3) :TRANSLATION (-12.55, -32.35, 0)],
+		 [CUBE trafo: SCALE (25.1, 0.05, 2.3) :TRANSLATION (-12.55, 32.3, 0)],
+		 [CUBE trafo: SCALE (25.1, 64.6, 0.06) :TRANSLATION (-12.55, -32.3, 2.3)],
+
+		 UNION_END);
+
+}

@@ -1,0 +1,36 @@
+#define TENDER_FRONT_PART \
+    createTenderFrontPart( art_gv, black_surface, grey_surface, red_surface )
+
+ArObj createTenderFrontPart(
+        ART_GV  * art_gv,
+        ArObj     black_surface,
+        ArObj     grey_surface,
+        ArObj     red_surface
+        )
+{
+
+   ArObj front_plate = [[[[CUBE trafo: SCALE ( 5.25, 10.85, 0.05 )] sub: 
+[CYLINDER trafo: SCALE ( 2.25, 5, 0.05)]]
+				sub: [CYLINDER trafo: SCALE ( 0.5, 0.5, 0.05) :TRANSLATION ( 5.25, 3.15, 0)]]
+					sub: [CUBE trafo: SCALE (0.6, 3.25, 0.05) :TRANSLATION ( 4.75, -0.1, 0)]];
+
+   ArObj low_step = [CUBE trafo: SCALE ( 2.5, 0.5, 2.5)];
+   ArObj mid_step = [CUBE trafo: SCALE ( 2.5, 0.5, 2)];
+   ArObj up_step = [CUBE trafo: SCALE ( 2.5, 0.5, 1.5)];
+
+   ArObj right_front_plate = UNION(front_plate,
+			[low_step trafo: TRANSLATION ( 2.25, 0, 0.05)],
+			[mid_step trafo: TRANSLATION ( 2.75, 3.65, 0.05)],
+			[up_step trafo: TRANSLATION (2.75, 7.3, 0.05)],UNION_END);
+
+   ArObj left_front_plate = UNION(front_plate,
+			[low_step trafo: TRANSLATION ( 2.25, 0, -2.5)],
+			[mid_step trafo: TRANSLATION ( 2.75, 3.65, -2)],
+			[up_step trafo: TRANSLATION (2.75, 7.3, -1.5)],UNION_END);
+
+   return [[right_front_plate trafo: ROT_Y (-90 DEGREES) :ROT_X (90 DEGREES) 
+:TRANSLATION_X (-12.5)] or:
+	   [left_front_plate trafo: ROT_Y (-90 DEGREES) :ROT_X (90 DEGREES) 
+:TRANSLATION_X (12.55)]];
+
+}

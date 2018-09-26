@@ -1,0 +1,207 @@
+//#define DIFFUSE_ILLUMINATION
+
+#import "Wheels.arm"
+#import "Frame.arm"
+#import "Cylinders.arm"
+#import "RunningGear.arm"
+#import "Pneumatics.arm"
+#import "Fasteners.arm"
+#import "Headlamps.arm"
+#import "LocomotiveBody.arm"
+#import "Tender.arm"
+
+
+#define  GROUND_RADIUS  10000.0
+ArNode * create_LocomotiveObjects(
+        ART_GV  * art_gv
+        )
+{
+  double track_width = 1360.0 MM;
+
+  ArObj black_surface = LAMBERT_REFLECTOR(MUNSELL_N_0600);
+
+  ArObj wheel_surface = LAMBERT_REFLECTOR(MUNSELL_050R_05_01);
+  ArObj red_surface = LAMBERT_REFLECTOR(MUNSELL_N_0500);
+  ArObj mirror_surface = LAMBERT_REFLECTOR(MUNSELL_050PB_05_01);
+
+    ArObj  wheels =
+        create_wheelset(
+            art_gv,
+            wheel_surface,
+            track_width
+            );
+
+    ArObj  frame =
+        create_frame(
+            art_gv,
+            black_surface
+            );
+
+    ArObj  cylinders =
+        create_cylinders(
+            art_gv,
+            black_surface,
+            red_surface
+            );
+
+    ArObj  running_gear =
+        create_running_gear(
+            art_gv,
+            black_surface,
+            wheel_surface,
+            red_surface,
+            0 DEGREES
+            );
+
+    ArObj  pneumatics =
+        create_pneumatics(
+            art_gv,
+            black_surface
+            );
+
+    ArObj  fasteners =
+        create_fasteners(
+            art_gv,
+            black_surface,
+            mirror_surface,
+            red_surface
+            );
+
+    ArObj  headlamps =
+        create_headlamps(
+            art_gv,
+            black_surface,
+            red_surface,
+            mirror_surface
+            );
+
+    ArObj  locomotive_body =
+        create_locomotive_body(
+            art_gv,
+            black_surface,
+            wheel_surface,
+            red_surface
+            );
+
+    ArObj  tender =
+        create_Tender(
+            art_gv,
+            black_surface,
+            wheel_surface,
+            red_surface
+            );
+
+    ArObj  locomotive =
+        [ UNION(
+            [ wheels trafo: TRANSLATION_Z(-4535 MM) ],
+            [ frame trafo: TRANSLATION(-2730 MM, 0 MM, -4095 MM) ],
+            cylinders,
+            running_gear,
+            pneumatics,
+            fasteners,
+            headlamps,
+            locomotive_body,
+            [ tender apply
+                :  USCALE(0.1)
+                :  ROT_Z(-90 DEGREES)
+                :  TRANSLATION(13500 MM,0,-4550 MM)
+                ],
+            UNION_END
+            )
+            apply
+            : ROT_Z(-75 DEGREES)
+            : TRANSLATION(0,0,4550 MM)
+            ];
+    
+    ArObj ground = [ [ CYLINDER
+                       trafo: SCALE( GROUND_RADIUS,
+		                     GROUND_RADIUS,
+				     1.0 )
+			    : TRANSLATION( 0.0, 0.0, -1.0) ]
+		     surfaceMaterial: LAMBERT_REFLECTOR( MACBETH_NEUTRAL5) ];
+    
+    return UNION( ground, locomotive, 0 );
+}
+
+ArNode <ArpCamera> * create_LocomotiveCamera(
+        ART_GV  * art_gv
+        )
+{
+    return
+    [ CAMERA
+	imageSize: IVEC2D( 1024, 768 )
+	ray:       RAY3D_PP( PNT3D(  60.0,  60.0,   3.0 ),
+	                     PNT3D(  -1.5,   -11.0,   3.78 ) ) // -1.5,   0.0,   3.78
+	zoom:      3.4
+    ];
+}
+
+#ifndef SAMPLES
+#define SAMPLES 32
+#endif
+
+ARM_MAIN_FUNCTION(LocomotiveScene)
+{
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  5
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+			maximalRecursion: 3
+                    ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       SAMPLES
+                randomValueGeneration: PSEUDORANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    YES
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+#ifdef DIFFUSE_ILLUMINATION
+    id  environment_material =
+        UNIFORM_ENVIRONMENT_MATERIAL( CIE_ILLUMINANT_D65, 1.0 );
+#endif
+
+    id result =
+        [ SCENE
+            sceneGeometry:       create_LocomotiveObjects(art_gv)
+#ifdef DIFFUSE_ILLUMINATION
+            environmentMaterial: environment_material
+#else
+            skyModel:
+                [ HOSEK_SKYLIGHT
+                    elevation   : 20 DEGREES
+                    azimuth     : 360.0 DEGREES
+                    turbidity   : 4.0
+                    groundAlbedo: CONST_COLOUR_GREY(0.5)
+                    ]
+#endif
+	camera:		create_LocomotiveCamera(art_gv)
+        actionSequence: actionsequence
+    ];
+
+    return result;
+}
+

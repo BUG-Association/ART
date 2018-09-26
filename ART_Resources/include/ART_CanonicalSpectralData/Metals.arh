@@ -1,0 +1,99 @@
+/* ===========================================================================
+
+    Copyright (c) 1996-2016 The ART Development Team
+    ------------------------------------------------
+
+    For a comprehensive list of the members of the development team, and a
+    desaription of their respective contributions, see the file
+    "ART_DeveloperList.txt" that is distributed with the libraries.
+
+    This file is part of the Advanced Rendering Toolkit (ART) libraries.
+
+    ART is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any
+    later version.
+
+    ART is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with ART.  If not, see <http://www.gnu.org/licenses/>.
+
+=========================================================================== */
+
+#define METAL_DATA(__name) \
+    EXTERNAL_NAMED_COLOUR("SpectralData/Metals.arm",(__name))
+
+#define CRI_SILVER_N		METAL_DATA("Silver_n")
+#define CRI_SILVER_K		METAL_DATA("Silver_k")
+#define CRI_COPPER_N		METAL_DATA("Copper_n")
+#define CRI_COPPER_K		METAL_DATA("Copper_k")
+#define CRI_GOLD_N		METAL_DATA("Gold_n")
+#define CRI_GOLD_K		METAL_DATA("Gold_k")
+#define CRI_COBALT_N		METAL_DATA("HexagonalCobalt_n")
+#define CRI_COBALT_K		METAL_DATA("HexagonalCobalt_k")
+#define CRI_MERCURY_N		METAL_DATA("LiquidMercury_n")
+#define CRI_MERCURY_K		METAL_DATA("LiquidMercury_k")
+#define CRI_CU2O_N		METAL_DATA("CuprousOxideCu2O_n")
+#define CRI_CU2O_K		METAL_DATA("CuprousOxideCu2O_k")
+#define CRI_CUO_N		METAL_DATA("CupricOxideCuO_n")
+#define CRI_CUO_K		METAL_DATA("CupricOxideCuO_k")
+#define CRI_CHROMIUM_N		METAL_DATA("Chromium_n")
+#define CRI_CHROMIUM_K		METAL_DATA("Chromium_k")
+#define CRI_NICKEL_N		METAL_DATA("Nickel_n")
+#define CRI_NICKEL_K		METAL_DATA("Nickel_k")
+#define CRI_PLATINUM_N		METAL_DATA("Platinum_n")
+#define CRI_PLATINUM_K		METAL_DATA("Platinum_k")
+#define CRI_ALUMINIUM_N		METAL_DATA("Aluminium_n")
+#define CRI_ALUMINIUM_K		METAL_DATA("Aluminium_k")
+#define CRI_SELENIUM_N		METAL_DATA("Selenium_n")
+#define CRI_SELENIUM_K		METAL_DATA("Selenium_k")
+#define CRI_BERYLLIUM_N		METAL_DATA("Beryllium_n")
+#define CRI_BERYLLIUM_K		METAL_DATA("Beryllium_k")
+#define CRI_VANADIUM_N		METAL_DATA("Vanadium_n")
+#define CRI_VANADIUM_K		METAL_DATA("Vanadium_k")
+
+#define GOLD_MATERIAL \
+    STANDARD_MATERIAL(CRI_GOLD_N,CRI_GOLD_K)
+
+#define SILVER_MATERIAL \
+    STANDARD_MATERIAL(CRI_SILVER_N,CRI_SILVER_K)
+
+#define COPPER_MATERIAL \
+    STANDARD_MATERIAL(CRI_COPPER_N,CRI_COPPER_K)
+#define CUPRIC_OXIDE_MATERIAL \
+    STANDARD_MATERIAL(CRI_CUO_N,CRI_CUO_K)
+#define CUPROUS_OXIDE_MATERIAL \
+    STANDARD_MATERIAL(CRI_CU2O_N,CRI_CU2O_K)
+    
+#define COBALT_MATERIAL \
+    STANDARD_MATERIAL(CRI_COBALT_N,CRI_COBALT_K)
+
+#define MERCURY_MATERIAL \
+    STANDARD_MATERIAL(CRI_MERCURY_N,CRI_MERCURY_K)
+  
+#define CHROMIUM_MATERIAL \
+    STANDARD_MATERIAL(CRI_CHROMIUM_N,CRI_CHROMIUM_K)
+  
+#define NICKEL_MATERIAL \
+    STANDARD_MATERIAL(CRI_NICKEL_N,CRI_NICKEL_K)
+  
+#define PLATINUM_MATERIAL \
+    STANDARD_MATERIAL(CRI_PLATINUM_N,CRI_PLATINUM_K)
+  
+#define ALUMINIUM_MATERIAL \
+    STANDARD_MATERIAL(CRI_ALUMINIUM_N,CRI_ALUMINIUM_K)
+  
+#define SELENIUM_MATERIAL \
+    STANDARD_MATERIAL(CRI_SELENIUM_N,CRI_SELENIUM_K)
+  
+#define BERYLLIUM_MATERIAL \
+    STANDARD_MATERIAL(CRI_BERYLLIUM_N,CRI_BERYLLIUM_K)
+    
+#define VANADIUM_MATERIAL \
+    STANDARD_MATERIAL(CRI_VANADIUM_N,CRI_VANADIUM_K)
+  
+// ===========================================================================

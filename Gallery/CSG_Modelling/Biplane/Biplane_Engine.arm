@@ -1,0 +1,105 @@
+ArObj create_Biplane_Propeller(
+        ART_GV  * art_gv,
+	ArObj     bladeSurface,
+	ArObj     axisSurface,
+	ArObj     spinnerSurface
+	)
+{
+    double  propellerAxisWidth		= 0.05;
+    double  propellerAxisLength		= 0.15;
+    
+    double  propellerBaseSpinnerLength	= 0.30;
+    double  propellerBaseSpinnerWidth	= 0.14;
+    
+    double  propellerLowerBlade		= 1.42;
+    double  propellerUpperBlade		= 0.55;
+    double  propellerThickness		= 0.04;
+    double  propellerWidth		= 0.176;
+    double  propellerBladeRotation      = -25 DEGREES;
+    double  propellerBladeBaseWidth	= 0.10;
+    double  propellerBladeBaseHeight	= 0.38;
+    
+    ArObj propellerBlade = UNION(
+	[
+	[ SPHERE trafo              : SCALE(  propellerWidth,
+	                                      propellerThickness,
+					      propellerLowerBlade) ]
+	sub:
+	[ CUBE trafo                : SCALE(  propellerWidth * 2 + meps2,
+	                                      propellerThickness * 2 + meps2,
+					      propellerLowerBlade + meps)
+			            : TRANSLATION( -propellerWidth + meps,
+	                                     -propellerThickness + meps,
+					      0.00) ]
+	],
+	[
+	[ SPHERE trafo              : SCALE(  propellerWidth,
+	                                      propellerThickness,
+					      propellerUpperBlade) ]
+	sub:
+	[ CUBE trafo                : SCALE(  propellerWidth * 2 + meps2,
+	                                      propellerThickness * 2 + meps2,
+					      propellerUpperBlade + meps)
+			            : TRANSLATION( -propellerWidth + meps,
+	                                     -propellerThickness + meps,
+					     -propellerUpperBlade + meps) ]
+	],
+	UNION_END
+	);
+
+    ArObj propellerAxis = UNION(
+	[ CYLINDER_Y trafo          : SCALE(  propellerAxisWidth,
+	                                      propellerAxisLength,
+					      propellerAxisWidth) ],
+	[ CYLINDER_Y trafo          : SCALE(  propellerBaseSpinnerWidth,
+	                                      propellerBaseSpinnerLength,
+	                                      propellerBaseSpinnerWidth)
+	                            : TRANSLATION(  0.00,
+	                                      propellerAxisLength,
+	                                      0.00) ],
+	[ SPHERE trafo              : SCALE(  propellerBaseSpinnerWidth,
+	                                      propellerBaseSpinnerWidth,
+	                                      propellerBaseSpinnerWidth)
+	                            : TRANSLATION(  0.00,
+	                                        propellerAxisLength
+					      + propellerBaseSpinnerLength,
+	                                      0.00) ],
+	UNION_END
+	);
+	
+    ArObj propeller = UNION(
+	[
+	  propellerAxis
+	    surfaceMaterial: axisSurface ],
+	[ [
+	  CYLINDER_Z trafo          : SCALE(  propellerBladeBaseWidth,
+	                                      propellerBladeBaseWidth,
+					      propellerBladeBaseHeight)
+				    : TRANSLATION(  0.00,
+	                                      propellerAxisLength
+					      + 
+					      (propellerBaseSpinnerLength/2.0),
+	                                     -propellerBladeBaseHeight/2.0) ]
+	    surfaceMaterial: axisSurface ],
+	[ [
+	  propellerBlade trafo      : ROT_Z( propellerBladeRotation )
+	                            : TRANSLATION(  0.00,
+	                                      propellerAxisLength
+					      + 
+					      (propellerBaseSpinnerLength/2.0),
+	                                      propellerLowerBlade) ]
+	    surfaceMaterial: bladeSurface ],
+	[ [
+	  propellerBlade trafo      : ROT_Z( propellerBladeRotation )
+	                            : TRANSLATION(  0.00,
+	                                      propellerAxisLength
+					      + 
+					      (propellerBaseSpinnerLength/2.0),
+	                                      propellerLowerBlade)
+			            : ROT_Y( 180 DEGREES ) ]
+	    surfaceMaterial: bladeSurface ],
+	UNION_END
+	);
+	
+    return [ propeller trafo        : ROT_Y( 37 DEGREES ) ];
+}

@@ -1,0 +1,15 @@
+FIND_PATH(LCMS2_INCLUDE_DIR lcms2.h /usr/include/ /usr/local/include/ /opt/local/include)
+
+FIND_LIBRARY(LCMS2_LIBRARY NAMES lcms2 PATH /lib /usr/lib /usr/local/lib) 
+
+IF (LCMS2_INCLUDE_DIR AND LCMS2_LIBRARY)
+   SET(LCMS2_FOUND TRUE)
+ENDIF (LCMS2_INCLUDE_DIR AND LCMS2_LIBRARY)
+
+include(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(
+    LCMS2
+    REQUIRED_VARS LCMS2_LIBRARY LCMS2_INCLUDE_DIR
+    FAIL_MESSAGE "Could not find LittleCMS 2.x"
+    )
+

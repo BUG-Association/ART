@@ -1,0 +1,362 @@
+ArObj create_Biplane_Wings(
+        ART_GV  * art_gv,
+	ArObj  wingSurface,
+	ArObj  strutSurface,
+	ArObj  rudderSurface
+	)
+{
+    double  wing_spacing_y		=   0.44;
+    double  wing_spacing_z		=   2.56;
+    
+    double  tw_straightspan		=  10.00;
+    double  tw_front			=   0.76;
+    double  tw_rear			=   1.76;
+    double  tw_thickness		=   0.10;
+    double  tw_tiplength		=   1.00;
+    double  tw_cutout_angle		=  34.00 DEGREES;
+    double  tw_cutout_depth		=   0.76;
+    double  tw_cutout_width		=   1.00;
+    
+    double  ai_width			=   2.76;
+    double  ai_front			=   0.12;
+    double  ai_rear			=   0.55;
+    double  ai_thickness		=   0.06;
+    double  ai_depth			=   ai_front + ai_rear;
+    double  ai_tipdistance		=   0.22;
+    
+    double  bw_straightspan		=   8.00;
+    double  bw_front			=   0.50;
+    double  bw_rear			=   1.22;
+    double  bw_thickness		=   0.10;
+    double  bw_tiplength		=   1.00;
+        
+    double  os_height			=   wing_spacing_z;
+    double  os_width			=   0.08;
+    double  os_thickness		=   0.04;
+    double  os_forward_angle		=  14.00 DEGREES;
+    double  os_outward_angle		=   0.00 DEGREES;
+    double  os_position_x		=   3.60;
+    double  os_position_y1		=   0.20;
+    double  os_position_y2		=  -0.66;
+
+    double  is_height			=   1.76;
+    double  is_width			=   0.05;
+    double  is_thickness		=   0.02;
+    double  is_forward_angle		=  14.00 DEGREES;
+    double  is_outward_angle		=  22.00 DEGREES;
+    double  is_position_x		=   0.50;
+    double  is_position_y1		=  -0.50;
+    double  is_position_y2		=   0.10;
+
+    ArObj topWingCenterFront =
+	[ CYLINDER_X trafo          : SCALE(  tw_straightspan,
+	                                      tw_front,
+					      tw_thickness )
+				    : TRANSLATION( -tw_straightspan/2.0,
+				              0.00,
+					      0.00 ) ];
+				    
+    ArObj topWingCenterRear =
+        [
+	[ CYLINDER_X trafo          : SCALE(  tw_straightspan,
+	                                      tw_rear,
+					      tw_thickness )
+				    : TRANSLATION( -tw_straightspan/2.0,
+				              0.00,
+					      0.00 ) ]
+	sub:
+	[ CUBE trafo                : SCALE(  tw_straightspan + meps2,
+	                                      tw_rear + meps,
+					      tw_thickness * 2 + meps2 )
+				    : TRANSLATION( -tw_straightspan/2.0 - meps,
+				              0.00,
+					     -tw_thickness - meps ) ]
+	];
+				    
+    ArObj topWingTipFront =
+	[ SPHERE trafo              : SCALE(  tw_tiplength,
+	                                      tw_front,
+					      tw_thickness ) ];
+				    
+    ArObj topWingTipRear =
+        [
+	[ SPHERE trafo              : SCALE(  tw_tiplength,
+	                                      tw_rear,
+					      tw_thickness ) ]
+	sub:
+	[ CUBE trafo                : SCALE(  tw_tiplength * 2 + meps2,
+	                                      tw_rear + meps,
+					      tw_thickness * 2 + meps2 )
+				    : TRANSLATION( -tw_tiplength - meps,
+				              0.00,
+					     -tw_thickness - meps ) ]
+	];
+				    
+    ArObj topWingPlus = UNION(
+          topWingCenterFront,
+          topWingCenterRear,
+	[ topWingTipFront trafo	    : TRANSLATION(  tw_straightspan / 2.0,
+	                                      0.00,
+					      0.00 ) ],
+	[ topWingTipFront trafo	    : TRANSLATION( -tw_straightspan / 2.0,
+	                                      0.00,
+					      0.00 ) ],
+	[ topWingTipRear trafo	    : TRANSLATION(  tw_straightspan / 2.0,
+	                                      0.00,
+					      0.00 ) ],
+	[ topWingTipRear trafo	    : TRANSLATION( -tw_straightspan / 2.0,
+	                                      0.00,
+					      0.00 ) ],
+	UNION_END
+	);
+					      
+    ArObj topWingMinusCutout = [ UNION(
+	[ CUBE trafo                : SCALE(  tw_cutout_width,
+	                                      tw_cutout_depth + meps,
+					      tw_thickness * 2 )
+	                            : TRANSLATION( -tw_cutout_width/2.0,
+				              0.00,
+					      0.00)
+	],
+	
+	[ CUBE trafo                : SCALE(  tw_cutout_width,
+	                                      tw_cutout_depth + meps,
+					      tw_thickness * 2 )
+	                            : TRANSLATION( -tw_cutout_width/2.0,
+				              0.00,
+					      0.00)
+	                            : SHEAR_ZX(  0.00,  tan(tw_cutout_angle) )
+	],
+	
+	[ CUBE trafo                : SCALE(  tw_cutout_width,
+	                                      tw_cutout_depth + meps,
+					      tw_thickness * 2 )
+	                            : TRANSLATION( -tw_cutout_width/2.0,
+				              0.00,
+					      0.00)
+	                            : SHEAR_ZX(  0.00, -tan(tw_cutout_angle) )
+	],
+	
+        UNION_END ) trafo                   : ROT_Z( 180 DEGREES )
+		                    : TRANSLATION(  0.00,
+				             -tw_rear + tw_cutout_depth,
+					     -tw_thickness ) ];
+		
+    ArObj topWingMinusAileron = [ UNION(
+	[ CUBE trafo                : SCALE(  ai_width + meps2,
+	                                      ai_depth + meps,
+					      tw_thickness * 2 )
+	                            : TRANSLATION( -meps,
+				              0.00,
+					      0.00)
+	                            : TRANSLATION( -tw_straightspan/2.0
+				              + ai_tipdistance,
+				              0.00,
+					      0.00)
+	],
+	[ CUBE trafo                : SCALE(  ai_width + meps2,
+	                                      ai_depth + meps,
+					      tw_thickness * 2 )
+	                            : TRANSLATION( -ai_width + meps,
+				              0.00,
+					      0.00)
+	                            : TRANSLATION(  tw_straightspan/2.0
+				              - ai_tipdistance,
+				              0.00,
+					      0.00)
+	],
+		
+        UNION_END ) trafo                   : TRANSLATION(  0.00,
+				             -tw_rear - meps,
+					     -tw_thickness ) ];
+		
+    ArObj topWingMinus = [ topWingMinusCutout or: topWingMinusAileron ];
+    
+    ArObj topWing = [ topWingPlus sub: topWingMinus ];
+    
+    ArObj bottomWingCenterFront =
+	[ CYLINDER_X trafo          : SCALE(  bw_straightspan,
+	                                      bw_front,
+					      bw_thickness )
+				    : TRANSLATION( -bw_straightspan/2.0,
+				              0.00,
+					      0.00 ) ];
+				    
+    ArObj bottomWingCenterRear =
+        [
+	[ CYLINDER_X trafo          : SCALE(  bw_straightspan,
+	                                      bw_rear,
+					      bw_thickness )
+				    : TRANSLATION( -bw_straightspan/2.0,
+				              0.00,
+					      0.00 ) ]
+	sub:
+	[ CUBE trafo                : SCALE(  bw_straightspan + meps2,
+	                                      bw_rear + meps,
+					      bw_thickness * 2 + meps2 )
+				    : TRANSLATION( -bw_straightspan/2.0 - meps,
+				              0.00,
+					     -bw_thickness - meps ) ]
+	];
+				    
+    ArObj bottomWingTipFront =
+	[ SPHERE trafo              : SCALE(  bw_tiplength,
+	                                      bw_front,
+					      bw_thickness ) ];
+				    
+    ArObj bottomWingTipRear =
+        [
+	[ SPHERE trafo              : SCALE(  bw_tiplength,
+	                                      bw_rear,
+					      bw_thickness ) ]
+	sub:
+	[ CUBE trafo                : SCALE(  bw_tiplength * 2 + meps2,
+	                                      bw_rear + meps,
+					      bw_thickness * 2 + meps2 )
+				    : TRANSLATION( -bw_tiplength - meps,
+				              0.00,
+					     -bw_thickness - meps ) ]
+	];
+
+    ArObj bottomWing = UNION(
+          bottomWingCenterFront,
+          bottomWingCenterRear,
+	[ bottomWingTipFront trafo  : TRANSLATION(  bw_straightspan / 2.0,
+	                                      0.00,
+					      0.00 ) ],
+	[ bottomWingTipFront trafo  : TRANSLATION( -bw_straightspan / 2.0,
+	                                      0.00,
+					      0.00 ) ],
+	[ bottomWingTipRear trafo   : TRANSLATION(  bw_straightspan / 2.0,
+	                                      0.00,
+					      0.00 ) ],
+	[ bottomWingTipRear trafo   : TRANSLATION( -bw_straightspan / 2.0,
+	                                      0.00,
+					      0.00 ) ],
+	UNION_END
+	);
+	
+    ArObj innerWingStrutA =
+	[ CYLINDER_Z trafo          : SCALE(  is_thickness,
+	                                      is_width,
+					      is_height)
+				    : SHEAR_XY(  tan(is_outward_angle),
+				                 tan(is_forward_angle) ) ];
+    ArObj innerWingStrutB =
+	[ CYLINDER_Z trafo          : SCALE(  is_thickness,
+	                                      is_width,
+					      is_height)
+				    : SHEAR_XY( -tan(is_outward_angle),
+				                 tan(is_forward_angle) ) ];
+
+    ArObj outerWingStrutA =
+	[ CYLINDER_Z trafo          : SCALE(  os_thickness,
+	                                      os_width,
+					      os_height)
+				    : SHEAR_XY(  tan(os_outward_angle),
+				                 tan(os_forward_angle) ) ];
+    ArObj outerWingStrutB =
+	[ CYLINDER_Z trafo          : SCALE(  os_thickness,
+	                                      os_width,
+					      os_height)
+				    : SHEAR_XY( -tan(os_outward_angle),
+				                 tan(os_forward_angle) ) ];
+
+    ArObj aileron = [ UNION(
+	[
+	[ CYLINDER_X trafo          : SCALE(  ai_width,
+	                                      ai_front,
+					      ai_thickness ) ]
+	sub:
+	[ CUBE trafo                : SCALE(  ai_width + meps2,
+	                                      ai_front + meps,
+					      ai_thickness * 2 + meps2)
+				    : TRANSLATION( -meps,
+				             -ai_front - meps,
+					     -ai_thickness - meps) ]
+	],
+
+	[
+	[ CYLINDER_X trafo          : SCALE(  ai_width,
+	                                      ai_rear,
+					      ai_thickness ) ]
+	sub:
+	[ CUBE trafo                : SCALE(  ai_width + meps2,
+	                                      ai_rear + meps,
+					      ai_thickness * 2 + meps2)
+				    : TRANSLATION( -meps,
+				              0.00,
+					     -ai_thickness - meps) ]
+	],
+
+	UNION_END ) trafo                   : TRANSLATION(  0.00,
+				              0.00, //ai_front,
+					      0.00) ];
+	
+    ArObj wings = UNION(
+	[ [ innerWingStrutA trafo   : TRANSLATION(  is_position_x,
+	                                      is_position_y1,
+					      wing_spacing_z - is_height ) ]
+	    surfaceMaterial: strutSurface ],
+	    
+	[ [ innerWingStrutA trafo   : TRANSLATION(  is_position_x,
+	                                      is_position_y2, 
+					      wing_spacing_z - is_height ) ]
+	    surfaceMaterial: strutSurface ],
+	    
+	[ [ innerWingStrutB trafo   : TRANSLATION( -is_position_x,
+	                                      is_position_y1,
+					      wing_spacing_z - is_height ) ]
+	    surfaceMaterial: strutSurface ],
+	    
+	[ [ innerWingStrutB trafo   : TRANSLATION( -is_position_x,
+	                                      is_position_y2,
+					      wing_spacing_z - is_height ) ]
+	    surfaceMaterial: strutSurface ],
+	
+	[ [ outerWingStrutA trafo   : TRANSLATION(  os_position_x,
+	                                      os_position_y1,
+					      0.00 ) ]
+	    surfaceMaterial: strutSurface ],
+	    
+	[ [ outerWingStrutA trafo   : TRANSLATION(  os_position_x,
+	                                      os_position_y2,
+					      0.00 ) ]
+	    surfaceMaterial: strutSurface ],
+	    
+	[ [ outerWingStrutB trafo   : TRANSLATION( -os_position_x,
+	                                      os_position_y1,
+					      0.00 ) ]
+	    surfaceMaterial: strutSurface ],
+	    
+	[ [ outerWingStrutB trafo   : TRANSLATION( -os_position_x,
+	                                      os_position_y2,
+					      0.00 ) ]
+	    surfaceMaterial: strutSurface ],
+	    
+	[ [ topWing trafo           : TRANSLATION(  0.00,
+	                                      wing_spacing_y,
+					      wing_spacing_z ) ]
+	    surfaceMaterial: wingSurface ],
+	    
+	[ [ aileron trafo           : TRANSLATION( -tw_straightspan/2.0
+				              + ai_tipdistance,
+				              wing_spacing_y - tw_rear
+					      + ai_rear,
+					      wing_spacing_z) ]
+	    surfaceMaterial: rudderSurface ],
+	    
+	[ [ aileron trafo           : TRANSLATION( -ai_width
+				              + tw_straightspan/2.0
+				              - ai_tipdistance,
+				              wing_spacing_y - tw_rear
+					      + ai_rear,
+					      wing_spacing_z) ]
+	    surfaceMaterial: rudderSurface ],
+	    
+	[   bottomWing
+	    surfaceMaterial: wingSurface ],
+	UNION_END);
+
+    return wings;
+}

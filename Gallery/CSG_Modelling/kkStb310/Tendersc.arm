@@ -1,0 +1,14 @@
+#import "Tender.arm"
+#import "Setcamer.arm"
+#import "renderer/MidPointTracer.arm"
+
+ArObj create_Tendersc()
+{
+    return
+    [ SCENE
+	object:		create_Tender()
+	camera:		create_Setcamer()
+	renderer:       create_MidPointTracer()
+    ];
+}
+

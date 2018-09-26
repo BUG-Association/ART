@@ -1,0 +1,184 @@
+ArObj create_Nieten_Verkleidung(
+        ART_GV  * art_gv,
+        ArObj     Niete_Z
+        )
+{
+  double mov = 175 MM;
+  ArObj Nieten_Verkleidung = [ Niete_Z trafo: TRANSLATION(-1505 MM, 1470 MM,
+						    -2922.5 MM) ];
+ 
+  while ( mov < 3150  MM)
+  {
+      Nieten_Verkleidung = [ Nieten_Verkleidung 
+			       or: [ Niete_Z trafo: TRANSLATION(-1505 MM+mov,
+							  1470 MM, -2922.5 MM) ]];
+      mov = mov + 175 MM;
+  }
+  return Nieten_Verkleidung;
+}
+
+ArObj create_Nieten_Zyl_unten(
+        ART_GV  * art_gv,
+        ArObj     Niete_Z
+        )
+{
+  double rot_v = 20;
+
+  ArObj Nieten_Zyl_unten = [ Niete_Z trafo: TRANSLATION(-1505 MM, 0 , -297.5 MM) ];
+
+  while ( rot_v < 360 )
+  {
+    Nieten_Zyl_unten = [ Nieten_Zyl_unten
+                       or: [ Niete_Z trafo: TRANSLATION(-1505 MM, 0, -297.5 MM) :
+                                          ROT_X(rot_v DEGREES) ]];
+    rot_v = rot_v + 20;
+  }
+  return [ Nieten_Zyl_unten trafo: TRANSLATION(-70 MM, 1120 MM, -3377.5 MM) ];
+}
+
+ArObj create_Nieten_Zyl_oben(
+        ART_GV  * art_gv,
+        ArObj     Niete_Z
+        )
+{
+  double rot_v = 20;
+
+  ArObj Nieten_Zyl_oben = [ Niete_Z trafo: TRANSLATION(-1592.5 MM, 0, -192.5 MM) ];
+
+  while ( rot_v < 360 )
+  {
+    Nieten_Zyl_oben = [ Nieten_Zyl_oben
+                       or: [ Niete_Z trafo: TRANSLATION(-1592.5 MM, 0, -192.5 MM) :
+                                          ROT_X(rot_v DEGREES) ]];
+    rot_v = rot_v + 20;
+  }
+  return [ Nieten_Zyl_oben trafo: TRANSLATION(17.5 MM, 1225 MM, -2677.5 MM) ];
+}
+
+ArObj create_cylinders(
+        ART_GV  * art_gv,
+        ArObj     black_surface,
+        ArObj     red_surface
+        )
+{
+  ArObj Niete_Z = [ SPHERE trafo: USCALE(17.5 MM) ];
+
+  ArObj Nieten_Zyl_unten = create_Nieten_Zyl_unten(art_gv,Niete_Z);
+
+  ArObj Nieten_Zyl_oben = create_Nieten_Zyl_oben(art_gv,Niete_Z);
+
+  ArObj Nieten_Verkleidung = create_Nieten_Verkleidung(art_gv,Niete_Z);
+
+  ArObj Zylinder_unten = UNION([[[[[[[[[ CYLINDER trafo: SCALE(385 MM, 385
+							       MM, 1050 MM) ]
+
+                               or: [ CONE trafo: SCALE(280 MM, 280 MM, 175 MM) :
+                                                 ROT_X(180 DEGREES) :
+                                                 TRANSLATION_Z(1225 MM) ]]
+                               or: [ CYLINDER trafo: SCALE(350 MM, 350 MM,
+							   35 MM) :
+                                                     TRANSLATION_Z(1050 MM) ]]
+                               or: [ CYLINDER trafo: SCALE(105 MM, 105 MM,
+							   35 MM) :
+                                                     TRANSLATION_Z(1172.5 MM) ]]
+                               or: [ CONE trafo: SCALE(280 MM, 280 MM, 175 MM) :
+                                                     TRANSLATION_Z(-175 MM) ]]
+                               or: [ CYLINDER trafo: SCALE(350 MM, 350 MM,
+							   35 MM) :
+                                                     TRANSLATION_Z(-35 MM) ]]
+                               or: [ CYLINDER trafo: SCALE(105 MM, 105 MM,
+							   35 MM) :
+                                                     TRANSLATION_Z(-157.5 MM) ]]
+
+                               or: [ CYLINDER trafo: SCALE(43.75 MM, 43.75
+							   MM, 1050 MM) :
+                                                     TRANSLATION_Z(1050 MM) ]]
+                               trafo: ROT_Y(-90 DEGREES) :
+                                      TRANSLATION(-490 MM, 1120 MM, -3377.5 MM) ],
+                               [ Nieten_Zyl_unten
+                                       surfaceMaterial: black_surface ],
+                               UNION_END);
+
+  ArObj Zylinder_oben = UNION([[[[[[[[[[[[ CYLINDER trafo: SCALE(280 MM,
+								 280 MM,
+								 1050 MM) ]
+                              or: [ CONE trafo: SCALE(227.5 MM, 227.5 MM,
+						      122.5 MM) :
+                                                ROT_X(180 DEGREES) :
+                                                TRANSLATION_Z(1172.5 MM) ]]
+                              or: [ CYLINDER trafo: SCALE(227.5 MM, 227.5
+							  MM, 35 MM) :
+                                                    TRANSLATION_Z(1050 MM) ]]
+                              or: [ CYLINDER trafo: SCALE(70 MM, 70 MM, 28 MM) :
+                                                    TRANSLATION_Z(1127 MM) ]]
+                              or: [ CONE trafo: SCALE(227.5 MM, 227.5 MM,
+						      122.5 MM) :
+                                                TRANSLATION_Z(-122.5 MM) ]]
+                              or: [ CYLINDER trafo: SCALE(227.5 MM, 227.5
+							  MM, 35 MM) :
+                                                    TRANSLATION_Z(-35 MM) ]]
+                              or: [ CYLINDER trafo: SCALE(70 MM, 70 MM, 28 MM) :
+                                                    TRANSLATION_Z(-112 MM) ]]
+                              or: [ CYLINDER trafo: SCALE(35 MM, 35 MM, 420
+							  MM) :
+                                                    TRANSLATION_Z(1050 MM) ]]
+                              trafo: ROT_Y(-90 DEGREES) :
+                                     TRANSLATION(-490 MM, 1225 MM, -2677.5 MM) ]
+                              or: [ CUBE trafo: SCALE(665 MM, 280 MM, 420 MM) :
+                                                TRANSLATION(-1330 MM, 1186.5 MM,
+						      -3290 MM) ]]
+                              or: [ CYLINDER trafo: USCALE(105 MM) :
+                                                    ROT_X(-90 DEGREES) :
+                                                    TRANSLATION(35 MM, 1365 MM,
+							  -2764 MM) ]]
+                              or: [ CUBE trafo: SCALE(210 MM, 105 MM, 140 MM) :
+                                                TRANSLATION(-70 MM, 1365 MM,
+						      -2870 MM) ]],
+                              [ Nieten_Zyl_oben
+                                      surfaceMaterial: black_surface ],
+                              UNION_END);
+                          
+
+  ArObj Verkleidung = [[[[[[[[[[ CUBE trafo: SCALE(3045 MM, 140 MM, 962.5 MM) ]
+                      sub: [ CUBE trafo: SCALE(1942.5 MM, 140 MM, 752.5 MM) :
+                                         TRANSLATION(-17.5 MM, 0, -17.5 MM) ]]
+                      sub: [ CYLINDER trafo: SCALE(735 MM, 735 MM, 350 MM) :
+                                             ROT_X(-90 DEGREES) :
+                                             TRANSLATION(1925 MM, -70 MM, 0) ]]
+                      sub: [ CUBE trafo: SCALE(122.5 MM, 140 MM, 507.5 MM) :
+                                         TRANSLATION(2957.5 MM, 0, -17.5 MM) ]]
+                      or: [ CUBE trafo: SCALE(227.5 MM, 140 MM, 70 MM) :
+                                        TRANSLATION(-227.5 MM, 0, 892.5 MM) ]]
+                      sub: [ CUBE trafo: SCALE(3272.5 MM, 35 MM, 192.5 MM) :
+                                         TRANSLATION(-227.5 MM, 105 MM, 752.5 MM) ]]
+                      sub: [ CUBE trafo: SCALE(1155 MM, 35 MM, 735 MM) :
+                                         TRANSLATION(1925 MM, 105 MM, 0) ]]
+                      or: [ CUBE trafo: SCALE(280 MM, 175 MM, 35 MM) :
+                                        TRANSLATION(2660 MM, 105 MM, 0) ]]
+                      or: [ CUBE trafo: SCALE(245 MM, 175 MM, 35 MM) :
+                                        TRANSLATION(2800 MM, 105 MM, 490 MM) ]]
+                             trafo: TRANSLATION(-1330 MM, 1365 MM, -3832.5 MM) ];
+
+  ArObj Zylinder_mit_Verkleidung = UNION([ Zylinder_unten surfaceMaterial: black_surface ],
+                                         [[ Zylinder_unten trafo: SCALE(1, -1, 1) ] 
+                                          surfaceMaterial: black_surface ], 
+                                         [ Zylinder_oben surfaceMaterial: black_surface ], 
+                                         [[ Zylinder_oben trafo: SCALE(1, -1, 1) ] 
+                                           surfaceMaterial: black_surface ], 
+                                         [ Verkleidung surfaceMaterial: red_surface ], 
+                                         [[ Verkleidung trafo: SCALE(1, -1, 1) ] 
+                                           surfaceMaterial: red_surface ], 
+                                         [ Nieten_Verkleidung surfaceMaterial: red_surface ], 
+                                         [[ Nieten_Verkleidung trafo: SCALE(1, -1, 1) ]
+                                           surfaceMaterial: red_surface ],
+                                         UNION_END);
+
+  return Zylinder_mit_Verkleidung;
+}
+
+
+
+
+
+
+

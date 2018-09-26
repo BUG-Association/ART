@@ -1,0 +1,387 @@
+#define SG_SURFACE(__c)     LAMBERT_MATERIAL(__c)
+
+ArNode * createMacbethChartSG(
+        ART_GV  * art_gv
+        )
+{
+    ArObj  sgp[140];
+    
+    sgp[  0] = SG_SURFACE( MACBETH_SG_A1 );
+    sgp[  1] = SG_SURFACE( MACBETH_SG_A2 );
+    sgp[  2] = SG_SURFACE( MACBETH_SG_A3 );
+    sgp[  3] = SG_SURFACE( MACBETH_SG_A4 );
+    sgp[  4] = SG_SURFACE( MACBETH_SG_A5 );
+    sgp[  5] = SG_SURFACE( MACBETH_SG_A6 );
+    sgp[  6] = SG_SURFACE( MACBETH_SG_A7 );
+    sgp[  7] = SG_SURFACE( MACBETH_SG_A8 );
+    sgp[  8] = SG_SURFACE( MACBETH_SG_A9 );
+    sgp[  9] = SG_SURFACE( MACBETH_SG_A10 );
+    
+    sgp[ 10] = SG_SURFACE( MACBETH_SG_B1 );
+    sgp[ 11] = SG_SURFACE( MACBETH_SG_B2 );
+    sgp[ 12] = SG_SURFACE( MACBETH_SG_B3 );
+    sgp[ 13] = SG_SURFACE( MACBETH_SG_B4 );
+    sgp[ 14] = SG_SURFACE( MACBETH_SG_B5 );
+    sgp[ 15] = SG_SURFACE( MACBETH_SG_B6 );
+    sgp[ 16] = SG_SURFACE( MACBETH_SG_B7 );
+    sgp[ 17] = SG_SURFACE( MACBETH_SG_B8 );
+    sgp[ 18] = SG_SURFACE( MACBETH_SG_B9 );
+    sgp[ 19] = SG_SURFACE( MACBETH_SG_B10 );
+    
+    sgp[ 20] = SG_SURFACE( MACBETH_SG_C1 );
+    sgp[ 21] = SG_SURFACE( MACBETH_SG_C2 );
+    sgp[ 22] = SG_SURFACE( MACBETH_SG_C3 );
+    sgp[ 23] = SG_SURFACE( MACBETH_SG_C4 );
+    sgp[ 24] = SG_SURFACE( MACBETH_SG_C5 );
+    sgp[ 25] = SG_SURFACE( MACBETH_SG_C6 );
+    sgp[ 26] = SG_SURFACE( MACBETH_SG_C7 );
+    sgp[ 27] = SG_SURFACE( MACBETH_SG_C8 );
+    sgp[ 28] = SG_SURFACE( MACBETH_SG_C9 );
+    sgp[ 29] = SG_SURFACE( MACBETH_SG_C10 );
+    
+    sgp[ 30] = SG_SURFACE( MACBETH_SG_D1 );
+    sgp[ 31] = SG_SURFACE( MACBETH_SG_D2 );
+    sgp[ 32] = SG_SURFACE( MACBETH_SG_D3 );
+    sgp[ 33] = SG_SURFACE( MACBETH_SG_D4 );
+    sgp[ 34] = SG_SURFACE( MACBETH_SG_D5 );
+    sgp[ 35] = SG_SURFACE( MACBETH_SG_D6 );
+    sgp[ 36] = SG_SURFACE( MACBETH_SG_D7 );
+    sgp[ 37] = SG_SURFACE( MACBETH_SG_D8 );
+    sgp[ 38] = SG_SURFACE( MACBETH_SG_D9 );
+    sgp[ 39] = SG_SURFACE( MACBETH_SG_D10 );
+    
+    sgp[ 40] = SG_SURFACE( MACBETH_SG_E1 );
+    sgp[ 41] = SG_SURFACE( MACBETH_SG_E2 );
+    sgp[ 42] = SG_SURFACE( MACBETH_SG_E3 );
+    sgp[ 43] = SG_SURFACE( MACBETH_SG_E4 );
+    sgp[ 44] = SG_SURFACE( MACBETH_SG_E5 );
+    sgp[ 45] = SG_SURFACE( MACBETH_SG_E6 );
+    sgp[ 46] = SG_SURFACE( MACBETH_SG_E7 );
+    sgp[ 47] = SG_SURFACE( MACBETH_SG_E8 );
+    sgp[ 48] = SG_SURFACE( MACBETH_SG_E9 );
+    sgp[ 49] = SG_SURFACE( MACBETH_SG_E10 );
+    
+    sgp[ 50] = SG_SURFACE( MACBETH_SG_F1 );
+    sgp[ 51] = SG_SURFACE( MACBETH_SG_F2 );
+    sgp[ 52] = SG_SURFACE( MACBETH_SG_F3 );
+    sgp[ 53] = SG_SURFACE( MACBETH_SG_F4 );
+    sgp[ 54] = SG_SURFACE( MACBETH_SG_F5 );
+    sgp[ 55] = SG_SURFACE( MACBETH_SG_F6 );
+    sgp[ 56] = SG_SURFACE( MACBETH_SG_F7 );
+    sgp[ 57] = SG_SURFACE( MACBETH_SG_F8 );
+    sgp[ 58] = SG_SURFACE( MACBETH_SG_F9 );
+    sgp[ 59] = SG_SURFACE( MACBETH_SG_F10 );
+    
+    sgp[ 60] = SG_SURFACE( MACBETH_SG_G1 );
+    sgp[ 61] = SG_SURFACE( MACBETH_SG_G2 );
+    sgp[ 62] = SG_SURFACE( MACBETH_SG_G3 );
+    sgp[ 63] = SG_SURFACE( MACBETH_SG_G4 );
+    sgp[ 64] = SG_SURFACE( MACBETH_SG_G5 );
+    sgp[ 65] = SG_SURFACE( MACBETH_SG_G6 );
+    sgp[ 66] = SG_SURFACE( MACBETH_SG_G7 );
+    sgp[ 67] = SG_SURFACE( MACBETH_SG_G8 );
+    sgp[ 68] = SG_SURFACE( MACBETH_SG_G9 );
+    sgp[ 69] = SG_SURFACE( MACBETH_SG_G10 );
+    
+    sgp[ 70] = SG_SURFACE( MACBETH_SG_H1 );
+    sgp[ 71] = SG_SURFACE( MACBETH_SG_H2 );
+    sgp[ 72] = SG_SURFACE( MACBETH_SG_H3 );
+    sgp[ 73] = SG_SURFACE( MACBETH_SG_H4 );
+    sgp[ 74] = SG_SURFACE( MACBETH_SG_H5 );
+    sgp[ 75] = SG_SURFACE( MACBETH_SG_H6 );
+    sgp[ 76] = SG_SURFACE( MACBETH_SG_H7 );
+    sgp[ 77] = SG_SURFACE( MACBETH_SG_H8 );
+    sgp[ 78] = SG_SURFACE( MACBETH_SG_H9 );
+    sgp[ 79] = SG_SURFACE( MACBETH_SG_H10 );
+    
+    sgp[ 80] = SG_SURFACE( MACBETH_SG_I1 );
+    sgp[ 81] = SG_SURFACE( MACBETH_SG_I2 );
+    sgp[ 82] = SG_SURFACE( MACBETH_SG_I3 );
+    sgp[ 83] = SG_SURFACE( MACBETH_SG_I4 );
+    sgp[ 84] = SG_SURFACE( MACBETH_SG_I5 );
+    sgp[ 85] = SG_SURFACE( MACBETH_SG_I6 );
+    sgp[ 86] = SG_SURFACE( MACBETH_SG_I7 );
+    sgp[ 87] = SG_SURFACE( MACBETH_SG_I8 );
+    sgp[ 88] = SG_SURFACE( MACBETH_SG_I9 );
+    sgp[ 89] = SG_SURFACE( MACBETH_SG_I10 );
+    
+    sgp[ 90] = SG_SURFACE( MACBETH_SG_J1 );
+    sgp[ 91] = SG_SURFACE( MACBETH_SG_J2 );
+    sgp[ 92] = SG_SURFACE( MACBETH_SG_J3 );
+    sgp[ 93] = SG_SURFACE( MACBETH_SG_J4 );
+    sgp[ 94] = SG_SURFACE( MACBETH_SG_J5 );
+    sgp[ 95] = SG_SURFACE( MACBETH_SG_J6 );
+    sgp[ 96] = SG_SURFACE( MACBETH_SG_J7 );
+    sgp[ 97] = SG_SURFACE( MACBETH_SG_J8 );
+    sgp[ 98] = SG_SURFACE( MACBETH_SG_J9 );
+    sgp[ 99] = SG_SURFACE( MACBETH_SG_J10 );
+    
+    sgp[100] = SG_SURFACE( MACBETH_SG_K1 );
+    sgp[101] = SG_SURFACE( MACBETH_SG_K2 );
+    sgp[102] = SG_SURFACE( MACBETH_SG_K3 );
+    sgp[103] = SG_SURFACE( MACBETH_SG_K4 );
+    sgp[104] = SG_SURFACE( MACBETH_SG_K5 );
+    sgp[105] = SG_SURFACE( MACBETH_SG_K6 );
+    sgp[106] = SG_SURFACE( MACBETH_SG_K7 );
+    sgp[107] = SG_SURFACE( MACBETH_SG_K8 );
+    sgp[108] = SG_SURFACE( MACBETH_SG_K9 );
+    sgp[109] = SG_SURFACE( MACBETH_SG_K10 );
+    
+    sgp[110] = SG_SURFACE( MACBETH_SG_L1 );
+    sgp[111] = SG_SURFACE( MACBETH_SG_L2 );
+    sgp[112] = SG_SURFACE( MACBETH_SG_L3 );
+    sgp[113] = SG_SURFACE( MACBETH_SG_L4 );
+    sgp[114] = SG_SURFACE( MACBETH_SG_L5 );
+    sgp[115] = SG_SURFACE( MACBETH_SG_L6 );
+    sgp[116] = SG_SURFACE( MACBETH_SG_L7 );
+    sgp[117] = SG_SURFACE( MACBETH_SG_L8 );
+    sgp[118] = SG_SURFACE( MACBETH_SG_L9 );
+    sgp[119] = SG_SURFACE( MACBETH_SG_L10 );
+    
+    sgp[120] = SG_SURFACE( MACBETH_SG_M1 );
+    sgp[121] = SG_SURFACE( MACBETH_SG_M2 );
+    sgp[122] = SG_SURFACE( MACBETH_SG_M3 );
+    sgp[123] = SG_SURFACE( MACBETH_SG_M4 );
+    sgp[124] = SG_SURFACE( MACBETH_SG_M5 );
+    sgp[125] = SG_SURFACE( MACBETH_SG_M6 );
+    sgp[126] = SG_SURFACE( MACBETH_SG_M7 );
+    sgp[127] = SG_SURFACE( MACBETH_SG_M8 );
+    sgp[128] = SG_SURFACE( MACBETH_SG_M9 );
+    sgp[129] = SG_SURFACE( MACBETH_SG_M10 );
+    
+    sgp[130] = SG_SURFACE( MACBETH_SG_N1 );
+    sgp[131] = SG_SURFACE( MACBETH_SG_N2 );
+    sgp[132] = SG_SURFACE( MACBETH_SG_N3 );
+    sgp[133] = SG_SURFACE( MACBETH_SG_N4 );
+    sgp[134] = SG_SURFACE( MACBETH_SG_N5 );
+    sgp[135] = SG_SURFACE( MACBETH_SG_N6 );
+    sgp[136] = SG_SURFACE( MACBETH_SG_N7 );
+    sgp[137] = SG_SURFACE( MACBETH_SG_N8 );
+    sgp[138] = SG_SURFACE( MACBETH_SG_N9 );
+    sgp[139] = SG_SURFACE( MACBETH_SG_N10 );
+    
+    ArObj patch =
+        [ CUBE apply
+            : SCALE( 1.39 CM, 1.39 CM, 0.5 MM )
+            : TRANSLATION( -0.695 CM, -0.695 CM, 0.0 )
+            ];
+    
+    double  dx = 1.78 CM;
+    double  dy = 1.78 CM;
+    double  dz = 0.00 CM;
+    
+    double  dv = 0.0;
+    
+    ArObj  cpa[140];
+    
+    //  l = letter (A..M), i = index (1..10)
+    
+    for ( int l = 0; l < 14; l++ )
+    {
+        for ( int i = 0; i < 10; i++ )
+        {
+            cpa[ l * 10 + i ] =
+                [ patch apply
+                    : TRANSLATION( l * dx, - i * dy, dz)
+                    : sgp[ l * 10 + i ]
+                    ];
+        }
+    }
+
+    ArObj  patches = UNION(
+        cpa[0], cpa[1], cpa[2], cpa[3], cpa[4],
+        cpa[5], cpa[6], cpa[7], cpa[8], cpa[9],
+        
+        cpa[10], cpa[11], cpa[12], cpa[13], cpa[14],
+        cpa[15], cpa[16], cpa[17], cpa[18], cpa[19],
+        
+        cpa[20], cpa[21], cpa[22], cpa[23], cpa[24],
+        cpa[25], cpa[26], cpa[27], cpa[28], cpa[29],
+        
+        cpa[30], cpa[31], cpa[32], cpa[33], cpa[34],
+        cpa[35], cpa[36], cpa[37], cpa[38], cpa[39],
+        
+        cpa[40], cpa[41], cpa[42], cpa[43], cpa[44],
+        cpa[45], cpa[46], cpa[47], cpa[48], cpa[49],
+        
+        cpa[50], cpa[51], cpa[52], cpa[53], cpa[54],
+        cpa[55], cpa[56], cpa[57], cpa[58], cpa[59],
+        
+        cpa[60], cpa[61], cpa[62], cpa[63], cpa[64],
+        cpa[65], cpa[66], cpa[67], cpa[68], cpa[69],
+        
+        cpa[70], cpa[71], cpa[72], cpa[73], cpa[74],
+        cpa[75], cpa[76], cpa[77], cpa[78], cpa[79],
+        
+        cpa[80], cpa[81], cpa[82], cpa[83], cpa[84],
+        cpa[85], cpa[86], cpa[87], cpa[88], cpa[89],
+        
+        cpa[90], cpa[91], cpa[92], cpa[93], cpa[94],
+        cpa[95], cpa[96], cpa[97], cpa[98], cpa[99],
+        
+        cpa[100], cpa[101], cpa[102], cpa[103], cpa[104],
+        cpa[105], cpa[106], cpa[107], cpa[108], cpa[109],
+        
+        cpa[110], cpa[111], cpa[112], cpa[113], cpa[114],
+        cpa[115], cpa[116], cpa[117], cpa[118], cpa[119],
+        
+        cpa[120], cpa[121], cpa[122], cpa[123], cpa[124],
+        cpa[125], cpa[126], cpa[127], cpa[128], cpa[129],
+        
+        cpa[130], cpa[131], cpa[132], cpa[133], cpa[134],
+        cpa[135], cpa[136], cpa[137], cpa[138], cpa[139],
+        
+        UNION_END );
+
+    patches =
+        [ patches apply
+            :   TRANSLATION( -(13 * dx) / 2.0, 10 * dy - (11 * dy) / 2.0, 0.0 )
+            ];
+
+    ArObj main_panel =
+        [ CUBE apply
+            :   SCALE(  29.0 CM,  20.3 CM, 1.5 MM )
+            ];
+    
+    ArObj corner_cutout =
+        [ CUBE apply
+            :   SCALE(  MATH_SQRT_2 * 0.5 CM,  MATH_SQRT_2 * 0.5 CM, 1.7 MM )
+            :   TRANSLATION( 0.0, 0.0, -0.1 MM )
+            :   ROT_Z( 45 DEGREES )
+            :   TRANSLATION( 0.0, -MATH_SQRT_2 * MATH_SQRT_2 * 0.5 * 0.5 CM, 0.0 )
+            ];
+    
+    ArObj  corner_cutouts =
+	UNION(
+            [ corner_cutout apply: TRANSLATION(  0.0 CM,  0.0 CM, 0.0) ],
+            [ corner_cutout apply: TRANSLATION( 29.0 CM,  0.0 CM, 0.0) ],
+            [ corner_cutout apply: TRANSLATION(  0.0 CM, 20.3 CM, 0.0) ],
+            [ corner_cutout apply: TRANSLATION( 29.0 CM, 20.3 CM, 0.0) ],
+            UNION_END
+            );
+
+    ArObj corner_disc =
+        [ CYLINDER apply
+            :   SCALE(  0.5 CM,  0.5 CM, 1.5 MM )
+            ];
+    
+    ArObj  corner_discs =
+	UNION(
+            [ corner_disc apply: TRANSLATION(   0.5 CM,  0.5 CM, 0.0) ],
+            [ corner_disc apply: TRANSLATION(   0.5 CM, 19.8 CM, 0.0) ],
+            [ corner_disc apply: TRANSLATION(  28.5 CM,  0.5 CM, 0.0) ],
+            [ corner_disc apply: TRANSLATION(  28.5 CM, 19.8 CM, 0.0) ],
+            UNION_END
+            );
+
+    ArObj  frame =
+	UNION(
+            [ main_panel sub: corner_cutouts ],
+            corner_discs,
+            UNION_END
+            );
+
+    frame =
+        [ frame apply
+            :   TRANSLATION( -14.5 CM, -10.15 CM, -1.01 MM )
+            :   LAMBERT_REFLECTOR( CONST_COLOUR_GRAY(0.014) )
+            ];
+
+    ArObj  chart =
+	UNION(
+            patches,
+            frame,
+            UNION_END
+            );
+
+    return chart;
+}
+
+#define MACBETH_CHART_SG   createMacbethChartSG( art_gv )
+
+ARM_MAIN_FUNCTION(MacbethChartSG)
+{
+    id lambertBaseSurface = LAMBERT_MATERIAL( MACBETH_NEUTRAL8 );
+
+    id cylinder0   =
+        [ CYLINDER apply
+            :   SCALE( 4000.0, 4000.0, 1.0 )
+            :   TRANSLATION( 0.0, 0.0, -3.6)
+            :   lambertBaseSurface
+            ];
+
+    double tz = -0.7;
+    
+    id scene_geometry =
+        UNION(
+            [ MACBETH_CHART_SG apply
+                :   ROT_Z( 180 DEGREES )
+                :   ROT_X( -64.8 DEGREES )
+                :   USCALE( 90 )
+                :   TRANSLATION( 0.0, 0.0 , 6.0 )
+                ],
+
+            cylinder0,
+            
+            UNION_END
+            );
+            
+    id camera =
+        [ CAMERA
+            imageSize:  IVEC2D( 256 , 192 )
+            ray:        RAY3D( PNT3D(0.0,50.0,30.0),VEC3D(0.0,-50.0,-23.8) )
+            zoom:       1.5
+            ];
+
+#ifndef SAMPLES
+#define SAMPLES 64
+#endif
+
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  6
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+			maximalRecursion: 3
+                    ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       SAMPLES
+                randomValueGeneration: PSEUDORANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    YES
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END
+            );
+
+    id  environment_material =
+        UNIFORM_ENVIRONMENT_MATERIAL( CIE_ILLUMINANT_D65, 1.0 );
+
+    return
+        [ SCENE
+            sceneGeometry      : scene_geometry
+            environmentMaterial: environment_material
+            camera             : camera
+            actionSequence     : actionsequence
+            ];
+}

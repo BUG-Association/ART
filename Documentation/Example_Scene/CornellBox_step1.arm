@@ -1,0 +1,182 @@
+ArObj createShortBlock(ART_GV * art_gv) {
+    Pnt3D * blockPoints = ALLOC_ARRAY( Pnt3D, 9);
+    
+    blockPoints[0] = PNT3D(130.0, 165.0,  65.0); // top    right front
+    blockPoints[1] = PNT3D( 82.0, 165.0, 225.0); // top    right rear
+    blockPoints[2] = PNT3D(290.0, 165.0, 114.0); // top    left  front
+    blockPoints[3] = PNT3D(240.0, 165.0, 272.0); // top    left  rear
+    blockPoints[4] = PNT3D(130.0,   0.0,  65.0); // bottom right front
+    blockPoints[5] = PNT3D( 82.0,   0.0, 225.0); // bottom right rear
+    blockPoints[6] = PNT3D(290.0,   0.0, 114.0); // bottom left  front
+    blockPoints[7] = PNT3D(240.0,   0.0, 272.0); // bottom left  rear
+
+
+    blockPoints[8] = PNT3D_HUGE;
+
+    ArObj vertices = 
+        arnvertexset(
+            art_gv,
+            blockPoints,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+            );
+
+    ArObj block =
+        UNION(
+            QUADRANGLE( 0, 1, 3, 2 ),
+            QUADRANGLE( 2, 3, 7, 6 ),
+            QUADRANGLE( 6, 4, 5, 7 ),
+            QUADRANGLE( 7, 3, 1, 5 ),
+            QUADRANGLE( 5, 1, 0, 4 ),
+            QUADRANGLE( 4, 0, 2, 6 ),
+            UNION_END
+            );
+
+    return [ block apply: vertices ];
+}
+
+ArObj createTallBlock(ART_GV * art_gv) {
+    Pnt3D * blockPoints = ALLOC_ARRAY( Pnt3D, 9);
+
+
+    blockPoints[0] = PNT3D(265.0, 330.0, 296.0); // top    right front
+    blockPoints[1] = PNT3D(314.0, 330.0, 456.0); // top    right rear
+    blockPoints[2] = PNT3D(423.0, 330.0, 247.0); // top    left  front
+    blockPoints[3] = PNT3D(472.0, 330.0, 406.0); // top    left  rear
+    blockPoints[4] = PNT3D(265.0,   0.0, 296.0); // bottom right front
+    blockPoints[5] = PNT3D(314.0,   0.0, 456.0); // bottom right rear
+    blockPoints[6] = PNT3D(423.0,   0.0, 247.0); // bottom left  front
+    blockPoints[7] = PNT3D(472.0,   0.0, 406.0); // bottom left  rear
+
+
+    blockPoints[8] = PNT3D_HUGE;
+
+    ArObj vertices = 
+        arnvertexset(
+            art_gv,
+            blockPoints,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+            );
+    
+    ArObj block =
+        UNION(
+            QUADRANGLE( 0, 1, 3, 2 ),
+            QUADRANGLE( 2, 3, 7, 6 ),
+            QUADRANGLE( 6, 4, 5, 7 ),
+            QUADRANGLE( 7, 3, 1, 5 ),
+            QUADRANGLE( 5, 1, 0, 4 ),
+            QUADRANGLE( 4, 6, 2, 0 ),
+            QUADRANGLE( 4, 6, 2, 0 ),
+            UNION_END
+            );
+
+    return [ block apply: vertices ];
+}
+
+ArObj createBox(ART_GV * art_gv) {
+    Pnt3D * boxPoints = ALLOC_ARRAY( Pnt3D, 9 );
+
+    boxPoints[0] = PNT3D( 553.0, 548.8, 559.2 ); // left   top    rear
+    boxPoints[1] = PNT3D( 553.0, 548.8,   0.0 ); // left   top    front
+    boxPoints[2] = PNT3D( 553.0,   0.0, 559.2 ); // left   bottom rear
+    boxPoints[3] = PNT3D( 553.0,   0.0,   0.0 ); // left   bottom front
+    boxPoints[4] = PNT3D(   0.0, 548.8, 559.2 ); // right  top    rear
+    boxPoints[5] = PNT3D(   0.0, 548.8,   0.0 ); // right  top    front
+    boxPoints[6] = PNT3D(   0.0,   0.0, 559.2 ); // right  bottom rear
+    boxPoints[7] = PNT3D(   0.0,   0.0,   0.0 ); // right  bottom front
+
+    boxPoints[8] = PNT3D_HUGE;
+    
+    ArObj vertices = 
+        arnvertexset(
+            art_gv,
+            boxPoints,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+            );
+
+    ArObj box =
+        UNION(
+            QUADRANGLE(2, 3, 1, 6),
+            QUADRANGLE(4, 5, 1, 0),
+            QUADRANGLE(6, 7, 5, 4),
+            QUADRANGLE(0, 1, 3, 2),
+            QUADRANGLE(2, 0, 4, 6),
+            UNION_END
+            );
+
+    return [ box apply: vertices ];
+}
+
+ARM_MAIN_FUNCTION(CornellBox_step1)
+{
+    id scene_geometry = 
+        UNION(
+            createBox(art_gv),
+            createTallBlock(art_gv),
+            createShortBlock(art_gv),
+            UNION_END
+            );
+    
+    id camera =
+        [ CAMERA
+            imageSize: IVEC2D(250, 250)
+            ray:       RAY3D(PNT3D(278, 273, -800), VEC3D(0.0, 0.0, 1.0))
+            zoom:      1
+            ];
+    
+    [ camera withTwist: -90 DEGREES ];
+
+    id actionsquence = 
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+            
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  5
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+                        maximalRecursion: 8
+                        mode:             arpathtracermode_mis
+                        ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       512
+                randomValueGeneration: RANDOM_SEQUENCE
+                ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+                ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+            
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:   YES
+                bitsPerChannel: 8
+                ],
+            
+            ACTION_SEQUENCE_END
+            );
+        
+    return
+        [ SCENE
+            sceneGeometry:       scene_geometry
+            environmentMaterial: UNIFORM_ENVIRONMENT_MATERIAL( CONST_COLOUR_GREY(1.0), 1.0 )
+            camera:              camera
+            actionSequence:      actionsquence
+            ];
+}

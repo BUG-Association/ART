@@ -1,0 +1,287 @@
+\chapter{Using ART}
+\label{sec:usingart}
+
+ART is a toolkit which provides several command-line
+applications. These all perform smaller, individual tasks that are relevant to
+photorealistic image synthesis, following a UNIX-like philosophy: there is no single large application, but rather several smaller, modular ones.
+
+Since its inception, ART has been a command-line only toolkit since
+\begin{enumerate}
+\item we wanted to concentrate on getting the implementation of the
+  photorealistic rendering processes right without having GUI issues standing
+  in the way and
+\item we neither wanted to be tied to one particular GUI that we would have to
+  develop for, nor be burdened with some kind of portable cross-GUI solution.
+  These only became viable long after ART was started, and we might integrate
+  one yet sometime.
+\end{enumerate}
+
+Once the toolkit has been built and installed with \command{make install} (or the \command{install} target in Xcode), ART
+is ready for use. It installs its executables as specified to \command{cmake}. Usually, when doing development work local to your account, they are placed in \command{\textasciitilde/bin}. Currently the three main applications are: \command{artist} (the actual command-line renderer), \command{tonemap} (the
+tonemapping tool) and \command{bugblatter} (the difference image generator), but there are others as well.
+
+
+Calling each of them without any arguments displays information about the version of the particular executable which is being called. If you call any of them with the option \command{-h}, all the valid soptions for this particular application are displayed.
+
+\section{Usage Background}
+We first outline some general points about the design philosophy of ART applications, and then briefly discuss the fairly simple actual usage of the tools.
+
+\subsection{Action Sequences}
+\label{sec:using:ActionSequence}
+Rendering jobs in ART were intended to go beyond the traditional rendering toolkit workflow of
+\begin{quote}\itshape
+the user provides a scene which just contains some geometry, and does
+  everything else by first fiddling around with the hardwired command-line
+  parameters of the actual renderer, and later perhaps calling the tone mapper
+  on some HDR result image.
+\end{quote}
+
+
+Anything which is done by an ART command line application is determined by a so-called \emph{action sequence} that is executed. With the exception of \command{impresario} (which makes no use of action sequences), the only real difference between the various ART command line applications lies in where the action sequence they execute comes from, and at which point of the rendering pipeline it starts.
+
+Action sequences are linearly progressing, non-branching lists of \class{ArnAction}-derived object instances. They
+are stored in an \class{ArnActionSequence} object, and are executed one after another. Each action can
+take arbitrarily many \emph{data objects} off the provided single \emph{data stack}. This stack is initialised according to the task at hand: for rendering purposes, the camera, the -- at that point, still empty! -- result image, and the scene geometry are initially placed there. The tone mapper initialises it by putting the raw images that are to be processed there, while the image comparison tool initially pushes the two images that are to be compared. Each action in the sequence then works by taking the input it needs from this stack, and places any resulting objects back there. If an action does not find the data object(s) it needs on the data stack, it terminates the program with an error message.
+
+The utility of this concept is easily seen when considering what has to be done for a typical rendering job to arrive at the desired end result of a displayable RGB image: 
+\begin{itemize}
+\item loading of the scene into memory
+\item insertion of raycasting acceleration structures, e.g.\ bounding
+  boxes
+\item identification and measurement of the lightsources
+\item the actual rendering, e.g.\ path tracing -- this yields an intermediate \command{artraw} HDR image, a lossless format internal to ART
+\item conversion of the (possibly spectral) \command{artraw} image to the equally lossless
+  colour space HDR format \command{artcsp}
+\item tone mapping
+\item gamut mapping
+\item conversion from the \command{artcsp} format
+  to a common end-user image format, such as TIFF.
+\end{itemize}
+
+The various actions in this sequence perform different data stack manipulations;
+for instance, the second one takes the plain scene graph off the data stack,
+inserts the bounding boxes and puts it back. The lightsource analysis action
+first pops the scene graph off the data stack, analyses it, and then puts it back
+again, along with a collection of lightsource descriptors in a separate
+container object. The path tracing action expects a camera, a scene graph and a
+collection of lightsource descriptors on the data stack, and puts an
+\filename{artraw} image back. And so on.
+
+Apart from compartmentalising the parameters for each of the subtasks necessary
+for image synthesis this approach also allows easy modification of the process:
+a nice example would be to exchange the action which inserts bounding boxes
+against one which inserts a kD-tree. Since the raycaster used by the path tracer
+is oblivious to what---and indeed if any---ray acceleration data structures are
+present (with the obvious exception from the user's viewpoint that execution
+times skyrocket if there are none) this provides a highly intuitive way of
+comparing the performance of different algorithms.
+
+Normally, an action sequence is assembled on the fly based on the command line options specified by the user (most applications, such as \command{tonemap} or \command{bugblatter}, follow this pattern), or loaded together with the scene file (as with the actual renderer, \command{artist}). In addition to this, a lot of ART command line applications have the option \command{-acs <filename>} to load an entire, ready-made action sequence from disk; this overrides any in-built action sequences, or those found in a scene file. This capability is convenient if systematic manipulation of large numbers of files is desired, and saves the bother of always having to specify lots of command line parameters. But there are also some mono-purpose tools such as \command{bugblatter} which cannot load a complete action sequence from disk. Internally, however, even the mono-purpose tools use a small action sequence, and the \command{-acs <filename>} functionality could easily be activated for them.
+
+\subsection{The Structure of an ART Scene}
+ART uses a proprietary scene description language not out of the desire to
+invent yet another file format, but rather for various hard technical reasons,
+one of them being for instance the fact that no existing format provided the
+possibility to properly incorporate (bi-)spectral reflectance and emission data. 
+
+Another key reason---\emph{the} reason as far as this part of the explanation is
+concerned---was that a file format which is capable of encoding the entire
+rendering pipeline after the modeling step was deemed to be a desirable
+property. This is achieved by saving the associated action sequences as integral
+part of each ART scene---and thereby storing instructions for all manipulation
+steps apart from the actual rendering alongside the geometry.
+
+The top-level object in any ART scene is of the type \class{ArnScene},
+an Objective-C class which maintains the geometry, the camera, an
+environment map / skydome description (if present) and the action sequence. This is also
+the kind of class many actions expect on the data stack---just putting
+plain geometry there would not work.
+
+The user-editable format of such native ART scenes is the
+\filename{.arm} format (which cannot be directly parsed by the
+renderer), whereas the internal, parseable versions of these scenes
+are \filename{.art} or \filename{.arb} files. Details on the
+relationship between these formats can be found in background
+section~\ref{sec:ARTscenefileformat}.
+
+
+
+\section{Using the Renderer}
+%The \command{artist} executable has always had the idiosyncrasy that it only
+%works properly when called from its application directory. Fixing this would not
+%require a major effort (it would mainly require that \command{artist} gets some
+%notion of library search paths---not exactly rocket science), and will probably
+%occur sometime in the nearer future.
+
+The minimal action to render the scene described by the file \filename{foo.arm} is to change into the directory where the scene \filename{foo.arm} lives, and invoke \command{artist}:
+
+\begin{verbatim}
+cd <working dir>
+artist foo.arm
+\end{verbatim}
+
+As long as no GUI scene editor for the actual internal \filename{.art} scene file format exists, changing anything in the scene has to be done by editing the associated \filename{.arm} file. 
+
+\subsection{Multiprocessor Operation}
+On being started up, the ART libraries detect the number of available processor cores, and use all of them where this is applicable and implemented. This behaviour can be overridden via the option \option{-j~<n>} to use $n$ processor cores ($n$ can be either larger or smaller than the number of physical cores - use this at your discretion).
+
+Note that ART at the moment only uses threading for some of the cases
+where this is possible; as development progresses this ratio will
+increase. The major tasks -- such as the actual path, photon or ray
+tracing -- are threaded, but there is still room for improvement,
+especially during the scene setup phase (\eg lightsource
+identification or mesh preparation calculations).
+
+\subsection{Obtaining Intermediate Rendering Results}
+For reasons of efficiency, \command{artist} does not write any intermediate results to disk while it is running. The rendering thread(s) store all computed information locally in each thread: only once all of them have terminated, the complete result image is assembled by the main thread, and saved to disk. 
+
+For long-running rendering jobs, this behaviour can be undesirable, as one might want to quickly see whether the rendering is doing what one expects. To solve this problem, it is possible to obtain intermediate results at any time during rendering with the \command{impresario} command. This small tool uses UNIX signals to wake up the dormant main thread of a running \command{artist} instance, and forces it to write (and if selected, also display) the current state of the result image. \command{impresario} can also be run in a way that it sends repeated wake-up calls to \command{artist} at pre-defined time intervals.
+
+\subsection{Changing the Result Image Size}
+\label{sec:using:imageSize}
+Sometimes it is desirable to alter the size of the output image---or
+to render just a subimage---without altering the scene file itself.
+
+The option \option{-res WxH} will create an output image $W$ pixels
+wide and $H$ pixels high.  The option \option{-res /r} reduces the
+size of the output image by the factor $1/r$, and the options
+\option{-x x0:x1} and \option{-y y0:y1}, which---used individually or
+together---restrict image synthesis to the subimage defined by
+$(x_0|y_0)$ and $(x_1|y_1)$.  
+
+Examples would be
+\begin{verbatim}
+artist foo.arm -x 0:20 -y 30:40
+\end{verbatim}
+which only renders the subimage bounded by the points ($0|30$) and ($20|40$) and
+\begin{verbatim}
+artist foo.arm -res /2
+\end{verbatim}
+which renders the image at half the resolution specified in the scene
+file. Enlargement is also possible by specifying fractions, as in
+\begin{verbatim}
+artist foo.arm -res /0.5 
+\end{verbatim}
+which yields a result image of twice the original size. This slightly
+counterintuitive notation is necessary since most (probably all) shells escape
+(i.e.\ for our purposes hide) the \option{*} character which would be the far more
+obvious choice here.
+
+Also note that the resolution change and subimage options can be
+combined, and that the \option{-x} and \option{-y} subimage options
+already operate on the altered size of the image in that case (i.e.\ 
+you have to specify the subimage coordinates in terms of the new image
+size).  Note further that one of either $x_0, x_1$ or $y_0, y_1$ can
+also be omitted, meaning ``from edge to given value''. So, the
+following command can be used to produce a section in the top right
+corner of a reduced image:
+\begin{verbatim}
+artist foo.arm -res /4 -x 20: -y :25
+\end{verbatim}
+
+\subsection{Passing \command{\#define}s to \filename{.arm} Files}
+
+As explained in depth in section~\ref{sec:ARTscenefileformat}, all human-editable \filename{.arm} input files are automatically translated into the internal \filename{.art} format before use. This process is usually very quick, and involves compilation and execution of the \filename{.arm} file. As the human editable scene files of ART are basically Objective-C programs, it is possible to transparently pass \command{\#define}s to them from the command line, in a manner similar to \command{gcc} or \command{llvm} command-line behaviour. The purpose of this facility is to be able to control certain frequently modified scene file properties, such as the number of samples that are to be taken for each pixel, via the command line, without having to edit the actual scene file.
+
+For example, if the scene file \filename{foo.arm} uses a conditionally defined macro \command{SAMPLE} to define a default number of samples cast for each pixel, like this:
+
+\begin{verbatim}
+#ifndef SAMPLES
+#define SAMPLES 32
+#endif
+\end{verbatim}
+
+it can then later be used during the definition of the scene action sequence, in the spot where sample count is specified (see the scene files in the ART Gallery for examples):
+
+\begin{verbatim}
+[ STOCHASTIC_PIXEL_SAMPLER
+	...
+    samplesPerPixel:  SAMPLES
+    ],
+\end{verbatim}
+
+This value can then be conveniently over-ridden from the command line: all \command{-D} switches force re-translation of the \filename{.arm} file, so the scene is automatically re-translated with \command{SAMPLE} set to 256:
+
+\begin{verbatim}
+artist foo.arm -DSAMPLES=256
+\end{verbatim}
+
+Note that this facility is not limited with regard to the number of \command{\#define}s that are passed to the \filename{.arm} file before translation: so you can be creative in making your scenes capable of command line manipulation via as many such switches as you want. Note also, though, that there is currently only an informal standard on what conditionally defined macros one can expect in an \filename{.arm} file: all examples in the ART gallery use \command{SAMPLE} to define the number of samples, and a number of them have an option \command{DIFFUSE\_ILLUMINATION} that can be activated instead of the standard scene illumination. But beyond that, there are no conventions at the moment.
+
+\subsection{Tagging Output by Data Type}
+Note should also be taken of the \option{-t} option, which tags the output of a
+rendering pass with the name of the data type that is used for the pixels of the image. For example,
+rendering the scene \filename{foo.arm} with the \option{RGB} renderer and
+the \option{-t} flag set would generate a result file of the form
+\filename{foo.RGB.tiff}, while a polarising \option{Spectrum8} rendering would yield
+\filename{foo.Spectrum8.polarising.tiff}.
+
+This is useful for those users who wish to compare e.g. colourspace and spectral renderings of the same scene, or the effect of different spectral output resolutions: one can easily keep the results of these computations in separate files this way. 
+
+
+\subsection{Tagging Output with an Arbitrary Tag}
+The option \option{-tt <extraTag>} allows you to give yet one more tag
+to the filename.  \option{.<extraTag>} is added just before the
+filename extension. Useful tags typically may be things you are currently
+testing, like number of samples, recursion depth, filter names, \ldots
+
+Note that \option{-tt} can of course be combined with \option{-t}, so that
+
+\begin{verbatim}
+artist foo.arm -t -tt TestCase1
+\end{verbatim}
+
+would yield an output file named \filename{foo.Spectrum8.TestCase1.tiff}. In normal operation, you probably do not need this sort of thing, but it can be very handy if you \eg do systematic experiments, and wish to tag the images properly in order to be able to tell them apart later.
+
+\subsection{Generating High DPI Result Images}
+The option \option{-ret} doubles the DPI count of result images, to yield images that "natively" display on modern high-DPI displays ("Retina displays"). Selecting this option also automatically doubles image resolution, and thereby likely quadruples rendering time. However, on modern displays, a much sharper image results. Use this feature with care when appropriate.
+
+\section{Using the Tonemapper}
+
+The \command{tonemap} executable is a tool designed to cover the last third of the rendering pipeline -- all that which comes after image synthesis. Currently, it is capable of reading and processing \filename{ARTRAW}, \filename{ARTCSP} and (if ART was built with support for the format) \filename{EXR} images. Usage is straightforward: the name of the image you want to process, followed by the desired tone reproduction operator, together with parameters:
+
+\begin{verbatim}
+tonemap foo.artraw -iac -a 1 
+\end{verbatim}
+
+which yields an \filename{RGB TIFF} version of the \filename{ARTRAW} image in
+question, using the Interactive Calibration tone reproduction operator, with the algorithm parameter $a$ set to 1. Use \command{tonemap -h} to see a list of all available tone mapping operators and output options. Note that different RGB spaces are available for the final output image (Wide Gamut RGB might be suitable for very colourful images in some cases), as well as the option to generate 16 bpc \filename{TIFF} images.
+
+\section{Bugblatter: Creating Difference Images}
+\label{sec:using:bugblatter}
+
+This application generates difference images between two \filename{ARTCSP} images, which obviously have to be of the same size:
+
+\begin{verbatim}
+bugblatter foo.artcsp bar.artcsp -o snarfle
+\end{verbatim}
+
+This generates a difference image of the two images \filename{foo} and \filename{bar}, and names the resulting image \filename{snarfle}. Use \command{bugblatter -h} to see a list of available options.
+
+The \filename{ARTCSP} files needed for this comparison can easily be obtained by using the \command{-rcsp} option of \command{tonemap}. This option retains the last intermediate \filename{ARTCSP} file before conversion to some common image format (\filename{TIFF}, \filename{EXR}). The output options are very similar to those for \command{tonemap} (16 bit output, RGB colourspace selection, \etc).
+
+\section{Polarisation Visualisation}
+As ART is capable of rendering with polarised light, and of storing the results in spectral image files that actually contain polarised light for each pixel, a tool to visualise these results named \command{polvis} is included with the toolkit. Much like \command{tonemap}, it is a command-line application that offers the sort of output options that are common to all ART image processing tools. Unlike most other tools, \command{polvis} is specific with regard to its input insofar as it will refuse to work on non-polarised \filename{ARTRAW} files.
+
+The visualisation options are pretty much exactly those outlined in the 2010 SCCG paper "A Standardised Polarisation Visualisation for Images": degree of polarisation (option \command{-dop}), prevalence of linear versus circular polarisation (\command{-lvc}), orientation of linear polarisation (\command{-lin}), as well as the chirality of any circular polarisation that may be present (\command{-cir}). In addition to these "canonical" four plots, there is also a fifth option that splits the image into its four Stokes Components, and outputs these separately as four false-colour images (\command{-stc}).
+
+For all of the four "canonical" plots, three display options exist: stand-alone (the default behaviour, with a black background), and two that are overlaid over a black and white version of the ARTRAW image in question (see the 2010 paper for details). The black and white image is actually not a normal black-and-white conversion of the image in question, but a monochrome spectral image extracted at the visualisation wavelength. So, to give just one example, a \command{polvis} invocation like this
+
+\begin{verbatim}
+polvis foo.artraw -dop -so -wl 400
+\end{verbatim}
+
+would yield a degree of polarisation plot for wavelength 400nm, that is overlaid over a tone mapped black and white version of the image at that wavelength. The resulting visualisation would have the filename
+
+\begin{verbatim}
+foo.dop.400nm.scaledOverlay.tiff
+\end{verbatim}
+
+as all \command{polvis} result images have filenames that are uniquely tagged. So running the visualisation tool multiple times with different visualisations selected will yield separate images -- and also not over-write the normal, tone mapped version of the image.
+
+% LocalWords:  bugblatter tonemap
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "ARTforNewbies"
+%%% End: 

@@ -1,0 +1,192 @@
+#define TENDER_WHEELS \
+    createTenderWheels( art_gv, black_surface, grey_surface, red_surface )
+
+ArObj createTenderWheels(
+        ART_GV  * art_gv,
+        ArObj     black_surface,
+        ArObj     grey_surface,
+        ArObj     red_surface
+        )
+{
+
+   ArObj w1 = [[[CYLINDER trafo: SCALE( 5.17, 5.17, 1 )] sub:
+			[CYLINDER trafo: SCALE (4, 4, 1)]] or:
+		   [[[CYLINDER trafo: SCALE( 5.5, 5.5, 0.4 )] sub:
+			[CYLINDER trafo: SCALE (4, 4, 0.4)]] trafo:TRANSLATION_Z ( 1 )]];
+   ArObj s1 = [[CUBE sub: CYLINDER] and: CUBE];
+   ArObj w2 = UNION (	[CUBE trafo: SCALE (4, 0.4, 1.4) :TRANSLATION_Y (-0.2)],
+			[s1 trafo: SCALE (0.2, 0.2, 1.4) :TRANSLATION (3.8, -0.4, 0)],
+			[s1 trafo: SCALE (0.2, 0.2, 1.4) :ROT_X (180 DEGREES) :TRANSLATION (3.8, 0.4, 
+1.4)],
+			UNION_END);
+
+   ArObj wheel = [ UNION (w1,
+			w2,
+			[w2 trafo: ROT_Z (36 DEGREES)],
+			[w2 trafo: ROT_Z (72 DEGREES)],
+			[w2 trafo: ROT_Z (108 DEGREES)],
+			[w2 trafo: ROT_Z (144 DEGREES)],
+			[w2 trafo: ROT_Z (180 DEGREES)],
+			[w2 trafo: ROT_Z (216 DEGREES)],
+			[w2 trafo: ROT_Z (252 DEGREES)],
+			[w2 trafo: ROT_Z (288 DEGREES)],
+			[w2 trafo: ROT_Z (324 DEGREES)],
+			UNION_END) apply: grey_surface ];
+
+   ArObj left_wheel = [wheel trafo: ROT_Y( 90 DEGREES ) :TRANSLATION_X ( -8.2 )];
+   ArObj right_wheel = [wheel trafo: ROT_Y( -90 DEGREES ) :TRANSLATION_X ( 8.2 )];
+   ArObj axis =
+    [ UNION(
+        [CYLINDER trafo: SCALE ( 0.75, 0.75, 0.3 )] ,
+        [CYLINDER trafo: SCALE ( 0.5, 0.5, 1.9 ) :TRANSLATION_Z ( 0.3 )],
+        [CYLINDER trafo: SCALE ( 0.75, 0.75, 17 ) :TRANSLATION_Z ( 2.2 )],
+        [CYLINDER trafo: SCALE ( 0.5, 0.5, 1.9 ) :TRANSLATION_Z ( 19.2 )],
+        [CYLINDER trafo: SCALE ( 0.75, 0.75, 0.3 ) :TRANSLATION_Z ( 21.1) ],
+        UNION_END)
+        apply: ROT_Y ( 90 DEGREES ) :TRANSLATION_X ( -10.7 )];
+
+   ArObj wheel_line = UNION (	left_wheel,
+				right_wheel,
+				axis,
+				UNION_END);
+
+   ArObj p2 = UNION (	[CUBE trafo: SCALE (1, 10, 0.1)],
+			[CUBE trafo: SCALE (1, 9.6, 0.1) :TRANSLATION (0, 0.2, -0.1)],
+			[CUBE trafo: SCALE (1, 9.2, 0.1) :TRANSLATION (0, 0.4, -0.2)],
+			[CUBE trafo: SCALE (1, 8.8, 0.1) :TRANSLATION (0, 0.6, -0.3)],
+			[CUBE trafo: SCALE (1, 8.4, 0.1) :TRANSLATION (0, 0.8, -0.4)],
+			[CUBE trafo: SCALE (1, 8, 0.1) :TRANSLATION (0, 1, -0.5)],
+			[CUBE trafo: SCALE (1, 7.6, 0.1) :TRANSLATION (0, 1.2, -0.6)],
+			[CUBE trafo: SCALE (1, 7.2, 0.1) :TRANSLATION (0, 1.4, -0.7)],
+			[CUBE trafo: SCALE (1, 6.8, 0.1) :TRANSLATION (0, 1.6, -0.8)],
+			[CUBE trafo: SCALE (1, 6.4, 0.1) :TRANSLATION (0, 1.8, -0.9)],
+			[CUBE trafo: SCALE (1, 6, 0.1) :TRANSLATION (0, 2, -1)],
+			[CUBE trafo: SCALE (1, 5.6, 0.1) :TRANSLATION (0, 2.2, -1.1)],
+			[CUBE trafo: SCALE (1, 5.2, 0.1) :TRANSLATION (0, 2.4, -1.2)],
+			[CUBE trafo: SCALE (1, 4.8, 0.1) :TRANSLATION (0, 2.6, -1.3)],
+			[CUBE trafo: SCALE (1, 4.4, 0.1) :TRANSLATION (0, 2.8, -1.4)],
+			[CUBE trafo: SCALE (1, 4, 0.1) :TRANSLATION (0, 3, -1.5)],
+			[CUBE trafo: SCALE (1, 3.6, 0.1) :TRANSLATION (0, 3.2, -1.6)],
+			[CUBE trafo: SCALE (1, 3.2, 0.1) :TRANSLATION (0, 3.4, -1.7)],
+			[CUBE trafo: SCALE (1, 2.8, 0.1) :TRANSLATION (0, 3.6, -1.8)],
+			[CUBE trafo: SCALE (1, 2.4, 0.1) :TRANSLATION (0, 3.8, -1.9)],
+			[CUBE trafo: SCALE (1, 2, 0.1) :TRANSLATION (0, 4, -2)],
+			[CUBE trafo: SCALE (1.4, 1, 2.4) :TRANSLATION (-0.2, 4.5, -2.15)],
+			UNION_END);
+  ArObj p1 = UNION (	[CUBE trafo: SCALE (0.2, 0.6, 1.2) :TRANSLATION (0.5, -0.3, 
+0)],
+			[CUBE trafo: SCALE (0.2, 0.6, 1.2) :TRANSLATION (-0.7, -0.3, 0)],
+			[CUBE trafo: SCALE (1, 0.6, 0.2) :TRANSLATION (-0.5, -0.3, 1)],
+			[CUBE trafo: SCALE (1, 0.6, 0.2) :TRANSLATION (-0.5, -0.3, 0)],
+			[CYLINDER trafo: SCALE (0.2, 0.2, 3) :TRANSLATION_Z (-3)],
+			[CYLINDER trafo: SCALE (0.4, 0.4, 1) :TRANSLATION_Z (-4)],
+			UNION_END);
+
+  ArObj xx = [PARABOLOID trafo: ROT_Y (90 DEGREES) :SCALE (0.2, 0.2, 0.2)];
+
+  ArObj x2 = [PARABOLOID trafo: ROT_Y (90 DEGREES) :SCALE (0.15, 0.15, 
+0.15)];
+
+  ArObj feder = UNION (	[p2 trafo: TRANSLATION (-0.5, -5, 2.15)],
+		 	[p1 trafo: TRANSLATION (0, 4.5, 1.1)],
+		 	[p1 trafo: TRANSLATION (0, -4.5, 1.1)],
+			[
+			 [[CYLINDER trafo: SCALE (0.5, 0.5, 0.5)] sub: [CYLINDER trafo: SCALE 
+(0.3, 0.3, 0.5)]]
+				trafo: TRANSLATION (0, -4.5, -1.75)],
+			[
+			 [[CYLINDER trafo: SCALE (0.5, 0.5, 0.5)] sub: [CYLINDER trafo: SCALE 
+(0.3, 0.3, 0.5)]]
+				trafo: TRANSLATION (0, 4.5, -1.75)],
+			[CUBE trafo: SCALE (0.5, 1.4, 0.5) :TRANSLATION (-1.1, -5.2, -1.75)],
+			[CUBE trafo: SCALE (0.5, 1.4, 0.5) :TRANSLATION (-1.1, 3.8, -1.75)],
+			[CUBE trafo: SCALE ( 2.2, 2, 3) :TRANSLATION (-1.1, -1, -3)],
+			[CUBE trafo: SCALE (0.5, 1.2, 3) :TRANSLATION (-1.1, 1, -3)],
+			[CUBE trafo: SCALE (0.5, 1.2, 3) :TRANSLATION (-1.1, -2.2, -3)],
+			[CUBE trafo: SCALE (1.5, 0.4, 0.1) :TRANSLATION (-0.6, 1, -0.5)],
+			[CUBE trafo: SCALE (1.5, 0.4, 0.1) :TRANSLATION (-0.6, 1, -1.3)],
+			[CUBE trafo: SCALE (1.5, 0.4, 0.1) :TRANSLATION (-0.6, 1, -2.1)],
+			[CUBE trafo: SCALE (1.5, 0.4, 0.1) :TRANSLATION (-0.6, -1.4, -0.5)],
+			[CUBE trafo: SCALE (1.5, 0.4, 0.1) :TRANSLATION (-0.6, -1.4, -1.3)],
+			[CUBE trafo: SCALE (1.5, 0.4, 0.1) :TRANSLATION (-0.6, -1.4, -2.1)],
+			[CUBE trafo: SCALE (0.1, 2, 0.3) :TRANSLATION (1.1, -1, -0.7)],
+			[CUBE trafo: SCALE (0.1, 0.3, 2.3) :TRANSLATION (1.1, 0.7, -3)],
+			[CUBE trafo: SCALE (0.1, 0.3, 2.3):TRANSLATION (1.1, -1, -3)],
+			[CUBE trafo: SCALE (0.1, 1.4, 0.3) :TRANSLATION (1.1, -0.7, -3)],
+			[xx trafo: TRANSLATION (-0.6, 1.25, -0.25)],
+			[xx trafo: TRANSLATION (-0.6, 1.25, -0.9)],
+			[xx trafo: TRANSLATION (-0.6, 1.25, -1.7)],
+			[xx trafo: TRANSLATION (-0.6, 1.25, -2.5)],
+			[xx trafo: TRANSLATION (-0.6, -1.25, -0.25)],
+			[xx trafo: TRANSLATION (-0.6, -1.25, -0.9)],
+			[xx trafo: TRANSLATION (-0.6, -1.25, -1.7)],
+			[xx trafo: TRANSLATION (-0.6, -1.25, -2.5)],
+			[xx trafo: TRANSLATION (-0.6, 1.75, -0.5)],
+			[xx trafo: TRANSLATION (-0.6, 1.75, -1.3)],
+			[xx trafo: TRANSLATION (-0.6, 1.75, -2.1)],
+			[xx trafo: TRANSLATION (-0.6, -1.75, -0.5)],
+			[xx trafo: TRANSLATION (-0.6, -1.75, -1.3)],
+			[xx trafo: TRANSLATION (-0.6, -1.75, -2.1)],
+			UNION_END);
+
+
+  ArObj wheel_group = UNION (	[wheel_line trafo: TRANSLATION_Y (9.5)],
+				[wheel_line trafo: TRANSLATION_Y (-9.5)],
+				[CUBE trafo: SCALE ( 18, 0.5, 4) :TRANSLATION (-9, -15.5, -2)],
+				[CUBE trafo: SCALE ( 18, 0.5, 4) :TRANSLATION (-9, 15, -2)],
+				[CUBE trafo: SCALE ( 0.5, 31, 4) :TRANSLATION ( 8.5, -15.5, -2)],
+				[CUBE trafo: SCALE ( 0.5, 31, 4) :TRANSLATION ( -9, -15.5, -2)],
+				[feder trafo: TRANSLATION ( 9.7, 9.5, 1)],
+				[feder trafo: TRANSLATION ( 9.7, -9.5, 1)],
+				[feder trafo: ROT_Z (180 DEGREES) :TRANSLATION ( -9.7, 9.5, 1)],
+				[feder trafo: ROT_Z (180 DEGREES) :TRANSLATION ( -9.7, -9.5, 1)],
+				[x2 trafo: TRANSLATION (9, 15, 1.2)],
+				[x2 trafo: TRANSLATION (9, 15, 0.4)],
+				[x2 trafo: TRANSLATION (9, 15, -0.4)],
+				[x2 trafo: TRANSLATION (9, 15, -1.2)],
+				[x2 trafo: TRANSLATION (9, -15, 1.2)],
+				[x2 trafo: TRANSLATION (9, -15, 0.4)],
+				[x2 trafo: TRANSLATION (9, -15, -0.4)],
+				[x2 trafo: TRANSLATION (9, -15, -1.2)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, 15, 1.2)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, 15, 0.4)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, 15, -0.4)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, 15, -1.2)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, -15, 1.2)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, -15, 0.4)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, -15, -0.4)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, -15, -1.2)],
+				[x2 trafo: TRANSLATION (9, 4, 1.2)],
+				[x2 trafo: TRANSLATION (9, 4, 0.4)],
+				[x2 trafo: TRANSLATION (9, 4, -0.4)],
+				[x2 trafo: TRANSLATION (9, 4, -1.2)],
+				[x2 trafo: TRANSLATION (9, -4, 1.2)],
+				[x2 trafo: TRANSLATION (9, -4, 0.4)],
+				[x2 trafo: TRANSLATION (9, -4, -0.4)],
+				[x2 trafo: TRANSLATION (9, -4, -1.2)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, 4, 1.2)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, 4, 0.4)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, 4, -0.4)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, 4, -1.2)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, -4, 1.2)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, -4, 0.4)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, -4, -0.4)],
+				[x2 trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, -4, -1.2)],
+				[xx trafo: TRANSLATION (9, 0, 1)],
+				[xx trafo: TRANSLATION (9, 1.5, 1)],
+				[xx trafo: TRANSLATION (9, -1.5, 1)],
+				[xx trafo: TRANSLATION (9, 0, 0)],
+				[xx trafo: TRANSLATION (9, 1.5, 0)],
+				[xx trafo: TRANSLATION (9, -1.5, 0)],
+				[xx trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, 0, 1)],
+				[xx trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, 1.5, 1)],
+				[xx trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, -1.5, 1)],
+				[xx trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, 0, 0)],
+				[xx trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, 1.5, 0)],
+				[xx trafo: ROT_Z (180 DEGREES) :TRANSLATION (-9, -1.5, 0)],
+				UNION_END);
+
+   return UNION ([wheel_group trafo: TRANSLATION_Y (17)],
+		 [wheel_group trafo: TRANSLATION_Y (-17)],
+		 UNION_END);
+}

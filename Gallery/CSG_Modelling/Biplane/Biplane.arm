@@ -1,0 +1,317 @@
+#define  meps		0.0001
+#define  meps2		(meps * 2.0)
+
+#define		WITH_WINGS
+#define		WITH_FUSELAGE
+#define		WITH_UNDERCARRIAGE
+#define		WITH_TAIL
+#define		WITH_ENGINE
+
+#ifdef WITH_ENGINE
+#import "Biplane_Engine.arm"
+#endif
+
+#ifdef WITH_TAIL
+#import "Biplane_Tail.arm"
+#endif
+
+#ifdef WITH_UNDERCARRIAGE
+#import "Biplane_Undercarriage.arm"
+#endif
+
+#ifdef WITH_WINGS
+#import "Biplane_Wings.arm"
+#endif
+
+ArObj create_BiplaneCamera(
+        ART_GV  * art_gv
+        )
+{
+    return
+    [ CAMERA
+	imageSize: IVEC2D( 640 , 640 )
+	ray: RAY3D(PNT3D(80, 60, 50), VEC3D( 0, 0, 0 ))
+//	ray:       RAY3D(PNT3D(1,-20,1),VEC3D(-1,20,-1))
+	zoom: 18.0
+    ];
+}
+
+ArObj create_BiplaneObject(
+        ART_GV  * art_gv
+        )
+{
+    ArObj wingSurface = LAMBERT_REFLECTOR( MACBETH_BLUESKY );
+			    
+    ArObj rudderSurface = LAMBERT_REFLECTOR( MACBETH_RED );
+			    
+    ArObj strutSurface = LAMBERT_REFLECTOR( MACBETH_DARKSKIN );
+			    
+#ifdef WITH_WINGS
+    ArObj  wings = create_Biplane_Wings(art_gv,wingSurface, strutSurface,
+                                        rudderSurface);
+#endif
+
+#ifdef WITH_FUSELAGE
+    ArObj fuselageSurface = LAMBERT_REFLECTOR( MACBETH_ORANGEYELLOW );
+			    
+    double fs_rlength = 4.0;
+    
+#ifdef WITH_TAIL
+    ArObj  tailplane = create_Biplane_Tail(art_gv,fuselageSurface, wingSurface,
+                                           rudderSurface);
+#endif
+
+    ArObj tailCubeA =
+	[ CUBE trafo                : SCALE(  1.80,  fs_rlength,  0.70)
+				    : TRANSLATION( -0.90, -fs_rlength, -0.70) 
+				    : SHEAR_ZX(  0.00, -0.9 / fs_rlength ) ];
+    
+    ArObj tailCubeB =
+	[ CUBE trafo                : SCALE(  1.80,  fs_rlength,  0.70)
+				    : TRANSLATION( -0.90, -fs_rlength, -0.70) 
+				    : SHEAR_ZX(  0.00,  0.9 / fs_rlength ) ];
+
+    ArObj cube_tailpiece = [ tailCubeA and: tailCubeB ];
+        
+    ArObj tailBaseA =
+    	[[
+	[ CUBE trafo                : SCALE(  1.80,  fs_rlength,  0.30)
+	                            : TRANSLATION( -0.70, -fs_rlength, -0.95) ]
+	or:
+	[ CYLINDER_Y trafo          : SCALE(  0.20,  fs_rlength,  0.20)
+	                            : TRANSLATION( -0.70, -fs_rlength, -0.70) ]
+	] trafo			    : SHEAR_ZX(  0.00, -0.9 / fs_rlength ) ];
+				    
+    ArObj tailBaseB = 
+    	[[
+	[ CUBE trafo                : SCALE(  1.80,  fs_rlength,  0.20)
+	                            : TRANSLATION( -1.10, -fs_rlength, -0.90) ]
+	or:
+	[ CYLINDER_Y trafo          : SCALE(  0.20,  fs_rlength,  0.20)
+	                            : TRANSLATION(  0.70, -fs_rlength, -0.70) ]
+	] trafo			    : SHEAR_ZX(  0.00,  0.9 / fs_rlength ) ];
+				    
+    ArObj tail_base = [ tailBaseA and: tailBaseB ];
+
+    ArObj fuselagePlus = UNION(
+	[ CONE_Y trafo              : SCALE(  0.90,  fs_rlength,  0.89)
+	                            : TRANSLATION(  0.00, -fs_rlength,  0.00) ],
+	tail_base,
+	cube_tailpiece,
+				    
+	[ CYLINDER_Y trafo          : SCALE(  0.90,  3.50,  0.89) ],
+	
+	[ SPHERE trafo              : SCALE(  0.20,  0.42,  0.20)
+	                            : TRANSLATION(  0.70,  3.05, -0.70) ],
+	[ SPHERE trafo              : SCALE(  0.20,  0.42,  0.20)
+	                            : TRANSLATION( -0.70,  3.05, -0.70) ],
+				    
+	[ CYLINDER_X trafo          : SCALE(  1.40,  0.42,  0.20)
+	                            : TRANSLATION( -0.70,  3.05, -0.70) ],
+				    
+	[ CYLINDER_Z trafo          : SCALE(  0.20,  0.42,  0.70)
+	                            : TRANSLATION(  0.70,  3.05, -0.70) ],
+	[ CYLINDER_Z trafo          : SCALE(  0.20,  0.42,  0.70)
+	                            : TRANSLATION( -0.70,  3.05, -0.70) ],
+				    
+	[ CYLINDER_Y trafo          : SCALE(  0.20,  3.05,  0.20)
+	                            : TRANSLATION(  0.70,  0.00, -0.70) ],
+	[ CYLINDER_Y trafo          : SCALE(  0.20,  3.05,  0.20)
+	                            : TRANSLATION( -0.70,  0.00, -0.70) ],
+				    
+	[ CUBE trafo                : SCALE(  1.40,  3.05,  0.20)
+	                            : TRANSLATION( -0.70,  0.00, -0.90) ],
+				    
+	[ CUBE trafo                : SCALE(  0.20,  3.05,  0.70)
+	                            : TRANSLATION( -0.90,  0.00, -0.70) ],
+	[ CUBE trafo                : SCALE(  0.20,  3.05,  0.70)
+	                            : TRANSLATION(  0.70,  0.00, -0.70) ],
+	
+	[ CONE_Y trafo              : SCALE(  0.90, -1.50,  0.89)
+	                            : TRANSLATION(  0.00,  4.26,  0.00) ],
+	UNION_END
+	);
+	
+    ArObj fuselageMinus = UNION(
+	[ CYLINDER_Y trafo          : SCALE(  0.82,  3.00,  0.81)
+	                            : TRANSLATION(  0.00,  0.00,  0.00) ],
+				    
+	[ CUBE trafo                : SCALE(  1.00,  1.10,  1.10)
+	                            : TRANSLATION( -0.50,  0.20,  0.00) ],
+	[ CUBE trafo                : SCALE(  1.20,  0.90,  1.10)
+	                            : TRANSLATION( -0.60,  0.30,  0.00) ],
+
+	[ CYLINDER_Z trafo          : SCALE(  0.10,  0.10,  1.10)
+	                            : TRANSLATION(  0.50,  0.30,  0.00) ],
+	[ CYLINDER_Z trafo          : SCALE(  0.10,  0.10,  1.10)
+	                            : TRANSLATION( -0.50,  0.30,  0.00) ],
+	[ CYLINDER_Z trafo          : SCALE(  0.10,  0.10,  1.10)
+	                            : TRANSLATION(  0.50,  1.20,  0.00) ],
+	[ CYLINDER_Z trafo          : SCALE(  0.10,  0.10,  1.10)
+	                            : TRANSLATION( -0.50,  1.20,  0.00) ],
+
+	UNION_END
+	);
+
+    ArObj fuselage = [ fuselagePlus sub: fuselageMinus ];
+#endif
+
+#ifdef WITH_ENGINE
+    ArObj motorSurface = LAMBERT_REFLECTOR( MACBETH_NEUTRAL35 );
+			    
+    ArObj cowlingSurface = LAMBERT_REFLECTOR( MACBETH_BLUESKY );
+			    
+    ArObj cowlingPlus = UNION(
+	[ TORUS_Y(0.2/0.8)    trafo : SCALE(  0.80,  0.80,  0.80)
+	                            : TRANSLATION(  0.00,  0.80,  0.00) ],
+	[ CYLINDER_Y trafo          : SCALE(  1.00,  1.00,  1.00)
+	                            : TRANSLATION(  0.00, -0.20,  0.00) ],
+	[ CYLINDER_Y trafo          : SCALE(  0.80,  1.20,  0.80)
+	                            : TRANSLATION(  0.00, -0.20,  0.00) ],
+	UNION_END
+	);
+
+    ArObj cowlingMinus = UNION(
+	[ TORUS_Y(0.18/0.8)   trafo : SCALE(  0.80,  0.80,  0.80)
+	                            : TRANSLATION(  0.00,  0.80,  0.00) ],
+	[ CYLINDER_Y trafo          : SCALE(  0.70,  1.50,  0.70)
+	                            : TRANSLATION(  0.00, -0.45,  0.00) ],
+	[ CYLINDER_Y trafo          : SCALE(  0.98,  1.00,  0.98)
+	                            : TRANSLATION(  0.00, -0.20,  0.00) ],
+	UNION_END
+	);
+
+    ArObj cowling = UNION(
+	[ TORUS_Y(0.02/0.7)   trafo : USCALE( 0.7 )
+	                            : TRANSLATION(  0.0,  0.98,  0.0) ],
+        [ cowlingPlus sub: cowlingMinus ],
+	UNION_END
+	);
+    
+    ArObj cylinder = UNION(
+	[ CYLINDER_Z trafo          : SCALE(  0.18,  0.18,  0.01)
+	                            : TRANSLATION(  0.00,  0.00,  0.40) ],
+	[ CYLINDER_Z trafo          : SCALE(  0.18,  0.18,  0.01)
+	                            : TRANSLATION(  0.00,  0.00,  0.43) ],
+	[ CYLINDER_Z trafo          : SCALE(  0.18,  0.18,  0.01)
+	                            : TRANSLATION(  0.00,  0.00,  0.46) ],
+				    
+	[ CYLINDER_Z trafo          : SCALE(  0.20,  0.20,  0.01)
+	                            : TRANSLATION(  0.00,  0.00,  0.49) ],
+	[ CYLINDER_Z trafo          : SCALE(  0.20,  0.20,  0.01)
+	                            : TRANSLATION(  0.00,  0.00,  0.52) ],
+	[ CYLINDER_Z trafo          : SCALE(  0.20,  0.20,  0.01)
+	                            : TRANSLATION(  0.00,  0.00,  0.55) ],
+	[ CYLINDER_Z trafo          : SCALE(  0.20,  0.20,  0.01)
+	                            : TRANSLATION(  0.00,  0.00,  0.58) ],
+	[ CYLINDER_Z trafo          : SCALE(  0.20,  0.20,  0.01)
+	                            : TRANSLATION(  0.00,  0.00,  0.61) ],
+				    
+	[ CYLINDER_Z trafo          : SCALE(  0.18,  0.18,  0.01)
+	                            : TRANSLATION(  0.00,  0.00,  0.64) ],
+	[ CYLINDER_Z trafo          : SCALE(  0.18,  0.18,  0.01)
+	                            : TRANSLATION(  0.00,  0.00,  0.67) ],
+				    
+	[ CYLINDER_Z trafo          : SCALE(  0.13,  0.13,  0.50)
+	                            : TRANSLATION(  0.00,  0.00,  0.20) ],
+				    
+	[ SPHERE     trafo          : SCALE(  0.15,  0.15,  0.03)
+	                            : TRANSLATION(  0.00,  0.00,  0.70) ],
+
+	[ CYLINDER_Z trafo          : SCALE(  0.03,  0.03,  0.04)
+	                            : TRANSLATION(  0.00,  0.00,  0.70) ],
+	UNION_END
+	);
+
+    double starIncrement = 360.0 / 7.0;
+    
+    ArObj star = UNION(
+	[ cylinder   trafo          : TRANSLATION(  0.00,  0.20,  0.00) ],
+	[ cylinder   trafo          : ROT_Y( 1.0 * starIncrement DEGREES)
+	                            : TRANSLATION(  0.00,  0.20,  0.00) ],
+	[ cylinder   trafo          : ROT_Y( 2.0 * starIncrement DEGREES)
+	                            : TRANSLATION(  0.00,  0.20,  0.00) ],
+	[ cylinder   trafo          : ROT_Y( 3.0 * starIncrement DEGREES)
+	                            : TRANSLATION(  0.00,  0.20,  0.00) ],
+	[ cylinder   trafo          : ROT_Y( 4.0 * starIncrement DEGREES)
+	                            : TRANSLATION(  0.00,  0.20,  0.00) ],
+	[ cylinder   trafo          : ROT_Y( 5.0 * starIncrement DEGREES)
+	                            : TRANSLATION(  0.00,  0.20,  0.00) ],
+	[ cylinder   trafo          : ROT_Y( 6.0 * starIncrement DEGREES)
+	                            : TRANSLATION(  0.00,  0.20,  0.00) ],
+	UNION_END
+	);
+
+    ArObj motor = UNION(
+	[ star  trafo               : ROT_Y( ( starIncrement / 2.0 ) DEGREES) ],
+	[ star  trafo               : TRANSLATION(  0.00,  0.35,  0.00) ],
+
+	[ CYLINDER_Y trafo          : SCALE(  0.30,  0.72,  0.30) ],
+	[ SPHERE     trafo          : SCALE(  0.30,  0.10,  0.30)
+	                            : TRANSLATION(  0.00,  0.72,  0.00) ],
+	[ CYLINDER_Y trafo          : SCALE(  0.10,  0.12,  0.10)
+	                            : TRANSLATION(  0.00,  0.72,  0.00) ],
+	UNION_END
+	);
+
+    ArObj  propeller = create_Biplane_Propeller(art_gv,strutSurface, motorSurface,
+                                                rudderSurface);
+    
+    ArObj engine = UNION(
+	[ [ motor      trafo          : TRANSLATION(  0.00,  0.22,  0.00) ]
+	    surfaceMaterial: motorSurface ],
+	[ [ cowling    trafo          : TRANSLATION(  0.00,  0.00,  0.00) ]
+	    surfaceMaterial: cowlingSurface ],
+	[ propeller  trafo            : TRANSLATION(  0.00,  1.00,  0.00) ],
+	UNION_END
+    	);
+#endif
+
+#ifdef WITH_UNDERCARRIAGE
+    ArObj hubcapSurface = LAMBERT_REFLECTOR( MACBETH_NEUTRAL5 );
+			    
+    ArObj tireSurface = LAMBERT_REFLECTOR( MACBETH_BLACK );
+
+    ArObj  undercarriage = create_Biplane_Main_Wheels(art_gv, fuselageSurface,
+                                                      motorSurface,
+						      motorSurface,
+						      tireSurface,
+						      hubcapSurface);
+#endif
+
+#ifdef WITH_FUSELAGE
+    double  tpps = -3.76;
+#endif
+
+    ArObj biplane = UNION(
+
+#ifdef WITH_FUSELAGE
+	[
+	    [ fuselage surfaceMaterial: fuselageSurface ]
+	    sub:
+	    [ CUBE trafo            : SCALE(  0.24,  0.30,  1.40)
+	                            : TRANSLATION( -0.12, -0.30+tpps+meps,-1.00) ]
+	],
+#endif
+
+#ifdef WITH_UNDERCARRIAGE			    
+        [ undercarriage trafo       : TRANSLATION(  0.00,  3.10, -0.79) ],
+#endif
+
+#ifdef WITH_ENGINE
+	[ engine trafo              : TRANSLATION(  0.00,  3.76,  0.00) ],
+#endif
+
+#ifdef WITH_WINGS
+	[ wings trafo               : TRANSLATION(  0.00,  2.66, -0.79) ],
+#endif
+
+#ifdef WITH_TAIL
+	[ tailplane trafo           : TRANSLATION(  0.00,  tpps,  0.00) ],
+#endif
+
+	UNION_END
+    	);
+
+    return  biplane;
+}

@@ -1,0 +1,140 @@
+ArObj create_fasteners(ART_GV  * art_gv,ArObj black_surface,
+                       ArObj spiegel,
+                       ArObj red_surface)
+{
+  ArObj Quer_hinten = [[ CUBE trafo: SCALE(6895 MM, 1050 MM, 70 MM) :
+                                    TRANSLATION(1715 MM, 455 MM, -2345 MM) ]
+                      or: [ CUBE trafo: SCALE(6895 MM, 1085 MM, 17.5 MM) :
+                                        TRANSLATION(1715 MM, 455 MM, -2275 MM) ]];
+
+  ArObj Quer_vorne = [[ CUBE trafo: SCALE(3255 MM, 805 MM, 70 MM) :
+                                   TRANSLATION(-1540 MM, 455 MM, -2345 MM) ]
+                     or: [ CUBE trafo: SCALE(3255 MM, 840 MM, 17.5 MM) :
+                                       TRANSLATION(-1540 MM, 455 MM, -2275 MM) ]];
+
+  ArObj Kessel_Haltestange = UNION([[[ CYLINDER trafo: SCALE(17.5 MM, 17.5 MM,
+							 700 MM) ]
+                               or: [ CYLINDER trafo: USCALE(35 MM) ]]
+                               surfaceMaterial: red_surface ],
+                               [[[ CYLINDER trafo: SCALE(26.25 MM, 26.25
+							 MM, 35 MM) :
+                                                 TRANSLATION_Z(700 MM) ]
+                               or: [ SPHERE trafo: USCALE(26.25 MM) :
+                                                   TRANSLATION_Z(752.5 MM) ]]
+                               surfaceMaterial: spiegel ],
+                               [[ CYLINDER trafo: SCALE(17.5 MM, 17.5 MM,
+							1435 MM) :
+                                                 ROT_X(90 DEGREES) :
+                                                 TRANSLATION(0 MM, 1435 MM, 717.5
+						       MM) ]
+                               surfaceMaterial: spiegel ],
+                               UNION_END);
+
+  ArObj Halterung = UNION(Quer_hinten,
+                          [ Quer_hinten trafo: SCALE(1, -1, 1) ],
+                          Quer_vorne,
+                          [ Quer_vorne trafo: SCALE(1, -1, 1) ],
+                          [ Kessel_Haltestange trafo: TRANSLATION(1785 MM, -1435 MM,
+							-2257.5 MM) ],
+                          [ Kessel_Haltestange trafo: SCALE(1, -1, 1) :
+                                                      TRANSLATION(1785 MM, 1435 MM, 
+                                                        -2257.5 MM) ],
+                          UNION_END);
+
+  ArObj Stangen_Halt = UNION([ CUBE trafo: SCALE(52.5 MM, 385 MM, 35 MM) ],
+                             [ CYLINDER trafo: SCALE(17.5 MM, 26.25 MM,
+						     17.5 MM) :
+                                               ROT_Y(90 DEGREES) :
+                                               TRANSLATION(-17.5 MM, 140 MM, 17.5
+						     MM) ],
+                             [ CYLINDER trafo: SCALE(17.5 MM, 26.25 MM,
+						     17.5 MM) :
+                                               ROT_Y(90 DEGREES) :
+                                               TRANSLATION(-17.5 MM, 227.5 MM,
+						     17.5 MM) ],
+                             [ CYLINDER trafo: SCALE(17.5 MM, 26.25 MM,
+						     17.5 MM) :
+                                               ROT_Y(90 DEGREES) :
+                                               TRANSLATION(-17.5 MM, 297.5 MM,
+						     17.5 MM) ],
+                             [ CYLINDER trafo: SCALE(17.5 MM, 26.25 MM,
+						     17.5 MM) :
+                                               ROT_Y(90 DEGREES) :
+                                               TRANSLATION(52.5 MM, 140 MM, 17.5 MM) ],
+                             [ CYLINDER trafo: SCALE(17.5 MM, 26.25 MM,
+						     17.5 MM) :
+                                               ROT_Y(90 DEGREES) :
+                                               TRANSLATION(52.5 MM, 227.5 MM,
+						     17.5 MM) ],
+                             [ CYLINDER trafo: SCALE(17.5 MM, 26.25 MM,
+						     17.5 MM) :
+                                               ROT_Y(90 DEGREES) :
+                                               TRANSLATION(52.5 MM, 297.5 MM,
+						     17.5 MM) ],
+                             UNION_END);
+
+  ArObj Stangen = UNION([ Stangen_Halt 
+                               trafo: TRANSLATION(1750 MM, 910 MM, -1505 MM) ],
+                        [ Stangen_Halt
+                               trafo: TRANSLATION(3815 MM, 910 MM, -1505 MM) ],
+                        [ Stangen_Halt
+                               trafo: TRANSLATION(6615 MM, 910 MM, -1505 MM) ],
+                        [ CYLINDER trafo: SCALE(14 MM, 14 MM, 7280 MM) :
+                                          ROT_Y(90 DEGREES) :
+                                          TRANSLATION(700 MM, 1046.5 MM, -1487.5 MM) ],
+                        [ CYLINDER trafo: SCALE(14 MM, 14 MM, 8435 MM) :
+                                          ROT_Y(90 DEGREES) :
+                                          TRANSLATION(-420 MM, 1120 MM, -1487.5 MM) ],
+                        [ CYLINDER trafo: SCALE(14 MM, 14 MM, 9240 MM) :
+                                          ROT_Y(90 DEGREES) :
+                                          TRANSLATION(-1225 MM, 1190 MM, -1487.5 MM) ],
+                        [ CYLINDER trafo: SCALE(10.5 MM, 10.5 MM, 6265 MM) :
+                                          ROT_Y(90 DEGREES) :
+                                          TRANSLATION(1750 MM, 1260 MM, -1487.5 MM) ],
+                        [ CUBE trafo: SCALE(52.5 MM, 1207.5 MM, 35 MM) :
+                                          TRANSLATION(-875 MM, 0 MM, -1505 MM) ],
+                        UNION_END);
+
+  ArObj Stangen_mit_Farbe = [ Stangen surfaceMaterial: spiegel ];
+
+  ArObj Drucklufttank = UNION([[ CYLINDER trafo: SCALE(280 MM, 280 MM, 1750
+						       MM) :
+                                              ROT_Y(90 DEGREES) ]
+                           surfaceMaterial: black_surface ],
+			      [[ CYLINDER trafo: USCALE(70 MM) :
+					     ROT_Y(90 DEGREES) :
+                                             TRANSLATION_X(-52.5 MM) ]
+				  surfaceMaterial: black_surface ],
+                              [[ CYLINDER trafo: USCALE(70 MM) :
+					      ROT_Y(90 DEGREES) :
+                                              TRANSLATION_X(1732.5 MM) ]
+                                  surfaceMaterial: black_surface ],
+                           [[ CUBE trafo: SCALE(70 MM, 35 MM, 315 MM) :
+                                         TRANSLATION(1575 MM, -280 MM, -315 MM) ]
+                           surfaceMaterial: spiegel ],
+                           [[ CUBE trafo: SCALE(70 MM, 35 MM, 315 MM) :
+                                         TRANSLATION(105 MM, -280 MM, -315 MM) ]
+                           surfaceMaterial: spiegel ],
+                           UNION_END);
+
+  ArObj Halterung_mit_Farbe = UNION([ Halterung 
+                                    surfaceMaterial: black_surface ],
+                                    Stangen_mit_Farbe,
+                                    [ Drucklufttank trafo: TRANSLATION(4025 MM,
+								 -1225 MM,
+								 -1960 MM) ],
+                                    [ Drucklufttank trafo: TRANSLATION(2100 MM,
+								 -1225 MM,
+								 -1960 MM) ],
+                                    UNION_END);
+
+  return Halterung_mit_Farbe;
+}
+
+
+
+
+
+
+
+

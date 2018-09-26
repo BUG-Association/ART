@@ -1,0 +1,258 @@
+#define TENDER_LEFT_SIDE \
+    createTenderLeftSide( art_gv, black_surface, grey_surface, red_surface )
+
+ArObj createTenderLeftSide(
+        ART_GV  * art_gv,
+        ArObj     black_surface,
+        ArObj     grey_surface,
+        ArObj     red_surface
+        )
+{
+
+  ArObj xx = [PARABOLOID trafo: ROT_Y (90 DEGREES) :SCALE (0.15, 0.15, 
+0.15)];
+
+   ArObj curve
+= [[[CYLINDER trafo: SCALE ( 2.5, 2.5, 1)] sub:
+		     [CYLINDER trafo: SCALE (2.45, 2.45, 1)]] and:
+                        [CUBE trafo: SCALE (2.5, 2.5, 1)]];
+
+   ArObj side_part = [[[CUBE trafo: SCALE (2.5, 2.5, 0.05)] sub:
+			[CYLINDER trafo: SCALE ( 2.5, 2.5, 1)]] and:
+                        [CUBE trafo: SCALE (2.5, 2.5, 1)]];
+
+
+   ArObj leftside_seg = [[CUBE trafo: SCALE ( 0.05, 15.3, 5)] or:
+			[curve trafo: ROT_X (90 DEGREES) :TRANSLATION ( -2.45, 1, 5) :SCALE_Y (15.3)]];
+
+
+   ArObj part = [[ CUBE trafo: SCALE (1.75, 0.5, 2)] or: [CYLINDER trafo: 
+SCALE (0.25, 0.25, 2) :TRANSLATION (1.75, 0.25, 0)]];
+
+   ArObj lid = [[[part trafo: ROT_X (90 DEGREES)]
+	or: [part trafo: ROT_X (90 DEGREES) :ROT_Y (150 DEGREES) :TRANSLATION_Z (0.5)]] 
+trafo: SCALE_Y (17.5) :ROT_Z (180 DEGREES)];
+
+
+   return UNION ([leftside_seg trafo: TRANSLATION_Y (17)],
+		 [leftside_seg  trafo: TRANSLATION_Y(-32.3)],
+		 [CUBE trafo: SCALE ( 0.05, 34, 10.92) : TRANSLATION_Y (-17)],
+		 [curve trafo: ROT_X (-90 DEGREES) :TRANSLATION ( -2.45, 0, 0) :SCALE_Y (32.3)],
+		 [curve trafo: ROT_X (-90 DEGREES) :TRANSLATION ( -2.45, 0, 0) :SCALE_Y 
+(-32.3)],
+		 [side_part trafo: ROT_X (90 DEGREES) :TRANSLATION ( -2.45, 16.95, 5)],
+		 [side_part trafo: ROT_X (90 DEGREES) :TRANSLATION ( -2.45, -17, 5)],
+		 [CUBE trafo: SCALE ( 1.75, 15.3, 0.05) : TRANSLATION (-4.2, -32.3, 7.45)],
+		 [CUBE trafo: SCALE ( 1.75, 15.3, 0.05) : TRANSLATION (-4.2, 17, 7.45)],
+		 [CUBE trafo: SCALE ( 4.2, 0.05, 3.42) :TRANSLATION (-4.2, 16.95, 7.5)],	// not correct SHEAR!!
+		 [CUBE trafo: SCALE ( 4.2, 0.05, 3.42) :TRANSLATION (-4.2, -17, 7.5)],	// not correct SHEAR!!
+		 [CUBE trafo: SCALE ( 4.15, 34, 0.05) :TRANSLATION (-4.15, -17, 10.87)],	// not correct SHEAR!! xx missing !!
+		 [lid trafo: TRANSLATION ( -2.2, -17.5, 12.05)],
+		 [xx trafo: TRANSLATION_X (2.5) :ROT_Y (-15 DEGREES) :TRANSLATION (-2.45, 17.5, 
+5)],[xx trafo: TRANSLATION_X (2.5) :ROT_Y (-30 DEGREES) :TRANSLATION (-2.45, 17.5, 5)], 
+[xx trafo: TRANSLATION_X (2.5) :ROT_Y (-45 DEGREES) :TRANSLATION (-2.45, 17.5, 5)], [xx 
+trafo: TRANSLATION_X (2.5) :ROT_Y (-60 DEGREES) :TRANSLATION (-2.45, 17.5, 5)], [xx 
+trafo: TRANSLATION_X (2.5) :ROT_Y (-75 DEGREES) :TRANSLATION (-2.45, 17.5, 5)],
+		 [xx trafo: TRANSLATION_X (2.5) :ROT_Y (-15 DEGREES) :TRANSLATION (-2.45, -17.5, 
+5)],[xx trafo: TRANSLATION_X (2.5) :ROT_Y (-30 DEGREES) :TRANSLATION (-2.45, -17.5, 5)], 
+[xx trafo: TRANSLATION_X (2.5) :ROT_Y (-45 DEGREES) :TRANSLATION (-2.45, -17.5, 5)], [xx 
+trafo: TRANSLATION_X (2.5) :ROT_Y (-60 DEGREES) :TRANSLATION (-2.45, -17.5, 5)], [xx 
+trafo: TRANSLATION_X (2.5) :ROT_Y (-75 DEGREES) :TRANSLATION (-2.45, -17.5, 5)],
+		 [xx trafo: TRANSLATION_X (2.5) :ROT_Y (-15 DEGREES) :TRANSLATION (-2.45, 32, 5)],[xx 
+trafo: TRANSLATION_X (2.5) :ROT_Y (-30 DEGREES) :TRANSLATION (-2.45, 32, 5)], [xx trafo: 
+TRANSLATION_X (2.5) :ROT_Y (-45 DEGREES) :TRANSLATION (-2.45, 32, 5)], [xx trafo: 
+TRANSLATION_X (2.5) :ROT_Y (-60 DEGREES) :TRANSLATION (-2.45, 32, 5)], [xx trafo: 
+TRANSLATION_X (2.5) :ROT_Y (-75 DEGREES) :TRANSLATION (-2.45, 32, 5)],
+		 [xx trafo: TRANSLATION_X (2.5) :ROT_Y (-15 DEGREES) :TRANSLATION (-2.45, -32, 5)],[xx 
+trafo: TRANSLATION_X (2.5) :ROT_Y (-30 DEGREES) :TRANSLATION (-2.45, -32, 5)], [xx 
+trafo: TRANSLATION_X (2.5) :ROT_Y (-45 DEGREES) :TRANSLATION (-2.45, -32, 5)], [xx 
+trafo: TRANSLATION_X (2.5) :ROT_Y (-60 DEGREES) :TRANSLATION (-2.45, -32, 5)], [xx 
+trafo: TRANSLATION_X (2.5) :ROT_Y (-75 DEGREES) :TRANSLATION (-2.45, -32, 5)],
+		 [xx trafo: TRANSLATION_X (2.5) :ROT_Y (15 DEGREES) :TRANSLATION (-2.45, 32, 5)],[xx 
+trafo: TRANSLATION_X (2.5) :ROT_Y (30 DEGREES) :TRANSLATION (-2.45, 32, 5)], [xx trafo: 
+TRANSLATION_X (2.5) :ROT_Y (45 DEGREES) :TRANSLATION (-2.45, 32, 5)], [xx trafo: TRANSLATION_X 
+(2.5) :ROT_Y (60 DEGREES) :TRANSLATION (-2.45, 32, 5)], [xx trafo: TRANSLATION_X (2.5) 
+:ROT_Y (75 DEGREES) :TRANSLATION (-2.45, 32, 5)],
+		 [xx trafo: TRANSLATION_X (2.5) :ROT_Y (15 DEGREES) :TRANSLATION (-2.45, -32, 5)],[xx 
+trafo: TRANSLATION_X (2.5) :ROT_Y (30 DEGREES) :TRANSLATION (-2.45, -32, 5)], [xx trafo: 
+TRANSLATION_X (2.5) :ROT_Y (45 DEGREES) :TRANSLATION (-2.45, -32, 5)], [xx trafo: 
+TRANSLATION_X (2.5) :ROT_Y (60 DEGREES) :TRANSLATION (-2.45, -32, 5)], [xx trafo: 
+TRANSLATION_X (2.5) :ROT_Y (75 DEGREES) :TRANSLATION (-2.45, -32, 5)],
+		 [xx trafo: TRANSLATION (0.05, 0, 1.1)], [xx trafo: TRANSLATION (0.05, 0, 1.8)], [xx 
+trafo: TRANSLATION (0.05, 0, 2.5)], [xx trafo: TRANSLATION (0.05, 0, 3.2)], [xx trafo: 
+TRANSLATION (0.05, 0, 3.9)],
+		 [xx trafo: TRANSLATION (0.05, 8.5, 1.1)], [xx trafo: TRANSLATION (0.05, 8.5, 1.8)], 
+[xx trafo: TRANSLATION (0.05, 8.5, 2.5)], [xx trafo: TRANSLATION (0.05, 8.5, 3.2)], [xx 
+trafo: TRANSLATION (0.05, 8.5, 3.9)],
+		 [xx trafo: TRANSLATION (0.05, -8.5, 1.1)], [xx trafo: TRANSLATION (0.05, -8.5, 1.8)], 
+[xx trafo: TRANSLATION (0.05, -8.5, 2.5)], [xx trafo: TRANSLATION (0.05, -8.5, 3.2)], 
+[xx trafo: TRANSLATION (0.05, -8.5, 3.9)],
+		 [xx trafo: TRANSLATION (0.05, 17.5, 1.1)], [xx trafo: TRANSLATION (0.05, 17.5, 1.8)], 
+[xx trafo: TRANSLATION (0.05, 17.5, 2.5)], [xx trafo: TRANSLATION (0.05, 17.5, 3.2)], 
+[xx trafo: TRANSLATION (0.05, 17.5, 3.9)],
+		 [xx trafo: TRANSLATION (0.05, 17, 3.2)], [xx trafo: TRANSLATION (0.05, 17, 3.9)],
+		 [xx trafo: TRANSLATION (0.05, -17.5, 1.1)], [xx trafo: TRANSLATION (0.05, -17.5, 
+1.8)], [xx trafo: TRANSLATION (0.05, -17.5, 2.5)], [xx trafo: TRANSLATION (0.05, -17.5, 
+3.2)], [xx trafo: TRANSLATION (0.05, -17.5, 3.9)],
+		 [xx trafo: TRANSLATION (0.05, -17, 3.2)], [xx trafo: TRANSLATION (0.05, -17, 3.9)],
+		 [xx trafo: TRANSLATION (0.05, 25, 1.1)], [xx trafo: TRANSLATION (0.05, 25, 1.8)], [xx 
+trafo: TRANSLATION (0.05, 25, 2.5)], [xx trafo: TRANSLATION (0.05, 25, 3.2)], [xx trafo: 
+TRANSLATION (0.05, 25, 3.9)],
+		 [xx trafo: TRANSLATION (0.05, -25, 1.1)], [xx trafo: TRANSLATION (0.05, -25, 1.8)], 
+[xx trafo: TRANSLATION (0.05, -25, 2.5)], [xx trafo: TRANSLATION (0.05, -25, 3.2)], [xx 
+trafo: TRANSLATION (0.05, -25, 3.9)],
+		 [xx trafo: TRANSLATION (0.05, 0, 0.2)], [xx trafo: TRANSLATION (0.05, 0.5, 0.2)], [xx 
+trafo: TRANSLATION (0.05, 1, 0.2)], [xx trafo: TRANSLATION (0.05, 1.5, 0.2)], [xx trafo: 
+TRANSLATION (0.05, 2, 0.2)], [xx trafo: TRANSLATION (0.05, 2.5, 0.2)], [xx trafo: TRANSLATION 
+(0.05, 3, 0.2)], [xx trafo: TRANSLATION (0.05, 3.5, 0.2)], [xx trafo: TRANSLATION (0.05, 
+4, 0.2)], [xx trafo: TRANSLATION (0.05, 4.5, 0.2)], [xx trafo: TRANSLATION (0.05, 5, 
+0.2)], [xx trafo: TRANSLATION (0.05, 5.5, 0.2)], [xx trafo: TRANSLATION (0.05, 6, 0.2)], 
+[xx trafo: TRANSLATION (0.05, 6.5, 0.2)], [xx trafo: TRANSLATION (0.05, 7, 0.2)], [xx 
+trafo: TRANSLATION (0.05, 7.5, 0.2)], [xx trafo: TRANSLATION (0.05, 8, 0.2)], [xx trafo: 
+TRANSLATION (0.05, 8.5, 0.2)], [xx trafo: TRANSLATION (0.05, 9, 0.2)], [xx trafo: TRANSLATION 
+(0.05, 9.5, 0.2)], [xx trafo: TRANSLATION (0.05, 10, 0.2)], [xx trafo: TRANSLATION 
+(0.05, 10.5, 0.2)], [xx trafo: TRANSLATION (0.05, 11, 0.2)], [xx trafo: TRANSLATION 
+(0.05, 11.5, 0.2)], [xx trafo: TRANSLATION (0.05, 12, 0.2)], [xx trafo: TRANSLATION 
+(0.05, 12.5, 0.2)], [xx trafo: TRANSLATION (0.05, 13, 0.2)], [xx trafo: TRANSLATION 
+(0.05, 13.5, 0.2)], [xx trafo: TRANSLATION (0.05, 14, 0.2)], [xx trafo: TRANSLATION 
+(0.05, 14.5, 0.2)], [xx trafo: TRANSLATION (0.05, 15, 0.2)], [xx trafo: TRANSLATION 
+(0.05, 15.5, 0.2)],[xx trafo: TRANSLATION (0.05, 16, 0.2)],[xx trafo: TRANSLATION (0.05, 
+16.5, 0.2)],[xx trafo: TRANSLATION (0.05, 17, 0.2)],[xx trafo: TRANSLATION (0.05, 17.5, 
+0.2)],[xx trafo: TRANSLATION (0.05, 18, 0.2)],[xx trafo: TRANSLATION (0.05, 18.5, 
+0.2)],[xx trafo: TRANSLATION (0.05, 19, 0.2)],[xx trafo: TRANSLATION (0.05, 19.5, 
+0.2)],[xx trafo: TRANSLATION (0.05, 20, 0.2)],[xx trafo: TRANSLATION (0.05, 20.5, 
+0.2)],[xx trafo: TRANSLATION (0.05, 21, 0.2)], [xx trafo: TRANSLATION (0.05, 21.5, 
+0.2)],[xx trafo: TRANSLATION (0.05, 22, 0.2)],[xx trafo: TRANSLATION (0.05, 22.5, 
+0.2)],[xx trafo: TRANSLATION (0.05, 23, 0.2)],[xx trafo: TRANSLATION (0.05, 23.5, 
+0.2)],[xx trafo: TRANSLATION (0.05, 24, 0.2)],[xx trafo: TRANSLATION (0.05, 24.5, 
+0.2)],[xx trafo: TRANSLATION (0.05, 25, 0.2)],[xx trafo: TRANSLATION (0.05, 25.5, 
+0.2)],[xx trafo: TRANSLATION (0.05, 26, 0.2)],[xx trafo: TRANSLATION (0.05, 26.5, 0.2)], 
+[xx trafo: TRANSLATION (0.05, 27, 0.2)],[xx trafo: TRANSLATION (0.05, 27.5, 0.2)],[xx 
+trafo: TRANSLATION (0.05, 28, 0.2)],[xx trafo: TRANSLATION (0.05, 28.5, 0.2)],[xx trafo: 
+TRANSLATION (0.05, 29, 0.2)],[xx trafo: TRANSLATION (0.05, 29.5, 0.2)],[xx trafo: TRANSLATION 
+(0.05, 30, 0.2)],[xx trafo: TRANSLATION (0.05, 30.5, 0.2)],[xx trafo: TRANSLATION (0.05, 
+31, 0.2)],[xx trafo: TRANSLATION (0.05, 31.5, 0.2)], [xx trafo: TRANSLATION (0.05, 32, 
+0.2)],
+		 [xx trafo: TRANSLATION (0.05, -0.5, 0.2)], [xx trafo: TRANSLATION (0.05, -1, 0.2)], 
+[xx trafo: TRANSLATION (0.05, -1.5, 0.2)], [xx trafo: TRANSLATION (0.05, -2, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -2.5, 0.2)], [xx trafo: TRANSLATION (0.05, -3, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -3.5, 0.2)], [xx trafo: TRANSLATION (0.05, -4, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -4.5, 0.2)], [xx trafo: TRANSLATION (0.05, -5, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -5.5, 0.2)], [xx trafo: TRANSLATION (0.05, -6, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -6.5, 0.2)], [xx trafo: TRANSLATION (0.05, -7, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -7.5, 0.2)], [xx trafo: TRANSLATION (0.05, -8, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -8.5, 0.2)], [xx trafo: TRANSLATION (0.05, -9, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -9.5, 0.2)], [xx trafo: TRANSLATION (0.05, -10, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -10.5, 0.2)], [xx trafo: TRANSLATION (0.05, -11, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -11.5, 0.2)], [xx trafo: TRANSLATION (0.05, -12, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -12.5, 0.2)], [xx trafo: TRANSLATION (0.05, -13, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -13.5, 0.2)], [xx trafo: TRANSLATION (0.05, -14, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -14.5, 0.2)], [xx trafo: TRANSLATION (0.05, -15, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -15.5, 0.2)],[xx trafo: TRANSLATION (0.05, -16, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -16.5, 0.2)],[xx trafo: TRANSLATION (0.05, -17, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -17.5, 0.2)],[xx trafo: TRANSLATION (0.05, -18, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -18.5, 0.2)],[xx trafo: TRANSLATION (0.05, -19, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -19.5, 0.2)],[xx trafo: TRANSLATION (0.05, -20, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -20.5, 0.2)],[xx trafo: TRANSLATION (0.05, -21, 0.2)], [xx 
+trafo: TRANSLATION (0.05, -21.5, 0.2)],[xx trafo: TRANSLATION (0.05, -22, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -22.5, 0.2)],[xx trafo: TRANSLATION (0.05, -23, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -23.5, 0.2)],[xx trafo: TRANSLATION (0.05, -24, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -24.5, 0.2)],[xx trafo: TRANSLATION (0.05, -25, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -25.5, 0.2)],[xx trafo: TRANSLATION (0.05, -26, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -26.5, 0.2)], [xx trafo: TRANSLATION (0.05, -27, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -27.5, 0.2)],[xx trafo: TRANSLATION (0.05, -28, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -28.5, 0.2)],[xx trafo: TRANSLATION (0.05, -29, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -29.5, 0.2)],[xx trafo: TRANSLATION (0.05, -30, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -30.5, 0.2)],[xx trafo: TRANSLATION (0.05, -31, 0.2)],[xx 
+trafo: TRANSLATION (0.05, -31.5, 0.2)], [xx trafo: TRANSLATION (0.05, -32, 0.2)],
+		 [xx trafo: TRANSLATION (0.05, 17, 4.8)],[xx trafo: TRANSLATION (0.05, 17.5, 4.8)],[xx 
+trafo: TRANSLATION (0.05, 18, 4.8)],[xx trafo: TRANSLATION (0.05, 18.5, 4.8)],[xx trafo: 
+TRANSLATION (0.05, 19, 4.8)],[xx trafo: TRANSLATION (0.05, 19.5, 4.8)],[xx trafo: TRANSLATION 
+(0.05, 20, 4.8)],[xx trafo: TRANSLATION (0.05, 20.5, 4.8)],[xx trafo: TRANSLATION (0.05, 
+21, 4.8)], [xx trafo: TRANSLATION (0.05, 21.5, 4.8)],[xx trafo: TRANSLATION (0.05, 22, 
+4.8)],[xx trafo: TRANSLATION (0.05, 22.5, 4.8)],[xx trafo: TRANSLATION (0.05, 23, 
+4.8)],[xx trafo: TRANSLATION (0.05, 23.5, 4.8)],[xx trafo: TRANSLATION (0.05, 24, 
+4.8)],[xx trafo: TRANSLATION (0.05, 24.5, 4.8)],[xx trafo: TRANSLATION (0.05, 25, 
+4.8)],[xx trafo: TRANSLATION (0.05, 25.5, 4.8)],[xx trafo: TRANSLATION (0.05, 26, 
+4.8)],[xx trafo: TRANSLATION (0.05, 26.5, 4.8)], [xx trafo: TRANSLATION (0.05, 27, 
+4.8)],[xx trafo: TRANSLATION (0.05, 27.5, 4.8)],[xx trafo: TRANSLATION (0.05, 28, 
+4.8)],[xx trafo: TRANSLATION (0.05, 28.5, 4.8)],[xx trafo: TRANSLATION (0.05, 29, 
+4.8)],[xx trafo: TRANSLATION (0.05, 29.5, 4.8)],[xx trafo: TRANSLATION (0.05, 30, 
+4.8)],[xx trafo: TRANSLATION (0.05, 30.5, 4.8)],[xx trafo: TRANSLATION (0.05, 31, 
+4.8)],[xx trafo: TRANSLATION (0.05, 31.5, 4.8)], [xx trafo: TRANSLATION (0.05, 32, 
+4.8)],
+		 [xx trafo: TRANSLATION (0.05, -17, 4.8)],[xx trafo: TRANSLATION (0.05, -17.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -18, 4.8)],[xx trafo: TRANSLATION (0.05, -18.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -19, 4.8)],[xx trafo: TRANSLATION (0.05, -19.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -20, 4.8)],[xx trafo: TRANSLATION (0.05, -20.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -21, 4.8)], [xx trafo: TRANSLATION (0.05, -21.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -22, 4.8)],[xx trafo: TRANSLATION (0.05, -22.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -23, 4.8)],[xx trafo: TRANSLATION (0.05, -23.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -24, 4.8)],[xx trafo: TRANSLATION (0.05, -24.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -25, 4.8)],[xx trafo: TRANSLATION (0.05, -25.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -26, 4.8)],[xx trafo: TRANSLATION (0.05, -26.5, 
+4.8)], [xx trafo: TRANSLATION (0.05, -27, 4.8)],[xx trafo: TRANSLATION (0.05, -27.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -28, 4.8)],[xx trafo: TRANSLATION (0.05, -28.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -29, 4.8)],[xx trafo: TRANSLATION (0.05, -29.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -30, 4.8)],[xx trafo: TRANSLATION (0.05, -30.5, 
+4.8)],[xx trafo: TRANSLATION (0.05, -31, 4.8)],[xx trafo: TRANSLATION (0.05, -31.5, 
+4.8)], [xx trafo: TRANSLATION (0.05, -32, 4.8)],
+		 [xx trafo: TRANSLATION (0.05, -32.1, 0.5)], [xx trafo: TRANSLATION (0.05, -32.1, 1)], 
+[xx trafo: TRANSLATION (0.05, -32.1, 1.5)], [xx trafo: TRANSLATION (0.05, -32.1, 2)], 
+[xx trafo: TRANSLATION (0.05, -32.1, 2.5)],[xx trafo: TRANSLATION (0.05, -32.1, 3)], [xx 
+trafo: TRANSLATION (0.05, -32.1, 3.5)], [xx trafo: TRANSLATION (0.05, -32.1, 4)], [xx 
+trafo: TRANSLATION (0.05, -32.1, 4.5)],
+		 [xx trafo: TRANSLATION (0.05, 32.1, 0.5)], [xx trafo: TRANSLATION (0.05, 32.1, 1)], 
+[xx trafo: TRANSLATION (0.05, 32.1, 1.5)], [xx trafo: TRANSLATION (0.05, 32.1, 2)], [xx 
+trafo: TRANSLATION (0.05, 32.1, 2.5)],[xx trafo: TRANSLATION (0.05, 32.1, 3)], [xx 
+trafo: TRANSLATION (0.05, 32.1, 3.5)], [xx trafo: TRANSLATION (0.05, 32.1, 4)], [xx 
+trafo: TRANSLATION (0.05, 32.1, 4.5)],
+		 [xx trafo: TRANSLATION (0.05, -16.8, 5.5)], [xx trafo: TRANSLATION (0.05, -16.8, 6)], 
+[xx trafo: TRANSLATION (0.05, -16.8, 6.5)], [xx trafo: TRANSLATION (0.05, -16.8, 7)], 
+[xx trafo: TRANSLATION (0.05, -16.8, 7.5)],[xx trafo: TRANSLATION (0.05, -16.8, 8)], [xx 
+trafo: TRANSLATION (0.05, -16.8, 8.5)], [xx trafo: TRANSLATION (0.05, -16.8, 9)], [xx 
+trafo: TRANSLATION (0.05, -16.8, 9.5)], [xx trafo: TRANSLATION (0.05, -16.8, 10)], [xx 
+trafo: TRANSLATION (0.05, -16.8, 10.5)],
+		 [xx trafo: TRANSLATION (0.05, 16.8, 5.5)], [xx trafo: TRANSLATION (0.05, 16.8, 6)], 
+[xx trafo: TRANSLATION (0.05, 16.8, 6.5)], [xx trafo: TRANSLATION (0.05, 16.8, 7)], [xx 
+trafo: TRANSLATION (0.05, 16.8, 7.5)],[xx trafo: TRANSLATION (0.05, 16.8, 8)], [xx 
+trafo: TRANSLATION (0.05, 16.8, 8.5)], [xx trafo: TRANSLATION (0.05, 16.8, 9)], [xx 
+trafo: TRANSLATION (0.05, 16.8, 9.5)], [xx trafo: TRANSLATION (0.05, 16.8, 10)], [xx 
+trafo: TRANSLATION (0.05, 16.8, 10.5)],
+		 [xx trafo: TRANSLATION (0.05, 0, 10.72)], [xx trafo: TRANSLATION (0.05, 1, 10.72)], 
+[xx trafo: TRANSLATION (0.05, 2, 10.72)], [xx trafo: TRANSLATION (0.05, 3, 10.72)], [xx 
+trafo: TRANSLATION (0.05, 4, 10.72)], [xx trafo: TRANSLATION (0.05, 5, 10.72)], [xx 
+trafo: TRANSLATION (0.05, 6, 10.72)], [xx trafo: TRANSLATION (0.05, 7, 10.72)], [xx 
+trafo: TRANSLATION (0.05, 8, 10.72)], [xx trafo: TRANSLATION (0.05, 9, 10.72)], [xx 
+trafo: TRANSLATION (0.05, 10, 10.72)], [xx trafo: TRANSLATION (0.05, 11, 10.72)], [xx 
+trafo: TRANSLATION (0.05, 12, 10.72)], [xx trafo: TRANSLATION (0.05, 13, 10.72)], [xx 
+trafo: TRANSLATION (0.05, 14, 10.72)], [xx trafo: TRANSLATION (0.05, 15, 10.72)], [xx 
+trafo: TRANSLATION (0.05, 16, 10.72)],
+		 [xx trafo: TRANSLATION (0.05, -1, 10.72)], [xx trafo: TRANSLATION (0.05, -2, 10.72)], 
+[xx trafo: TRANSLATION (0.05, -3, 10.72)], [xx trafo: TRANSLATION (0.05, -4, 10.72)], 
+[xx trafo: TRANSLATION (0.05, -5, 10.72)], [xx trafo: TRANSLATION (0.05, -6, 10.72)], 
+[xx trafo: TRANSLATION (0.05, -7, 10.72)], [xx trafo: TRANSLATION (0.05, -8, 10.72)], 
+[xx trafo: TRANSLATION (0.05, -9, 10.72)], [xx trafo: TRANSLATION (0.05, -10, 10.72)], 
+[xx trafo: TRANSLATION (0.05, -11, 10.72)], [xx trafo: TRANSLATION (0.05, -12, 10.72)], 
+[xx trafo: TRANSLATION (0.05, -13, 10.72)], [xx trafo: TRANSLATION (0.05, -14, 10.72)], 
+[xx trafo: TRANSLATION (0.05, -15, 10.72)], [xx trafo: TRANSLATION (0.05, -16, 10.72)],
+		 [xx trafo: TRANSLATION (0.05, 0, 7.5)], [xx trafo: TRANSLATION (0.05, 1, 7.5)], [xx 
+trafo: TRANSLATION (0.05, 2, 7.5)], [xx trafo: TRANSLATION (0.05, 3, 7.5)], [xx trafo: 
+TRANSLATION (0.05, 4, 7.5)], [xx trafo: TRANSLATION (0.05, 5, 7.5)], [xx trafo: TRANSLATION 
+(0.05, 6, 7.5)], [xx trafo: TRANSLATION (0.05, 7, 7.5)], [xx trafo: TRANSLATION (0.05, 
+8, 7.5)], [xx trafo: TRANSLATION (0.05, 9, 7.5)], [xx trafo: TRANSLATION (0.05, 10, 
+7.5)], [xx trafo: TRANSLATION (0.05, 11, 7.5)], [xx trafo: TRANSLATION (0.05, 12, 7.5)], 
+[xx trafo: TRANSLATION (0.05, 13, 7.5)], [xx trafo: TRANSLATION (0.05, 14, 7.5)], [xx 
+trafo: TRANSLATION (0.05, 15, 7.5)], [xx trafo: TRANSLATION (0.05, 16, 7.5)],
+		 [xx trafo: TRANSLATION (0.05, -1, 7.5)], [xx trafo: TRANSLATION (0.05, -2, 7.5)], [xx 
+trafo: TRANSLATION (0.05, -3, 7.5)], [xx trafo: TRANSLATION (0.05, -4, 7.5)], [xx trafo: 
+TRANSLATION (0.05, -5, 7.5)], [xx trafo: TRANSLATION (0.05, -6, 7.5)], [xx trafo: TRANSLATION 
+(0.05, -7, 7.5)], [xx trafo: TRANSLATION (0.05, -8, 7.5)], [xx trafo: TRANSLATION (0.05, 
+-9, 7.5)], [xx trafo: TRANSLATION (0.05, -10, 7.5)], [xx trafo: TRANSLATION (0.05, -11, 
+7.5)], [xx trafo: TRANSLATION (0.05, -12, 7.5)], [xx trafo: TRANSLATION (0.05, -13, 
+7.5)], [xx trafo: TRANSLATION (0.05, -14, 7.5)], [xx trafo: TRANSLATION (0.05, -15, 
+7.5)], [xx trafo: TRANSLATION (0.05, -16, 7.5)],
+		 UNION_END);
+
+
+}

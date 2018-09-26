@@ -1,0 +1,298 @@
+#ifndef SAMPLES
+    #define SAMPLES 256
+#endif
+
+#ifndef PATH_LENGTH
+    #define PATH_LENGTH 20
+#endif
+
+#ifndef THICKNESS
+    #define THICKNESS 1.25
+#endif
+
+#define KNUBBEL_KUGEL \
+    knubbelKugel( art_gv, 22 DEGREES, 0.1 )
+
+#define LIGHT_BOX(_emitter, _reflector) \
+    makeLightBox(art_gv, (_emitter), (_reflector))
+
+ArNode * knubbelKugel(
+        ART_GV  * art_gv,
+        double    angle,
+        double    secondaryRadius
+        )
+{
+    id  mainTorus =
+        [ TORUS( ( 1.0 / cos(angle) ) * secondaryRadius ) apply
+            :   USCALE( cos(angle) )
+            :   TRANSLATION( 0.0, 0.0, sin(angle) ) 
+            ];
+
+    double  deltaAngle = atan( secondaryRadius );
+    
+    double  angleA = angle - deltaAngle;
+    
+    id  subTorusA =
+        [ TORUS( ( 1.0 / ( ( 1.0 - secondaryRadius ) * cos(angleA) ) ) * secondaryRadius ) apply
+            :   USCALE( ( 1.0 - secondaryRadius ) * cos(angleA) )
+            :   TRANSLATION( 0.0, 0.0, ( 1.0 - secondaryRadius ) * sin(angleA) ) ];
+
+    double  angleB = angle + deltaAngle;
+    
+    id  subTorusB =
+        [ TORUS( ( 1.0 / ( ( 1.0 - secondaryRadius ) * cos(angleB) ) ) * secondaryRadius ) apply
+            :   USCALE( ( 1.0 - secondaryRadius ) * cos(angleB) )
+            :   TRANSLATION( 0.0, 0.0, ( 1.0 - secondaryRadius ) * sin(angleB) ) ];
+
+    id  grooveObj = [ mainTorus sub: [ subTorusA or: subTorusB ] ];
+        
+   id  groovePair =
+        UNION(
+            grooveObj,
+            [ grooveObj apply: ROT_X( 180 DEGREES ) ],
+            0 );
+            
+     id  allGrooves =
+        UNION(
+              groovePair,
+            [ groovePair apply: ROT_X( 90 DEGREES ) ],
+            [ groovePair apply: ROT_Y( 90 DEGREES ) ],
+            0 );
+
+    return [ SPHERE sub: allGrooves ];
+}
+
+ArNode * makeLightBox(
+        ART_GV  * art_gv,
+        ArNode  * emitter,
+        ArNode  * reflector
+        )
+{
+    Pnt3D  * lightBoxPoints = ALLOC_ARRAY( Pnt3D, 9 );
+
+    lightBoxPoints[0] = PNT3D(-1, -1, -1);
+    lightBoxPoints[1] = PNT3D(-1,  1, -1);
+    lightBoxPoints[2] = PNT3D( 1, -1, -1);
+    lightBoxPoints[3] = PNT3D( 1,  1, -1);
+    lightBoxPoints[4] = PNT3D(-1, -1,  1);
+    lightBoxPoints[5] = PNT3D(-1,  1,  1);
+    lightBoxPoints[6] = PNT3D( 1, -1,  1);
+    lightBoxPoints[7] = PNT3D( 1,  1,  1);
+    lightBoxPoints[8] = PNT3D_HUGE;
+
+    ArNode * lightBoxQuads = UNION(
+        [ QUADRANGLE(0, 1, 3, 2) apply : emitter ],
+        [ QUADRANGLE(0, 2, 6, 4) apply : reflector ],
+        [ QUADRANGLE(2, 3, 7, 6) apply : reflector ],
+        [ QUADRANGLE(3, 1, 5, 7) apply : reflector ],
+        [ QUADRANGLE(1, 0, 4, 5) apply : reflector ],
+        UNION_END
+    );
+    ArNode * lightBoxVertices =
+        arnvertexset(
+            art_gv,
+            lightBoxPoints,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+        );
+    ArNode * lightBox = [ lightBoxQuads apply: lightBoxVertices ];
+
+    return lightBox;
+}
+
+ARM_MAIN_FUNCTION(Material)
+{
+    id floor =
+        [ CUBE apply
+            : SCALE(200 ,200 , 1 )
+            : TRANSLATION(-100 ,-100 , -2.0 )
+            : LAMBERT_REFLECTOR(MACBETH_NEUTRAL8)
+        ];
+
+    double absorbanceGivenForLength = 1;
+    id green = RAINBOW_GREEN;
+    id red = MACBETH_RED;
+    id clearGlass = STANDARD_MATERIAL(CONST_COLOUR_GREY(1.6), CONST_COLOUR_GREY(0.0));
+    id clearCoating = STANDARD_MATERIAL(CONST_COLOUR_GREY(1.6), CONST_COLOUR_GREY(0.0));
+    id greenGlass = STANDARD_MATERIAL(CONST_COLOUR_GREY(1.6), CONST_REFLECTIVITY_SPECTRUM(green, absorbanceGivenForLength));
+    id redGlass = STANDARD_MATERIAL(CONST_COLOUR_GREY(1.6), CONST_REFLECTIVITY_SPECTRUM(red, absorbanceGivenForLength));
+    id greenCoating = STANDARD_MATERIAL(CONST_COLOUR_GREY(1.3), CONST_REFLECTIVITY_SPECTRUM(green, absorbanceGivenForLength));
+    id redCoating = STANDARD_MATERIAL(CONST_COLOUR_GREY(1.3), CONST_REFLECTIVITY_SPECTRUM(red, absorbanceGivenForLength));
+
+    id materialColour = red; //CONST_COLOUR_GREY(1.0);
+
+    double materialParam = 0.01;
+    double materialParam1 = 0.2;
+    double materialParam2 = 0.8;
+
+    id glassMaterial            =
+        STANDARD_MATERIAL(
+            CONST_COLOUR_GRAY(1.55),
+            CONST_COLOUR_GRAY(0.0)
+            );
+
+    id synthFluoA =
+        CONST_FLUORESCENT_COLOUR(
+            FLUORESCENT_RED_PLAIN,
+            0.025,
+            PNT2D( 370 NM, 620 NM ),
+            VEC2D(  40 NM,  50 NM )
+            ); 
+
+    id mainItem =
+        [ KNUBBEL_KUGEL apply
+            : ROT_X(15 DEGREES)
+            : ROT_Z(-40 DEGREES)
+        #if defined MATERIAL_LAMBERT
+            : LAMBERT_REFLECTOR(materialColour)
+        #elif defined MATERIAL_PHONG
+            : PHONG_REFLECTOR(materialColour, CONST_DOUBLE(materialParam))
+        #elif defined MATERIAL_OREN_NAYAR
+            : OREN_NAYAR_SURFACE(materialColour, CONST_DOUBLE(materialParam))
+        #elif defined MATERIAL_PERFECT_REFLECTOR
+            : PERFECT_REFLECTOR(materialColour)
+        #elif defined MATERIAL_PERFECT_REFRACTOR
+            : PERFECT_REFRACTOR(materialColour)
+        #elif defined MATERIAL_SMOOTH_FRESNEL
+            : SMOOTH_FRESNEL_SURFACE
+        #elif defined MATERIAL_SMOOTH_FRESNEL_WITH
+            : SMOOTH_FRESNEL_SURFACE_WITH_MATERIAL(GOLD_MATERIAL)
+        #elif defined MATERIAL_TORRANCE_SPARROW
+            : TORRANCE_SPARROW_SURFACE(BLINN_MICROFACET_DISTRIBUTION_CONST(materialParam))
+        #elif defined MATERIAL_TORRANCE_SPARROW_BLINN_SURFACE_WITH
+            : TORRANCE_SPARROW_BLINN_SURFACE_WITH_MATERIAL_CONST(materialParam, GOLD_MATERIAL)
+        #elif defined MATERIAL_LAYERED
+            : LAYERED_SURFACE(
+                  TORRANCE_SPARROW_BLINN_SURFACE_CONST( 15 DEGREES )
+				, redCoating, CONST_DOUBLE( THICKNESS)
+                , TORRANCE_SPARROW_BLINN_SURFACE_CONST( 15 DEGREES )
+                )
+            : ALUMINIUM_MATERIAL
+        #elif defined MATERIAL_GLASS_FRESNEL
+                : glassMaterial
+                : SMOOTH_FRESNEL_SURFACE
+        #elif defined MATERIAL_GLASS_TORRANCE_SPARROW
+                : glassMaterial
+                : TORRANCE_SPARROW_BLINN_SURFACE_CONST( 2 DEGREES )
+        #elif defined MATERIAL_INERT
+                : INERT_SURFACE
+        #elif defined MATERIAL_TRANSPARENT
+                : TRANSPARENT_SURFACE(materialColour)
+        #elif defined MATERIAL_HTSG
+                : HTSG_SURFACE(materialColour, CONST_DOUBLE(materialParam), CONST_DOUBLE(materialParam1), CONST_DOUBLE(materialParam2))
+        #elif defined MATERIAL_WARD
+                : WARD_SURFACE_CONST(materialColour, materialParam, materialParam1, materialParam2)
+        #elif defined MATERIAL_SYNTH_FLUORESCENT
+                : LAMBERT_REFLECTOR( synthFluoA )
+        #elif defined MATERIAL_MEASURED_FLUORESCENT
+                : LAMBERT_REFLECTOR( GREEN_POSTIT_FLUORESCENT )
+        #endif
+        ];
+
+
+
+    id scene_geometry =
+        UNION(
+            mainItem,
+#if ! defined USE_HOSEK_SKYLIGHT && ! defined USE_DIFFUSE_ILLUMINATION
+  #ifndef SMALL_LIGHT
+            [ LIGHT_BOX(
+                LAMBERT_EMITTER_CONST(CONST_COLOUR_GREY(10), 1),
+                LAMBERT_REFLECTOR(MACBETH_NEUTRAL8)
+            ) apply
+                : SCALE(10, 10, 0.1)
+                : TRANSLATION(-8, 6, 10)
+            ],
+  #else
+            [ LIGHT_BOX(
+                LAMBERT_EMITTER_CONST(CONST_COLOUR_GREY(10), 100),
+                LAMBERT_REFLECTOR(MACBETH_NEUTRAL8)
+            ) apply
+                : SCALE(0.1, 0.1, 0.1)
+                : TRANSLATION(-8, -6, 10)
+            ],
+  #endif
+#endif
+            floor,
+            UNION_END
+            );
+
+    id camera =
+        [ CAMERA
+            imageSize:  IVEC2D( 128, 128 )
+            ray:        RAY3D( PNT3D(0.0,30.0,15.0),VEC3D(0.0,-30.0,-15) )
+            zoom:       9
+            ];
+
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  6
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+                        maximalRecursion: PATH_LENGTH
+                #ifdef ALG_DS
+                    #ifdef WEIGHED
+                        mode:             arpathtracermode_weighed_direction_sampling
+                    #else
+                        mode:             arpathtracermode_direction_sampling
+                    #endif
+                #elif defined ALG_LS
+                    #ifdef WEIGHED
+                        mode:             arpathtracermode_weighed_light_sampling
+                    #else
+                        mode:             arpathtracermode_light_sampling
+                    #endif
+                #endif
+                    ]
+                sampleSplattingKernel:    TENT_KERNEL
+                samplesPerPixel:         SAMPLES
+                randomValueGeneration:   RANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    NO
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+    return
+        [ SCENE
+            sceneGeometry      : scene_geometry
+#ifdef USE_HOSEK_SKYLIGHT
+            skyModel :
+                [ HOSEK_SKYLIGHT
+                    elevation   : 45 DEGREES
+                    azimuth     : 120.0 DEGREES
+                    turbidity   : 2.0
+                    groundAlbedo: CONST_COLOUR_GREY(0.5)
+                ]
+#elif defined USE_DIFFUSE_ILLUMINATION
+            environmentMaterial: UNIFORM_ENVIRONMENT_MATERIAL( CONST_COLOUR_GREY(1.0), 1.0 )
+#endif
+            camera        : camera
+            actionSequence: actionsequence
+            ];
+}
+
+// ===========================================================================
