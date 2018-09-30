@@ -712,12 +712,18 @@ int art_application_number_of_input_files(
 //   running as a foreground process that is actually attached to
 //   a terminal.
 
+//   This is deactivated for debug builds, so that output
+//   is shown in Xcode.
+
 int art_is_running_as_foreground_process(
         )
 {
-    return isatty(STDIN_FILENO);
-//    pid_t  fg = tcgetpgrp(STDIN_FILENO);
-//    return ( fg == getpgrp() );
+#ifdef NDEBUG
+    pid_t  fg = tcgetpgrp(STDIN_FILENO);
+    return ( fg == getpgrp() );
+#else
+    return 1;
+#endif
 }
 
 int art_interactive_mode_permitted(

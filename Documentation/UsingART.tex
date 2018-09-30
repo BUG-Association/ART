@@ -206,6 +206,12 @@ This value can then be conveniently over-ridden from the command line: all \comm
 artist foo.arm -DSAMPLES=256
 \end{verbatim}
 
+The SAMPLES option is special insofar as the stochastic sampler will switch into "open ended" mode when this value is set to -1: in this mode, the sampler will keep running until the user presses either Control-C or T. As there is a conveniently defined macro called \command{UNLIMITED} which has a value of -1, one can intuitively also write: 
+
+\begin{verbatim}
+artist foo.arm -DSAMPLES=UNLIMITED
+\end{verbatim}
+
 Note that this facility is not limited with regard to the number of \command{\#define}s that are passed to the \filename{.arm} file before translation: so you can be creative in making your scenes capable of command line manipulation via as many such switches as you want. Note also, though, that there is currently only an informal standard on what conditionally defined macros one can expect in an \filename{.arm} file: all examples in the ART gallery use \command{SAMPLE} to define the number of samples, and a number of them have an option \command{DIFFUSE\_ILLUMINATION} that can be activated instead of the standard scene illumination. But beyond that, there are no conventions at the moment.
 
 \subsection{Tagging Output by Data Type}
