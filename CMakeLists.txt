@@ -11,8 +11,8 @@ project (ART)
 
 set ( ART_VERSION_MAJOR 2 )
 set ( ART_VERSION_MINOR 0 )
-set ( ART_VERSION_PATCH 1 )
-set ( ART_VERSION_DEVTAG -wip )
+set ( ART_VERSION_PATCH 0 )
+set ( ART_VERSION_DEVTAG )
 
 if ( APPLE )
 set(CMAKE_MACOSX_RPATH 1)
