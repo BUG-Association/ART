@@ -127,15 +127,14 @@ On being started up, the ART libraries detect the number of available processor 
 
 Note that ART at the moment only uses threading for some of the cases
 where this is possible; as development progresses this ratio will
-increase. The major tasks -- such as the actual path, photon or ray
-tracing -- are threaded, but there is still room for improvement,
-especially during the scene setup phase (\eg lightsource
-identification or mesh preparation calculations).
+increase. The major tasks -- such as the actual path tracing -- are threaded, but there is still room for improvement,
+especially during the scene setup phase, \eg lightsource
+identification or mesh preparation calculations.
 
 \subsection{Obtaining Intermediate Rendering Results}
 For reasons of efficiency, \command{artist} does not write any intermediate results to disk while it is running. The rendering thread(s) store all computed information locally in each thread: only once all of them have terminated, the complete result image is assembled by the main thread, and saved to disk. 
 
-For long-running rendering jobs, this behaviour can be undesirable, as one might want to quickly see whether the rendering is doing what one expects. To solve this problem, it is possible to obtain intermediate results at any time during rendering with the \command{impresario} command. This small tool uses UNIX signals to wake up the dormant main thread of a running \command{artist} instance, and forces it to write (and if selected, also display) the current state of the result image. \command{impresario} can also be run in a way that it sends repeated wake-up calls to \command{artist} at pre-defined time intervals.
+For long-running rendering jobs, this behaviour can be undesirable, as one might want to quickly see whether the rendering is doing what one expects. To solve this problem, it is possible to obtain intermediate results at any time during rendering either via interactive mode commands \command{w} or \command{d}, or for detached rendering jobs with the \command{impresario} command. This small tool uses UNIX signals to wake up the dormant main thread of a running \command{artist} instance, and forces it to write (and if selected, also display) the current state of the result image. \command{impresario} can also be run in a way that it sends repeated wake-up calls to \command{artist} at pre-defined time intervals.
 
 \subsection{Changing the Result Image Size}
 \label{sec:using:imageSize}
@@ -217,12 +216,10 @@ Note that this facility is not limited with regard to the number of \command{\#d
 \subsection{Tagging Output by Data Type}
 Note should also be taken of the \option{-t} option, which tags the output of a
 rendering pass with the name of the data type that is used for the pixels of the image. For example,
-rendering the scene \filename{foo.arm} with the \option{RGB} renderer and
-the \option{-t} flag set would generate a result file of the form
-\filename{foo.RGB.tiff}, while a polarising \option{Spectrum8} rendering would yield
+rendering the scene \filename{foo.arm} with  polarising \option{Spectrum8} would yield an output filename of
 \filename{foo.Spectrum8.polarising.tiff}.
 
-This is useful for those users who wish to compare e.g. colourspace and spectral renderings of the same scene, or the effect of different spectral output resolutions: one can easily keep the results of these computations in separate files this way. 
+This is useful for those users who wish to compare \eg the effects of different spectral output resolutions: one can easily keep the results of these computations in separate files this way. 
 
 
 \subsection{Tagging Output with an Arbitrary Tag}
