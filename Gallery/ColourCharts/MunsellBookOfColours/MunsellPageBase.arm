@@ -255,6 +255,26 @@ ArNode * createMunsellPage(
 #define SAMPLES 64
 #endif
 
+#ifdef D50
+#define CHART_ILLUMINANT CIE_ILLUMINANT_D50
+#endif
+
+#ifdef FL3
+#define CHART_ILLUMINANT CIE_ILLUMINANT_FL3
+#endif
+
+#ifdef FL3_13
+#define CHART_ILLUMINANT CIE_ILLUMINANT_FL3_13
+#endif
+
+#ifdef FL3_15
+#define CHART_ILLUMINANT CIE_ILLUMINANT_FL3_15
+#endif
+
+#ifndef CHART_ILLUMINANT
+#define CHART_ILLUMINANT CIE_ILLUMINANT_D65
+#endif
+
 #define MUNSELL_PAGE_FUNCTION_BODY(__name) \
 { \
     id lambertBaseSurface = LAMBERT_MATERIAL( MACBETH_NEUTRAL8 ); \
@@ -332,7 +352,7 @@ ArNode * createMunsellPage(
             ); \
 \
     id  environment_material = \
-        UNIFORM_ENVIRONMENT_MATERIAL( CIE_ILLUMINANT_D65, 1.0 ); \
+        UNIFORM_ENVIRONMENT_MATERIAL( CHART_ILLUMINANT, 1.0 ); \
 \
     return \
         [ SCENE \
