@@ -38,6 +38,7 @@ int tonemap(
           art_appfeatures_open_result
         | art_appfeatures_alter_output_filename
         | art_appfeatures_change_rgb_space
+        | art_appfeatures_change_whitepoint
         | art_appfeatures_load_actionsequence
         | art_appfeatures_no_threading
         );

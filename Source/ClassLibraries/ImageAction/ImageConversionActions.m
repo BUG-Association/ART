@@ -674,7 +674,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
                 xyz_to_lab(
                       art_gv,
                     & XYZA_SOURCE_BUFFER_XYZ(x),
-                    & labValue );
+                    & labValue
+                    );
 
     #ifdef IMAGECONVERSION_DEBUGPRINTF
                 lab_c_debugprintf( art_gv,& labValue );

@@ -87,6 +87,7 @@ typedef struct ApplicationSupport_GV
     id  srgbOpt;
     id  argbOpt;
     id  wrgbOpt;
+    id  cctOpt;
     id  iccOpt;
     id  isrOpt;
 
@@ -158,6 +159,7 @@ ApplicationSupport_GV;
 #define ARGB_OPT        APPSUPPORT_GV->argbOpt
 #define WRGB_OPT        APPSUPPORT_GV->wrgbOpt
 #define IRGB_OPT        APPSUPPORT_GV->iccOpt
+#define CCT_OPT         APPSUPPORT_GV->cctOpt
 #define ISR_OPT         APPSUPPORT_GV->isrOpt
 
 #define SPECIAL_STARTUP_OPTION \
@@ -219,6 +221,7 @@ ART_MODULE_INITIALISATION_FUNCTION
     ARGB_OPT        = NULL;
     WRGB_OPT        = NULL;
     IRGB_OPT        = NULL;
+    CCT_OPT         = NULL;
     ISR_OPT         = NULL;
 
     SPECIAL_STARTUP_OPTION = NULL;
@@ -573,6 +576,17 @@ void art_define_standard_commandline_options(
                 :   "<ICC profile>"
                 :   "use RGB space from a given ICC file"
                 ];
+
+        if( APP_FEATURES & art_appfeatures_change_whitepoint )
+        {
+            CCT_OPT =
+                [ STRING_OPTION
+                    :   "whitepoint"
+                    :   "wp"
+                    :   "<wp ID or CCT>"
+                    :   "use given whitepoint as adaption colour"
+                    ];
+        }
     }
 
     INSERTIONPOINT_OTHER_OPTIONS =
@@ -975,6 +989,13 @@ int art_print_banner_and_process_standard_commandline_options(
     working space, and output related diagnostics.
 ------------------------------------------------------------------------aw- */
 
+    //   Set the L*a*b* white point
+
+    if ( [ CCT_OPT hasBeenSpecified ] )
+    {
+        art_set_system_white_point( art_gv, [ CCT_OPT cStringValue ] );
+    }
+
     unsigned int  numberOfRequestedWorkingSpaces = 0;
 
     //   sRGB
@@ -1043,7 +1064,6 @@ int art_print_banner_and_process_standard_commandline_options(
             "more than one RGB working space specified"
             );
     }
-
 
 /* ---------------------------------------------------------------------------
     Setting up the colour and light subsystem: if requested, change

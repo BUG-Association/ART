@@ -402,6 +402,78 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnOpenImageInExternalViewer)
 @end
 
 /* ===========================================================================
+    'ArnSetColourSubsystemWhitepoint'
+=========================================================================== */
+
+
+@implementation ArnSetColourSubsystemWhitepoint
+
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSetColourSubsystemWhitepoint)
+ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetColourSubsystemWhitepoint)
+
+- init
+        : (char *) newWP_Desc
+{
+    self = [ super init ];
+
+    if ( self )
+    {
+        wp_desc = arsymbol(art_gv, newWP_Desc);
+    }
+    
+    return self;
+}
+
+- init
+{
+    return
+        [ self init
+            :   "D50"
+            ];
+}
+
+- (void) performOn
+        : (ArNode <ArpNodeStack> *) nodeStack
+{
+    if ( art_system_white_point_has_been_manually_set(art_gv) )
+    {
+        [ ART_GLOBAL_REPORTER beginAction
+            :   "white point setting of %s overridden by the user to %s"
+            ,   wp_desc
+            ,   art_system_white_point_symbol(art_gv)
+            ];
+
+        [ ART_GLOBAL_REPORTER endAction ];
+    }
+    else
+    {
+        [ ART_GLOBAL_REPORTER beginAction
+            :   "setting the white point of the colour subsystem to %s"
+            ,   wp_desc
+            ];
+
+        art_set_system_white_point( art_gv, wp_desc );
+
+        [ ART_GLOBAL_REPORTER endAction ];
+    }
+}
+
+- (void) code
+        : (ArcObject <ArpCoder> *) coder
+{
+    [ super code
+        :   coder
+        ];
+
+    [ coder codeSymbol
+        : & wp_desc
+        ];
+}
+
+@end
+
+
+/* ===========================================================================
     'ArnChangeISR_to_Match_ARTRAW_Contents'
 =========================================================================== */
 

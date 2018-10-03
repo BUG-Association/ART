@@ -210,6 +210,9 @@ void luv_s_debugprintf(
 #define ARCIEXYZ_D65        * xyz_illuminant_D65(art_gv)
 #define ARCIEXYZ_A          * xyz_illuminant_A(art_gv)
 
+#define ARCIEXYZ_SYSTEM_WHITE_POINT \
+    * art_system_white_point_xyz(art_gv)
+
 ArCIEXYZ const * xyz_zero(
         const ART_GV  * art_gv
         );
@@ -230,6 +233,22 @@ ArCIEXYZ const * xyz_illuminant_A(
         const ART_GV  * art_gv
         );
 
+ArCIEXYZ const * art_system_white_point_xyz(
+        const ART_GV  * art_gv
+        );
+
+void art_set_system_white_point(
+              ART_GV  * art_gv,
+        const char    * wp_desc
+        );
+
+ArSymbol art_system_white_point_symbol(
+        const ART_GV  * art_gv
+        );
+
+int art_system_white_point_has_been_manually_set(
+        const ART_GV  * art_gv
+        );
 
 /* ---------------------------------------------------------------------------
 

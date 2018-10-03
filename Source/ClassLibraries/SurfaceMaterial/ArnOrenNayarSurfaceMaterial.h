@@ -61,6 +61,8 @@ ART_MODULE_INTERFACE(ArnOrenNayarSurfaceMaterial)
     : ArnBinary
         < ArpCoding, ArpConcreteClass, ArpSurfaceMaterial >
 {
+    ArSurfaceType   additionalSurfaceProperties;
+
     // (Potentially) precomputed data based on sigma parameter
     BOOL            isSigmaConstant;
     double          sigma2;

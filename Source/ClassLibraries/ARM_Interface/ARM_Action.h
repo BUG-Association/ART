@@ -173,6 +173,16 @@ ART_MODULE_INTERFACE(ARM_Action)
                     ]
 
         /**
+         * @def SET_COLOUR_SUBSYSTEM_WHITEPOINT(whitepoint)
+         *
+         * @param whitepoint    string  whitepoint, either as "D50", or as temperature in K.
+         */
+        #define SET_COLOUR_SUBSYSTEM_WHITEPOINT(__whitepoint) \
+                [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnSetColourSubsystemWhitepoint) \
+                    :   (__whitepoint) \
+                    ]
+
+        /**
          * @def MUL_ARTRAW_IMAGE
          */
         #define MUL_ARTRAW_IMAGE \

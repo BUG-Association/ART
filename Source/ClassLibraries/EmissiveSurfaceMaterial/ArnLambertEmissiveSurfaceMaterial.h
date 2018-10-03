@@ -38,7 +38,7 @@ ART_MODULE_INTERFACE(ArnLambertEmissiveSurfaceMaterial)
             : ArnBinary
             < ArpCoding, ArpConcreteClass, ArpSurfaceMaterial >
 {
-    ArSurfaceType   additionalSurfaceProperties; // used for matte
+    ArSurfaceType   additionalSurfaceProperties;
 }
 
 - init

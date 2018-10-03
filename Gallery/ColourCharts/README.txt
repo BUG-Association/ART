@@ -1,1 +1,1 @@
-The scenes in this directory show head on renderings of the two Macbeth Colour Checkers.
+The two scenes in this directory show head on renderings of the two Macbeth Colour Checkers. Also, there is a subdirectory which contains all the colour pages of the Munsell Book of Color.

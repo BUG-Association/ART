@@ -1,0 +1,88 @@
+#import "MunsellPageBase.arm"
+
+#define MUNSELL_PAGE_025B      createMunsellPage_025B( art_gv )
+
+ArNode * createMunsellPage_025B(
+        ART_GV  * art_gv
+        )
+{
+    return
+        createMunsellPage(
+            art_gv,
+            
+            MUNSELL_025B_02_02,
+            MUNSELL_025B_02_04,
+            MUNSELL_025B_02_06,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+
+            MUNSELL_025B_03_02,
+            MUNSELL_025B_03_04,
+            MUNSELL_025B_03_06,
+            MUNSELL_025B_03_08,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+
+            MUNSELL_025B_04_02,
+            MUNSELL_025B_04_04,
+            MUNSELL_025B_04_06,
+            MUNSELL_025B_04_08,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            
+            MUNSELL_025B_05_02,
+            MUNSELL_025B_05_04,
+            MUNSELL_025B_05_06,
+            MUNSELL_025B_05_08,
+            MUNSELL_025B_05_10,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+
+            MUNSELL_025B_06_02,
+            MUNSELL_025B_06_04,
+            MUNSELL_025B_06_06,
+            MUNSELL_025B_06_08,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+
+            MUNSELL_025B_07_02,
+            MUNSELL_025B_07_04,
+            MUNSELL_025B_07_06,
+            MUNSELL_025B_07_08,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+
+            MUNSELL_025B_08_02,
+            MUNSELL_025B_08_04,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+
+            MUNSELL_025B_09_02,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK,
+            MUNSELL_BLANK
+            );
+}
+
+ARM_MAIN_FUNCTION(25_MunsellPage025B)
+MUNSELL_PAGE_FUNCTION_BODY(025B)

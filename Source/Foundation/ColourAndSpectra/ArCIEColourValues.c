@@ -29,111 +29,295 @@
 #include "ArCIEColourValues.h"
 
 #include "ArCIEColourConversions.h"
+#include "ColourAndSpectralDataConversion.h"
+
+#include "ArSpectrum500.h"
 
 typedef struct ArCIEColourValues_GV
 {
-    ArCIEXYZ  XYZ_BLACK;
-    ArCIEXYZ  XYZ_WHITE;
-    ArCIEXYZ  XYZ_E;
-    ArCIEXYZ  XYZ_D50;
-    ArCIEXYZ  XYZ_D55;
-    ArCIEXYZ  XYZ_D65;
-    ArCIEXYZ  XYZ_D75;
-    ArCIEXYZ  XYZ_A;
+    pthread_mutex_t  mutex;
+    
+    ArCIEXYZ         XYZ_BLACK;
+    ArCIEXYZ         XYZ_WHITE;
+    ArCIEXYZ         XYZ_E;
+    ArCIEXYZ         XYZ_D50;
+    ArCIEXYZ         XYZ_D55;
+    ArCIEXYZ         XYZ_D65;
+    ArCIEXYZ         XYZ_D75;
+    ArCIEXYZ         XYZ_A;
+    ArCIEXYZ         XYZ_SYSWHITE;
+    ArSymbol         syswhite_symbol;
+    int              manual_syswhite;
 
-    ArCIExyY  xyY_BLACK;
-    ArCIExyY  xyY_WHITE;
-    ArCIExyY  xyY_E;
-    ArCIExyY  xyY_D50;
-    ArCIExyY  xyY_D55;
-    ArCIExyY  xyY_D65;
-    ArCIExyY  xyY_D75;
-    ArCIExyY  xyY_A;
+    ArCIExyY         xyY_BLACK;
+    ArCIExyY         xyY_WHITE;
+    ArCIExyY         xyY_E;
+    ArCIExyY         xyY_D50;
+    ArCIExyY         xyY_D55;
+    ArCIExyY         xyY_D65;
+    ArCIExyY         xyY_D75;
+    ArCIExyY         xyY_A;
 
-    ArCIELab  Lab_BLACK;
-    ArCIELab  Lab_WHITE;
+    ArCIELab         Lab_BLACK;
+    ArCIELab         Lab_WHITE;
 
-    ArCIELuv  Luv_BLACK;
-    ArCIELuv  Luv_WHITE;
+    ArCIELuv         Luv_BLACK;
+    ArCIELuv         Luv_WHITE;
 }
 ArCIEColourValues_GV;
 
+#define ARCIECV_GV              art_gv->arciecolourvalues_gv
+#define ARCIECV_MUTEX           ARCIECV_GV->mutex
+#define ARCIECV_XYZ_BLACK       ARCIECV_GV->XYZ_BLACK
+#define ARCIECV_XYZ_WHITE       ARCIECV_GV->XYZ_WHITE
+#define ARCIECV_xyY_BLACK       ARCIECV_GV->xyY_BLACK
+#define ARCIECV_xyY_WHITE       ARCIECV_GV->xyY_WHITE
+#define ARCIECV_xyY_E           ARCIECV_GV->xyY_E
+#define ARCIECV_xyY_D50         ARCIECV_GV->xyY_D50
+#define ARCIECV_xyY_D55         ARCIECV_GV->xyY_D55
+#define ARCIECV_xyY_D65         ARCIECV_GV->xyY_D65
+#define ARCIECV_xyY_D75         ARCIECV_GV->xyY_D75
+#define ARCIECV_xyY_A           ARCIECV_GV->xyY_A
+#define ARCIECV_XYZ_E           ARCIECV_GV->XYZ_E
+#define ARCIECV_XYZ_D50         ARCIECV_GV->XYZ_D50
+#define ARCIECV_XYZ_D55         ARCIECV_GV->XYZ_D55
+#define ARCIECV_XYZ_D65         ARCIECV_GV->XYZ_D65
+#define ARCIECV_XYZ_D75         ARCIECV_GV->XYZ_D75
+#define ARCIECV_XYZ_A           ARCIECV_GV->XYZ_A
+#define ARCIECV_XYZ_SYSWHITE    ARCIECV_GV->XYZ_SYSWHITE
+#define ARCIECV_SYSWHITE_SYMBOL ARCIECV_GV->syswhite_symbol
+#define ARCIECV_MANUAL_SYSWHITE ARCIECV_GV->manual_syswhite
+#define ARCIECV_Lab_BLACK       ARCIECV_GV->Lab_BLACK
+#define ARCIECV_Lab_WHITE       ARCIECV_GV->Lab_WHITE
+#define ARCIECV_Luv_BLACK       ARCIECV_GV->Luv_BLACK
+#define ARCIECV_Luv_WHITE       ARCIECV_GV->Luv_WHITE
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
-    ArCIEColourValues_GV  * arccv_gv;
+    ARCIECV_GV = ALLOC(ArCIEColourValues_GV);
 
-    arccv_gv = ALLOC(ArCIEColourValues_GV);
+    pthread_mutex_init( & ARCIECV_MUTEX, NULL );
 
-    arccv_gv->XYZ_BLACK = ARCIEXYZ( 0.0, 0.0, 0.0 );
-    arccv_gv->XYZ_WHITE = ARCIEXYZ( 1.0, 1.0, 1.0 );
+    ARCIECV_XYZ_BLACK = ARCIEXYZ( 0.0, 0.0, 0.0 );
+    ARCIECV_XYZ_WHITE = ARCIEXYZ( 1.0, 1.0, 1.0 );
 
-    arccv_gv->xyY_BLACK = ARCIExyY( MATH_1_DIV_3, MATH_1_DIV_3, 0.0 );
-    arccv_gv->xyY_WHITE = ARCIExyY( MATH_1_DIV_3, MATH_1_DIV_3, 1.0 );
+    ARCIECV_xyY_BLACK = ARCIExyY( MATH_1_DIV_3, MATH_1_DIV_3, 0.0 );
+    ARCIECV_xyY_WHITE = ARCIExyY( MATH_1_DIV_3, MATH_1_DIV_3, 1.0 );
 
     double  standard_Y = 1.0;
 
-    arccv_gv->xyY_E     = ARCIExyY( MATH_1_DIV_3, MATH_1_DIV_3, standard_Y );
-    arccv_gv->xyY_D50   = ARCIExyY( 0.34567, 0.35850, standard_Y );
-    arccv_gv->xyY_D55   = ARCIExyY( 0.33242, 0.34743, standard_Y );
-    arccv_gv->xyY_D65   = ARCIExyY( 0.31271, 0.32902, standard_Y );
-    arccv_gv->xyY_D75   = ARCIExyY( 0.29902, 0.31485, standard_Y );
-    arccv_gv->xyY_A     = ARCIExyY( 0.44757, 0.40745, standard_Y );
+    ARCIECV_xyY_E     = ARCIExyY( MATH_1_DIV_3, MATH_1_DIV_3, standard_Y );
+    ARCIECV_xyY_D50   = ARCIExyY( 0.34567, 0.35850, standard_Y );
+    ARCIECV_xyY_D55   = ARCIExyY( 0.33242, 0.34743, standard_Y );
+    ARCIECV_xyY_D65   = ARCIExyY( 0.31271, 0.32902, standard_Y );
+    ARCIECV_xyY_D75   = ARCIExyY( 0.29902, 0.31485, standard_Y );
+    ARCIECV_xyY_A     = ARCIExyY( 0.44757, 0.40745, standard_Y );
 
-    xyy_to_xyz( art_gv, & arccv_gv->xyY_E  , & arccv_gv->XYZ_E   );
-    xyy_to_xyz( art_gv, & arccv_gv->xyY_D50, & arccv_gv->XYZ_D50 );
-    xyy_to_xyz( art_gv, & arccv_gv->xyY_D55, & arccv_gv->XYZ_D55 );
-    xyy_to_xyz( art_gv, & arccv_gv->xyY_D65, & arccv_gv->XYZ_D65 );
-    xyy_to_xyz( art_gv, & arccv_gv->xyY_D75, & arccv_gv->XYZ_D75 );
-    xyy_to_xyz( art_gv, & arccv_gv->xyY_A  , & arccv_gv->XYZ_A );
+    xyy_to_xyz( art_gv, & ARCIECV_xyY_E  , & ARCIECV_XYZ_E   );
+    xyy_to_xyz( art_gv, & ARCIECV_xyY_D50, & ARCIECV_XYZ_D50 );
+    xyy_to_xyz( art_gv, & ARCIECV_xyY_D55, & ARCIECV_XYZ_D55 );
+    xyy_to_xyz( art_gv, & ARCIECV_xyY_D65, & ARCIECV_XYZ_D65 );
+    xyy_to_xyz( art_gv, & ARCIECV_xyY_D75, & ARCIECV_XYZ_D75 );
+    xyy_to_xyz( art_gv, & ARCIECV_xyY_A  , & ARCIECV_XYZ_A );
+ 
+    //  set to -1, first needed invocation immediately afterwards
+    //  sets it to 0, all subsequent ones increase it
+ 
+    ARCIECV_MANUAL_SYSWHITE = -1;
+    ARCIECV_SYSWHITE_SYMBOL = NULL;
+    art_set_system_white_point(art_gv, "D50");
+ 
+    ARCIECV_Lab_BLACK = ARCIELab(   0.0, 0.0, 0.0 );
+    ARCIECV_Lab_WHITE = ARCIELab( 100.0, 0.0, 0.0 );
 
-    arccv_gv->Lab_BLACK = ARCIELab(   0.0, 0.0, 0.0 );
-    arccv_gv->Lab_WHITE = ARCIELab( 100.0, 0.0, 0.0 );
-
-    arccv_gv->Luv_BLACK = ARCIELuv(   0.0, 0.0, 0.0 );
-    arccv_gv->Luv_WHITE = ARCIELuv( 100.0, 0.0, 0.0 );
-
-    art_gv->arciecolourvalues_gv = arccv_gv;
+    ARCIECV_Luv_BLACK = ARCIELuv(   0.0, 0.0, 0.0 );
+    ARCIECV_Luv_WHITE = ARCIELuv( 100.0, 0.0, 0.0 );
 )
 
 ART_MODULE_SHUTDOWN_FUNCTION
 (
-    FREE( art_gv->arciecolourvalues_gv );
+    pthread_mutex_destroy( & ARCIECV_MUTEX );
+
+    FREE( ARCIECV_GV );
 )
 
 ArCIEXYZ const * xyz_zero(
         const ART_GV  * art_gv
         )
 {
-    return & art_gv->arciecolourvalues_gv->XYZ_BLACK;
+    return & ARCIECV_XYZ_BLACK;
 }
 
 ArCIEXYZ const * xyz_illuminant_E(
         const ART_GV  * art_gv
         )
 {
-    return & art_gv->arciecolourvalues_gv->XYZ_E;
+    return & ARCIECV_XYZ_E;
 }
 
 ArCIEXYZ const * xyz_illuminant_D50(
         const ART_GV  * art_gv
         )
 {
-    return & art_gv->arciecolourvalues_gv->XYZ_D50;
+    return & ARCIECV_XYZ_D50;
 }
 
 ArCIEXYZ const * xyz_illuminant_D65(
         const ART_GV  * art_gv
         )
 {
-    return & art_gv->arciecolourvalues_gv->XYZ_D65;
+    return & ARCIECV_XYZ_D65;
 }
 
 ArCIEXYZ const * xyz_illuminant_A(
         const ART_GV  * art_gv
         )
 {
-    return & art_gv->arciecolourvalues_gv->XYZ_A;
+    return & ARCIECV_XYZ_A;
+}
+
+ArCIEXYZ const * art_system_white_point_xyz(
+        const ART_GV  * art_gv
+        )
+{
+    return & ARCIECV_XYZ_SYSWHITE;
+}
+
+//   This thing lives elsewhere in ART, and in lieu of including that
+//   header (which would complicate things), we put the prototype here
+//   instead.
+
+void blackbody_d_s500(
+        const ART_GV         * art_gv,
+        const double           temperature,
+              ArSpectrum500  * spectrum500
+        );
+
+int art_system_white_point_has_been_manually_set(
+        const ART_GV  * art_gv
+        )
+{
+    return ARCIECV_MANUAL_SYSWHITE;
+}
+
+ArSymbol art_system_white_point_symbol(
+        const ART_GV  * art_gv
+        )
+{
+    return ARCIECV_SYSWHITE_SYMBOL;
+}
+
+void art_set_system_white_point(
+              ART_GV  * art_gv,
+        const char    * wp_desc
+        )
+{
+    pthread_mutex_lock( & ARCIECV_MUTEX );
+
+    int  valid_wp_desc = 0;
+
+    if (    strlen(wp_desc) == 1
+         && (wp_desc[0] == 'E' || wp_desc[0] == 'e') )
+    {
+        //   Option 1: Illuminant E. Not that this makes much sense from
+        //             a practical viewpoint, but let's include it anyway.
+    
+        ARCIECV_XYZ_SYSWHITE = ARCIECV_XYZ_E;
+        valid_wp_desc = 1;
+    }
+    
+    if (    strlen(wp_desc) == 1
+         && (wp_desc[0] == 'A' || wp_desc[0] == 'a') )
+    {
+        //   Option 2: Illuminant A. Extremely red, probably not very
+        //             useful, either.
+    
+        ARCIECV_XYZ_SYSWHITE = ARCIECV_XYZ_A;
+        valid_wp_desc = 1;
+    }
+    
+    if (    strlen(wp_desc) == 3
+         && (wp_desc[0] == 'D' || wp_desc[0] == 'd') )
+    {
+        //   Option 3: the user wrote something which starts with "D"
+        //             We interpret this to mean one of the CIE Dxx
+        //             illuminants: 50, 55, 65, 75 are on offer.
+    
+        if ( wp_desc[1] == '5' && wp_desc[2] == '0' )
+        {
+            ARCIECV_XYZ_SYSWHITE = ARCIECV_XYZ_D50;
+            valid_wp_desc = 1;
+        }
+
+        if ( wp_desc[1] == '5' && wp_desc[2] == '5' )
+        {
+            ARCIECV_XYZ_SYSWHITE = ARCIECV_XYZ_D55;
+            valid_wp_desc = 1;
+        }
+
+        if ( wp_desc[1] == '6' && wp_desc[2] == '5' )
+        {
+            ARCIECV_XYZ_SYSWHITE = ARCIECV_XYZ_D65;
+            valid_wp_desc = 1;
+        }
+
+        if ( wp_desc[1] == '7' && wp_desc[2] == '5' )
+        {
+            ARCIECV_XYZ_SYSWHITE = ARCIECV_XYZ_D75;
+            valid_wp_desc = 1;
+        }
+    }
+
+    if (   strlen(wp_desc) == 2
+        || strlen(wp_desc) == 4 )
+    {
+        //  Option 4: a two or four digit CCT, with 3k < cct < 9k
+        
+        int  cct = atoi(wp_desc);
+        
+        if ( strlen(wp_desc) == 2 )
+            cct *= 100;
+        
+        if ( cct > 3000 && cct < 9900 )
+        {
+            ArSpectrum500  bb500;
+            
+            blackbody_d_s500(
+                  art_gv,
+                  (double) cct,
+                & bb500
+                );
+            
+            ArCIEXYZ  bbxyz;
+            
+            s500_to_xyz( art_gv, & bb500, & bbxyz );
+
+            ArCIExyY  bbxyy;
+
+            xyz_to_xyy( art_gv, & bbxyz, & bbxyy );
+
+            ARCIExyY_Y(bbxyy) = 1.0;
+
+            xyy_to_xyz( art_gv, & bbxyy, & ARCIECV_XYZ_SYSWHITE );
+
+            valid_wp_desc = 1;
+        }
+    }
+
+    pthread_mutex_unlock( & ARCIECV_MUTEX );
+
+    if ( valid_wp_desc )
+    {
+        ARCIECV_MANUAL_SYSWHITE += 1;
+        ARCIECV_SYSWHITE_SYMBOL = arsymbol(art_gv, wp_desc);
+    }
+    else
+    {
+        ART_ERRORHANDLING_FATAL_ERROR(
+            "invalid white point specification '%s'",
+            wp_desc
+            );
+    }
 }
 
 double lab_delta_L(

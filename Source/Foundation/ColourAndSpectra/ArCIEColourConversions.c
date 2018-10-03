@@ -413,7 +413,7 @@ void lab_to_xyz(
         )
 {
     CC_START_DEBUGPRINTF( lab_to_xyz )
-    lab_wp_to_xyz( art_gv, lab_0, xyz_illuminant_D50( art_gv ), xyz_r );
+    lab_wp_to_xyz( art_gv, lab_0, & ARCIEXYZ_SYSTEM_WHITE_POINT, xyz_r );
     CC_END_DEBUGPRINTF( lab_to_xyz )
 }
 
@@ -464,7 +464,14 @@ void xyz_to_lab(
         )
 {
     CC_START_DEBUGPRINTF( xyz_to_lab )
-    xyz_wp_to_lab( art_gv, xyz_0, & ARCIEXYZ_D50 , lab_r );
+
+    xyz_wp_to_lab(
+          art_gv,
+          xyz_0,
+        & ARCIEXYZ_SYSTEM_WHITE_POINT,
+          lab_r
+        );
+
     CC_END_DEBUGPRINTF( xyz_to_lab )
 }
 
@@ -541,7 +548,7 @@ double luv_u_prime_from_luv(
         luv_u_prime_wp_from_luv(
               art_gv,
               luv_0,
-            & ARCIEXYZ_D50
+            & ARCIEXYZ_SYSTEM_WHITE_POINT
             );
 }
 
@@ -554,7 +561,7 @@ double luv_v_prime_from_luv(
         luv_v_prime_wp_from_luv(
               art_gv,
               luv_0,
-            & ARCIEXYZ_D50
+            & ARCIEXYZ_SYSTEM_WHITE_POINT
             );
 }
 
@@ -609,7 +616,7 @@ void xyz_to_luv(
 {
     CC_START_DEBUGPRINTF( xyz_to_luv )
 
-    xyz_wp_to_luv( art_gv, xyz_0, & ARCIEXYZ_D50 , luv_r );
+    xyz_wp_to_luv( art_gv, xyz_0, & ARCIEXYZ_SYSTEM_WHITE_POINT , luv_r );
 
     CC_END_DEBUGPRINTF( xyz_to_luv )
 }
@@ -670,7 +677,7 @@ void luv_to_xyz(
 {
     CC_START_DEBUGPRINTF( luv_to_xyz )
 
-    luv_wp_to_xyz( art_gv, luv_0, & ARCIEXYZ_D50, xyz_r );
+    luv_wp_to_xyz( art_gv, luv_0, & ARCIEXYZ_SYSTEM_WHITE_POINT, xyz_r );
 
     CC_END_DEBUGPRINTF( luv_to_xyz )
 }
