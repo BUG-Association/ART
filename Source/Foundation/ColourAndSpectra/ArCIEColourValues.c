@@ -125,7 +125,7 @@ ART_MODULE_INITIALISATION_FUNCTION
  
     ARCIECV_MANUAL_SYSWHITE = -1;
     ARCIECV_SYSWHITE_SYMBOL = NULL;
-    art_set_system_white_point(art_gv, "D50");
+    art_set_system_white_point_by_desc(art_gv, "D50");
  
     ARCIECV_Lab_BLACK = ARCIELab(   0.0, 0.0, 0.0 );
     ARCIECV_Lab_WHITE = ARCIELab( 100.0, 0.0, 0.0 );
@@ -207,14 +207,15 @@ ArSymbol art_system_white_point_symbol(
     return ARCIECV_SYSWHITE_SYMBOL;
 }
 
-void art_set_system_white_point(
+void art_set_system_white_point_by_desc(
               ART_GV  * art_gv,
         const char    * wp_desc
         )
 {
     pthread_mutex_lock( & ARCIECV_MUTEX );
 
-    int  valid_wp_desc = 0;
+    int     valid_wp_desc = 0;
+    char  * my_wp_desc = 0;
 
     if (    strlen(wp_desc) == 1
          && (wp_desc[0] == 'E' || wp_desc[0] == 'e') )
@@ -223,6 +224,7 @@ void art_set_system_white_point(
         //             a practical viewpoint, but let's include it anyway.
     
         ARCIECV_XYZ_SYSWHITE = ARCIECV_XYZ_E;
+        my_wp_desc = "E";
         valid_wp_desc = 1;
     }
     
@@ -233,6 +235,7 @@ void art_set_system_white_point(
         //             useful, either.
     
         ARCIECV_XYZ_SYSWHITE = ARCIECV_XYZ_A;
+        my_wp_desc = "A";
         valid_wp_desc = 1;
     }
     
@@ -246,24 +249,28 @@ void art_set_system_white_point(
         if ( wp_desc[1] == '5' && wp_desc[2] == '0' )
         {
             ARCIECV_XYZ_SYSWHITE = ARCIECV_XYZ_D50;
+            my_wp_desc = "D50";
             valid_wp_desc = 1;
         }
 
         if ( wp_desc[1] == '5' && wp_desc[2] == '5' )
         {
             ARCIECV_XYZ_SYSWHITE = ARCIECV_XYZ_D55;
+            my_wp_desc = "D55";
             valid_wp_desc = 1;
         }
 
         if ( wp_desc[1] == '6' && wp_desc[2] == '5' )
         {
             ARCIECV_XYZ_SYSWHITE = ARCIECV_XYZ_D65;
+            my_wp_desc = "D65";
             valid_wp_desc = 1;
         }
 
         if ( wp_desc[1] == '7' && wp_desc[2] == '5' )
         {
             ARCIECV_XYZ_SYSWHITE = ARCIECV_XYZ_D75;
+            my_wp_desc = "D75";
             valid_wp_desc = 1;
         }
     }
@@ -300,6 +307,12 @@ void art_set_system_white_point(
 
             xyy_to_xyz( art_gv, & bbxyy, & ARCIECV_XYZ_SYSWHITE );
 
+            asprintf(
+                & my_wp_desc,
+                  "%d K BB",
+                  cct
+                );
+
             valid_wp_desc = 1;
         }
     }
@@ -309,7 +322,7 @@ void art_set_system_white_point(
     if ( valid_wp_desc )
     {
         ARCIECV_MANUAL_SYSWHITE += 1;
-        ARCIECV_SYSWHITE_SYMBOL = arsymbol(art_gv, wp_desc);
+        ARCIECV_SYSWHITE_SYMBOL = arsymbol(art_gv, my_wp_desc);
     }
     else
     {
@@ -318,6 +331,29 @@ void art_set_system_white_point(
             wp_desc
             );
     }
+}
+
+void art_set_system_white_point(
+              ART_GV  * art_gv,
+        const char    * wp_desc,
+        const double    x,
+        const double    y
+        )
+{
+    pthread_mutex_lock( & ARCIECV_MUTEX );
+
+    ARCIECV_MANUAL_SYSWHITE += 1;
+    ARCIECV_SYSWHITE_SYMBOL = arsymbol(art_gv, wp_desc);
+    
+    ArCIExyY  new_syswhite;
+    
+    ARCIExyY_x(new_syswhite) = x;
+    ARCIExyY_y(new_syswhite) = y;
+    ARCIExyY_Y(new_syswhite) = 1.0;
+
+    xyy_to_xyz( art_gv, & new_syswhite, & ARCIECV_XYZ_SYSWHITE );
+
+    pthread_mutex_unlock( & ARCIECV_MUTEX );
 }
 
 double lab_delta_L(

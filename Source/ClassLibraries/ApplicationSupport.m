@@ -993,7 +993,7 @@ int art_print_banner_and_process_standard_commandline_options(
 
     if ( [ CCT_OPT hasBeenSpecified ] )
     {
-        art_set_system_white_point( art_gv, [ CCT_OPT cStringValue ] );
+        art_set_system_white_point_by_desc( art_gv, [ CCT_OPT cStringValue ] );
     }
 
     unsigned int  numberOfRequestedWorkingSpaces = 0;

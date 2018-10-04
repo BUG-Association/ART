@@ -413,8 +413,12 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetColourSubsystemWhitepoint)
 
 - init
         : (char *) newWP_Desc
+        : (ArNode <ArpSpectrum> *) newIlluminantSpectrum
 {
-    self = [ super init ];
+    self =
+        [ super init
+            :   HARD_NODE_REFERENCE(newIlluminantSpectrum)
+            ];
 
     if ( self )
     {
@@ -429,8 +433,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetColourSubsystemWhitepoint)
     return
         [ self init
             :   "D50"
+            :   0
             ];
 }
+
+#define  WHITEPOINT_SUBNODE ((ArNode <ArpSpectrum>*)ARNUNARY_SUBNODE)
 
 - (void) performOn
         : (ArNode <ArpNodeStack> *) nodeStack
@@ -452,7 +459,42 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetColourSubsystemWhitepoint)
             ,   wp_desc
             ];
 
-        art_set_system_white_point( art_gv, wp_desc );
+        if ( WHITEPOINT_SUBNODE )
+        {
+            ArSpectrum500  wp500;
+            
+            [ WHITEPOINT_SUBNODE getHiresSpectrum
+                :   0
+                : & wp500
+                ];
+            
+            ArCIEXYZ  wpXYZ;
+            
+            s500_to_xyz(
+                  art_gv,
+                & wp500,
+                & wpXYZ
+                );
+            
+            ArCIExyY  wpxyY;
+            
+            xyz_to_xyy(
+                  art_gv,
+                & wpXYZ,
+                & wpxyY
+                );
+            
+            art_set_system_white_point(
+                  art_gv,
+                  wp_desc,
+                  ARCIExyY_x(wpxyY),
+                  ARCIExyY_y(wpxyY)
+                );
+        }
+        else
+        {
+            art_set_system_white_point_by_desc( art_gv, wp_desc );
+        }
 
         [ ART_GLOBAL_REPORTER endAction ];
     }

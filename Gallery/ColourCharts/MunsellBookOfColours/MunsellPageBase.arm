@@ -257,22 +257,32 @@ ArNode * createMunsellPage(
 
 #ifdef D50
 #define CHART_ILLUMINANT CIE_ILLUMINANT_D50
+#define CHART_ILLUMINANT_DESC "D50"
 #endif
 
 #ifdef FL3
 #define CHART_ILLUMINANT CIE_ILLUMINANT_FL3
+#define CHART_ILLUMINANT_DESC "FL3"
+#endif
+
+#ifdef FL11
+#define CHART_ILLUMINANT CIE_ILLUMINANT_FL11
+#define CHART_ILLUMINANT_DESC "FL11"
 #endif
 
 #ifdef FL3_13
 #define CHART_ILLUMINANT CIE_ILLUMINANT_FL3_13
+#define CHART_ILLUMINANT_DESC "FL3_13"
 #endif
 
 #ifdef FL3_15
 #define CHART_ILLUMINANT CIE_ILLUMINANT_FL3_15
+#define CHART_ILLUMINANT_DESC "FL3_15"
 #endif
 
 #ifndef CHART_ILLUMINANT
 #define CHART_ILLUMINANT CIE_ILLUMINANT_D65
+#define CHART_ILLUMINANT_DESC "D65"
 #endif
 
 #define MUNSELL_PAGE_FUNCTION_BODY(__name) \
@@ -311,7 +321,10 @@ ArNode * createMunsellPage(
 \
     id actionsequence = \
         ACTION_SEQUENCE( \
-            SET_COLOUR_SUBSYSTEM_WHITEPOINT("D65"), \
+            SET_COLOUR_SUBSYSTEM_WHITEPOINT( \
+                CHART_ILLUMINANT_DESC, \
+                CHART_ILLUMINANT \
+                ), \
 \
             CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE, \
 \

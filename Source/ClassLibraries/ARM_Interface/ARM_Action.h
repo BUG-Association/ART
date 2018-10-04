@@ -175,11 +175,24 @@ ART_MODULE_INTERFACE(ARM_Action)
         /**
          * @def SET_COLOUR_SUBSYSTEM_WHITEPOINT(whitepoint)
          *
+         * @param whitepoint_desc string  description string used for the whitepoint.
+         * @param whitepoint      node    whitepoint data, has to conform to ArpSpectrum.
+         */
+        #define SET_COLOUR_SUBSYSTEM_WHITEPOINT(__whitepoint_desc,__whitepoint) \
+                [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnSetColourSubsystemWhitepoint) \
+                    :   (__whitepoint_desc) \
+                    :   (__whitepoint) \
+                    ]
+
+        /**
+         * @def SET_COLOUR_SUBSYSTEM_WHITEPOINT_BY_DESC(whitepoint)
+         *
          * @param whitepoint    string  whitepoint, either as "D50", or as temperature in K.
          */
-        #define SET_COLOUR_SUBSYSTEM_WHITEPOINT(__whitepoint) \
+        #define SET_COLOUR_SUBSYSTEM_WHITEPOINT_BY_DESC(__whitepoint_desc) \
                 [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnSetColourSubsystemWhitepoint) \
-                    :   (__whitepoint) \
+                    :   (__whitepoint_desc) \
+                    :   0 \
                     ]
 
         /**

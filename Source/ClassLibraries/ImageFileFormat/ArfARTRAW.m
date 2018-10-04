@@ -643,12 +643,13 @@ while (0);
     
     TERMINATE_IF_SCANF_UNSUCCESSFUL( scanf_success );
 
-    //   Hard-wired exception: no warning is raised if 2.4 tries to read
-    //   2.3 and 2.2 images, as this will always work
+    //   Hard-wired exceptions: no warning is raised if 2.5 tries to read
+    //   2.4 - 2.2 images, as this will always work
 
     if (   artRawVersion != (float) ARFARTRAW_VERSION
         && artRawVersion != (float) 2.2
-        && artRawVersion != (float) 2.3 )
+        && artRawVersion != (float) 2.3
+        && artRawVersion != (float) 2.4 )
         ART_ERRORHANDLING_WARNING(
             "file %s format version mismatch: %3.1f vs. %3.1f"
             ,   [ file name ]
@@ -699,6 +700,44 @@ while (0);
                 , & XC(resolution)
                 , & YC(resolution)
                 ];
+        
+        TERMINATE_IF_SCANF_UNSUCCESSFUL( scanf_success );
+    }
+
+    //   Image white point - this is optional, as it was not present in 2.2
+    //   or earlier, and it is also not added in 2.5 if the system default
+    //   of D50 was not altered by the user
+
+    if ( [ file peek ] == 'W' )
+    {
+        float  x, y;
+        
+        scanf_success =
+            [ file scanf
+                :   "White point (x|y):  ( %f | %f )\n"
+                , & x
+                , & y
+                ];
+        
+        TERMINATE_IF_SCANF_UNSUCCESSFUL( scanf_success );
+
+        char  wp_desc[256];
+
+        scanf_success =
+            [ file scanf
+                :   "White point desc:   %s\n"
+                , & wp_desc
+                ];
+        
+        if ( ! art_system_white_point_has_been_manually_set(art_gv) )
+        {
+            art_set_system_white_point(
+                  art_gv,
+                  wp_desc,
+                  x,
+                  y
+                );
+        }
         
         TERMINATE_IF_SCANF_UNSUCCESSFUL( scanf_success );
     }
@@ -1157,6 +1196,28 @@ while (0);
         ,   XC([ imageInfo resolution ])
         ,   YC([ imageInfo resolution ])
         ];
+
+    if ( art_system_white_point_has_been_manually_set(art_gv) )
+    {
+        ArCIExyY  wp_xyy;
+        
+        xyz_to_xyy(
+              art_gv,
+              art_system_white_point_xyz(art_gv),
+            & wp_xyy
+            );
+        
+        [ file printf
+            :   "White point (x|y):  ( %f | %f )\n"
+            ,   ARCIExyY_x(wp_xyy)
+            ,   ARCIExyY_y(wp_xyy)
+            ];
+
+        [ file printf
+            :   "White point desc:   %s\n"
+            ,   art_system_white_point_symbol(art_gv)
+            ];
+    }
 
     [ file printf: "Image type:         " ];
 

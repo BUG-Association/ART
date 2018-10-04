@@ -237,9 +237,16 @@ ArCIEXYZ const * art_system_white_point_xyz(
         const ART_GV  * art_gv
         );
 
-void art_set_system_white_point(
+void art_set_system_white_point_by_desc(
               ART_GV  * art_gv,
         const char    * wp_desc
+        );
+
+void art_set_system_white_point(
+              ART_GV  * art_gv,
+        const char    * wp_desc,
+        const double    x,
+        const double    y
         );
 
 ArSymbol art_system_white_point_symbol(
