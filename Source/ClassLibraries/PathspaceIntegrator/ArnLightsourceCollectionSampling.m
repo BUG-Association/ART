@@ -96,6 +96,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         if ( illuminationProbability || emissionProbability )
         {
             ArSpectralSample pdf;
+            
             sps_s500w_init_s(
                   art_gv,
                   LSC_LIGHT(i).percentOfOverallSpectralPower,
