@@ -305,7 +305,7 @@ void trafo3d_ht_mul_h(
         );
 }
 
-void trafo3d_v_local2world_t(
+void trafo3d_v_local2world_from_worldspace_normal_t(
         const Vec3D    * in_vec,
               Trafo3D  * out_local2world
         )
@@ -354,7 +354,7 @@ void trafo3d_v_local2world_t(
     TRAFO3D_Z_VEC(*out_local2world) = *in_vec;
 }
 
-void trafo3d_v_world2local_t(
+void trafo3d_v_world2local_from_worldspace_normal_t(
         const Vec3D    * in_vec,
               Trafo3D  * out_world2local
         )

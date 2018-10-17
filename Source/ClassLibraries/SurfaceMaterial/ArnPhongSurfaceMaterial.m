@@ -288,7 +288,7 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
     
     Trafo3D  local2world;
     
-    trafo3d_v_local2world_t(
+    trafo3d_v_local2world_from_worldspace_normal_t(
         & ARDIRECTIONCOSINE_VECTOR(reflectedDirection),
         & local2world
         );

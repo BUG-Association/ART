@@ -97,6 +97,42 @@ ART_MODULE_INTERFACE(ARM_SurfaceMaterial)
 #define LAMBERT_MATERIAL    LAMBERT_REFLECTOR
 
 /**
+ * @brief Oren-Nayar surface material
+ *
+ * Potentially retroreflective rough surface; if sigma = 0, ON becomes Lambert. Retro-reflectivity sets in for high values of sigma. Generally similar to Lambert in all other regards.
+ *
+ * @ignore @artist Material.arm -DMATERIAL_OREN_NAYAR
+ *
+ * @def OREN_NAYAR_SURFACE(reflectance_spectrum, sigma)
+ * @def OREN_NAYAR_SURFACE_CONST(reflectance_spectrum, sigma)
+ *
+ * \textbf{Polarisation support:} like a Lambert surface, an Oren-Nayar material acts as a total depolariser.
+ * @param reflectance_spectrum   spectrum      Colour of the surface
+ * @param sigma    double        Oren-Nayar roughness parameter
+ *
+ */
+#define OREN_NAYAR_SURFACE( \
+        _colour, \
+        _sigma \
+        ) \
+    \
+    [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnOrenNayarSurfaceMaterial) \
+        : (_colour) \
+        : (_sigma) \
+        ]
+
+#define OREN_NAYAR_SURFACE_CONST( \
+        _colour, \
+        _sigma \
+        ) \
+    \
+    [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnOrenNayarSurfaceMaterial) \
+        : (_colour) \
+        : CONST_DOUBLE(_sigma) \
+        ]
+
+
+/**
  * @brief Phong surface material
  *
  * Classical cosine lobe reflector without a diffuse component. The standard form of this surface material takes two expressions as input: the first one has to evaluate to a spectrum, the second one to a floating point number. Note that standard reflectance spectra are, apart from being a container for such values, also constant expressions for this data type.

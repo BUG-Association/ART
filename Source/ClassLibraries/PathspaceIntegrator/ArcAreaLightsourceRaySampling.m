@@ -140,7 +140,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     }
     while ( ! *sampledPoint );
 
-
     if(illuminatedPoint)
     {
         // only one possible direction can be generated
@@ -150,9 +149,11 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
            & ARCPOINTCONTEXT_WORLDSPACE_POINT(illuminatedPoint),
            & ARDIRECTIONCOSINE_VECTOR(*sampledDirection)
            );
+        
         vec3d_norm_v(
             & ARDIRECTIONCOSINE_VECTOR(*sampledDirection)
             );
+        
         ARDIRECTIONCOSINE_COSINE(*sampledDirection) =
             vec3d_vv_dot(
               & ARDIRECTIONCOSINE_VECTOR(*sampledDirection),
@@ -161,7 +162,10 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         
         if(illuminationProbability)
         {
-            double pdf = patch[i].percentOfLightsourceRadiantPower / patch[i].area;
+            double pdf =
+                  patch[i].percentOfLightsourceRadiantPower
+                / patch[i].area;
+            
             arpdfvalue_dd_init_p(
                 pdf,
                 pdf,
@@ -201,7 +205,10 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 {
     if(illuminationProbability)
     {
-        double pdf = patch[*samplingRegion].percentOfLightsourceRadiantPower / patch[*samplingRegion].area;
+        double pdf =
+              patch[*samplingRegion].percentOfLightsourceRadiantPower
+            / patch[*samplingRegion].area;
+
         arpdfvalue_dd_init_p(
             pdf,
             pdf,

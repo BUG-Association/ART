@@ -260,11 +260,15 @@ ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_SHIFTING_SURFACETYPE_IMPLEMENTATION(
 {
     Trafo3D  local2world;
 
-    trafo3d_v_local2world_t( & SURFACE_NORMAL_WORLDSPACE, & local2world );
+    trafo3d_v_local2world_from_worldspace_normal_t(
+        & SURFACE_NORMAL_WORLDSPACE,
+        & local2world
+        );
 
-    Vec3D localVec;
+    Vec3D  localO;
+    
     SAMPLE_HEMISPHERE_COSINE_WEIGHTED(
-        localVec,
+        localO,
         ARDIRECTIONCOSINE_VECTOR(*sampledDirection)
         );
 
@@ -277,15 +281,16 @@ ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_SHIFTING_SURFACETYPE_IMPLEMENTATION(
     if ( [ SUB_COLOUR isFluorescent ] )
     {
         ArSpectralSample attenuation;
+        
         if(![ SUB_SPECTRUM2D randomWavelengthShift
-            :   incomingDirectionAndLocation
-            :   incomingWavelength
-            :   RANDOM_GENERATOR
-            :   pathDirection
-            :   sampledWavelength
-            : & attenuation
-            :   sampleProbability
-            ])
+                :   incomingDirectionAndLocation
+                :   incomingWavelength
+                :   RANDOM_GENERATOR
+                :   pathDirection
+                :   sampledWavelength
+                : & attenuation
+                :   sampleProbability
+                ])
             return NO;
         
         arpdfvalue_d_mul_p(

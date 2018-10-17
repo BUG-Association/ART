@@ -57,12 +57,22 @@ ArObj redReflectance(ART_GV * art_gv) {
 
 ArObj lightSpectrum(ART_GV * art_gv)
 {
-    return 
+    return
+#ifdef FL11
+        CIE_ILLUMINANT_FL11;
+#endif
+
+//   The fall-thorugh default, if no lightsource #define is specified,
+//   is the original measured light source spectrum of the Cornell box.
+
+#ifdef D65
+        CIE_ILLUMINANT_D65;
+#else
         CONST_COLOUR_RSSPECTRUM(400 NANOMETER, 100 NANOMETER, 1.0,
             0.0, 8.0, 15.6, 18.4,
             RSS_END
             );
-
+#endif
 }
 
 ArObj ceilingHoleGeometry(ART_GV * art_gv) {

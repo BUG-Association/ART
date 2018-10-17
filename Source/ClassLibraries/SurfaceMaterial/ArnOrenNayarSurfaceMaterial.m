@@ -67,20 +67,84 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return copiedInstance;
 }
 
-#define SUB_COLOUR_NODE         ARNBINARY_SUBNODE_0
-#define SUB_SIGMA_NODE          ARNBINARY_SUBNODE_1
+#define SPECTRUM_SUBNODE    ((ArNode <ArpSpectrum,ArpSpectrum2D,ArpSpectrumValues>*) ARNBINARY_SUBNODE_0)
+#define SIGMA_SUBNODE       ((ArNode <ArpDoubleValues>*) ARNBINARY_SUBNODE_1)
 
-#define SUB_COLOUR_VALUES       ((ArNode <ArpSpectrumValues>*) SUB_COLOUR_NODE)
-#define SUB_SIGMA_VALUES        ((ArNode <ArpDoubleValues>*) SUB_SIGMA_NODE)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnOrenNayarSurfaceMaterial)
-
-ARPSURFACEMATERIAL_DEFAULT_NONDIFFUSE_NONEMISSIVE_IMPLEMENTATION
-ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
-      arsurface_generates_perfectly_diffuse_reflections,
-      YES
+ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION
+ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_SHIFTING_SURFACETYPE_IMPLEMENTATION(
+    arsurface_generates_perfectly_diffuse_reflections,
+    YES
     )
 
+- (BOOL) sampleWavelengthShift
+        : (      ArcIntersection               *) incomingDirectionAndLocation
+        : (      ArPathDirection                ) pathDirection
+        : (      ArBSDFSampleGenerationContext *) context
+        : (const ArWavelength                  *) incomingWavelength
+        : (      ArWavelength                  *) sampledWavelength
+        : (      ArPDFValue                    *) shiftProbability
+{
+    if ( [ SPECTRUM_SUBNODE isFluorescent ] )
+    {
+        ArSpectralSample dummyAttenuation;
+        
+        return
+            [ SPECTRUM_SUBNODE randomWavelengthShift
+                :   incomingDirectionAndLocation
+                :   incomingWavelength
+                :   RANDOM_GENERATOR
+                :   pathDirection
+                :   sampledWavelength
+                : & dummyAttenuation
+                :   shiftProbability
+                ];
+    }
+    else
+    {
+        *sampledWavelength = *incomingWavelength;
+        *shiftProbability  = ARPDFVALUE_UNIT_INFINITY;
+        return YES;
+    }
+}
+
+- (BOOL) calculateWavelengthShiftProbability
+        : (      ArcIntersection               *) incomingDirectionAndLocation
+        : (      ArPathDirection                ) pathDirection
+        : (      ArBSDFSampleGenerationContext *) context
+        : (const ArWavelength                  *) incomingWavelength
+        : (const ArWavelength                  *) outgoingWavelength
+        : (      ArPDFValue                    *) shiftProbability
+{
+    if ( [ SPECTRUM_SUBNODE isFluorescent ] )
+    {
+        ArSpectralSample dummyAttenuation;
+        return
+            [ SPECTRUM_SUBNODE attenuationForWavelengthShift
+                :   incomingDirectionAndLocation
+                :   incomingWavelength
+                :   outgoingWavelength
+                :   pathDirection
+                : & dummyAttenuation
+                :   shiftProbability
+                ];
+    }
+    else
+    {
+        if ( ! arwavelength_ww_equal(
+                    art_gv,
+                    incomingWavelength,
+                    outgoingWavelength
+              ) )
+        {
+            return NO;
+        }
+        
+        *shiftProbability = ARPDFVALUE_UNIT_INFINITY;
+        return YES;
+    }
+}
 
 - (void) _computeSigmaData
         :   (double) sigma
@@ -92,39 +156,41 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
 - (void) _computeSigmaDataIfNecessary
         :   (ArcObject <ArpEvaluationEnvironment> *) evalEnv
 {
-    if (!isSigmaConstant)
+    if ( ! isSigmaConstant )
     {
         double sigma;
-        [ SUB_SIGMA_VALUES getDoubleValue
-         :     evalEnv
-         :   & sigma
-         ];
+
+        [ SIGMA_SUBNODE getDoubleValue
+            :    evalEnv
+            :  & sigma
+            ];
+
         [ self _computeSigmaData
-         :     sigma
-         ];
+            :    sigma
+            ];
     }
 }
 
 - (void) _setupOrenNayarReflector
 {
     ART_ERRORHANDLING_MANDATORY_ARPROTOCOL_CHECK(
-          SUB_COLOUR_NODE,
+          SPECTRUM_SUBNODE,
           ArpSpectrumValues
         );
 
     ART_ERRORHANDLING_MANDATORY_ARPROTOCOL_CHECK(
-          SUB_SIGMA_NODE,
+          SIGMA_SUBNODE,
           ArpDoubleValues
         );
 
     AREVALENV_TYPE_CHECK(
-          SUB_COLOUR_VALUES,
+          SPECTRUM_SUBNODE,
           arevalenv_surfacepoint,
           "colour"
         );
 
     AREVALENV_TYPE_CHECK(
-          SUB_SIGMA_VALUES,
+          SIGMA_SUBNODE,
           arevalenv_surfacepoint,
           "sigma"
         );
@@ -134,16 +200,18 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
     double  sigma;
     
     unsigned long  constValCount =
-        [ SUB_SIGMA_VALUES getConstDoubleValue
+        [ SIGMA_SUBNODE getConstDoubleValue
             : & sigma
             ];
     
     isSigmaConstant = (constValCount > 0);
 
     if (isSigmaConstant)
+    {
         [ self _computeSigmaData
-         :     sigma
-         ];
+            :   sigma
+            ];
+    }
 }
 
 - init
@@ -232,12 +300,13 @@ double on_lr1(
           * on_factor_c3( alpha, beta, sigma2 ) * tan( ( alpha + beta ) / 2.0 );
 }
 
-void orenNayarReflectanceSample(
-     const Vec3D                * localI_original,
-     const Vec3D                * localR,
-     const double                 c1,
-     const double                 sigma2,
-           ArAttenuationSample  * attenuationSample
+void orenNayarReflectanceSpectralSample(
+           ART_GV            * art_gv,
+     const Vec3D             * localI_original,
+     const Vec3D             * localR,
+     const double              c1,
+     const double              sigma2,
+           ArSpectralSample  * spectralSample
      )
 {
     Vec3D  localI;
@@ -271,63 +340,57 @@ void orenNayarReflectanceSample(
         cosDeltaPhi = vec2d_vv_dot( & phiI, & phiR );
     }
     else
+    {
         cosDeltaPhi = 0.0;
+    }
 
     double  alpha = M_MAX( M_ABS(thetaR), M_ABS(thetaI) );
     double  beta  = M_MIN( M_ABS(thetaR), M_ABS(thetaI) );
 
     double  d_lr1  = on_lr1( cosDeltaPhi, sigma2, alpha, beta, c1 );
 
-    d_lr1 *= MATH_1_DIV_PI;
-#ifdef NEVERMORE
-    ArAttenuation  *lr1 = arattenuation_alloc( art_gv );
-    ArAttenuation  *lr2 = arattenuation_alloc( art_gv );
+    //   Clamp to zero, to get rid of values just beneath zero for extreme
+    //   roughness values.
+    
+    d_lr1 = M_MAX( d_lr1, 0. );
+    
+    ArSpectralSample  sps_temp_1;
 
+    sps_d_init_s(
+          art_gv,
+          d_lr1,
+        & sps_temp_1
+        );
 
     double  mulFactor =
           0.17 / MATH_PI
         * ( sigma2 / ( sigma2 + 0.13 ) )
         * ( 1.0 - cosDeltaPhi * M_SQR( 2 * beta / MATH_PI) );
+
+    //   Clamp to zero, to get rid of values just beneath zero for extreme
+    //   roughness values.
+
+    mulFactor = M_MAX( mulFactor, 0. );
+
+    ArSpectralSample  sps_temp_2;
+
+    sps_ds_mul_s(
+          art_gv,
+          mulFactor,
+          spectralSample,
+        & sps_temp_2
+        );
     
-    arattenuation_da_mul_a(
-        art_gv,
-        mulFactor,
-        attenuationSample,
-                  lr2
-                                    );
+    sps_s_add_s(
+          art_gv,
+        & sps_temp_1,
+        & sps_temp_2
+        );
 
-    if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
-    {
-        ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
-    }
-    else
-    {
-        arattenuation_d_init_a(
-            art_gv,
-            d_lr1,
-            lr1
-            );
-    }
-
-    arattenuation_a_add_a(art_gv, lr1, lr2 );
-
-    arattenuation_a_mul_a( art_gv, lr1, surfaceReflectancy);
-
-    arattenuation_free(art_gv, lr1);
-    arattenuation_free(art_gv, lr2);
-#endif
-
-}
-
-void orenNayarProbability(
-     double      * cosine,
-     ArPDFValue  * bsdfsampleProbability
-     )
-{
-    arpdfvalue_dd_init_p(
-          *cosine / MATH_PI,
-          *cosine / MATH_PI,
-          bsdfsampleProbability
+    sps_s_mul_s(
+          art_gv,
+        & sps_temp_2,
+          spectralSample
         );
 }
 
@@ -342,8 +405,142 @@ void orenNayarProbability(
         : (      ArPDFValue *) reverseSampleProbability
         : (      ArAttenuationSample *) attenuationSample
 {
-    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
-    return NO;
+    if ( OUTGOING_COSINE_WORLDSPACE > 0.0 )
+    {
+        ArSpectralSample  spectralSample;
+
+        if ( [ SPECTRUM_SUBNODE isFluorescent ] )
+        {
+            if(![ SPECTRUM_SUBNODE attenuationForWavelengthShift
+                    :   incomingDirectionAndLocation
+                    :   incomingWavelength
+                    :   outgoingWavelength
+                    :   pathDirection
+                    : & spectralSample
+                    :   sampleProbability
+                ])
+                return NO;
+            
+            if(sampleProbability)
+            {
+                arpdfvalue_d_mul_p(
+                      OUTGOING_COSINE_WORLDSPACE / MATH_PI,
+                      sampleProbability
+                    );
+            }
+
+            if ( reverseSampleProbability )
+            {
+                // todo: reverseSampleProbability
+                
+                ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+            }
+        }
+        else
+        {
+            if ( ! arwavelength_ww_equal(
+                        art_gv,
+                        incomingWavelength,
+                        outgoingWavelength
+                  ) )
+            {
+                return NO;
+            }
+            
+            if ( sampleProbability )
+            {
+                arpdfvalue_d_init_p(
+                      OUTGOING_COSINE_WORLDSPACE / MATH_PI,
+                      sampleProbability
+                    );
+            }
+            
+            if ( reverseSampleProbability )
+            {
+                arpdfvalue_d_init_p(
+                      INCOMING_COSINE_WORLDSPACE / MATH_PI,
+                      reverseSampleProbability
+                    );
+            }
+            
+            [ SPECTRUM_SUBNODE getSpectralSample
+                :   incomingDirectionAndLocation
+                :   incomingWavelength
+                : & spectralSample
+                ];
+        }
+
+        [ self _computeSigmaDataIfNecessary
+            :   incomingDirectionAndLocation
+            ];
+
+        Trafo3D  world2local;
+
+        trafo3d_v_world2local_from_worldspace_normal_t(
+            & SURFACE_NORMAL_WORLDSPACE,
+            & world2local
+            );
+        
+        Vec3D  localI;
+
+        vec3d_v_trafo3d_v(
+            & INCOMING_VECTOR_WORLDSPACE,
+            & world2local,
+            & localI
+            );
+
+        Vec3D  localO;
+
+        vec3d_v_trafo3d_v(
+            & OUTGOING_VECTOR_WORLDSPACE,
+            & world2local,
+            & localO
+            );
+
+        orenNayarReflectanceSpectralSample(
+              art_gv,
+            & localI,
+            & localO,
+              c1,
+              sigma2,
+            & spectralSample
+            );
+
+        ARATTENUATIONSAMPLE_VVV_PD_C_INIT_DEPOLARISING_A(
+            & INCOMING_VECTOR_WORLDSPACE,
+            & SURFACE_NORMAL_WORLDSPACE,
+            & OUTGOING_VECTOR_WORLDSPACE,
+              pathDirection,
+            & spectralSample,
+              attenuationSample
+        );
+
+        arattenuationsample_d_mul_a(
+            art_gv,
+            MATH_1_DIV_PI,
+            attenuationSample
+            );
+
+        return YES;
+    }
+    else
+    {
+        if ( sampleProbability )
+            *sampleProbability = ARPDFVALUE_ZERO;
+        
+        if ( reverseSampleProbability )
+            *reverseSampleProbability = ARPDFVALUE_ZERO;
+
+        ARATTENUATIONSAMPLE_VVV_PD_INIT_AS_BLOCKER_A(
+            & INCOMING_VECTOR_WORLDSPACE,
+            & SURFACE_NORMAL_WORLDSPACE,
+            & OUTGOING_VECTOR_WORLDSPACE,
+              pathDirection,
+              attenuationSample
+            );
+
+        return NO;
+    }
 }
 
 
@@ -358,8 +555,120 @@ void orenNayarProbability(
         : (      ArPDFValue *) reverseSampleProbability
         : (      ArAttenuationSample *) attenuationSample
 {
-    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
-    return NO;
+    Trafo3D  local2world;
+
+    trafo3d_v_local2world_from_worldspace_normal_t(
+        & SURFACE_NORMAL_WORLDSPACE,
+        & local2world
+        );
+
+    Vec3D  localO;
+    
+    SAMPLE_HEMISPHERE_COSINE_WEIGHTED(
+        localO,
+        ARDIRECTIONCOSINE_VECTOR(*sampledDirection)
+        );
+
+    ARDIRECTIONCOSINE_COSINE(*sampledDirection) =
+        vec3d_vv_dot(
+            & ARDIRECTIONCOSINE_VECTOR(*sampledDirection),
+            & SURFACE_NORMAL_WORLDSPACE
+            );
+
+    ArSpectralSample  spectralSample;
+    
+    if ( [ SPECTRUM_SUBNODE isFluorescent ] )
+    {
+        if(![ SPECTRUM_SUBNODE randomWavelengthShift
+                :   incomingDirectionAndLocation
+                :   incomingWavelength
+                :   RANDOM_GENERATOR
+                :   pathDirection
+                :   sampledWavelength
+                : & spectralSample
+                :   sampleProbability
+                ])
+            return NO;
+
+        arpdfvalue_d_mul_p(
+              SAMPLED_COSINE_WORLDSPACE / MATH_PI, // probability of direction
+              sampleProbability
+            );
+        
+        if( reverseSampleProbability )
+        {
+            // todo: reverseSampleProbability
+            ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+        }
+    }
+    else
+    {
+        *sampledWavelength = *incomingWavelength;
+    
+        arpdfvalue_d_init_p(
+              SAMPLED_COSINE_WORLDSPACE / MATH_PI,
+              sampleProbability
+            );
+        
+        if( reverseSampleProbability )
+        {
+            arpdfvalue_d_init_p(
+                  INCOMING_COSINE_WORLDSPACE / MATH_PI,
+                  reverseSampleProbability
+                );
+        }
+
+        [ SPECTRUM_SUBNODE getSpectralSample
+            :   incomingDirectionAndLocation
+            :   incomingWavelength
+            : & spectralSample
+            ];
+    }
+    
+    [ self _computeSigmaDataIfNecessary
+        :   incomingDirectionAndLocation
+        ];
+
+    Trafo3D  world2local;
+
+    trafo3d_t_transpose_t(
+        & local2world,
+        & world2local
+        );
+
+    Vec3D  localI;
+
+    vec3d_v_trafo3d_v(
+        & INCOMING_VECTOR_WORLDSPACE,
+        & world2local,
+        & localI
+        );
+
+    orenNayarReflectanceSpectralSample(
+          art_gv,
+        & localI,
+        & localO,
+          c1,
+          sigma2,
+        & spectralSample
+        );
+
+    ARATTENUATIONSAMPLE_VVV_PD_C_INIT_DEPOLARISING_A(
+        & INCOMING_VECTOR_WORLDSPACE,
+        & SURFACE_NORMAL_WORLDSPACE,
+        & ARDIRECTIONCOSINE_VECTOR(*sampledDirection),
+          pathDirection,
+        & spectralSample,
+          attenuationSample
+        );
+
+    arattenuationsample_d_mul_a(
+          art_gv,
+          MATH_1_DIV_PI,
+          attenuationSample
+        );
+    
+    return YES;
 }
 
 

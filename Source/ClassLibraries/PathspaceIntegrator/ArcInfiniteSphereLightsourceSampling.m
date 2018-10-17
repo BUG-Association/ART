@@ -51,7 +51,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 #define ORIGIN_YN          YC(ARCHITINFO_NORMAL(*ARLSSC_ORIGIN(*samplingContext)))
 #define ORIGIN_ZN          ZC(ARCHITINFO_NORMAL(*ARLSSC_ORIGIN(*samplingContext)))
 
-#define UNIFORM_SPHERE_PDF        (0.25 * MATH_1_DIV_PI)
+#define UNIFORM_SPHERE_PDF  (0.25 * MATH_1_DIV_PI)
 
 - (BOOL) sampleLightsource
         : (      ArcPointContext *)              illuminatedPoint /* optional */
@@ -124,6 +124,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             illuminationProbability
           );
     }
+
     if(emissionProbability)
     {
         arpdfvalue_dd_init_p(

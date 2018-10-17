@@ -173,12 +173,6 @@ void vec3d_v_trafo3d_v(
               Vec3D    * vr
         );
 
-void vec3d_n_trafo3d_n(
-        const Vec3D    * v0,
-        const Trafo3D  * t0,
-              Vec3D    * vr
-        );
-
 void vec3d_v_htrafo3d_v(
         const Vec3D     * v0,
         const HTrafo3D  * h0,
@@ -235,40 +229,27 @@ void trafo3d_ht_mul_h(
 
 /* ---------------------------------------------------------------------------
 
-    'trafo3d_v_local2world_t'
+    'trafo3d_v_local2world_from_worldspace_normal_t'
+    'trafo3d_v_world2local_from_worldspace_normal_t'
 
-        Given a vector in world coordinates, this function calculates the
-        "local to world" transformation matrix under the assumption that an
-        input vector of Vec3D( 0, 0, 1 ) should transform to the "up" direction 
-        in world coordinates.
+    These two functions are fairly similar: they both take a surface normal
+    in worldspace coordinates, and return the trafo which translates
+    to or from local coordinates defined by the z direction facing upwards,
+    i.e. where the normal in question translates to Vec3D( 0, 0, 1 ).
 
-        A classical use for this is to determine a linear transformation from
-        a local coordinate system (e.g. in which sampling directions are
-        being cast for a BRDF) to the world coordinate system in which
-        these samples will be used.
+    Note that if you need both trafos, you should only call
+    'trafo3d_v_local2world_from_worldspace_normal_t', and then use
+    'trafo3d_t_transpose_t' on the result. There is no need to call both
+    functions.
 
 --------------------------------------------------------------------rft-aw- */
 
-void trafo3d_v_local2world_t(
+void trafo3d_v_local2world_from_worldspace_normal_t(
         const Vec3D    * v0,
               Trafo3D  * tr
         );
 
-/* ---------------------------------------------------------------------------
-
-    'trafo3d_v_world2local_t'
-
-        Given a vector in local coordinates, this function calculates the
-        "world to local" transformation matrix under the assumption that the
-        input vector should transform to Vec3D( 0, 0, 1 ) in world coordinates.
-
-        A classical use for this is to e.g. bring incoming and outgoing
-        vectors into a local coordinate system aligned around the surface
-        normal for BRDF evaluations.
-
---------------------------------------------------------------------rft-aw- */
-
-void trafo3d_v_world2local_t(
+void trafo3d_v_world2local_from_worldspace_normal_t(
         const Vec3D    * v0,
               Trafo3D  * tr
         );

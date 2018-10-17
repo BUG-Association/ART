@@ -34,6 +34,12 @@
 #define CIE_ILLUMINANT_A	CIE_ILLUMINANT("A")
 
 
+// =========   B: old direct sunlight standard, deprecated   =================
+
+
+#define CIE_ILLUMINANT_B	CIE_ILLUMINANT("B")
+
+
 // =========   C: old daylight standard, deprecated   ========================
 
 

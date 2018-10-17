@@ -54,7 +54,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
 - (void) _setup
 {
     sourceImageSize = [ IMAGE_FILE size ];
-    
+
     Class  sourceImageBufferClass =
         [ IMAGE_FILE nativeContentClass ];
 
@@ -82,7 +82,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
 
     int  sourceImageDataSize =
         XC(sourceImageSize) * YC(sourceImageSize);
-    
+
     imageData = ALLOC_ARRAY( ArSpectrum8 *, sourceImageDataSize );
     
     for ( int i = 0; i < sourceImageDataSize; i++)
@@ -116,11 +116,11 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
         [ super init
             :   HARD_NODE_REFERENCE(newImage)
             ];
-    
+
     if ( self )
     {
         scaleFactor = newScaleFactor;
-    
+
         [ self _setup ];
     }
     
@@ -383,7 +383,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
 
 - (BOOL) isFluorescent
 {
-    ART__CODE_IS_NOT_TESTED__EXIT_WITH_ERROR
+//    ART__CODE_IS_NOT_TESTED__EXIT_WITH_ERROR
     return NO;
 }
 

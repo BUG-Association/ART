@@ -188,7 +188,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRayleighPhaseFunction)
     }
     
     Trafo3D  local2world;
-    trafo3d_v_local2world_t(
+    trafo3d_v_local2world_from_worldspace_normal_t(
         & ARCRAYENDPOINT_WORLDSPACE_INCOMING_RAY_VECTOR(incomingDirectionAndLocation),
         & local2world
         );

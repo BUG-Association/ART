@@ -111,8 +111,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
                   );
             
             if(emissionProbability)
-                arpdfvalue_s_mul_p(
-                  & pdf,
+                arpdfvalue_d_mul_p(
+                    ARPDFVALUE_MAIN(pdf),
                     emissionProbability
                   );
         }
@@ -162,14 +162,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             );
         
         if(illuminationProbability)
-            arpdfvalue_s_mul_p(
-              & pdf,
+            arpdfvalue_d_mul_p(
+                ARPDFVALUE_MAIN(pdf),
                 illuminationProbability
               );
         
         if(emissionProbability)
-            arpdfvalue_s_mul_p(
-              & pdf,
+            arpdfvalue_d_mul_p(
+                ARPDFVALUE_MAIN(pdf),
                 emissionProbability
               );
     }

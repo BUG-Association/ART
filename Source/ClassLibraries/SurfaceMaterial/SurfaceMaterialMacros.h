@@ -127,7 +127,7 @@
 #define TRANSFORM_BRDF_DIRECTIONS_TO_LOCAL_SYSTEM \
         \
         Trafo3D  world2local; \
-        trafo3d_v_world2local_t( & SURFACE_NORMAL_WORLDSPACE, \
+        trafo3d_v_world2local_from_worldspace_normal_t( & SURFACE_NORMAL_WORLDSPACE, \
                                  & world2local ); \
         \
         Vec3D  localI, localO; \
@@ -145,7 +145,7 @@
         Trafo3D     local2world; \
         Trafo3D     world2local; \
         \
-        trafo3d_v_world2local_t( & SURFACE_NORMAL_WORLDSPACE, & world2local ); \
+        trafo3d_v_world2local_from_worldspace_normal_t( & SURFACE_NORMAL_WORLDSPACE, & world2local ); \
         trafo3d_t_transpose_t( & world2local, & local2world ); \
         \
         Vec3D localI, localO; \
