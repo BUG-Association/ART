@@ -341,7 +341,7 @@ ART_MODULE_INTERFACE(ARM_Colour)
      * @param filename      char*           Path to the file to load.
      * @param scaleFactor   double          Scaling of the image.
      */
-    #define IMAGE_MAP( _fn, _sf ) \
+    #define IMAGE_MAP_SCALED( _fn, _sf ) \
         [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnImageMap) \
             : [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnExternal) \
                 : arsymbol(art_gv,_fn) \
@@ -350,6 +350,7 @@ ART_MODULE_INTERFACE(ARM_Colour)
             : _sf \
         ]
 
+    #define IMAGE_MAP( _fn )    IMAGE_MAP_SCALED( _fn, 1.0 )
 
     #define ARP_COLOUR       ARPROTOCOL(ArpSpectrum)
     #define ARP_COLOUR_VAL   ARPROTOCOL(ArpSpectrumValues)

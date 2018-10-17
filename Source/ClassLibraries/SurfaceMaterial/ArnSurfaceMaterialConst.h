@@ -38,7 +38,7 @@ ART_MODULE_INTERFACE(ArnSurfaceMaterialConst)
         : ArnUnary
         < ArpCoding >
 {
-    ArSurfaceType   additionalSurfaceProperties; // used for matte
+    ArSurfaceType   additionalSurfaceProperties;
 }
 
 @end

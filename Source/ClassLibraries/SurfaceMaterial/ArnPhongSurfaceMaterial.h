@@ -38,7 +38,7 @@ ART_MODULE_INTERFACE(ArnPhongSurfaceMaterial)
             : ArnBinary
             < ArpCoding, ArpConcreteClass, ArpSurfaceMaterial >
 {
-    ArSurfaceType   additionalSurfaceProperties; // used for matte
+    ArSurfaceType   additionalSurfaceProperties;
 }
 
 - init

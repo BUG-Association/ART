@@ -126,6 +126,22 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
 
 @end
 
+/* ===========================================================================
+    'ArnSetColourSubsystemWhitepoint'
+=========================================================================== */
+
+@interface ArnSetColourSubsystemWhitepoint
+        : ArnUnary < ArpConcreteClass, ArpAction >
+{
+    ArSymbol  wp_desc;
+}
+
+- init
+        : (char *) newWP_Desc
+        : (ArNode <ArpSpectrum> *) newIlluminantSpectrum
+        ;
+
+@end
 
 /* ===========================================================================
     'ArnChangeISR_to_Match_ARTRAW_Contents'

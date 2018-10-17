@@ -1,0 +1,51 @@
+/* ---------------------------------------------------------------------------
+    'createGroovedSphere'
+--------------------------------------------------------------------------- */
+ArNode * createGroovedSphere(
+        ART_GV  * art_gv,
+        double    angle,
+        double    secondaryRadius
+        )
+{
+    double  deltaAngle = atan( secondaryRadius );
+    double  angleA = angle - deltaAngle;
+    double  angleB = angle + deltaAngle;
+	
+    id mainTorus = 
+        [ TORUS( ( 1.0 / cos(angle) ) * secondaryRadius ) apply
+            : USCALE( cos(angle) )
+            : TRANSLATION( 0.0, 0.0, sin(angle) ) 
+            ];
+
+    double  torusFactorA = 
+        ( 1.0 / ( ( 1.0 - secondaryRadius ) * cos(angleA) ) ) * secondaryRadius;
+        
+    id subTorusA = 
+        [ TORUS( torusFactorA ) apply
+            : USCALE( ( 1.0 - secondaryRadius ) * cos(angleA) )
+            : TRANSLATION( 0.0, 0.0, ( 1.0 - secondaryRadius ) * sin(angleA) ) 
+            ];
+
+
+    double  torusFactorB = 
+        ( 1.0 / ( ( 1.0 - secondaryRadius ) * cos(angleB) ) ) * secondaryRadius;
+
+    id subTorusB = 
+        [ TORUS( torusFactorB ) apply
+            : USCALE( ( 1.0 - secondaryRadius ) * cos(angleB) )
+            : TRANSLATION( 0.0, 0.0, ( 1.0 - secondaryRadius ) * sin(angleB) ) 
+            ];
+
+    id grooveObj =  [ mainTorus sub : [ subTorusA or : subTorusB ] ];
+    id groovePair = [ grooveObj or : [ grooveObj apply : ROT_X( 180 DEGREES )]];
+        
+    id  allGrooves =
+        UNION(
+            groovePair,
+            [ groovePair apply: ROT_X( 90 DEGREES ) ],
+            [ groovePair apply: ROT_Y( 90 DEGREES ) ],
+            UNION_END
+            );
+
+    return [ SPHERE sub: allGrooves ];
+}

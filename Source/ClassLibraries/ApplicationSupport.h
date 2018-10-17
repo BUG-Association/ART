@@ -46,9 +46,10 @@ typedef enum
     art_appfeatures_load_actionsequence     = 0x0080,
     art_appfeatures_change_rgb_space        = 0x0100,
     art_appfeatures_change_isr              = 0x0200,
-    art_appfeatures_no_threading            = 0x0400,
-    art_appfeatures_quiet_if_args_present   = 0x0800,
-    art_appfeatures_no_verbosity_control    = 0x1000
+    art_appfeatures_change_whitepoint       = 0x0400,
+    art_appfeatures_no_threading            = 0x0800,
+    art_appfeatures_quiet_if_args_present   = 0x1000,
+    art_appfeatures_no_verbosity_control    = 0x2000
 }
 ART_CommandApplicationFeature;
 
@@ -340,6 +341,22 @@ int art_print_banner_and_process_standard_commandline_options(
                __name, \
                __desc, \
                __ldesc, \
+               __usage, \
+               1, \
+               1 \
+               ) ) \
+        return 0; \
+}
+
+#define ART_NO_INPUT_FILES_APPLICATION_STARTUP(__name,__desc,__usage) \
+{ \
+    if ( ! art_print_banner_and_process_standard_commandline_options( \
+               argc, \
+               argv, \
+               art_gv, \
+               __name, \
+               __desc, \
+               "", \
                __usage, \
                1, \
                1 \

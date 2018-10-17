@@ -183,7 +183,10 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     
     *sampledPoint = 0; // indicates that the point is on the infinite sphere
     
-    double pdf = patch[i].percentOfSkydomeRadiantPower * patch[i].probability;
+    double pdf =
+          patch[i].percentOfSkydomeRadiantPower
+        * patch[i].probability;
+        
     if(illuminationProbability)
     {
         arpdfvalue_dd_init_p(
@@ -214,13 +217,17 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (      ArPDFValue *)                   illuminationProbability /* optional */
         : (      ArPDFValue *)                   emissionProbability /* optional */
 {
-    int patchIndex;
+    int  patchIndex;
+    
     if ( *samplingRegion == ARNSKYLIGHT_SAMPLINGREGION_SUN_A )
         patchIndex = 1;
     else
         patchIndex = 0;
 
-    double pdf = patch[patchIndex].percentOfSkydomeRadiantPower * patch[patchIndex].probability;
+    double pdf =
+          patch[patchIndex].percentOfSkydomeRadiantPower
+        * patch[patchIndex].probability;
+
     if(illuminationProbability)
     {
         arpdfvalue_dd_init_p(

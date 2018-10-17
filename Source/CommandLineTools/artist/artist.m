@@ -135,6 +135,7 @@ int artist(
         | art_appfeatures_open_result
         | art_appfeatures_load_actionsequence
         | art_appfeatures_change_isr
+        | art_appfeatures_change_whitepoint
         );
 
 /* ---------------------------------------------------------------------------

@@ -216,7 +216,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 {
     Trafo3D  local2world;
 
-    trafo3d_v_local2world_t(
+    trafo3d_v_local2world_from_worldspace_normal_t(
         & EMISSION_SURFACE_NORMAL,
         & local2world
         );

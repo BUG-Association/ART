@@ -34,6 +34,7 @@ ART_LIBRARY_INTERFACE(ART_SurfaceMaterial)
 #import "ArnGeneralSurfaceMaterial.h"
 #import "ArnFresnelSurfaceMaterial.h"
 #import "ArnLambertSurfaceMaterial.h"
+#import "ArnOrenNayarSurfaceMaterial.h"
 #import "ArnPhongSurfaceMaterial.h"
 #import "ArnTorranceSparrowSurfaceMaterial.h"
 #import "ArnPDFSampling.h"

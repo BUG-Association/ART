@@ -35,7 +35,7 @@ ART_MODULE_INTERFACE(ArfARTRAW)
 
 #import "ArfRasterImage.h"
 
-#define ARFARTRAW_VERSION       2.4
+#define ARFARTRAW_VERSION       2.5
 #define ARFARTRAW_EXTENSION     "artraw"
 
     /* ------------------------------------------------------------------
@@ -58,6 +58,7 @@ ART_MODULE_INTERFACE(ArfARTRAW)
         2.3    includes DPI information
         2.4    includes considerably more info about image creation:
                platform, command line, render time, samples per pixel
+        2.5    optional info on image white point
 
     ---------------------------------------------------------------aw- */
 

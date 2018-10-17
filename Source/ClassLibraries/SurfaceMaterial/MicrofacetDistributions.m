@@ -127,7 +127,7 @@ double  blinn_exponentFromBeta(
     // transform the microfacet normal from local space to world space using
     // the normal of the macrosurface
     Trafo3D     local2world;
-    trafo3d_v_local2world_t(
+    trafo3d_v_local2world_from_worldspace_normal_t(
         & SURFACE_NORMAL_WORLDSPACE,
         & local2world
         );

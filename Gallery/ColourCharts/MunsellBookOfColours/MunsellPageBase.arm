@@ -1,0 +1,377 @@
+#define  MUNSELL_BLANK  MUNSELL_N_0900
+
+ArNode * createMunsellPage(
+        ART_GV                * art_gv,
+        
+        ArNode <ArpSpectrum>  * c00,
+        ArNode <ArpSpectrum>  * c01,
+        ArNode <ArpSpectrum>  * c02,
+        ArNode <ArpSpectrum>  * c03,
+        ArNode <ArpSpectrum>  * c04,
+        ArNode <ArpSpectrum>  * c05,
+        ArNode <ArpSpectrum>  * c06,
+        ArNode <ArpSpectrum>  * c07,
+        
+        ArNode <ArpSpectrum>  * c10,
+        ArNode <ArpSpectrum>  * c11,
+        ArNode <ArpSpectrum>  * c12,
+        ArNode <ArpSpectrum>  * c13,
+        ArNode <ArpSpectrum>  * c14,
+        ArNode <ArpSpectrum>  * c15,
+        ArNode <ArpSpectrum>  * c16,
+        ArNode <ArpSpectrum>  * c17,
+
+        ArNode <ArpSpectrum>  * c20,
+        ArNode <ArpSpectrum>  * c21,
+        ArNode <ArpSpectrum>  * c22,
+        ArNode <ArpSpectrum>  * c23,
+        ArNode <ArpSpectrum>  * c24,
+        ArNode <ArpSpectrum>  * c25,
+        ArNode <ArpSpectrum>  * c26,
+        ArNode <ArpSpectrum>  * c27,
+
+        ArNode <ArpSpectrum>  * c30,
+        ArNode <ArpSpectrum>  * c31,
+        ArNode <ArpSpectrum>  * c32,
+        ArNode <ArpSpectrum>  * c33,
+        ArNode <ArpSpectrum>  * c34,
+        ArNode <ArpSpectrum>  * c35,
+        ArNode <ArpSpectrum>  * c36,
+        ArNode <ArpSpectrum>  * c37,
+
+        ArNode <ArpSpectrum>  * c40,
+        ArNode <ArpSpectrum>  * c41,
+        ArNode <ArpSpectrum>  * c42,
+        ArNode <ArpSpectrum>  * c43,
+        ArNode <ArpSpectrum>  * c44,
+        ArNode <ArpSpectrum>  * c45,
+        ArNode <ArpSpectrum>  * c46,
+        ArNode <ArpSpectrum>  * c47,
+        
+        ArNode <ArpSpectrum>  * c50,
+        ArNode <ArpSpectrum>  * c51,
+        ArNode <ArpSpectrum>  * c52,
+        ArNode <ArpSpectrum>  * c53,
+        ArNode <ArpSpectrum>  * c54,
+        ArNode <ArpSpectrum>  * c55,
+        ArNode <ArpSpectrum>  * c56,
+        ArNode <ArpSpectrum>  * c57,
+
+        ArNode <ArpSpectrum>  * c60,
+        ArNode <ArpSpectrum>  * c61,
+        ArNode <ArpSpectrum>  * c62,
+        ArNode <ArpSpectrum>  * c63,
+        ArNode <ArpSpectrum>  * c64,
+        ArNode <ArpSpectrum>  * c65,
+        ArNode <ArpSpectrum>  * c66,
+        ArNode <ArpSpectrum>  * c67,
+
+        ArNode <ArpSpectrum>  * c70,
+        ArNode <ArpSpectrum>  * c71,
+        ArNode <ArpSpectrum>  * c72,
+        ArNode <ArpSpectrum>  * c73,
+        ArNode <ArpSpectrum>  * c74,
+        ArNode <ArpSpectrum>  * c75,
+        ArNode <ArpSpectrum>  * c76,
+        ArNode <ArpSpectrum>  * c77
+        )
+{
+    ArObj s07   = LAMBERT_MATERIAL( c07 );
+    ArObj s06   = LAMBERT_MATERIAL( c06 );
+    ArObj s05   = LAMBERT_MATERIAL( c05 );
+    ArObj s04   = LAMBERT_MATERIAL( c04 );
+    ArObj s03   = LAMBERT_MATERIAL( c03 );
+    ArObj s02   = LAMBERT_MATERIAL( c02 );
+    ArObj s01   = LAMBERT_MATERIAL( c01 );
+    ArObj s00   = LAMBERT_MATERIAL( c00 );
+
+    ArObj s17   = LAMBERT_MATERIAL( c17 );
+    ArObj s16   = LAMBERT_MATERIAL( c16 );
+    ArObj s15   = LAMBERT_MATERIAL( c15 );
+    ArObj s14   = LAMBERT_MATERIAL( c14 );
+    ArObj s13   = LAMBERT_MATERIAL( c13 );
+    ArObj s12   = LAMBERT_MATERIAL( c12 );
+    ArObj s11   = LAMBERT_MATERIAL( c11 );
+    ArObj s10   = LAMBERT_MATERIAL( c10 );
+
+    ArObj s27   = LAMBERT_MATERIAL( c27 );
+    ArObj s26   = LAMBERT_MATERIAL( c26 );
+    ArObj s25   = LAMBERT_MATERIAL( c25 );
+    ArObj s24   = LAMBERT_MATERIAL( c24 );
+    ArObj s23   = LAMBERT_MATERIAL( c23 );
+    ArObj s22   = LAMBERT_MATERIAL( c22 );
+    ArObj s21   = LAMBERT_MATERIAL( c21 );
+    ArObj s20   = LAMBERT_MATERIAL( c20 );
+
+    ArObj s37   = LAMBERT_MATERIAL( c37 );
+    ArObj s36   = LAMBERT_MATERIAL( c36 );
+    ArObj s35   = LAMBERT_MATERIAL( c35 );
+    ArObj s34   = LAMBERT_MATERIAL( c34 );
+    ArObj s33   = LAMBERT_MATERIAL( c33 );
+    ArObj s32   = LAMBERT_MATERIAL( c32 );
+    ArObj s31   = LAMBERT_MATERIAL( c31 );
+    ArObj s30   = LAMBERT_MATERIAL( c30 );
+
+    ArObj s47   = LAMBERT_MATERIAL( c47 );
+    ArObj s46   = LAMBERT_MATERIAL( c46 );
+    ArObj s45   = LAMBERT_MATERIAL( c45 );
+    ArObj s44   = LAMBERT_MATERIAL( c44 );
+    ArObj s43   = LAMBERT_MATERIAL( c43 );
+    ArObj s42   = LAMBERT_MATERIAL( c42 );
+    ArObj s41   = LAMBERT_MATERIAL( c41 );
+    ArObj s40   = LAMBERT_MATERIAL( c40 );
+
+    ArObj s57   = LAMBERT_MATERIAL( c57 );
+    ArObj s56   = LAMBERT_MATERIAL( c56 );
+    ArObj s55   = LAMBERT_MATERIAL( c55 );
+    ArObj s54   = LAMBERT_MATERIAL( c54 );
+    ArObj s53   = LAMBERT_MATERIAL( c53 );
+    ArObj s52   = LAMBERT_MATERIAL( c52 );
+    ArObj s51   = LAMBERT_MATERIAL( c51 );
+    ArObj s50   = LAMBERT_MATERIAL( c50 );
+
+    ArObj s67   = LAMBERT_MATERIAL( c67 );
+    ArObj s66   = LAMBERT_MATERIAL( c66 );
+    ArObj s65   = LAMBERT_MATERIAL( c65 );
+    ArObj s64   = LAMBERT_MATERIAL( c64 );
+    ArObj s63   = LAMBERT_MATERIAL( c63 );
+    ArObj s62   = LAMBERT_MATERIAL( c62 );
+    ArObj s61   = LAMBERT_MATERIAL( c61 );
+    ArObj s60   = LAMBERT_MATERIAL( c60 );
+
+    ArObj s77   = LAMBERT_MATERIAL( c77 );
+    ArObj s76   = LAMBERT_MATERIAL( c76 );
+    ArObj s75   = LAMBERT_MATERIAL( c75 );
+    ArObj s74   = LAMBERT_MATERIAL( c74 );
+    ArObj s73   = LAMBERT_MATERIAL( c73 );
+    ArObj s72   = LAMBERT_MATERIAL( c72 );
+    ArObj s71   = LAMBERT_MATERIAL( c71 );
+    ArObj s70   = LAMBERT_MATERIAL( c70 );
+
+    ArObj bgr_surface  = LAMBERT_MATERIAL( MUNSELL_BLANK );
+
+    ArObj cube = [ CUBE apply: SCALE(5.5,5.5,0.5) : TRANSLATION(-2.75,-2.75,0) ];
+    
+    double  dv = 0.0;
+    
+    ArObj obj00 = [ cube apply: TRANSLATION(-21, -21, dv) : s00 ];
+    ArObj obj01 = [ cube apply: TRANSLATION(-15, -21, dv) : s01 ];
+    ArObj obj02 = [ cube apply: TRANSLATION( -9, -21, dv) : s02 ];
+    ArObj obj03 = [ cube apply: TRANSLATION( -3, -21, dv) : s03 ];
+    ArObj obj04 = [ cube apply: TRANSLATION(  3, -21, dv) : s04 ];
+    ArObj obj05 = [ cube apply: TRANSLATION(  9, -21, dv) : s05 ];
+    ArObj obj06 = [ cube apply: TRANSLATION( 15, -21, dv) : s06 ];
+    ArObj obj07 = [ cube apply: TRANSLATION( 21, -21, dv) : s07 ];
+
+    ArObj obj10 = [ cube apply: TRANSLATION(-21, -15, dv) : s10 ];
+    ArObj obj11 = [ cube apply: TRANSLATION(-15, -15, dv) : s11 ];
+    ArObj obj12 = [ cube apply: TRANSLATION( -9, -15, dv) : s12 ];
+    ArObj obj13 = [ cube apply: TRANSLATION( -3, -15, dv) : s13 ];
+    ArObj obj14 = [ cube apply: TRANSLATION(  3, -15, dv) : s14 ];
+    ArObj obj15 = [ cube apply: TRANSLATION(  9, -15, dv) : s15 ];
+    ArObj obj16 = [ cube apply: TRANSLATION( 15, -15, dv) : s16 ];
+    ArObj obj17 = [ cube apply: TRANSLATION( 21, -15, dv) : s17 ];
+
+    ArObj obj20 = [ cube apply: TRANSLATION(-21,  -9, dv) : s20 ];
+    ArObj obj21 = [ cube apply: TRANSLATION(-15,  -9, dv) : s21 ];
+    ArObj obj22 = [ cube apply: TRANSLATION( -9,  -9, dv) : s22 ];
+    ArObj obj23 = [ cube apply: TRANSLATION( -3,  -9, dv) : s23 ];
+    ArObj obj24 = [ cube apply: TRANSLATION(  3,  -9, dv) : s24 ];
+    ArObj obj25 = [ cube apply: TRANSLATION(  9,  -9, dv) : s25 ];
+    ArObj obj26 = [ cube apply: TRANSLATION( 15,  -9, dv) : s26 ];
+    ArObj obj27 = [ cube apply: TRANSLATION( 21,  -9, dv) : s27 ];
+
+    ArObj obj30 = [ cube apply: TRANSLATION(-21,  -3, dv) : s30 ];
+    ArObj obj31 = [ cube apply: TRANSLATION(-15,  -3, dv) : s31 ];
+    ArObj obj32 = [ cube apply: TRANSLATION( -9,  -3, dv) : s32 ];
+    ArObj obj33 = [ cube apply: TRANSLATION( -3,  -3, dv) : s33 ];
+    ArObj obj34 = [ cube apply: TRANSLATION(  3,  -3, dv) : s34 ];
+    ArObj obj35 = [ cube apply: TRANSLATION(  9,  -3, dv) : s35 ];
+    ArObj obj36 = [ cube apply: TRANSLATION( 15,  -3, dv) : s36 ];
+    ArObj obj37 = [ cube apply: TRANSLATION( 21,  -3, dv) : s37 ];
+
+    ArObj obj40 = [ cube apply: TRANSLATION(-21,   3, dv) : s40 ];
+    ArObj obj41 = [ cube apply: TRANSLATION(-15,   3, dv) : s41 ];
+    ArObj obj42 = [ cube apply: TRANSLATION( -9,   3, dv) : s42 ];
+    ArObj obj43 = [ cube apply: TRANSLATION( -3,   3, dv) : s43 ];
+    ArObj obj44 = [ cube apply: TRANSLATION(  3,   3, dv) : s44 ];
+    ArObj obj45 = [ cube apply: TRANSLATION(  9,   3, dv) : s45 ];
+    ArObj obj46 = [ cube apply: TRANSLATION( 15,   3, dv) : s46 ];
+    ArObj obj47 = [ cube apply: TRANSLATION( 21,   3, dv) : s47 ];
+
+    ArObj obj50 = [ cube apply: TRANSLATION(-21,   9, dv) : s50 ];
+    ArObj obj51 = [ cube apply: TRANSLATION(-15,   9, dv) : s51 ];
+    ArObj obj52 = [ cube apply: TRANSLATION( -9,   9, dv) : s52 ];
+    ArObj obj53 = [ cube apply: TRANSLATION( -3,   9, dv) : s53 ];
+    ArObj obj54 = [ cube apply: TRANSLATION(  3,   9, dv) : s54 ];
+    ArObj obj55 = [ cube apply: TRANSLATION(  9,   9, dv) : s55 ];
+    ArObj obj56 = [ cube apply: TRANSLATION( 15,   9, dv) : s56 ];
+    ArObj obj57 = [ cube apply: TRANSLATION( 21,   9, dv) : s57 ];
+
+    ArObj obj60 = [ cube apply: TRANSLATION(-21,  15, dv) : s60 ];
+    ArObj obj61 = [ cube apply: TRANSLATION(-15,  15, dv) : s61 ];
+    ArObj obj62 = [ cube apply: TRANSLATION( -9,  15, dv) : s62 ];
+    ArObj obj63 = [ cube apply: TRANSLATION( -3,  15, dv) : s63 ];
+    ArObj obj64 = [ cube apply: TRANSLATION(  3,  15, dv) : s64 ];
+    ArObj obj65 = [ cube apply: TRANSLATION(  9,  15, dv) : s65 ];
+    ArObj obj66 = [ cube apply: TRANSLATION( 15,  15, dv) : s66 ];
+    ArObj obj67 = [ cube apply: TRANSLATION( 21,  15, dv) : s67 ];
+
+    ArObj obj70 = [ cube apply: TRANSLATION(-21,  21, dv) : s70 ];
+    ArObj obj71 = [ cube apply: TRANSLATION(-15,  21, dv) : s71 ];
+    ArObj obj72 = [ cube apply: TRANSLATION( -9,  21, dv) : s72 ];
+    ArObj obj73 = [ cube apply: TRANSLATION( -3,  21, dv) : s73 ];
+    ArObj obj74 = [ cube apply: TRANSLATION(  3,  21, dv) : s74 ];
+    ArObj obj75 = [ cube apply: TRANSLATION(  9,  21, dv) : s75 ];
+    ArObj obj76 = [ cube apply: TRANSLATION( 15,  21, dv) : s76 ];
+    ArObj obj77 = [ cube apply: TRANSLATION( 21,  21, dv) : s77 ];
+
+    
+    ArObj backG =
+        [ CUBE apply
+            :   SCALE(  50,  50,   0.5 )
+            :   TRANSLATION( -25, -25,  -0.001 )
+            :   bgr_surface 
+            ];
+
+    ArObj chart =
+	UNION(
+            obj00, obj01, obj02, obj03, obj04, obj05, obj06, obj07,
+            obj10, obj11, obj12, obj13, obj14, obj15, obj16, obj17,
+            obj20, obj21, obj22, obj23, obj24, obj25, obj26, obj27,
+            obj30, obj31, obj32, obj33, obj34, obj35, obj36, obj37,
+            obj40, obj41, obj42, obj43, obj44, obj45, obj46, obj47,
+            obj50, obj51, obj52, obj53, obj54, obj55, obj56, obj57,
+            obj60, obj61, obj62, obj63, obj64, obj65, obj66, obj67,
+            obj70, obj71, obj72, obj73, obj74, obj75, obj76, obj77,
+            backG,
+            UNION_END
+            );
+
+    return chart;
+}
+
+#ifndef SAMPLES
+#define SAMPLES 64
+#endif
+
+#ifdef D50
+#define CHART_ILLUMINANT CIE_ILLUMINANT_D50
+#define CHART_ILLUMINANT_DESC "D50"
+#endif
+
+#ifdef FL3
+#define CHART_ILLUMINANT CIE_ILLUMINANT_FL3
+#define CHART_ILLUMINANT_DESC "FL3"
+#endif
+
+#ifdef FL11
+#define CHART_ILLUMINANT CIE_ILLUMINANT_FL11
+#define CHART_ILLUMINANT_DESC "FL11"
+#endif
+
+#ifdef FL3_13
+#define CHART_ILLUMINANT CIE_ILLUMINANT_FL3_13
+#define CHART_ILLUMINANT_DESC "FL3_13"
+#endif
+
+#ifdef FL3_15
+#define CHART_ILLUMINANT CIE_ILLUMINANT_FL3_15
+#define CHART_ILLUMINANT_DESC "FL3_15"
+#endif
+
+#ifndef CHART_ILLUMINANT
+#define CHART_ILLUMINANT CIE_ILLUMINANT_D65
+#define CHART_ILLUMINANT_DESC "D65"
+#endif
+
+#define MUNSELL_PAGE_FUNCTION_BODY(__name) \
+{ \
+    id lambertBaseSurface = LAMBERT_MATERIAL( MACBETH_NEUTRAL8 ); \
+ \
+    id cylinder0   = \
+        [ CYLINDER apply \
+            :   SCALE( 4000.0, 4000.0, 1.0 ) \
+            :   TRANSLATION( 0.0, 0.0, -10.5) \
+            :   lambertBaseSurface \
+            ]; \
+\
+    double tz = -0.7; \
+\
+    id scene_geometry = \
+        UNION( \
+            [ createMunsellPage_##__name(art_gv) apply \
+                :   ROT_Z( 180 DEGREES ) \
+                :   ROT_X( -66 DEGREES ) \
+                :   USCALE( 0.65 ) \
+                :   TRANSLATION( 0.0, 0.0 , 5.6 ) \
+                ], \
+\
+            cylinder0, \
+\
+            UNION_END \
+            ); \
+\
+    id camera = \
+        [ CAMERA \
+            imageSize:  IVEC2D( 256 , 256 ) \
+            ray:        RAY3D( PNT3D(0.0,50.0,28.0),VEC3D(0.0,-50.0,-23) ) \
+            zoom:       1.1 \
+            ]; \
+\
+    id actionsequence = \
+        ACTION_SEQUENCE( \
+            SET_COLOUR_SUBSYSTEM_WHITEPOINT( \
+                CHART_ILLUMINANT_DESC, \
+                CHART_ILLUMINANT \
+                ), \
+\
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE, \
+\
+            [ LIGHTSOURCE_COLLECTOR \
+                sampler2D:   STANDARD_SAMPLER_2D \
+                resolution:  5 \
+                type:        arlightsourcetype_area \
+            ], \
+\
+            [ STOCHASTIC_PIXEL_SAMPLER \
+                sampleProvider: \
+                    [ PATHTRACER \
+                        rayCaster:        STANDARD_RAYCASTER \
+			maximalRecursion: 3 \
+                    ] \
+                sampleSplattingKernel: TENT_KERNEL \
+                samplesPerPixel:       SAMPLES \
+                randomValueGeneration: PSEUDORANDOM_SEQUENCE \
+            ], \
+\
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP \
+                removeSource: NO \
+            ], \
+\
+            [ INTERACTIVE_CALIBRATION_TONEMAPPING_OPERATOR \
+                aperture: -0.35 \
+                contrast: IAC_TONEMAPPER_DEFAULT_CONTRAST \
+            ], \
+\
+            STANDARD_LUMINANCE_CLIPPING, \
+\
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF \
+                removeSource:    YES \
+                bitsPerChannel:  8 \
+                ], \
+\
+            ACTION_SEQUENCE_END \
+            ); \
+\
+    id  environment_material = \
+        UNIFORM_ENVIRONMENT_MATERIAL( CHART_ILLUMINANT, 1.0 ); \
+\
+    return \
+        [ SCENE \
+            sceneGeometry      : scene_geometry \
+            environmentMaterial: environment_material \
+            camera             : camera \
+            actionSequence     : actionsequence \
+            ]; \
+}
