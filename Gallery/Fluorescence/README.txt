@@ -1,0 +1,3 @@
+The file to look at in this directory is 'Volume.arm': via command line #defines, this scene can be made to render most of the figures in our 2018 EGSR paper about fluorescence rendering. Please refer to the comments in the file itself to see what the various options are.
+
+The other .arm files in this directory are only included as source for various scene components of 'Volume.arm', and might be removed in future updates: if and when a repository of "canonical ART objects" is added somewhere, from which they can be included in every scene file.

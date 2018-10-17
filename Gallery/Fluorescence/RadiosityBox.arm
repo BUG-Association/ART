@@ -1,0 +1,482 @@
+#define  STANDARD_RADIOSITY_BOX	    illuminatedRadiosityBox_DoubleGrid(5.5)
+#define  STANDARD_RADIOSITY_BOX_04  illuminatedRadiosityBox_DoubleGrid04(5.5)
+#define  STANDARD_RADIOSITY_BOX_16  illuminatedRadiosityBox_DoubleGrid16(5.5)
+#define  STANDARD_RADIOSITY_BOX_64  illuminatedRadiosityBox_DoubleGrid64(5.5)
+#define  PLANAR_LIGHT(__thn,__int)	planarLamp(__thn,__int)
+#define  RADIOSITY_BOX(__i)		illuminatedRadiosityBox_DoubleGrid(__i)
+#define  RADIOSITY_CAMERA		radiosityBoxCamera()
+
+ArObj  planarLamp(
+        ART_GV  * art_gv,
+	ArObj     emissionSpectrum,
+	double    thickness,
+	double    emissionIntensity
+	)
+{
+    Pnt3D  * lampPoint = ALLOC_ARRAY( Pnt3D, 9 );
+    
+    ArObj  emitterMaterial = LAMBERT_EMITTER( emissionSpectrum, emissionIntensity );
+    ArObj  whiteMaterial =   LAMBERT_MATERIAL( MACBETH_WHITE );
+
+    ArObj  light =
+        UNION(
+            [ QUADRANGLE( 4, 6, 7, 5 ) apply: whiteMaterial ],
+            [ QUADRANGLE( 1, 5, 7, 3 ) apply: whiteMaterial ],
+            [ QUADRANGLE( 1, 5, 4, 0 ) apply: whiteMaterial ],
+            [ QUADRANGLE( 2, 6, 4, 0 ) apply: whiteMaterial ],
+            [ QUADRANGLE( 2, 6, 7, 3 ) apply: whiteMaterial ],
+            [ QUADRANGLE( 0, 1, 3, 2 ) apply: emitterMaterial ],
+            UNION_END
+            );
+    
+    lampPoint[0] = PNT3D( 1.0, 1.0, 0.0);
+    lampPoint[1] = PNT3D( 1.0,-1.0, 0.0);
+    lampPoint[2] = PNT3D(-1.0, 1.0, 0.0);
+    lampPoint[3] = PNT3D(-1.0,-1.0, 0.0);
+    lampPoint[4] = PNT3D( 1.0, 1.0, thickness);
+    lampPoint[5] = PNT3D( 1.0,-1.0, thickness);
+    lampPoint[6] = PNT3D(-1.0, 1.0, thickness);
+    lampPoint[7] = PNT3D(-1.0,-1.0, thickness);
+    lampPoint[8] = PNT3D_HUGE;
+    
+    ArObj  vertices =
+        arnvertexset(
+            art_gv,
+            lampPoint,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+            );
+
+    return [ light apply: vertices ];
+}
+
+ArObj  radiosityBox(
+        ART_GV  * art_gv,
+        ArObj     rearSurface,
+        ArObj     topSurface,
+        ArObj     bottomSurface,
+        ArObj     leftSurface,
+        ArObj     rightSurface
+	)
+{
+    double boxCorner = 1.0;
+    
+    Pnt3D  * boxPoint = ALLOC_ARRAY( Pnt3D, 9 );
+    	    
+    ArObj box =
+        UNION(
+            [ QUADRANGLE( 2, 6, 7, 3 ) apply: rearSurface ],
+            [ QUADRANGLE( 0, 1, 3, 2 ) apply: leftSurface ],
+            [ QUADRANGLE( 6, 7, 5, 4 ) apply: rightSurface ],
+            [ QUADRANGLE( 0, 2, 6, 4 ) apply: topSurface ],
+            [ QUADRANGLE( 1, 3, 7, 5 ) apply: bottomSurface ],
+            UNION_END
+            );
+    
+    boxPoint[0] = PNT3D( boxCorner, boxCorner, boxCorner);
+    boxPoint[1] = PNT3D( boxCorner, boxCorner,-boxCorner);
+    boxPoint[2] = PNT3D( boxCorner,-boxCorner, boxCorner);
+    boxPoint[3] = PNT3D( boxCorner,-boxCorner,-boxCorner);
+    boxPoint[4] = PNT3D(-boxCorner, boxCorner, boxCorner);
+    boxPoint[5] = PNT3D(-boxCorner, boxCorner,-boxCorner);
+    boxPoint[6] = PNT3D(-boxCorner,-boxCorner, boxCorner);
+    boxPoint[7] = PNT3D(-boxCorner,-boxCorner,-boxCorner);
+    boxPoint[8] = PNT3D_HUGE;
+
+    ArObj  vertices =
+        arnvertexset(
+            art_gv,
+            boxPoint,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+            );
+
+    return [ box apply: vertices ];
+}
+
+
+ArObj radiosityBox_Plain(
+        ART_GV  * art_gv
+	)
+{
+    ArObj red =     LAMBERT_MATERIAL( MACBETH_RED );
+    ArObj blue =    LAMBERT_MATERIAL( MACBETH_BLUE );
+    ArObj yellow =  LAMBERT_MATERIAL( MACBETH_YELLOW );
+    ArObj white =   LAMBERT_MATERIAL( MACBETH_WHITE );
+			    
+    return radiosityBox( art_gv, white, yellow, white, red, blue );
+}
+
+/* ---------------------------------------------------------------------------
+    'createSymetricLinesExpression'
+--------------------------------------------------------------------------- */
+id createSymetricLinesExpression(
+        ART_GV  * art_gv,
+        id        inputValue,
+        double    frequency,
+        double    thickness
+        )
+{
+    // R -> [0, 1]
+    id periodicExpr =
+            DD_XMOD_D( 
+                    DD_MUL_D( inputValue, CONST_D( frequency ) ),
+                    CONST_D( 1.0 )
+                    );
+            
+    // lines
+    id gridExpr =
+        DD_SUB_D(
+            CONST_D( 1.0 ),
+            DDD_PULSE_D(
+                CONST_D( thickness / 2.0 ),
+                CONST_D( 1.0 - thickness / 2.0 ),
+                periodicExpr
+                )
+            );
+
+    return gridExpr;
+}
+
+/* ---------------------------------------------------------------------------
+    'createXYGridSurface'
+--------------------------------------------------------------------------- */
+id createYZGridSurface(
+        ART_GV  * art_gv,
+        id        coordinates,
+        id        mainSurface,
+        id        gridSurface,
+        double    thickness,        // portion of the periodic interval
+        double    frequency
+        )
+{
+    id xLinesExpr =
+        createSymetricLinesExpression(
+            art_gv,
+            P3_Y( coordinates ),
+            frequency,
+            thickness
+            );
+    id yLinesExpr =
+        createSymetricLinesExpression(
+            art_gv,
+            P3_Z( coordinates ),
+            frequency,
+            thickness
+            );
+    
+    id xyGridExpr =
+        DD_MAX_D(
+            xLinesExpr,
+            yLinesExpr
+            );
+    
+    return
+        MAPPED_SURFACE( 
+            xyGridExpr,
+            SURFACE_MAP(
+                0.0, mainSurface,
+                1.0, gridSurface,
+                MAP_END
+                )
+            );
+}
+
+id createXYGridSurface(
+        ART_GV  * art_gv,
+        id        coordinates,
+        id        mainSurface,
+        id        gridSurface,
+        double    thickness,        // portion of the periodic interval
+        double    frequency
+        )
+{
+    id xLinesExpr =
+        createSymetricLinesExpression(
+            art_gv,
+            P2_X( coordinates ),
+            frequency,
+            thickness
+            );
+    id yLinesExpr =
+        createSymetricLinesExpression(
+            art_gv,
+            P2_Y( coordinates ),
+            frequency,
+            thickness
+            );
+    
+    id xyGridExpr =
+        DD_MAX_D(
+            xLinesExpr,
+            yLinesExpr
+            );
+    
+    return
+        MAPPED_SURFACE( 
+            xyGridExpr,
+            SURFACE_MAP(
+                0.0, mainSurface,
+                1.0, gridSurface,
+                MAP_END
+                )
+            );
+}
+
+ArObj radiosityBox_SimpleGrid(
+        ART_GV  * art_gv
+	)
+{
+    ArObj red =        LAMBERT_MATERIAL( MUNSELL_050R_04_14 );
+    ArObj ltred =      LAMBERT_MATERIAL( MUNSELL_050R_06_08 );
+    ArObj blue =       LAMBERT_MATERIAL( MUNSELL_050PB_04_12 );
+    ArObj ltblue =     LAMBERT_MATERIAL( MUNSELL_050PB_06_08 );
+    ArObj yellow =     LAMBERT_MATERIAL( MUNSELL_050Y_07_12 );
+#ifdef METALLIC
+    ArObj ltyellow =   TORRANCE_SPARROW_BLINN_SURFACE_WITH_MATERIAL_CONST(5 DEGREES, GOLD_MATERIAL);
+#else
+    ArObj ltyellow =   LAMBERT_MATERIAL( MUNSELL_050Y_08_08 );
+#endif
+    //ArObj grey =       LAMBERT_MATERIAL( MACBETH_NEUTRAL8 );
+    ArObj grey =       LAMBERT_MATERIAL( CONST_COLOUR_GREY(1.0) );
+#ifdef METALLIC
+    ArObj white =      TORRANCE_SPARROW_BLINN_SURFACE_WITH_MATERIAL_CONST(5 DEGREES, SILVER_MATERIAL);
+#else
+    //ArObj white =      LAMBERT_MATERIAL( MACBETH_WHITE );
+    ArObj white =      LAMBERT_MATERIAL( CONST_COLOUR_GREY(0.7) );
+#endif
+
+    double  threshold = 0.075;
+    
+    ArObj bluegrid =
+        createXYGridSurface(
+            art_gv,
+            TEXTURE_COORDS,
+            blue,
+            ltblue,
+            threshold,
+            4
+            );
+    
+    ArObj redgrid =
+        createXYGridSurface(
+            art_gv,
+            TEXTURE_COORDS,
+            red,
+            ltred,
+            threshold,
+            4
+            );
+    
+    ArObj whitegrid =
+        createXYGridSurface(
+            art_gv,
+            TEXTURE_COORDS,
+            grey,
+            white,
+            threshold,
+            4
+            );
+    
+    ArObj yellowgrid =
+        createXYGridSurface(
+            art_gv,
+            TEXTURE_COORDS,
+            yellow,
+            ltyellow,
+            threshold,
+            4
+            );
+
+    return
+        radiosityBox(
+              art_gv,
+              whitegrid,
+              yellowgrid,
+              whitegrid,
+              redgrid,
+              bluegrid
+            );
+}
+
+//ArObj radiosityBox_DoubleGrid(
+//	)
+//{
+//    ArObj red =        LAMBERT_MATERIAL( MACBETH_RED );
+//    ArObj blue =       GENERAL_SURFACE(
+//			    0.85, LAMBERT_MATERIAL( MACBETH_BLUE ),
+//			    0.15, LAMBERT_MATERIAL( RAINBOW_BLUE ),
+//			    0.0 );
+//    ArObj orange =     LAMBERT_MATERIAL( MACBETH_MODERATERED );
+//    ArObj ltblue =     LAMBERT_MATERIAL( MACBETH_BLUEFLOWER );
+//    ArObj yellow =     LAMBERT_MATERIAL( MACBETH_YELLOW );
+//    ArObj yellowgrn =  LAMBERT_MATERIAL( MACBETH_ORANGEYELLOW );
+//    ArObj gray =       GENERAL_SURFACE(
+//			    0.5, LAMBERT_MATERIAL( MACBETH_NEUTRAL5 ),
+//			    0.5, LAMBERT_MATERIAL( MACBETH_NEUTRAL8 ),
+//			    0.0 );
+//    ArObj white =      LAMBERT_MATERIAL( MACBETH_NEUTRAL8 );
+//
+//    ArObj gridFunction = TILE_TEXTURE2D(
+//    	[ NATIVE_MAPPING(DEFAULT_PARAMETERISATION)
+//		    trafo: SCALE_2D(4.0,4.0) ],
+//	  VEC2D(1,1), PNT2D(1,1), 2);
+//	
+//    double  thresholdA = 0.06;
+//    double  thresholdB = 0.16;
+//    
+//    ArObj bluegrid   = MAPPED_SURFACE( gridFunction,
+//    				SURFACE_MAP(
+//                                       thresholdA, blue,
+//                                       thresholdA, ltblue,
+//                                       thresholdB, ltblue,
+//				       thresholdB, blue,
+//				       MAP_END) );
+//				       
+//    ArObj redgrid    = MAPPED_SURFACE( gridFunction,
+//    				SURFACE_MAP(
+//                                       thresholdA, red,
+//                                       thresholdA, orange,
+//                                       thresholdB, orange,
+//				       thresholdB, red,
+//				       MAP_END) );
+//				       
+//    ArObj whitegrid  = MAPPED_SURFACE( gridFunction,
+//    				SURFACE_MAP(
+//                                       thresholdA, white,
+//                                       thresholdA, gray,
+//                                       thresholdB, gray,
+//				       thresholdB, white,
+//				       MAP_END) );
+//				       
+//    ArObj yellowgrid = MAPPED_SURFACE( gridFunction,
+//    				SURFACE_MAP(
+//                                       thresholdA, yellow,
+//                                       thresholdA, yellowgrn,
+//                                       thresholdB, yellowgrn,
+//				       thresholdB, yellow,
+//				       MAP_END));
+//
+//    return radiosityBox(whitegrid, yellowgrid, whitegrid, redgrid, bluegrid);
+//}
+
+ArObj  illuminatedRadiosityBox_Plain(
+        ART_GV  * art_gv,
+	double    intensity
+	)
+{
+    ArObj  box   = radiosityBox_Plain( art_gv );
+    ArObj  light = planarLamp( art_gv, CIE_ILLUMINANT_D65, 0.2, intensity );
+    
+    light = [ light trafo: USCALE(0.2) : TRANSLATION(0.0,0.0,0.9) ];
+    
+    return [ box or: light ];
+}
+
+ArObj  illuminatedRadiosityBox_SimpleGrid(
+        ART_GV  * art_gv,
+	double    intensity
+	)
+{
+
+    ArObj fullSpectrum =
+        CONST_COLOUR_PSSPECTRUM(1.0,
+                            PNT2D( 300.0 NANOMETER, 1.0 ),
+                            PNT2D( 700.0 NANOMETER, 1.0 ),
+                            PSS_END
+                            );
+
+    ArObj box   = radiosityBox_SimpleGrid( art_gv );
+    //ArObj light = planarLamp( art_gv, CIE_ILLUMINANT_D65, 0.2, intensity );
+    ArObj light = planarLamp( art_gv, fullSpectrum, 0.2, intensity );
+    
+    light = [ light trafo: USCALE(0.4) : TRANSLATION(0.0,0.0,0.99) ];
+    
+    return [ box or: light ];
+}
+
+//ArObj  illuminatedRadiosityBox_DoubleGrid(
+//	double  intensity
+//	)
+//{
+//    ArObj box =   radiosityBox_DoubleGrid();
+//    ArObj light = planarLamp( CIE_ILLUMINANT_D65, 0.2, intensity );
+//    
+//    light = [ light trafo: USCALE(0.2) : TRANSLATION(0.0,0.0,0.9) ];
+//    
+//    return [ box or: light ];
+//}
+
+ArObj  radiosityBoxCamera(
+        ART_GV  * art_gv
+	)
+{
+    return
+        [ CAMERA
+            imageSize:	IVEC2D( 1280, 1280 )
+            ray:        RAY3D( PNT3D(0.0,5.0,0.0),VEC3D(0.0,-1.0,0.0) )
+            zoom:       1.42
+            ];
+}
+
+#ifndef SAMPLES
+#define SAMPLES 64
+#endif
+
+ARM_MAIN_FUNCTION(RadiosityBox)
+{
+    id scene_geometry =
+        illuminatedRadiosityBox_SimpleGrid(art_gv,1.0);
+    
+    id camera =
+        radiosityBoxCamera(art_gv);
+
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  5
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ SIMPLE_PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+                        maximalRecursion: 10
+                        mode:             arpathtracermode_mis
+                    ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       SAMPLES
+                randomValueGeneration: PSEUDORANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    YES
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+    return
+        [ SCENE
+            sceneGeometry      : scene_geometry
+            camera             : camera
+            actionSequence     : actionsequence
+            ];
+}

@@ -1,0 +1,127 @@
+/* ===========================================================================
+    Copyright (c) 1996-2016 The ART Development Team
+    ------------------------------------------------
+
+    For a comprehensive list of the members of the development team, and a
+    desaription of their respective contributions, see the file
+    "ART_DeveloperList.txt" that is distributed with the libraries.
+
+    This file is part of the Advanced Rendering Toolkit (ART) libraries.
+
+    ART is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any
+    later version.
+
+    ART is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with ART.  If not, see <http://www.gnu.org/licenses/>.
+   ===========================================================================
+    NAME:       SnailShell
+    TYPE:       art source
+    PROJECT:    Advanced Rendering Toolkit
+    CONTENT:    an optimized version of the recursive CSG shell
+   ===========================================================================
+    AUTHORS:    rft     Robert F. Tobler
+                aw      Alexander Wilkie
+   ===========================================================================
+    HISTORY:
+
+    21-Apr-16 00:00:00  aw      upgraded to ART 2.x syntax
+    01-Jul-96 00:00:00  rft     created
+   ===========================================================================
+    MANUAL:
+        Original scene devised and coded by Robert F. Tobler at the very
+        beginning of the ART 1.0 effort, way back when, at the Vienna 
+        Institute of Computer Graphcis. To honour his memory, this file 
+        retains the old-style project file header typical for ART 1.x which
+        was also introduced by him.
+        
+        The reference to this version of the shell being "optimised" is
+        to be understood in the context of ART 1, where ray-object 
+        intersections were directly computed on the actual scene graph used
+        to describe the scene. If that scene graph was built in a lopsided
+        way, ray casting performance would suffer: and in such a system, a
+        recursive shell like this one is of course potentially quite 
+        inefficient if coded in a naive way.
+        
+        ART 2 takes any scene graph presented to it apart, and builds a ray 
+        casting acceleration data structure from the list of terminal objects 
+        found in the graph. So how the shell is generated in the ARM file no 
+        longer has any impact on ray casting performance.
+    
+    BUGS
+	The segment at the opening is cut with a bigger sphere, but correct
+	handling of the opening is too complicated.
+=========================================================================== */
+
+ArObj create_Shell(
+        ART_GV  * art_gv
+        )
+{
+    int i;
+    int numberOfParts = 64;		// 32 segments/part thus 2048 segments
+    int segmentsPerWinding = 64;	// which is exactly 20 windings
+    double scale = 0.989227963463;	// segment to segment scale
+    double thickness = 0.02;		//
+    int correctInterior = 0;		// set to 1 if shell made of glass
+    
+    int segmentAngle = 360.0 / segmentsPerWinding;
+    ArNode<ArpTrafo3D>* contract = [ROT_Z(segmentAngle DEGREES) then: USCALE(scale)];
+    ArNode<ArpTrafo3D>* expand = [ROT_Z(-segmentAngle DEGREES) then: USCALE(1.0/scale)];
+    ArNode<ArpTrafo3D>* translate = TRANSLATION(-1.0,0,-2.0);
+    ArNode<ArpTrafo3D>* largeSphere = [SPHERE trafo : translate];
+    ArNode<ArpTrafo3D>* largeContractedSphere = [largeSphere trafo : contract];
+    ArNode<ArpTrafo3D>* smallSphere = [SPHERE trafo : USCALE(1.0 - thickness) : translate];
+    
+    
+    ArNode* addPart = largeContractedSphere;
+    ArNode* subPart = smallSphere;
+    ArNode<ArpTrafo3D>* partContract = contract;
+
+    ArObj shell;
+    
+    //  The optimization creates two completely balanced CSG-or trees that
+    //  can be subtracted to generate a part that contains a power of 2
+    //  segments.
+
+    for (i = 0; i < 5; i++)		// 2^5 = 32 segments in one part
+    {    
+	ArNode* singleAddPart = addPart;
+	ArNode* singleSubPart = subPart;
+	ArNode<ArpTrafo3D>* singleContract = partContract;
+
+	singleAddPart = [singleAddPart trafo: singleContract];
+	singleSubPart = [singleSubPart trafo: singleContract];
+	addPart = [addPart or: singleAddPart];
+	subPart = [subPart or: singleSubPart];
+
+	if (i > 1)
+	{
+	    subPart = [subPart trafo: expand];
+	    expand = [(ArnTrafo*)expand then: expand];
+	}
+
+	partContract = [(ArnTrafo*)partContract then: singleContract];
+    }
+
+    shell = [addPart sub: subPart];
+
+    for (i = 1; i < numberOfParts; i++)
+    {
+	addPart = [addPart trafo:partContract];
+	subPart = [subPart trafo:partContract];
+	if (i < 3 || correctInterior)
+	    shell = [[shell or: addPart]  sub: subPart];
+	else
+	    shell = [shell or: addPart];
+    }
+    
+    return shell;
+}
+
+// ===========================================================================
