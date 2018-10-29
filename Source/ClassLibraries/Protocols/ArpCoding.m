@@ -94,19 +94,19 @@ void arpcoder_arcolour(
     }
     else
     {
-        if ( art_foundation_isr(art_gv) == arspectrum_ut_rgb )
+        if ( art_foundation_isr(art_gv) == ardt_ut_xyz )
             [ coder codeArRGB: ((ArRGB*)spc->value) ];
 
-        if ( art_foundation_isr(art_gv) == arspectrum_spectrum8 )
+        if ( art_foundation_isr(art_gv) == ardt_spectrum8 )
             [ coder codeArSpectrum8: ((ArSpectrum8*)spc->value) ];
 
-        if ( art_foundation_isr(art_gv) == arspectrum_spectrum11 )
+        if ( art_foundation_isr(art_gv) == ardt_spectrum11 )
             [ coder codeArSpectrum18: ((ArSpectrum18*)spc->value) ];
 
-        if ( art_foundation_isr(art_gv) == arspectrum_spectrum18 )
+        if ( art_foundation_isr(art_gv) == ardt_spectrum18 )
             [ coder codeArSpectrum18: ((ArSpectrum18*)spc->value) ];
 
-        if ( art_foundation_isr(art_gv) == arspectrum_spectrum46 )
+        if ( art_foundation_isr(art_gv) == ardt_spectrum46 )
             [ coder codeArSpectrum46: ((ArSpectrum46*)spc->value) ];
     }
 }

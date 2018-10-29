@@ -407,7 +407,7 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     arcmf_gv->cie31_2deg_cmf = ALLOC(ArCMF);
 
-    ARCMF_RESULT_COLOURTYPE( *arcmf_gv->cie31_2deg_cmf  ) = arspectrum_ciexyz;
+    ARCMF_RESULT_DATATYPE( *arcmf_gv->cie31_2deg_cmf  ) = ardt_ciexyz;
     ARCMF_CURVES( *arcmf_gv->cie31_2deg_cmf  ) = ALLOC_ARRAY( ArPSSpectrum, 3 );
 
     rss_to_pss_new(
@@ -440,7 +440,7 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     arcmf_gv->cie06_2deg_cmf = ALLOC(ArCMF);
 
-    ARCMF_RESULT_COLOURTYPE( *arcmf_gv->cie06_2deg_cmf  ) = arspectrum_ciexyz;
+    ARCMF_RESULT_DATATYPE( *arcmf_gv->cie06_2deg_cmf  ) = ardt_ciexyz;
     ARCMF_CURVES( *arcmf_gv->cie06_2deg_cmf  ) = ALLOC_ARRAY( ArPSSpectrum, 3 );
 
     rss_to_pss_new(
@@ -502,7 +502,7 @@ void arcmf_c_copy_c(
               ArCMF   * cmf_r
         )
 {
-    ARCMF_RESULT_COLOURTYPE(*cmf_r) = ARCMF_RESULT_COLOURTYPE(*cmf_0);
+    ARCMF_RESULT_DATATYPE(*cmf_r) = ARCMF_RESULT_DATATYPE(*cmf_0);
 
     unsigned int  numChannels = ARCMF_RESULT_CHANNELS(*cmf_0);
 

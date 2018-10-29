@@ -65,7 +65,7 @@ void imageProbe(
             ArfARTRAW  * rawImage =
                 (ArfARTRAW *) inputFileImage->imageFile;
 
-            ArSpectrumType  rawContentType = [ rawImage fileColourType ];
+            ArDataType  rawContentType = [ rawImage fileDataType ];
 
             //   Check if the current ISR is already set to match the contents
             //   of the RAW file
@@ -87,30 +87,24 @@ void imageProbe(
 
                 [ ART_GLOBAL_REPORTER printf
                     :   "Default ISR was : %s\n"
-                    ,   arspectrumtype_name( art_isr( art_gv ) )
+                    ,   ardatatype_name( art_isr( art_gv ) )
                     ];
 
                 [ ART_GLOBAL_REPORTER printf
                     :   "ARTRAW content is : %s\n"
-                    ,   arspectrumtype_name( rawContentType )
+                    ,   ardatatype_name( rawContentType )
                     ];
-
-                if ( rawContentType == arspectrum_ciexyz )
-                    rawContentType = arspectrum_ut_rgb;
-
-                if ( rawContentType == arspectrum_ciexyz_polarisable )
-                    rawContentType = arspectrum_ut_rgb_polarisable;
 
                 [ ART_GLOBAL_REPORTER printf
                     :   "ISR will be set as: %s\n"
-                    ,   arspectrumtype_name( rawContentType )
+                    ,   ardatatype_name( rawContentType )
                     ];
 
                 art_set_isr( art_gv, rawContentType );
 
                 [ ART_GLOBAL_REPORTER printf
                     :   "ISR is now set to : %s\n"
-                    ,   arspectrumtype_name( art_isr( art_gv ) )
+                    ,   ardatatype_name( art_isr( art_gv ) )
                     ];
 
                 [ ART_GLOBAL_REPORTER printf

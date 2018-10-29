@@ -47,7 +47,6 @@ ART_MODULE_INITIALISATION_FUNCTION
     [ ArnRGB48Image       registerWithRuntime ];
     [ ArnRGBA64Image      registerWithRuntime ];
     [ ArnRGB96Image       registerWithRuntime ];
-    [ ArnRGBA128Image     registerWithRuntime ];
 
     [ ArnCIEXYZImage      registerWithRuntime ];
     [ ArnCIEXYZAImage     registerWithRuntime ];
@@ -293,7 +292,6 @@ _ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(_class,_Type)
     GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,RGB48,rgb48) \
     GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,RGBA64,rgba64) \
     GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,RGB96,rgb96) \
-    GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,RGBA128,rgba128) \
     \
     GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,CIEXYZ,xyz) \
     GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,CIEXYZA,xyza) \
@@ -317,116 +315,109 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnPlainImage)
 + new
         : (ART_GV *) new_art_gv
         : (IVec2D) s
-        : (ArSpectrumType) newSpectrumType
+        : (ArDataType) newSpectrumType
 {
     switch (newSpectrumType)
     {
-        case arspectrum_grey:
+        case ardt_grey:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnGreyImage)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_greyalpha:
+        case ardt_grey_alpha:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnGreyAlphaImage)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_grey8:
+        case ardt_grey8:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnGrey8Image)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_grey16:
+        case ardt_grey16:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnGrey16Image)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_rgb:
+        case ardt_rgb:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnRGBImage)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_ut_rgb:
+        case ardt_ut_xyz:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnUT_RGBImage)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_rgba:
+        case ardt_rgba:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnRGBAImage)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_rgba32:
+        case ardt_rgba32:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnRGBA32Image)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_rgba64:
+        case ardt_rgba64:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnRGBA64Image)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_rgb96:
+        case ardt_rgb96:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnRGB96Image)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_rgba128:
-            return
-                [ ALLOC_OBJECT_AGV(new_art_gv,ArnRGBA128Image)
-                    initWithSize
-                    :   s
-                    ];
-
-        case arspectrum_ciexyz:
+        case ardt_ciexyz:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnCIEXYZImage)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_ciexyza:
+        case ardt_ciexyza:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnCIEXYZAImage)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_spectrum8:
+        case ardt_spectrum8:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnSpectrum8Image)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_spectrum18:
+        case ardt_spectrum18:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnSpectrum18Image)
                     initWithSize
                     :   s
                     ];
 
-        case arspectrum_spectrum46:
+        case ardt_spectrum46:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnSpectrum46Image)
                     initWithSize
@@ -497,8 +488,8 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnPlainImage)
 - (void) change
     { changed = 1; }
 
-- (ArSpectrumType) colourType
-    { return arspectrum_unknown; }
+- (ArDataType) dataType
+    { return ardt_unknown; }
 
 - (IVec2D) size
     { return size; }
@@ -565,7 +556,7 @@ GETSET_REGION_DUMMY_IMPLEMENTATION(Spectrum)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGreyImage)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnGreyImage,Grey)
 
-- (ArSpectrumType) colourType { return arspectrum_grey; }
+- (ArDataType) dataType { return ardt_grey; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Grey,g)
 
@@ -579,7 +570,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Grey,g)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGreyAlphaImage)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnGreyAlphaImage,GreyAlpha)
 
-- (ArSpectrumType) colourType { return arspectrum_greyalpha; }
+- (ArDataType) dataType { return ardt_grey_alpha; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(GreyAlpha,ga)
 
@@ -593,7 +584,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(GreyAlpha,ga)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGrey8Image)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnGrey8Image,Grey8)
 
-- (ArSpectrumType) colourType { return arspectrum_grey8; }
+- (ArDataType) dataType { return ardt_grey8; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Grey8,g8)
 
@@ -607,7 +598,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Grey8,g8)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGrey16Image)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnGrey16Image,Grey16)
 
-- (ArSpectrumType) colourType { return arspectrum_grey16; }
+- (ArDataType) dataType { return ardt_grey16; }
 
 IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(Grey16,g16)
 
@@ -621,7 +612,7 @@ IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(Grey16,g16)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGreyAlpha16Image)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnGreyAlpha16Image,GreyAlpha16)
 
-- (ArSpectrumType) colourType { return arspectrum_grey16alpha; }
+- (ArDataType) dataType { return ardt_grey16_alpha; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(GreyAlpha16,ga16)
 
@@ -635,7 +626,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(GreyAlpha16,ga16)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGreyAlpha32Image)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnGreyAlpha32Image,GreyAlpha32)
 
-- (ArSpectrumType) colourType { return arspectrum_grey32alpha; }
+- (ArDataType) dataType { return ardt_grey32_alpha; }
 
 IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(GreyAlpha32,ga32)
 
@@ -649,7 +640,7 @@ IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(GreyAlpha32,ga32)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRGBImage)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnRGBImage,RGB)
 
-- (ArSpectrumType) colourType { return arspectrum_rgb; }
+- (ArDataType) dataType { return ardt_rgb; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(RGB,rgb)
 
@@ -663,7 +654,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(RGB,rgb)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnUT_RGBImage)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnUT_RGBImage,UT_RGB)
 
-- (ArSpectrumType) colourType { return arspectrum_rgb; }
+- (ArDataType) dataType { return ardt_rgb; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(UT_RGB,ut_rgb)
 
@@ -677,7 +668,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(UT_RGB,ut_rgb)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRGBAImage)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnRGBAImage,RGBA)
 
-- (ArSpectrumType) colourType { return arspectrum_rgba; }
+- (ArDataType) dataType { return ardt_rgba; }
 
 IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(RGBA,rgba)
 
@@ -691,7 +682,7 @@ IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(RGBA,rgba)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnUT_RGBAImage)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnUT_RGBAImage,UT_RGBA)
 
-- (ArSpectrumType) colourType { return arspectrum_ut_rgba; }
+- (ArDataType) dataType { return ardt_ut_xyza; }
 
 IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(UT_RGBA,ut_rgba)
 
@@ -705,7 +696,7 @@ IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(UT_RGBA,ut_rgba)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRGB24Image)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnRGB24Image,RGB24)
 
-- (ArSpectrumType) colourType { return arspectrum_rgb24; }
+- (ArDataType) dataType { return ardt_rgb24; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(RGB24,rgb24)
 
@@ -719,7 +710,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(RGB24,rgb24)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRGBA32Image)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnRGBA32Image,RGBA32)
 
-- (ArSpectrumType) colourType { return arspectrum_rgba32; }
+- (ArDataType) dataType { return ardt_rgba32; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(RGBA32,rgba32)
 
@@ -733,7 +724,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(RGBA32,rgba32)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRGB48Image)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnRGB48Image,RGB48)
 
-- (ArSpectrumType) colourType { return arspectrum_rgb48; }
+- (ArDataType) dataType { return ardt_rgb48; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(RGB48,rgb48)
 
@@ -747,7 +738,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(RGB48,rgb48)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRGBA64Image)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnRGBA64Image,RGBA64)
 
-- (ArSpectrumType) colourType { return arspectrum_rgba64; }
+- (ArDataType) dataType { return ardt_rgba64; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(RGBA64,rgba64)
 
@@ -762,26 +753,12 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(RGBA64,rgba64)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRGB96Image)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnRGB96Image,RGB96)
 
-- (ArSpectrumType) colourType { return arspectrum_rgb96; }
+- (ArDataType) dataType { return ardt_rgb96; }
 
 IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(RGB96,rgb96)
 
 @end
 
-/* ===========================================================================
-    'ArnRGBA128Image'
-=========================================================================== */
-@implementation ArnRGBA128Image
-
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRGBA128Image)
-ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnRGBA128Image,RGBA128)
-
-- (ArSpectrumType) colourType { return arspectrum_rgba128; }
-
-IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(RGBA128,rgba128)
-
-@end
-    
 /* ===========================================================================
     'ArnCIEXYZImage'
 =========================================================================== */
@@ -790,7 +767,7 @@ IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(RGBA128,rgba128)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCIEXYZImage)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnCIEXYZImage,CIEXYZ)
 
-- (ArSpectrumType) colourType { return arspectrum_ciexyz; }
+- (ArDataType) dataType { return ardt_ciexyz; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(CIEXYZ,xyz)
 
@@ -804,7 +781,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(CIEXYZ,xyz)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCIEXYZAImage)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnCIEXYZAImage,CIEXYZA)
 
-- (ArSpectrumType) colourType { return arspectrum_ciexyza; }
+- (ArDataType) dataType { return ardt_ciexyza; }
 
 IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(CIEXYZA,xyza)
 
@@ -818,7 +795,7 @@ IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(CIEXYZA,xyza)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSpectrum8Image)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnSpectrum8Image,Spectrum8)
 
-- (ArSpectrumType) colourType { return arspectrum_spectrum8; }
+- (ArDataType) dataType { return ardt_spectrum8; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Spectrum8,s8)
 
@@ -832,7 +809,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Spectrum8,s8)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSpectrum18Image)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnSpectrum18Image,Spectrum18)
 
-- (ArSpectrumType) colourType { return arspectrum_spectrum18; }
+- (ArDataType) dataType { return ardt_spectrum18; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Spectrum18,s18)
 
@@ -846,7 +823,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Spectrum18,s18)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSpectrum46Image)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnSpectrum46Image,Spectrum46)
 
-- (ArSpectrumType) colourType { return arspectrum_spectrum46; }
+- (ArDataType) dataType { return ardt_spectrum46; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Spectrum46,s46)
 
@@ -997,7 +974,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLightAlphaImage)
     return *(data + y * stride);
 }
 
-- (ArSpectrumType) colourType
+- (ArDataType) dataType
 {
     return art_foundation_isr(art_gv);
 }

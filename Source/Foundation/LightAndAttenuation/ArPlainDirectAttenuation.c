@@ -42,7 +42,7 @@ const char * arplaindirectattenuation_act_string(
         const ART_GV  * art_gv
         )
 {
-    return "Plain Attenuation";
+    return "plain attenuation";
 }
 
 ArPlainDirectAttenuation *

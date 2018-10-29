@@ -29,16 +29,16 @@
 
 #include "ART_Foundation_System.h"
 
-#include "ArSpectrumType.h"
+#include "ArDataType.h"
 
 ART_MODULE_INTERFACE(ArSpectrumSubsystemManagement)
 
 void art_foundation_set_isr(
         ART_GV          * art_gv,
-        ArSpectrumType    isr
+        ArDataType    isr
         );
 
-ArSpectrumType  art_foundation_isr(
+ArDataType  art_foundation_isr(
         ART_GV  * art_gv
         );
 

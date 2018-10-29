@@ -100,7 +100,7 @@ void art_set_default_rgbspace_ref(
 
 void art_set_isr(
         ART_GV          * art_gv,
-        ArSpectrumType    isr
+        ArDataType    isr
         )
 {
     art_shutdown_spectrum_subsystem( art_gv );
@@ -109,19 +109,19 @@ void art_set_isr(
 
     switch (isr)
     {
-        case arspectrum_ut_rgb:
-        case arspectrum_spectrum8:
-        case arspectrum_spectrum11:
-        case arspectrum_spectrum18:
-        case arspectrum_spectrum46:
+        case ardt_ut_xyz:
+        case ardt_spectrum8:
+        case ardt_spectrum11:
+        case ardt_spectrum18:
+        case ardt_spectrum46:
             arlightandattenuation_switch_to_plain( art_gv );
             break;
 
-        case arspectrum_ut_rgb_polarisable:
-        case arspectrum_spectrum8_polarisable:
-        case arspectrum_spectrum11_polarisable:
-        case arspectrum_spectrum18_polarisable:
-        case arspectrum_spectrum46_polarisable:
+        case ardt_ut_xyz_polarisable:
+        case ardt_spectrum8_polarisable:
+        case ardt_spectrum11_polarisable:
+        case ardt_spectrum18_polarisable:
+        case ardt_spectrum46_polarisable:
             arlightandattenuation_switch_to_polarisable( art_gv );
             break;
 
@@ -147,7 +147,7 @@ void art_set_isr(
         );
 }
 
-ArSpectrumType  art_isr(
+ArDataType  art_isr(
         ART_GV  * art_gv
         )
 {

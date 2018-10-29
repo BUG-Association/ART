@@ -82,34 +82,34 @@ ART_MODULE_INTERFACE(ARM_Action)
         : (__c) \
         ]
 
-#define SET_ISR_TO_PLAIN_RGB \
-    SET_ISR_ACTION(arspectrum_ut_rgb)
-#define SET_ISR_TO_POLARISABLE_RGB \
-    SET_ISR_ACTION(arspectrum_ut_rgb_polarisable)
-#define SET_ISR_TO_RGB                SET_ISR_TO_PLAIN_RGB
+#define SET_ISR_TO_PLAIN_XYZ \
+    SET_ISR_ACTION(ardt_ut_xyz)
+#define SET_ISR_TO_POLARISABLE_XYZ \
+    SET_ISR_ACTION(ardt_ut_xyz_polarisable)
+#define SET_ISR_TO_XYZ                SET_ISR_TO_PLAIN_XYZ
 
 #define SET_ISR_TO_PLAIN_SPECTRUM_8 \
-    SET_ISR_ACTION(arspectrum_spectrum8)
+    SET_ISR_ACTION(ardt_spectrum8)
 #define SET_ISR_TO_POLARISABLE_SPECTRUM_8 \
-    SET_ISR_ACTION(arspectrum_spectrum8_polarisable)
+    SET_ISR_ACTION(ardt_spectrum8_polarisable)
 #define SET_ISR_TO_SPECTRUM_8         SET_ISR_TO_PLAIN_SPECTRUM_8
 #define SET_ISR_TO_S8                 SET_ISR_TO_SPECTRUM_8
 #define SET_ISR_TO_PLAIN_S8           SET_ISR_TO_PLAIN_SPECTRUM_8
 #define SET_ISR_TO_POLARISABLE_S8     SET_ISR_TO_POLARISABLE_SPECTRUM_8
 
 #define SET_ISR_TO_PLAIN_SPECTRUM_16 \
-    SET_ISR_ACTION(arspectrum_spectrum18)
+    SET_ISR_ACTION(ardt_spectrum18)
 #define SET_ISR_TO_POLARISABLE_SPECTRUM_16 \
-    SET_ISR_ACTION(arspectrum_spectrum18_polarisable)
+    SET_ISR_ACTION(ardt_spectrum18_polarisable)
 #define SET_ISR_TO_SPECTRUM_16        SET_ISR_TO_PLAIN_SPECTRUM_16
 #define SET_ISR_TO_s18                SET_ISR_TO_SPECTRUM_16
 #define SET_ISR_TO_PLAIN_s18          SET_ISR_TO_PLAIN_SPECTRUM_16
 #define SET_ISR_TO_POLARISABLE_s18    SET_ISR_TO_POLARISABLE_SPECTRUM_16
 
 #define SET_ISR_TO_PLAIN_SPECTRUM_45 \
-    SET_ISR_ACTION(arspectrum_spectrum46)
+    SET_ISR_ACTION(ardt_spectrum46)
 #define SET_ISR_TO_POLARISABLE_SPECTRUM_45 \
-    SET_ISR_ACTION(arspectrum_spectrum46_polarisable)
+    SET_ISR_ACTION(ardt_spectrum46_polarisable)
 #define SET_ISR_TO_SPECTRUM_45        SET_ISR_TO_PLAIN_SPECTRUM_45
 #define SET_ISR_TO_s46                SET_ISR_TO_SPECTRUM_45
 #define SET_ISR_TO_PLAIN_s46          SET_ISR_TO_PLAIN_SPECTRUM_45

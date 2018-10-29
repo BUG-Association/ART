@@ -45,8 +45,8 @@ ART_MODULE_INTERFACE(ArfJPEG)
 
     void                           * dataLine;
 
-    unsigned int                     colourType;
-    unsigned int                     filecolourType;
+    unsigned int                     dataType;
+    unsigned int                     fileDataType;
 }
 
 @end

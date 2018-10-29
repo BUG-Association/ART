@@ -80,11 +80,11 @@ unsigned int arfjpegtype(
                 {
                     switch (samplesPerPixel)
                     {
-                        case 1:         return arspectrum_grey8;
-                        default:        return arspectrum_unknown;
+                        case 1:         return ardt_grey8;
+                        default:        return ardt_unknown;
                     }
                 }
-                default:                return arspectrum_unknown;
+                default:                return ardt_unknown;
             }
         }
         case JCS_RGB:
@@ -95,19 +95,19 @@ unsigned int arfjpegtype(
                 {
                     switch (samplesPerPixel)
                     {
-                        case 3:         return arspectrum_colour24;
+                        case 3:         return ardt_colour24;
                         // JPEG does not support RGBA
-                        //case 4:               return arspectrum_colour32;
-                        default:        return arspectrum_unknown;
+                        //case 4:               return ardt_colour32;
+                        default:        return ardt_unknown;
                     }
                 }
-                default:                return arspectrum_unknown;
+                default:                return ardt_unknown;
             }
         }
-        case JCS_UNKNOWN:               return arspectrum_unknown;
-        default:                        return arspectrum_unknown;
+        case JCS_UNKNOWN:               return ardt_unknown;
+        default:                        return ardt_unknown;
     }
-    return arspectrum_unknown;
+    return ardt_unknown;
 }
 
 - (ArnImageInfo *) open     // open for reading
@@ -164,12 +164,12 @@ unsigned int arfjpegtype(
     dataLine = 0;
     resolution = FVEC2D(72.0,72.0);
 
-    filecolourType = arfjpegtype(fileColourSpace, bitsPerSample, samplesPerPixel);
+    fileDataType = arfjpegtype(fileColourSpace, bitsPerSample, samplesPerPixel);
 
 //     printf("\n--------------------------------\n");
 //     printf("size= (%ld/%ld)\n",XC(size),YC(size));
 //     printf("Samples / Pixel: %d\n",samplesPerPixel);
-//     printf("filecolourType: %X\n",filecolourType);
+//     printf("fileDataType: %X\n",fileDataType);
 //     printf("out_color_space = %d \n",fileColourSpace);
 //
 //     printf("out-colour-space: %X\n",dinfo->out_color_space);
@@ -180,22 +180,22 @@ unsigned int arfjpegtype(
 //     printf("\t JCS_CMYK: %d\n",JCS_CMYK);
 //     printf("\t JCS_YCCK: %d\n",JCS_YCCK);
 
-    switch (filecolourType)
+    switch (fileDataType)
     {
-        case arspectrum_grey8:
+        case ardt_grey8:
         {
             G8_DATA_NC = ALLOC_ARRAY(Grey8, XC(size));
-            colourType = arspectrum_grey8;
+            dataType = ardt_grey8;
             break;
         }
-        case arspectrum_colour24:
-        case arspectrum_colour32:
+        case ardt_colour24:
+        case ardt_colour32:
         {
             C32_DATA_NC = ALLOC_ARRAY(Colour32, XC(size));
-            colourType = arspectrum_colour32;
+            dataType = ardt_colour32;
             break;
         }
-        case arspectrum_unknown:
+        case ardt_unknown:
         {
             ART_ERRORHANDLING_FATAL_ERROR(
                 "%s has unsupported type (colourSpace:%d, bits:%d, samples:%d)"
@@ -212,8 +212,8 @@ unsigned int arfjpegtype(
     imageInfo =
         [ NEW_WEAK_NODE(ArnImageInfo)
             :   size
-            :   colourType
-            :   filecolourType
+            :   dataType
+            :   fileDataType
             :   resolution
             ];
 
@@ -243,11 +243,11 @@ unsigned int arfjpegtype(
                 ,   [ file name ]
                 );
 
-    switch (filecolourType)
+    switch (fileDataType)
     {
-        case arspectrum_grey8:
+        case ardt_grey8:
         {
-            // printf("\n[arfjpeg_debug_R]\tarspectrum_grey8 : \n  want to read %ld lines, start at %ld\n",YC(image->size),YC(start));
+            // printf("\n[arfjpeg_debug_R]\tardt_grey8 : \n  want to read %ld lines, start at %ld\n",YC(image->size),YC(start));
             for (y = 0; y < YC(image->size); y++)
             {
                 if (jpeg_read_scanlines(dinfo, &jsampleRow, 1) != 1)
@@ -264,9 +264,9 @@ unsigned int arfjpegtype(
             }
             break;
         }
-        case arspectrum_colour24:
+        case ardt_colour24:
         {
-            // printf("\n[arfjpeg_debug_R]\tarspectrum_colour24 : \n  want to read %ld lines, start at %ld\n",YC(image->size),YC(start));
+            // printf("\n[arfjpeg_debug_R]\tardt_colour24 : \n  want to read %ld lines, start at %ld\n",YC(image->size),YC(start));
             for (y = 0; y < YC(image->size); y++)
             {
                 JSAMPLE * jsamples;
@@ -323,10 +323,10 @@ unsigned int arfjpegtype(
     jpeg_set_quality(cinfo, [imageInfo quality] * 100,
                      TRUE /* limit to baseline-JPEG values */);
 
-    colourType = [imageInfo colourType];
-    filecolourType = [imageInfo fileColourType];
+    dataType = [imageInfo dataType];
+    fileDataType = [imageInfo fileDataType];
 
-    numChannels = ARSPECTRUM_NUMCHANNELS(filecolourType);
+    numChannels = ARDATATYPE_NUMCHANNELS(fileDataType);
     switch (numChannels)
     {
         case 1:
@@ -350,7 +350,7 @@ unsigned int arfjpegtype(
         {
             ART_ERRORHANDLING_FATAL_ERROR(
                 "cannot write image of type %x"
-                ,   colourType
+                ,   dataType
                 );
         }
     }

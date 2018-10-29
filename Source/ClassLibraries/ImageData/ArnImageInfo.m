@@ -47,19 +47,19 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBasicImageInfo)
 - init
         : (IVec2D) newSize
 {
-    return [self init :newSize :arspectrum_unknown];
+    return [self init :newSize :ardt_unknown];
 }
 
 - init
         : (IVec2D) newSize
-        : (unsigned int) newColourType
+        : (unsigned int) newDataType
 {
     self = [super init];
     
     if ( self )
     {
         size = newSize;
-        colourType = newColourType;
+        dataType = newDataType;
     }
     
     return self;
@@ -90,8 +90,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBasicImageInfo)
 - (IVec2D) size
     { return size; }
 
-- (ArColourType) colourType
-    { return colourType; }
+- (ArDataType) dataType
+    { return dataType; }
 
 - (IPnt2D) origin
     { return IPNT2D(0,0); }
@@ -109,7 +109,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBasicImageInfo)
 {
     [ super code      :   coder];
     [ coder codeIVec2D: & size];
-    [ coder codeUInt  : ((unsigned int *)& colourType) ];
+    [ coder codeUInt  : ((unsigned int *)& dataType) ];
 }
 
 @end
@@ -120,13 +120,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageInfo)
 
 - init
         : (IVec2D) newSize
-        : (unsigned int) newColourType
+        : (unsigned int) newDataType
 {
-    self = [super init :newSize :newColourType];
+    self = [super init :newSize :newDataType];
     
     if ( self )
     {
-        fileColourType = newColourType;
+        fileDataType = newDataType;
         resolution = FVEC2D(72.0,72.0);
         quality = 1.0;
         destinationCSR = 0;
@@ -137,15 +137,15 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageInfo)
 
 - init
         : (IVec2D) newSize
-        : (ArColourType) newColourType
-        : (ArColourType) newFileColourType
+        : (ArDataType) newDataType
+        : (ArDataType) newFileDataType
         : (FVec2D) newResolution
 {
-    self = [super init :newSize :newColourType];
+    self = [super init :newSize :newDataType];
     
     if ( self )
     {
-        fileColourType = newFileColourType;
+        fileDataType = newFileDataType;
         resolution = newResolution;
         quality = 1.0;
         destinationCSR = 0;
@@ -156,16 +156,16 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageInfo)
 
 - init
         : (IVec2D) newSize
-        : (ArColourType) newColourType
-        : (ArColourType) newFileColourType
+        : (ArDataType) newDataType
+        : (ArDataType) newFileDataType
         : (FVec2D) newResolution
         : (ArNode <ArpColourSpace> *) newDestinationColourSpace
 {
-    self = [super init :newSize :newColourType];
+    self = [super init :newSize :newDataType];
     
     if ( self )
     {
-        fileColourType = newFileColourType;
+        fileDataType = newFileDataType;
         resolution = newResolution;
         quality = 1.0;
         destinationCSR = [ ((ArnColourSpace *)newDestinationColourSpace) colourSpaceRef ];
@@ -226,10 +226,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageInfo)
     size = newSize;
 }
 
-- (void) setColourType
-        : (ArColourType) newColourType
+- (void) setDataType
+        : (ArDataType) newDataType
 {
-    colourType = newColourType;
+    dataType = newDataType;
 }
 
 - (void) setRendertimeString
@@ -260,15 +260,15 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageInfo)
     return samplecountString;
 }
 
-- (ArColourType) fileColourType
+- (ArDataType) fileDataType
 {
-    return fileColourType;
+    return fileDataType;
 }
 
-- (void) setFileColourType
-        : (ArColourType) newFileColourType
+- (void) setFileDataType
+        : (ArDataType) newFileDataType
 {
-    fileColourType = newFileColourType;
+    fileDataType = newFileDataType;
 }
 
 - (FVec2D) resolution

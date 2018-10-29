@@ -260,7 +260,35 @@ ArConstString  art_ev_arm2art_stub_path(
         const ART_GV  * art_gv
         );
 
-#define ARM2ART_STUB_PATH      art_ev_arm2art_stub_path( art_gv )
+#define ARM2ART_STUB_PATH       art_ev_arm2art_stub_path( art_gv )
+
+
+/* ---------------------------------------------------------------------------
+
+    ART_DEFAULT_ISR
+
+    The default ISR used by ART. The environment variable should be set to
+    a string which corresponds to the commandline flags used by 'artist'
+    et al (minus the dash, of course), like so:
+ 
+    export ART_DEFAULT_ISR = s11e
+ 
+    or
+
+    export ART_DEFAULT_ISR = rgb
+
+    The function 'art_default_isr' returns an integer and not a string,
+    though. The integer is meant to be cast to the enum 'ArDataType'
+    by those functions which need to know about the default. We don't
+    include 'ArDataType.h' here to avoid cyclical #includes.
+
+------------------------------------------------------------------------aw- */
+
+unsigned int  art_default_isr(
+        const ART_GV  * art_gv
+        );
+
+#define ART_DEFAULT_ISR         art_default_isr( art_gv )
 
 
 #endif /* _ART_FOUNDATION_SYSTEM_ENVIRONMENT_VARIABLES_H_ */

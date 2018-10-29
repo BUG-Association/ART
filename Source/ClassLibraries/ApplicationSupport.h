@@ -263,15 +263,16 @@ void art_set_special_startup_option_and_function(
 }
 
 int art_print_banner_and_process_standard_commandline_options(
-        int           argc,
-        char       ** argv,
-        ART_GV      * art_gv,
-        const char  * application_name,
-        const char  * application_description,
-        const char  * application_long_description,
-        const char  * application_usage_line,
-        const unsigned int  minArgs,
-        const unsigned int  maxArgs
+              int             argc,
+              char         ** argv,
+              ART_GV        * art_gv,
+        const char          * application_name,
+        const char          * application_description,
+        const char          * application_long_description,
+        const char          * application_usage_line,
+        const BOOL            native_ART_app,
+        const unsigned int    minArgs,
+        const unsigned int    maxArgs
         );
 
 #define ART_DUAL_INPUT_FILE_APPLICATION_STARTUP(__name,__desc,__ldesc,__usage) \
@@ -284,6 +285,7 @@ int art_print_banner_and_process_standard_commandline_options(
                __desc, \
                __ldesc, \
                __usage, \
+               YES, \
                3, \
                3 \
                ) ) \
@@ -300,6 +302,7 @@ int art_print_banner_and_process_standard_commandline_options(
                __desc, \
                "", \
                __usage, \
+               YES, \
                2, \
                2 \
                ) ) \
@@ -321,6 +324,7 @@ int art_print_banner_and_process_standard_commandline_options(
                __desc, \
                __ldesc, \
                __usage, \
+               YES, \
                2, \
                2 \
                ) ) \
@@ -342,6 +346,7 @@ int art_print_banner_and_process_standard_commandline_options(
                __desc, \
                __ldesc, \
                __usage, \
+               YES, \
                1, \
                1 \
                ) ) \
@@ -358,6 +363,24 @@ int art_print_banner_and_process_standard_commandline_options(
                __desc, \
                "", \
                __usage, \
+               YES, \
+               1, \
+               1 \
+               ) ) \
+        return 0; \
+}
+
+#define ART_EXTERNAL_APP_NO_INPUT_FILES_APPLICATION_STARTUP(__name,__desc,__usage) \
+{ \
+    if ( ! art_print_banner_and_process_standard_commandline_options( \
+               argc, \
+               argv, \
+               art_gv, \
+               __name, \
+               __desc, \
+               "", \
+               __usage, \
+               NO, \
                1, \
                1 \
                ) ) \

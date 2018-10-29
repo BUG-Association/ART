@@ -94,8 +94,8 @@ ART_MODULE_INTERFACE(ArnSingleImageManipulationAction)
     char           ** destinationFilename;
     char           ** destinationFilenameTag;
     ArnImageInfo    * destinationImageInfo;
-    ArColourType      destinationImageColourType;
-    ArColourType      destinationFileColourType;
+    ArDataType      destinationImageDataType;
+    ArDataType      destinationFileDataType;
     ArNode         ** sourceImageBuffer;
     
     //   How many source scanline buffers there are. There can be more

@@ -1,0 +1,469 @@
+#ifndef SAMPLES
+#define SAMPLES 32
+#endif
+
+ARM_MAIN_FUNCTION(GlowingObjects)
+{
+#define WITH_DIFFUSE_ENVIRONMENT
+//#define NICKEL
+//#define SILVER
+#define GOLD
+//#define COPPER
+//#define PLATINUM
+//#define SELENIUM
+
+#ifdef GOLD_RSS
+    id ior_metal  = 
+        CONST_COLOUR_RSSPECTRUM( 
+            380.0 NANOMETER, 100.0 NANOMETER, 1.0,	
+            1.674,  1.242,  0.236, 0.160, 0.174,
+            RSS_END
+            );
+            
+    id extinction_metal  = 
+        CONST_COLOUR_RSSPECTRUM( 
+            380.0 NANOMETER, 100.0 NANOMETER, 1.0,	
+            1.936,  1.796,  2.88, 3.80, 4.86,
+            RSS_END
+            );
+#endif
+
+#ifdef GOLD
+    id ior_metal  =
+        CONST_COLOUR_PSSPECTRUM( 1.0,
+            PNT2D( 364.7 NANOMETER, 1.716 ),
+            PNT2D( 375.7 NANOMETER, 1.696 ),
+            PNT2D( 387.5 NANOMETER, 1.674 ),
+            PNT2D( 400.0 NANOMETER, 1.658 ),
+            PNT2D( 413.3 NANOMETER, 1.636 ),
+            PNT2D( 427.5 NANOMETER, 1.616 ),
+            PNT2D( 442.8 NANOMETER, 1.562 ),
+            PNT2D( 459.2 NANOMETER, 1.426 ),
+            PNT2D( 476.9 NANOMETER, 1.242 ),
+            PNT2D( 495.9 NANOMETER, 0.916 ),
+            PNT2D( 516.6 NANOMETER, 0.608 ),
+            PNT2D( 539.1 NANOMETER, 0.402 ),
+            PNT2D( 563.6 NANOMETER, 0.306 ),
+            PNT2D( 590.4 NANOMETER, 0.236 ),
+            PNT2D( 619.9 NANOMETER, 0.194 ),
+            PNT2D( 652.6 NANOMETER, 0.166 ),
+            PNT2D( 688.8 NANOMETER, 0.160 ),
+            PNT2D( 729.3 NANOMETER, 0.164 ),
+            PNT2D( 774.9 NANOMETER, 0.174 ),
+            PNT2D( 826.6 NANOMETER, 0.188 ),
+            PNT2D( 885.6 NANOMETER, 0.210 ),
+            PNT2D( 953.7 NANOMETER, 0.236 ),
+            PSS_END 
+            );
+            
+    id extinction_metal  = 
+        CONST_COLOUR_PSSPECTRUM( 1.0,
+            PNT2D( 364.7 NANOMETER, 1.862 ),
+            PNT2D( 375.7 NANOMETER, 1.906 ),
+            PNT2D( 387.5 NANOMETER, 1.936 ),
+            PNT2D( 400.0 NANOMETER, 1.956 ),
+            PNT2D( 413.3 NANOMETER, 1.958 ),
+            PNT2D( 427.5 NANOMETER, 1.940 ),
+            PNT2D( 442.8 NANOMETER, 1.904 ),
+            PNT2D( 459.2 NANOMETER, 1.846 ),
+            PNT2D( 476.9 NANOMETER, 1.796 ),
+            PNT2D( 495.9 NANOMETER, 1.840 ),
+            PNT2D( 516.6 NANOMETER, 2.120 ),
+            PNT2D( 539.1 NANOMETER, 2.540 ),
+            PNT2D( 563.6 NANOMETER, 2.88  ),
+            PNT2D( 652.6 NANOMETER, 3.15  ),
+            PNT2D( 688.8 NANOMETER, 3.80  ),
+            PNT2D( 729.3 NANOMETER, 4.35  ),
+            PNT2D( 774.9 NANOMETER, 4.86  ),
+            PNT2D( 826.6 NANOMETER, 5.39  ),
+            PNT2D( 885.6 NANOMETER, 5.88  ),
+            PNT2D( 953.7 NANOMETER, 6.47  ),
+            PSS_END 
+            );
+#endif
+
+#ifdef NICKEL
+    id ior_metal  = 
+        CONST_COLOUR_PSSPECTRUM( 1.0,
+            PNT2D(  344.4 NANOMETER, 1.64 ),
+            PNT2D(  354.2 NANOMETER, 1.63 ),
+            PNT2D(  364.7 NANOMETER, 1.62 ),
+            PNT2D(  375.7 NANOMETER, 1.61 ),
+            PNT2D(  387.5 NANOMETER, 1.61 ),
+            PNT2D(  400   NANOMETER, 1.61 ),
+            PNT2D(  413.3 NANOMETER, 1.61 ),
+            PNT2D(  427.5 NANOMETER, 1.62 ),
+            PNT2D(  442.8 NANOMETER, 1.62 ),
+            PNT2D(  459.2 NANOMETER, 1.64 ),
+            PNT2D(  476.9 NANOMETER, 1.66 ),
+            PNT2D(  495.9 NANOMETER, 1.67 ),
+            PNT2D(  516.6 NANOMETER, 1.71 ),
+            PNT2D(  539.1 NANOMETER, 1.75 ),
+            PNT2D(  563.6 NANOMETER, 1.80 ),
+            PNT2D(  590.4 NANOMETER, 1.85 ),
+            PNT2D(  619.9 NANOMETER, 1.93 ),
+            PNT2D(  635.8 NANOMETER, 1.98 ),
+            PNT2D(  652.6 NANOMETER, 2.02 ),
+            PNT2D(  670.2 NANOMETER, 2.08 ),
+            PNT2D(  688.8 NANOMETER, 2.14 ),
+            PNT2D(  708.5 NANOMETER, 2.21 ),
+            PNT2D(  729.3 NANOMETER, 2.28 ),
+            PNT2D(  751.4 NANOMETER, 2.36 ),
+            PNT2D(  774.9 NANOMETER, 2.43 ),
+            PNT2D(  799.9 NANOMETER, 2.48 ),
+            PNT2D(  826.6 NANOMETER, 2.53 ),
+            PNT2D(  855.1 NANOMETER, 2.59 ),
+            PNT2D(  885.6 NANOMETER, 2.65 ),
+            PNT2D(  918.4 NANOMETER, 2.69 ),
+            PNT2D(  953.7 NANOMETER, 2.74 ),
+            PSS_END 
+            );
+            
+    id extinction_metal  = 
+        CONST_COLOUR_PSSPECTRUM( 1.0,
+            PNT2D(  344.4 NANOMETER, 2.07 ),
+            PNT2D(  354.2 NANOMETER, 2.11 ),
+            PNT2D(  364.7 NANOMETER, 2.17 ),
+            PNT2D(  375.7 NANOMETER, 2.23 ),
+            PNT2D(  387.5 NANOMETER, 2.30 ),
+            PNT2D(  400   NANOMETER, 2.36 ),
+            PNT2D(  413.3 NANOMETER, 2.44 ),
+            PNT2D(  427.5 NANOMETER, 2.52 ),
+            PNT2D(  442.8 NANOMETER, 2.61 ),
+            PNT2D(  459.2 NANOMETER, 2.71 ),
+            PNT2D(  476.9 NANOMETER, 2.81 ),
+            PNT2D(  495.9 NANOMETER, 2.93 ),
+            PNT2D(  516.6 NANOMETER, 3.06 ),
+            PNT2D(  539.1 NANOMETER, 3.19 ),
+            PNT2D(  563.6 NANOMETER, 3.33 ),
+            PNT2D(  590.4 NANOMETER, 3.48 ),
+            PNT2D(  619.9 NANOMETER, 3.65 ),
+            PNT2D(  635.8 NANOMETER, 3.74 ),
+            PNT2D(  652.6 NANOMETER, 3.82 ),
+            PNT2D(  670.2 NANOMETER, 3.91 ),
+            PNT2D(  688.8 NANOMETER, 4.00 ),
+            PNT2D(  708.5 NANOMETER, 4.09 ),
+            PNT2D(  729.3 NANOMETER, 4.18 ),
+            PNT2D(  751.4 NANOMETER, 4.25 ),
+            PNT2D(  774.9 NANOMETER, 4.31 ),
+            PNT2D(  799.9 NANOMETER, 4.38 ),
+            PNT2D(  826.6 NANOMETER, 4.47 ),
+            PNT2D(  855.1 NANOMETER, 4.55 ),
+            PNT2D(  885.6 NANOMETER, 4.63 ),
+            PNT2D(  918.4 NANOMETER, 4.73 ),
+            PNT2D(  953.7 NANOMETER, 4.85 ),
+            PSS_END 
+            );
+#endif
+
+#ifdef SILVER
+    id ior_metal  = 
+        CONST_COLOUR_PSSPECTRUM( 1.0,
+            PNT2D( 364.7 NANOMETER, 0.186 ),
+            PNT2D( 375.7 NANOMETER, 0.200 ),
+            PNT2D( 387.5 NANOMETER, 0.192 ),
+            PNT2D( 400.0 NANOMETER, 0.173 ),
+            PNT2D( 413.3 NANOMETER, 0.173 ),
+            PNT2D( 427.5 NANOMETER, 0.160 ),
+            PNT2D( 442.8 NANOMETER, 0.157 ),
+            PNT2D( 459.2 NANOMETER, 0.144 ),
+            PNT2D( 476.9 NANOMETER, 0.132 ),
+            PNT2D( 495.9 NANOMETER, 0.130 ),
+            PNT2D( 516.6 NANOMETER, 0.130 ),
+            PNT2D( 539.1 NANOMETER, 0.129 ),
+            PNT2D( 563.6 NANOMETER, 0.120 ),
+            PNT2D( 590.4 NANOMETER, 0.121 ),
+            PNT2D( 619.9 NANOMETER, 0.131 ),
+            PNT2D( 652.6 NANOMETER, 0.140 ),
+            PNT2D( 688.8 NANOMETER, 0.140 ),
+            PNT2D( 729.3 NANOMETER, 0.148 ),
+            PNT2D( 774.9 NANOMETER, 0.143 ),
+            PNT2D( 826.6 NANOMETER, 0.145 ),
+            PNT2D( 885.6 NANOMETER, 0.163 ),
+            PNT2D( 953.7 NANOMETER, 0.198 ),
+            PSS_END 
+            );
+            
+    id extinction_metal  = 
+        CONST_COLOUR_PSSPECTRUM( 1.0,
+            PNT2D( 364.7 NANOMETER, 1.61 ),
+            PNT2D( 375.7 NANOMETER, 1.67 ),
+            PNT2D( 387.5 NANOMETER, 1.81 ),
+            PNT2D( 400.0 NANOMETER, 1.95 ),
+            PNT2D( 413.3 NANOMETER, 2.11 ),
+            PNT2D( 427.5 NANOMETER, 2.26 ),
+            PNT2D( 442.8 NANOMETER, 2.40 ),
+            PNT2D( 459.2 NANOMETER, 2.56 ),
+            PNT2D( 476.9 NANOMETER, 2.72 ),
+            PNT2D( 495.9 NANOMETER, 2.88 ),
+            PNT2D( 516.6 NANOMETER, 3.07 ),
+            PNT2D( 539.1 NANOMETER, 3.25 ),
+            PNT2D( 563.6 NANOMETER, 3.45 ),
+            PNT2D( 590.4 NANOMETER, 3.66 ),
+            PNT2D( 619.9 NANOMETER, 3.88 ),
+            PNT2D( 652.6 NANOMETER, 4.15 ),
+            PNT2D( 688.8 NANOMETER, 4.44 ),
+            PNT2D( 729.3 NANOMETER, 4.74 ),
+            PNT2D( 774.9 NANOMETER, 5.09 ),
+            PNT2D( 826.6 NANOMETER, 5.50 ),
+            PNT2D( 885.6 NANOMETER, 5.95 ),
+            PNT2D( 953.7 NANOMETER, 6.43 ),
+            PSS_END 
+            );
+#endif
+
+#ifdef COPPER
+    id ior_metal  = 
+        CONST_COLOUR_PSSPECTRUM( 1.0,
+            PNT2D(  344.4 NANOMETER, 1.31  ),
+            PNT2D(  364.6 NANOMETER, 1.27  ),
+            PNT2D(  387.4 NANOMETER, 1.18  ),
+            PNT2D(  413.3 NANOMETER, 1.18  ),
+            PNT2D(  442.8 NANOMETER, 1.17  ),
+            PNT2D(  476.8 NANOMETER, 1.15  ),
+            PNT2D(  516.6 NANOMETER, 1.12  ),
+            PNT2D(  539.0 NANOMETER, 1.04  ),
+            PNT2D(  563.5 NANOMETER, 0.826 ),
+            PNT2D(  590.4 NANOMETER, 0.468 ),
+            PNT2D(  619.9 NANOMETER, 0.272 ),
+            PNT2D(  652.5 NANOMETER, 0.214 ),
+            PNT2D(  670.2 NANOMETER, 0.215 ),
+            PNT2D(  688   NANOMETER, 0.213 ),
+            PNT2D(  708.4 NANOMETER, 0.214 ),
+            PNT2D(  729.3 NANOMETER, 0.223 ),
+            PNT2D(  826.5 NANOMETER, 0.260 ),
+            PNT2D( 1240   NANOMETER, 0.433 ),
+            PSS_END 
+            );
+            
+    id extinction_metal  = 
+        CONST_COLOUR_PSSPECTRUM( 1.0,
+            PNT2D(  344.4 NANOMETER, 1.87 ),
+            PNT2D(  364.6 NANOMETER, 1.95 ),
+            PNT2D(  387.4 NANOMETER, 2.21 ),
+            PNT2D(  413.3 NANOMETER, 2.21 ),
+            PNT2D(  442.8 NANOMETER, 2.36 ),
+            PNT2D(  476.8 NANOMETER, 2.50 ),
+            PNT2D(  516.6 NANOMETER, 2.60 ),
+            PNT2D(  539.0 NANOMETER, 2.59 ),
+            PNT2D(  563.5 NANOMETER, 2.60 ),
+            PNT2D(  590.4 NANOMETER, 2.81 ),
+            PNT2D(  619.9 NANOMETER, 3.24 ),
+            PNT2D(  652.5 NANOMETER, 3.67 ),
+            PNT2D(  670.2 NANOMETER, 3.86 ),
+            PNT2D(  688   NANOMETER, 4.05 ),
+            PNT2D(  708.4 NANOMETER, 4.24 ),
+            PNT2D(  729.3 NANOMETER, 4.43 ),
+            PNT2D(  826.5 NANOMETER, 5.26 ),
+            PNT2D( 1240   NANOMETER, 8.46 ),
+            PSS_END 
+            );
+#endif
+
+#ifdef PLATINUM
+    id ior_metal  = 
+        CONST_COLOUR_PSSPECTRUM( 1.0,
+            PNT2D(  344.4 NANOMETER, 1.58 ),
+            PNT2D(  354.2 NANOMETER, 1.60 ),
+            PNT2D(  364.7 NANOMETER, 1.62 ),
+            PNT2D(  375.7 NANOMETER, 1.65 ),
+            PNT2D(  387.5 NANOMETER, 1.68 ),
+            PNT2D(  400   NANOMETER, 1.72 ),
+            PNT2D(  413.3 NANOMETER, 1.75 ),
+            PNT2D(  427.5 NANOMETER, 1.79 ),
+            PNT2D(  442.8 NANOMETER, 1.83 ),
+            PNT2D(  459.2 NANOMETER, 1.87 ),
+            PNT2D(  476.9 NANOMETER, 1.91 ),
+            PNT2D(  495.9 NANOMETER, 1.96 ),
+            PNT2D(  516.6 NANOMETER, 2.03 ),
+            PNT2D(  539.1 NANOMETER, 2.10 ),
+            PNT2D(  536.6 NANOMETER, 2.17 ),
+            PNT2D(  590.4 NANOMETER, 2.23 ),
+            PNT2D(  619.9 NANOMETER, 2.30 ),
+            PNT2D(  652.6 NANOMETER, 2.38 ),
+            PNT2D(  688.8 NANOMETER, 2.51 ),
+            PNT2D(  729.3 NANOMETER, 2.63 ),
+            PNT2D(  774.9 NANOMETER, 2.76 ),
+            PNT2D(  826.6 NANOMETER, 2.92 ),
+            PNT2D(  885.6 NANOMETER, 3.10 ),
+            PNT2D(  953.7 NANOMETER, 3.29 ),
+            PSS_END );
+
+    id extinction_metal  = 
+        CONST_COLOUR_PSSPECTRUM( 1.0,
+            PNT2D(  344.4 NANOMETER, 2.48 ),
+            PNT2D(  354.2 NANOMETER, 2.55 ),
+            PNT2D(  364.7 NANOMETER, 2.62 ),
+            PNT2D(  375.7 NANOMETER, 2.69 ),
+            PNT2D(  387.5 NANOMETER, 2.76 ),
+            PNT2D(  400   NANOMETER, 2.84 ),
+            PNT2D(  413.3 NANOMETER, 2.92 ),
+            PNT2D(  427.5 NANOMETER, 3.01 ),
+            PNT2D(  442.8 NANOMETER, 3.10 ),
+            PNT2D(  459.2 NANOMETER, 3.20 ),
+            PNT2D(  476.9 NANOMETER, 3.30 ),
+            PNT2D(  495.9 NANOMETER, 3.42 ),
+            PNT2D(  516.6 NANOMETER, 3.54 ),
+            PNT2D(  539.1 NANOMETER, 3.67 ),
+            PNT2D(  536.6 NANOMETER, 3.77 ),
+            PNT2D(  590.4 NANOMETER, 3.92 ),
+            PNT2D(  619.9 NANOMETER, 4.07 ),
+            PNT2D(  652.6 NANOMETER, 4.26 ),
+            PNT2D(  688.8 NANOMETER, 4.43 ),
+            PNT2D(  729.3 NANOMETER, 4.63 ),
+            PNT2D(  774.9 NANOMETER, 4.84 ),
+            PNT2D(  826.6 NANOMETER, 5.07 ),
+            PNT2D(  885.6 NANOMETER, 5.32 ),
+            PNT2D(  953.7 NANOMETER, 5.61 ),
+            PSS_END );
+#endif
+
+#ifdef SELENIUM
+    id ior_metal  = 
+        CONST_COLOUR_PSSPECTRUM( 1.0,
+            PNT2D(  344.4 NANOMETER, 3.06 ),
+            PNT2D(  364.6 NANOMETER, 3.22 ),
+            PNT2D(  387.4 NANOMETER, 3.35 ),
+            PNT2D(  413.2 NANOMETER, 3.30 ),
+            PNT2D(  442.8 NANOMETER, 3.12 ),
+            PNT2D(  476.9 NANOMETER, 3.00 ),
+            PNT2D(  516.6 NANOMETER, 2.93 ),
+            PNT2D(  563.5 NANOMETER, 3.07 ),
+            PNT2D(  619.9 NANOMETER, 3.38 ),
+            PNT2D(  688.8 NANOMETER, 3.32 ),
+            PNT2D( 1000.0 NANOMETER, 2.81 ),
+            PSS_END );
+
+    id extinction_metal  = 
+        CONST_COLOUR_PSSPECTRUM( 1.0,
+            PNT2D(  344.4 NANOMETER, 1.47 ),
+            PNT2D(  364.6 NANOMETER, 1.24 ),
+            PNT2D(  387.4 NANOMETER, 1.01 ),
+            PNT2D(  413.2 NANOMETER, 0.70 ),
+            PNT2D(  442.8 NANOMETER, 0.58 ),
+            PNT2D(  476.9 NANOMETER, 0.53 ),
+            PNT2D(  516.6 NANOMETER, 0.61 ),
+            PNT2D(  563.5 NANOMETER, 0.73 ),
+            PNT2D(  619.9 NANOMETER, 0.65 ),
+            PNT2D(  688.8 NANOMETER, 0.11 ),
+            PNT2D( 1000.0 NANOMETER, 0.00002 ),
+            PSS_END );
+#endif
+
+    id material = STANDARD_MATERIAL( ior_metal, extinction_metal );
+
+//    id material = STANDARD_MATERIAL( CONST_COLOUR_GREY(1.6), CONST_COLOUR_GREY(1.0) );
+
+    id base_sphere =
+        [ SPHERE apply
+            :   USCALE( 2.0 ) //USCALE( 1.8 )
+            :   TRANSLATION( -8.0, 0.0, 0.0 )
+            ];
+
+    int  num_spheres = 12;
+    id   sphere[num_spheres];
+
+    double  angle_start = 120 DEGREES;
+    double  angle_increment = 30 DEGREES;
+
+    double  temp_start = 3150;
+    double  temp_increment = -150;
+
+    for ( int i = 0; i < num_spheres; i++ )
+        sphere[i] = 
+            [ base_sphere apply
+                :   SMOOTH_FRESNEL_EMITTER( 
+                            (temp_start + i * temp_increment) KELVIN
+                            )
+                :   ROT_Z( angle_start + i * angle_increment )
+                :   material
+                ];
+
+    id lambertBaseSurface = LAMBERT_REFLECTOR_CONST( CONST_COLOUR_GREY( 0.8 ) );
+
+    id cylinder0   =
+        [ CYLINDER apply
+            :   SCALE( 400.0, 400.0, 1.0 )
+            :   TRANSLATION( 0.0, 0.0, -3.0)
+            :   lambertBaseSurface
+            ];
+
+    id scene_geometry =
+        UNION(
+            sphere[0],
+            sphere[1],
+            sphere[2],
+            sphere[3],
+            sphere[4],
+            sphere[5],
+            sphere[6],
+            sphere[7],
+            sphere[8],
+            sphere[9],
+            sphere[10],
+            sphere[11],
+
+            cylinder0,
+            UNION_END
+            );
+            
+    id camera =
+        [ CAMERA
+            imageSize:  IVEC2D( 400 , 300 ) //IVEC2D( 1024 , 798 )
+            ray:        RAY3D( PNT3D(0.0,50.0,50.0),VEC3D(0.0,-50.0,-50) )
+            zoom:       2.0
+            ];
+
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  6
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+                        maximalRecursion: 3
+                        mode:             arpathtracermode_direction_sampling
+                    ]
+                sampleSplattingKernel:    TENT_KERNEL
+                samplesPerPixel:          SAMPLES
+                randomValueGeneration:    RANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    YES
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+    
+#ifdef WITH_DIFFUSE_ENVIRONMENT
+    id  environment_material =
+        UNIFORM_ENVIRONMENT_MATERIAL( CIE_ILLUMINANT_D65, 1000000000.0 );
+#endif
+
+    return
+        [ SCENE
+            sceneGeometry      : scene_geometry
+#ifdef WITH_DIFFUSE_ENVIRONMENT
+            environmentMaterial: environment_material
+#endif
+            camera             : camera
+            actionSequence     : actionsequence
+            ];
+}

@@ -42,7 +42,7 @@ const char * arplainlightsample_lct_string(
         const ART_GV                * art_gv
         )
 {
-    return " Plain Light";
+    return " plain light";
 }
 
 void arplainlightsample_s_rf_init_polarised_l(

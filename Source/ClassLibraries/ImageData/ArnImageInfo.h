@@ -40,7 +40,7 @@ ART_MODULE_INTERFACE(ArnImageInfo)
 {
 @public
     IVec2D              size;
-    ArColourType        colourType;
+    ArDataType        dataType;
 }
 
 - init
@@ -49,7 +49,7 @@ ART_MODULE_INTERFACE(ArnImageInfo)
 
 - init
         : (IVec2D) newSize
-        : (unsigned int) newColourType
+        : (unsigned int) newDataType
         ;
 
 @end
@@ -66,7 +66,7 @@ ART_MODULE_INTERFACE(ArnImageInfo)
                 ArpAdditionalImageInfo, ArpSetAdditionalImageInfo
             >
 {
-          ArColourType     fileColourType;
+          ArDataType     fileDataType;
           FVec2D           resolution;
           double           quality;        // For lossy image storage
                                            //  0.0 lowest ... 1.0 highest
@@ -80,20 +80,20 @@ ART_MODULE_INTERFACE(ArnImageInfo)
 
 - init
         : (IVec2D) newSize
-        : (unsigned int) newColourType
+        : (unsigned int) newDataType
         ;
 
 - init
         : (IVec2D) newSize
-        : (ArColourType) newColourType
-        : (ArColourType) newFileColourType
+        : (ArDataType) newDataType
+        : (ArDataType) newFileDataType
         : (FVec2D) newResolution
         ;
 
 - init
         : (IVec2D) newSize
-        : (ArColourType) newColourType
-        : (ArColourType) newFileColourType
+        : (ArDataType) newDataType
+        : (ArDataType) newFileDataType
         : (FVec2D) newResolution
         : (ArNode <ArpColourSpace> *) newDestinationColourSpace
         ;

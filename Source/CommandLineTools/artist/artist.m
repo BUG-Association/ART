@@ -239,7 +239,7 @@ int artist(
     }
 
     if ( [ gpvOpt hasBeenSpecified ] )
-        art_set_isr( art_gv, arspectrum_ut_rgb );
+        art_set_isr( art_gv, ardt_ut_xyz );
     
     if ( [ monoOpt hasBeenSpecified ] )
         art_set_hero_samples_to_splat( art_gv, 1 );
@@ -865,38 +865,30 @@ int artist(
     //   As always with ART images, the two colour types one specifies when
     //   creating an image have the following meaning:
     //
-    //   - imageColourType: the data type the image expects as input
-    //   - fileColourType : what we want it to write to disk for us
+    //   - imageDataType: the data type the image expects as input
+    //   - fileDataType : what we want it to write to disk for us
 
-    ArColourType  imageColourType;
-    ArColourType  fileColourType;
+    ArDataType  imageDataType;
+    ArDataType  fileDataType;
 
-    //   The image colour type is always "native" (i.e. whatever model we
-    //   are using), except for RGB images: to avoid issues with different
-    //   RGB colour spaces, any RGB results get written to disk as CIE XYZ
-
-    if (   art_isr( art_gv ) == arspectrum_ut_rgb
-        || art_isr( art_gv ) == arspectrum_ut_rgb_polarisable )
-        imageColourType = arspectrum_ciexyz;
-    else
-        imageColourType = art_isr( art_gv );
+    imageDataType = art_isr( art_gv );
 
     //   In the case of a renderer directly writing its output to file, the
     //   image and file colour data types are the same.
 
-    fileColourType = imageColourType;
+    fileDataType = imageDataType;
 
     if ( [ gpvOpt hasBeenSpecified ] )
     {
-        imageColourType = arspectrum_rgba;
-        fileColourType  = arspectrum_rgba32;
+        imageDataType = ardt_rgba;
+        fileDataType  = ardt_rgba32;
     }
     
     ArnImageInfo  * imageInfo =
         [ ALLOC_INIT_OBJECT(ArnImageInfo)
             :   imageSize
-            :   imageColourType
-            :   fileColourType
+            :   imageDataType
+            :   fileDataType
             :   resolution
             ];
 

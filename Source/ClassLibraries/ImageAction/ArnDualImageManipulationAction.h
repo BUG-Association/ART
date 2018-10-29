@@ -53,8 +53,8 @@ ART_MODULE_INTERFACE(ArnDualImageManipulationAction)
     const char      * outputTag;
     char            * destinationFilename;
     ArnImageInfo    * destinationImageInfo;
-    ArColourType      destinationImageColourType;
-    ArColourType      destinationFileColourType;
+    ArDataType      destinationImageDataType;
+    ArDataType      destinationFileDataType;
     ArNode          * sourceImageBufferA;
     ArNode          * sourceImageBufferB;
     ArNode          * sourceScanlineBufferA;

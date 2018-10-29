@@ -73,11 +73,11 @@ ART_MODULE_INTERFACE(ScenegraphActions)
 @interface ArnSetISRAction
         : ArNode < ArpCoding, ArpConcreteClass, ArpAction >
 {
-    ArSpectrumType  isr;
+    ArDataType  isr;
 }
 
 - init
-        : (ArSpectrumType) isr
+        : (ArDataType) isr
         ;
 
 @end

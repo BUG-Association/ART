@@ -567,8 +567,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
     destinationImageInfo =
         [ ALLOC_INIT_OBJECT(ArnImageInfo)
             :   destinationImageSize
-            :   destinationImageColourType
-            :   destinationFileColourType
+            :   destinationImageDataType
+            :   destinationFileDataType
             :   [ sourceImage[0] resolution ]
             :   DESTINATION_COLOURSPACE
             ];

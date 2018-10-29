@@ -42,37 +42,37 @@ SWITCHING_INTERFACE_FOR_ISR( ArSpectrum46, s46 );
 
 void art_foundation_set_isr(
         ART_GV          * art_gv,
-        ArSpectrumType    isr
+        ArDataType    isr
         )
 {
     switch (isr)
     {
-        case arspectrum_ut_rgb:
-        case arspectrum_ut_rgb_polarisable:
+        case ardt_ut_xyz:
+        case ardt_ut_xyz_polarisable:
             switch_isr_to_ut_rgb( art_gv );
             art_gv->arspectrum_gv->current_isr = isr;
             break;
 
-        case arspectrum_spectrum8:
-        case arspectrum_spectrum8_polarisable:
+        case ardt_spectrum8:
+        case ardt_spectrum8_polarisable:
             switch_isr_to_s8( art_gv );
             art_gv->arspectrum_gv->current_isr = isr;
             break;
 
-        case arspectrum_spectrum11:
-        case arspectrum_spectrum11_polarisable:
+        case ardt_spectrum11:
+        case ardt_spectrum11_polarisable:
             switch_isr_to_s11( art_gv );
             art_gv->arspectrum_gv->current_isr = isr;
             break;
 
-        case arspectrum_spectrum18:
-        case arspectrum_spectrum18_polarisable:
+        case ardt_spectrum18:
+        case ardt_spectrum18_polarisable:
             switch_isr_to_s18( art_gv );
             art_gv->arspectrum_gv->current_isr = isr;
             break;
 
-        case arspectrum_spectrum46:
-        case arspectrum_spectrum46_polarisable:
+        case ardt_spectrum46:
+        case ardt_spectrum46_polarisable:
             switch_isr_to_s46( art_gv );
             art_gv->arspectrum_gv->current_isr = isr;
             break;
@@ -85,12 +85,12 @@ void art_foundation_set_isr(
     }
 }
 
-ArSpectrumType  art_foundation_isr(
+ArDataType  art_foundation_isr(
         ART_GV  * art_gv
         )
 {
     return
-        art_gv->arspectrum_gv->current_isr & ~arspectrum_polarisable;
+        art_gv->arspectrum_gv->current_isr & ~ardt_polarisable;
 }
 
 void art_foundation_initialise_spectral_subsystem(

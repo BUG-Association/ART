@@ -342,8 +342,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDualImageManipulationAction)
         destinationImageInfo =
             [ ALLOC_INIT_OBJECT(ArnImageInfo)
                 :   imageSize
-                :   destinationImageColourType
-                :   destinationFileColourType
+                :   destinationImageDataType
+                :   destinationFileDataType
                 :   [ sourceImageA resolution ]
                 :   DESTINATION_COLOURSPACE
                 ];
@@ -352,8 +352,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDualImageManipulationAction)
         debugprintf(
             "Creating destination image '%s', colourtype %s, filetype %s \n",
             destinationFilename,
-            arspectrumtype_name(destinationImageColourType),
-            arspectrumtype_name(destinationFileColourType)
+            ardatatype_name(destinationImageDataType),
+            ardatatype_name(destinationFileDataType)
             );
     #endif
 

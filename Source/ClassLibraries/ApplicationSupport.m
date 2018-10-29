@@ -148,7 +148,7 @@ ApplicationSupport_GV;
 #define OUTPUT_OPT      APPSUPPORT_GV->outputOpt
 #define BATCH_OPT       APPSUPPORT_GV->batchOpt
 #define ACS_OPT         APPSUPPORT_GV->acsOpt
-#define RGB_ISR_OPT     APPSUPPORT_GV->rgbISROpt
+#define CSP_ISR_OPT     APPSUPPORT_GV->rgbISROpt
 #define S8V_ISR_OPT     APPSUPPORT_GV->s8vISROpt
 #define S11E_ISR_OPT    APPSUPPORT_GV->s11eISROpt
 #define S18V_ISR_OPT    APPSUPPORT_GV->s18vISROpt
@@ -211,7 +211,7 @@ ART_MODULE_INITIALISATION_FUNCTION
     OUTPUT_OPT      = NULL;
     BATCH_OPT       = NULL;
     ACS_OPT         = NULL;
-    RGB_ISR_OPT     = NULL;
+    CSP_ISR_OPT     = NULL;
     S8V_ISR_OPT     = NULL;
     S11E_ISR_OPT    = NULL;
     S18V_ISR_OPT    = NULL;
@@ -493,35 +493,42 @@ void art_define_standard_commandline_options(
     }
 
     [ OPTION_CATEGORY_TITLE
-        :   "Spectral result image and polarisation support options:"
+        :   "ARTRAW output and polarisation rendering options:"
         ];
 
     if( APP_FEATURES & art_appfeatures_change_isr )
     {
+        CSP_ISR_OPT =
+            [ FLAG_OPTION
+                :   "colourspace"
+                :   "csp"
+                :   "CIE XYZ colour ARTRAWs"
+                ];
+
         S8V_ISR_OPT =
             [ FLAG_OPTION
-                :   "ArSpectrum8"
+                :   "spectrum8"
                 :   "s8v"
                 :   "40nm spacing, 8 samples, visible range"
                 ];
 
         S11E_ISR_OPT =
             [ FLAG_OPTION
-                :   "ArSpectrum11"
+                :   "spectrum11"
                 :   "s11e"
                 :   "40nm spacing, 11 samples, extended range"
                 ];
 
         S18V_ISR_OPT =
             [ FLAG_OPTION
-                :   "ArSpectrum18"
+                :   "spectrum18"
                 :   "s18v"
                 :   "20nm spacing, 18 samples, visible range"
                 ];
 
         S46E_ISR_OPT =
             [ FLAG_OPTION
-                :   "ArSpectrum46"
+                :   "spectrum46"
                 :   "s46e"
                 :   "10nm spacing, 46 samples, extended range"
                 ];
@@ -530,14 +537,14 @@ void art_define_standard_commandline_options(
             [ FLAG_OPTION
                 :   "polarisation"
                 :   "p"
-                :   "enable polarisation rendering"
+                :   "enable polarisation during rendering"
                 ];
 
         ISR_OPT =
             [ FLAG_OPTION
                 :   "spectralInfo"
                 :   "spci"
-                :   "display info for chosen spectral settings"
+                :   "display info for ARTRAW & polarisation settings"
                 ];
     }
 
@@ -760,15 +767,16 @@ void art_set_special_startup_option_and_function(
 }
 
 int art_print_banner_and_process_standard_commandline_options(
-        int           argc,
-        char       ** argv,
-        ART_GV      * art_gv,
-        const char  * application_name,
-        const char  * application_description,
-        const char  * application_long_description,
-        const char  * application_usage_line,
-        const unsigned int  minArgs,
-        const unsigned int  maxArgs
+              int             argc,
+              char         ** argv,
+              ART_GV        * art_gv,
+        const char          * application_name,
+        const char          * application_description,
+        const char          * application_long_description,
+        const char          * application_usage_line,
+        const BOOL            native_ART_app,
+        const unsigned int    minArgs,
+        const unsigned int    maxArgs
         )
 {
     //   Concatenate and store the entire command line.
@@ -879,58 +887,80 @@ int art_print_banner_and_process_standard_commandline_options(
         #else
             assertions_on_string = "";
         #endif
+        
+        char  * second_line = "";
+        char  * third_line = "";
+        char  * linked_against = "";
 
+        if ( native_ART_app )
+        {
+            asprintf(
+                & third_line,
+                  "%s \n",
+                  art_copyright_string
+                );
+        }
+        else
+        {
+            asprintf(
+                & linked_against,
+                  "linked against the "
+                );
+        }
+        
         if ( THREAD_OPT )
         {
             if ( number_of_detected_cores > 1 )
-                printf( "\n"
-                        ART_STRING_BOLD
-                        "%s"
-                        ART_STRING_NORMAL
-                        " - %s\n"
-                        "%s version %s%s%s, %d cores detected\n"
-                        "%s \n\n",
-                        application_name,
-                        application_description,
-                        art_long_name_string,
-                        art_version_string,
-                        is_debug_build_string,
-                        assertions_on_string,
-                        number_of_detected_cores,
-                        art_copyright_string
-                        );
+            {
+                asprintf(
+                    & second_line,
+                      "%s%s version %s%s%s, %d cores detected",
+                      linked_against,
+                      art_long_name_string,
+                      art_version_string,
+                      is_debug_build_string,
+                      assertions_on_string,
+                      number_of_detected_cores
+                    );
+            }
             else
-                printf( "\n"
-                        ART_STRING_BOLD
-                        "%s"
-                        ART_STRING_NORMAL
-                        " - %s\n"
-                        "%s version %s%s%s, 1 core detected\n"
-                        "%s \n\n",
-                        application_name,
-                        application_description,
-                        art_long_name_string,
-                        art_version_string,
-                        is_debug_build_string,
-                        assertions_on_string,
-                        art_copyright_string
-                        );
+            {
+                asprintf(
+                    & second_line,
+                      "%s%s version %s%s%s, 1 core detected",
+                      linked_against,
+                      art_long_name_string,
+                      art_version_string,
+                      is_debug_build_string,
+                      assertions_on_string
+                    );
+            }
         }
         else
-            printf( "\n"
-                    ART_STRING_BOLD
-                    "%s"
-                    ART_STRING_NORMAL
-                    " - %s\n"
-                    "%s version %s%s\n"
-                    "%s \n\n",
-                    application_name,
-                    application_description,
-                    art_long_name_string,
-                    art_version_string,
-                    is_debug_build_string,
-                    art_copyright_string
-                    );
+        {
+            asprintf(
+                & second_line,
+                  "%s%s version %s%s%s",
+                  linked_against,
+                  art_long_name_string,
+                  art_version_string,
+                  is_debug_build_string,
+                  assertions_on_string
+                );
+        }
+        
+        printf( "\n"
+            ART_STRING_BOLD
+            "%s"
+            ART_STRING_NORMAL
+            " - %s\n"
+            "%s\n"
+            "%s\n",
+            application_name,
+            application_description,
+            second_line,
+            third_line
+            );
     }
 
     if (    SPECIAL_STARTUP_OPTION
@@ -1072,8 +1102,8 @@ int art_print_banner_and_process_standard_commandline_options(
 
     //   see what the current ISR is before we manipulate it
 
-    ArSpectrumType  defaultColourType = art_isr( art_gv );
-    ArSpectrumType  selectedColourType = art_isr( art_gv );
+    ArDataType  defaultDataType = art_isr( art_gv );
+    ArDataType  selectedDataType = art_isr( art_gv );
 
     //   S8V_ISR_OPT is null if the option to change ISR is disabled
 
@@ -1081,48 +1111,48 @@ int art_print_banner_and_process_standard_commandline_options(
     {
         unsigned int  numberOfRequestedISRs = 0;
 
-        if ( [ RGB_ISR_OPT hasBeenSpecified ] )
+        if ( [ CSP_ISR_OPT hasBeenSpecified ] )
         {
             ART_ISR_WAS_MANUALLY_SET_BY_USER = YES;
-            selectedColourType = arspectrum_ut_rgb;
+            selectedDataType = ardt_ut_xyz;
             if ( ART_POLARISATION_WAS_MANUALLY_SET_BY_USER )
-                selectedColourType |= arspectrum_polarisable;
+                selectedDataType |= ardt_polarisable;
             numberOfRequestedISRs++;
         }
 
         if ( [ S8V_ISR_OPT hasBeenSpecified ] )
         {
             ART_ISR_WAS_MANUALLY_SET_BY_USER = YES;
-            selectedColourType = arspectrum_spectrum8;
+            selectedDataType = ardt_spectrum8;
             if ( ART_POLARISATION_WAS_MANUALLY_SET_BY_USER )
-                selectedColourType |= arspectrum_polarisable;
+                selectedDataType |= ardt_polarisable;
             numberOfRequestedISRs++;
         }
 
         if ( [ S11E_ISR_OPT hasBeenSpecified ] )
         {
             ART_ISR_WAS_MANUALLY_SET_BY_USER = YES;
-            selectedColourType = arspectrum_spectrum11;
+            selectedDataType = ardt_spectrum11;
             if ( ART_POLARISATION_WAS_MANUALLY_SET_BY_USER )
-                selectedColourType |= arspectrum_polarisable;
+                selectedDataType |= ardt_polarisable;
             numberOfRequestedISRs++;
         }
 
         if ( [ S18V_ISR_OPT hasBeenSpecified ] )
         {
             ART_ISR_WAS_MANUALLY_SET_BY_USER = YES;
-            selectedColourType = arspectrum_spectrum18;
+            selectedDataType = ardt_spectrum18;
             if ( ART_POLARISATION_WAS_MANUALLY_SET_BY_USER )
-                selectedColourType |= arspectrum_polarisable;
+                selectedDataType |= ardt_polarisable;
             numberOfRequestedISRs++;
         }
 
         if ( [ S46E_ISR_OPT hasBeenSpecified ] )
         {
             ART_ISR_WAS_MANUALLY_SET_BY_USER = YES;
-            selectedColourType = arspectrum_spectrum46;
+            selectedDataType = ardt_spectrum46;
             if ( ART_POLARISATION_WAS_MANUALLY_SET_BY_USER )
-                selectedColourType |= arspectrum_polarisable;
+                selectedDataType |= ardt_polarisable;
             numberOfRequestedISRs++;
         }
 
@@ -1138,14 +1168,14 @@ int art_print_banner_and_process_standard_commandline_options(
         if ( [ POLARISABLE_OPT hasBeenSpecified ] )
         {
             ART_POLARISATION_WAS_MANUALLY_SET_BY_USER = YES;
-            selectedColourType |= arspectrum_polarisable;
+            selectedDataType |= ardt_polarisable;
         }
     }
 
     //   if the user specified any changes to the status quo, perform them
 
-    if ( selectedColourType != defaultColourType )
-        art_set_isr( art_gv, selectedColourType );
+    if ( selectedDataType != defaultDataType )
+        art_set_isr( art_gv, selectedDataType );
 
 
 /* ---------------------------------------------------------------------------
@@ -1156,23 +1186,32 @@ int art_print_banner_and_process_standard_commandline_options(
 
     if ( [ ISR_OPT hasBeenSpecified ] )
     {
-        arspectrum_printf_current_isr( art_gv );
+        printf( "Status of the ArSpectrum subsystem\n");
+        printf( "----------------------------------\n");
+        printf( "ArSpectrum is set to: ");
+
+        ardt_printf_current_isr( art_gv );
+        
         printf("\nNumber of channels   : %d\n",spc_channels(art_gv) );
-        printf("First visible channel: %d\n",spc_first_visible_channel(art_gv) );
-        printf("Channel bounds [nm]: " );
-        for ( unsigned int i = 0; i <= spc_channels(art_gv); i++ )
-            printf("%5.2f ", NANO_FROM_UNIT( spc_channel_lower_bound(art_gv,i) ) );
-        printf("\n" );
+        
+        if ( spc_channels(art_gv) > 3 )
+        {
+            printf("First visible channel: %d\n",spc_first_visible_channel(art_gv) );
+            printf("Channel bounds [nm]: " );
+            for ( unsigned int i = 0; i <= spc_channels(art_gv); i++ )
+                printf("%5.2f ", NANO_FROM_UNIT( spc_channel_lower_bound(art_gv,i) ) );
+            printf("\n" );
 
-        printf("Channel centers [nm]: " );
-        for ( unsigned int i = 0; i < spc_channels(art_gv); i++ )
-            printf("%5.2f ", NANO_FROM_UNIT( spc_channel_center(art_gv,i) ) );
-        printf("\n" );
+            printf("Channel centers [nm]: " );
+            for ( unsigned int i = 0; i < spc_channels(art_gv); i++ )
+                printf("%5.2f ", NANO_FROM_UNIT( spc_channel_center(art_gv,i) ) );
+            printf("\n" );
 
-        printf("Channel width [nm]: " );
-        for ( unsigned int i = 0; i < spc_channels(art_gv); i++ )
-            printf("%5.2f ", NANO_FROM_UNIT( spc_channel_width(art_gv,i) ) );
-
+            printf("Channel width [nm]: " );
+            for ( unsigned int i = 0; i < spc_channels(art_gv); i++ )
+                printf("%5.2f ", NANO_FROM_UNIT( spc_channel_width(art_gv,i) ) );
+        }
+        
         printf( "\n\nDefault RGB space is %s \n", ARCSR_NAME( DEFAULT_RGB_SPACE_REF ) );
 
         printf("\n" );

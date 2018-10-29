@@ -63,12 +63,12 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_ciexyz;
-    destinationFileColourType  = arspectrum_ciexyz;
+    destinationImageDataType = ardt_ciexyz;
+    destinationFileDataType  = ardt_ciexyz;
 
 
     /* ------------------------------------------------------------------
@@ -194,12 +194,12 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_ciexyz;
-    destinationFileColourType  = arspectrum_ciexyz;
+    destinationImageDataType = ardt_ciexyz;
+    destinationFileDataType  = ardt_ciexyz;
 
     numberOfDestinationsPerSource = 1;
     
@@ -387,8 +387,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
 
          In this case the two are not the same because we let the
          ArfTIFF class do the reduction from floating-point RGBA (which
@@ -396,8 +396,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
          content of TIFF files) for us.
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_ciexyz;
-    destinationFileColourType  = arspectrum_ciexyz;
+    destinationImageDataType = ardt_ciexyz;
+    destinationFileDataType  = ardt_ciexyz;
 
 
     /* ------------------------------------------------------------------
@@ -435,8 +435,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
 
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
-        ArColourType  sourceColourType =
-            [ sourceImage[i]->imageInfo fileColourType ];
+        ArDataType  sourceDataType =
+            [ sourceImage[i]->imageInfo fileDataType ];
 
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -446,7 +446,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
 
             for ( long x = 0; x < XC(destinationImageSize); x++ )
             {
-                if ( sourceColourType == arspectrum_rgba32 )
+                if ( sourceDataType == ardt_rgba32 )
                 {
                     rgba32_to_xyz(
                           art_gv,
@@ -459,7 +459,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
                     XYZA_DESTINATION_BUFFER_ALPHA(x) = RGBA32_SOURCE_BUFFER_ALPHA(x);
                 }
 
-                if ( sourceColourType == arspectrum_rgb48 )
+                if ( sourceDataType == ardt_rgb48 )
                 {
                     rgb48_to_xyz(
                           art_gv,
@@ -470,7 +470,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
                     XYZA_DESTINATION_BUFFER_ALPHA(x) = 1.0;
                 }
 
-                if ( sourceColourType == arspectrum_rgba64 )
+                if ( sourceDataType == ardt_rgba64 )
                 {
                     rgba64_to_xyz(
                           art_gv,
@@ -603,8 +603,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
 
          In this case the two are not the same because we let the
          ArfTIFF class do the reduction from floating-point RGBA (which
@@ -612,12 +612,12 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
          content of TIFF files) for us.
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_rgba;
+    destinationImageDataType = ardt_rgba;
 
     if ( destinationBitsPerChannel == 8 )
-        destinationFileColourType  = arspectrum_rgba32;
+        destinationFileDataType  = ardt_rgba32;
     else
-        destinationFileColourType  = arspectrum_rgba64;
+        destinationFileDataType  = ardt_rgba64;
 
 
     /* ------------------------------------------------------------------
@@ -815,8 +815,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
 
          In this case the two are not the same because we let the
          ArfTIFF class do the reduction from floating-point RGBA (which
@@ -824,9 +824,9 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
          content of TIFF files) for us.
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_rgba;
+    destinationImageDataType = ardt_rgba;
 
-    destinationFileColourType  = arspectrum_rgba;
+    destinationFileDataType  = ardt_rgba;
 
 
     /* ------------------------------------------------------------------
@@ -965,8 +965,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
 
          In this case the two are not the same because we let the
          ArfTIFF class do the reduction from floating-point RGBA (which
@@ -974,9 +974,9 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
          content of TIFF files) for us.
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_rgba;
+    destinationImageDataType = ardt_rgba;
 
-    destinationFileColourType  = arspectrum_rgba;
+    destinationFileDataType  = ardt_rgba;
 
 
     /* ------------------------------------------------------------------
@@ -1108,8 +1108,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
 
          In this case the two are not the same because we let the
          ArfTIFF class do the reduction from floating-point RGBA (which
@@ -1117,9 +1117,9 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
          content of TIFF files) for us.
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_rgba;
+    destinationImageDataType = ardt_rgba;
 
-    destinationFileColourType  = arspectrum_rgba;
+    destinationFileDataType  = ardt_rgba;
 
 
     /* ------------------------------------------------------------------
@@ -1401,8 +1401,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
 
          In this case the two are not the same because we let the
          ArfTIFF class do the reduction from floating-point RGBA (which
@@ -1410,8 +1410,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
          content of TIFF files) for us.
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_rgba;
-    destinationFileColourType  = arspectrum_rgba;
+    destinationImageDataType = ardt_rgba;
+    destinationFileDataType  = ardt_rgba;
     
     unsigned int  numberOfISRChannels = spc_channels(art_gv);
     
@@ -1734,12 +1734,12 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_grey;
-    destinationFileColourType  = arspectrum_grey;
+    destinationImageDataType = ardt_grey;
+    destinationFileDataType  = ardt_grey;
     
     unsigned int  numberOfISRChannels = spc_channels(art_gv);
     
@@ -2222,34 +2222,34 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_greyalpha;
+    destinationImageDataType = ardt_grey_alpha;
 
     if ( destinationBitsPerChannel == 8 )
     {
         if ( outputFalsecolour )
-            destinationFileColourType  = arspectrum_rgba32falsecolour;
+            destinationFileDataType  = ardt_rgba32_falsecolour;
         else
         {
             if ( plusMinus )
-                destinationFileColourType  = arspectrum_rgba32plusminus;
+                destinationFileDataType  = ardt_rgba32_plusminus;
             else
-                destinationFileColourType  = arspectrum_grey16;
+                destinationFileDataType  = ardt_grey16;
         }
     }
     else
     {
         if ( outputFalsecolour )
-            destinationFileColourType  = arspectrum_rgba64falsecolour;
+            destinationFileDataType  = ardt_rgba64_falsecolour;
         else
         {
             if ( plusMinus )
-                destinationFileColourType  = arspectrum_rgba64plusminus;
+                destinationFileDataType  = ardt_rgba64_plusminus;
             else
-                destinationFileColourType  = arspectrum_grey32;
+                destinationFileDataType  = ardt_grey32;
         }
     }
 
@@ -2651,8 +2651,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
 
          In this case the two are not the same because we let the
          ArfTIFF class do the reduction from floating-point RGBA (which
@@ -2660,9 +2660,9 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
          content of TIFF files) for us.
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_greyalpha;
+    destinationImageDataType = ardt_grey_alpha;
 
-    destinationFileColourType  = arspectrum_greyalpha;
+    destinationFileDataType  = ardt_grey_alpha;
 
 
     /* ------------------------------------------------------------------

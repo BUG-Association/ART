@@ -52,7 +52,7 @@ int art_commandline_app_main(
     NSAutoreleasePool  * innerDefaultPool =
         [ [ NSAutoreleasePool alloc ] init ];
 
-    art_set_isr( & art_gv, arspectrum_spectrum8 );
+    art_set_isr( & art_gv, art_default_isr( & art_gv ) );
 
     int exit_code = (*app_main)(argc, argv, & art_gv); \
 

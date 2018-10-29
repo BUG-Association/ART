@@ -313,7 +313,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSetISRAction)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetISRAction)
 
 - init
-        : (ArSpectrumType) newISR
+        : (ArDataType) newISR
 {
     self = [ super init ];
 
@@ -332,7 +332,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetISRAction)
         || ART_POLARISATION_WAS_MANUALLY_SET )
     {
         BOOL          alteredNewISR = NO;
-        ArSpectrumType  actualNewISR = isr;
+        ArDataType  actualNewISR = isr;
 
         if ( ART_ISR_WAS_MANUALLY_SET )
         {
@@ -341,11 +341,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetISRAction)
         }
 
         if (    ART_POLARISATION_WAS_MANUALLY_SET
-             && ! ( isr & arspectrum_polarisable )
+             && ! ( isr & ardt_polarisable )
              && ! ART_ISR_WAS_MANUALLY_SET )
         {
             alteredNewISR = YES;
-            actualNewISR |= arspectrum_polarisable;
+            actualNewISR |= ardt_polarisable;
         }
 
         if ( alteredNewISR )
@@ -353,10 +353,10 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetISRAction)
             [ REPORTER beginAction
                 :   "ISR requested in input file was %s%s\n"
                     "command line override to %s%s"
-                ,   arspectrumtype_polarisable_string( isr )
-                ,   arspectrumtype_long_name_string( art_gv, isr )
-                ,   arspectrumtype_polarisable_string( actualNewISR )
-                ,   arspectrumtype_long_name_string( art_gv, actualNewISR )
+                ,   ardatatype_polarisable_string( isr )
+                ,   ardatatype_long_name_string( art_gv, isr )
+                ,   ardatatype_polarisable_string( actualNewISR )
+                ,   ardatatype_long_name_string( art_gv, actualNewISR )
                 ];
 
             [ REPORTER endAction ];
@@ -365,8 +365,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetISRAction)
         {
             [ REPORTER beginAction
                 :   "input file defines ISR as %s%s"
-                ,   arspectrumtype_polarisable_string( isr )
-                ,   arspectrumtype_long_name_string( art_gv, isr )
+                ,   ardatatype_polarisable_string( isr )
+                ,   ardatatype_long_name_string( art_gv, isr )
                 ];
 
             ArList    refList = ARLIST_EMPTY;

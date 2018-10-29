@@ -24,69 +24,77 @@
 
 =========================================================================== */
 
-#ifndef _ART_FOUNDATION_GEOMETRY_IVEC2D_H_
-#define _ART_FOUNDATION_GEOMETRY_IVEC2D_H_
+#ifndef _ART_FOUNDATION_GEOMETRY_IVEC3D_H_
+#define _ART_FOUNDATION_GEOMETRY_IVEC3D_H_
 
 #include "ART_Foundation_System.h"
 
-ART_MODULE_INTERFACE(IVec2D)
+ART_MODULE_INTERFACE(IVec3D)
 
 #include "ART_Foundation_Math.h"
 
-#include "IPnt2D.h"
+#include "IPnt3D.h"
 
 
 /* ---------------------------------------------------------------------------
 
-    'IVec2D' struct
+    'IVec3D' struct
 
-    An integer vector in 2D space.
+    An integer vector in 3D space.
 
     Canonical abbreviations:
-    ivec2d_...   designator on related function names
+    ivec3d_...   designator on related function names
     v           function argument
 
 ------------------------------------------------------------------------aw- */
 
 
-typedef struct IVec2D
+typedef struct IVec3D
 {
-    ICrd2 c;
+    ICrd3 c;
 }
-IVec2D;
+IVec3D;
 
-#define IVEC2D(_x,_y)           ((IVec2D){{{ (_x), (_y) }}})
+#define IVEC3D(_x,_y,_z)        ((IVec3D){{{ (_x), (_y), (_z) }}})
 
-#define IVEC2D_I(_v,_i)         ((_v).c.x[_i])
+#define IVEC3D_I(_v,_i)         ((_v).c.x[_i])
 
-#define IVEC2D_INVALID          IVEC2D( 0, 0 )
-#define IVEC2D_X_UNIT           IVEC2D( 1, 0 )
-#define IVEC2D_Y_UNIT           IVEC2D( 0, 1 )
-#define IVEC2D_X_UNIT_NEG       IVEC2D(-1, 0 )
-#define IVEC2D_Y_UNIT_NEG       IVEC2D( 0,-1 )
+#define IVEC3D_INVALID          IVEC3D( 0, 0, 0 )
+#define IVEC3D_X_UNIT           IVEC3D( 1, 0, 0 )
+#define IVEC3D_Y_UNIT           IVEC3D( 0, 1, 0 )
+#define IVEC3D_Z_UNIT           IVEC3D( 0, 0, 1 )
+#define IVEC3D_X_UNIT_NEG       IVEC3D(-1, 0, 0 )
+#define IVEC3D_Y_UNIT_NEG       IVEC3D( 0,-1, 0 )
+#define IVEC3D_Z_UNIT_NEG       IVEC3D( 0, 0,-1 )
 
-#define IVEC2D_HUGE             IVEC2D(MATH_MAX_INT, \
+#define IVEC3D_HUGE             IVEC3D(MATH_MAX_INT, \
+                                       MATH_MAX_INT, \
                                        MATH_MAX_INT )
 
-#define IVEC2D_FORMAT(_form)    "IVEC2D(" _form "," _form ")"
-#define IVEC2D_V_PRINTF(_vec)   XC(_vec),YC(_vec)
-#define IVEC2D_V_SCANF(_vec)    &XC(_vec),&YC(_vec)
+#define IVEC3D_FORMAT(_form)    "IVEC3D(" _form "," _form "," _form ")"
+#define IVEC3D_V_PRINTF(_vec)   XC(_vec),YC(_vec),ZC(_vec)
+#define IVEC3D_V_SCANF(_vec)    &XC(_vec),&YC(_vec),&ZC(_vec)
 
+ARARRAY_INTERFACE_FOR_TYPE(IVec3D, ivec3d);
 
-ARARRAY_INTERFACE_FOR_TYPE(IVec2D, ivec2d);
+#define ARIVEC3DARRAY_EMPTY     ((ArIVec3DArray){ 0, 0, 0 })
 
-#define ARIVEC2DARRAY_EMPTY     ((ArIVec2DArray){ 0, 0, 0 })
-
-void ivec2d_d_mul_v(
+void ivec3d_d_mul_v(
         const double    d0,
-              IVec2D  * vr
+              IVec3D  * vr
         );
 
-void ivec2d_dv_mul_v(
+void ivec3d_dv_mul_v(
         const double    d0,
-        const IVec2D  * v0,
-              IVec2D  * vr
+        const IVec3D  * v0,
+              IVec3D  * vr
         );
 
-#endif /* _ART_FOUNDATION_GEOMETRY_IVEC2D_H_ */
+void ipnt3d_vp_add_p(
+        const IVec3D  * v0,
+        const IPnt3D  * p0,
+              IPnt3D  * pr
+        );
+
+#endif /* _ART_FOUNDATION_GEOMETRY_IVEC3D_H_ */
 /* ======================================================================== */

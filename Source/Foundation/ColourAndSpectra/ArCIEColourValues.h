@@ -195,13 +195,13 @@ void luv_s_debugprintf(
 #define ARCIELuv_GREY(_Y)       ARCIELuv( (_L), 0.0, 0.0 )
 
 
-#define ARCIEXYZ_FORMAT(_form)          "ARCIEXYZ(" _form "," _form "," _form ")"
-#define ARCIEXYZ_PRINTF                 RGB_PRINTF
-#define ARCIEXYZ_SCANF                  RGB_SCANF
+#define ARCIEXYZ_FORMAT(_form)          "ARCIEXYZ(" _form "," _form "," _form ", %d )"
+#define ARCIEXYZ_PRINTF                 ARRGB_PRINTF
+#define ARCIEXYZ_SCANF                  ARRGB_SCANF
 
-#define CIExyY_FORMAT(_form)            "ARCIExyY(" _form "," _form "," _form ")"
-#define CIExyY_PRINTF                   RGB_PRINTF
-#define CIExyY_SCANF                    RGB_SCANF
+#define CIExyY_FORMAT(_form)            "ARCIExyY(" _form "," _form "," _form ", %d )"
+#define CIExyY_PRINTF                   ARRGB_PRINTF
+#define CIExyY_SCANF                    ARRGB_SCANF
 
 #define ARCIEXYZ_BLACK      * xyz_zero(art_gv)
 #define ARCIEXYZ_WHITE      * xyz_illuminant_E(art_gv)

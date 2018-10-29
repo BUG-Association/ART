@@ -35,10 +35,10 @@ void art_set_default_rgbspace_ref(
 
 void art_set_isr(
         ART_GV          * art_gv,
-        ArSpectrumType    isr
+        ArDataType    isr
         );
 
-ArSpectrumType  art_isr(
+ArDataType  art_isr(
         ART_GV  * art_gv
         );
 

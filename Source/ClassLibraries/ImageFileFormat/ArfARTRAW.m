@@ -310,12 +310,12 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,artraw)
         :   channels * 4 \
         ];
 
-- (ArSpectrumType) fileColourType
+- (ArDataType) fileDataType
 {
     if ( fileContainsPolarisationData )
-        return fileColourType | arspectrum_polarisable;
+        return fileDataType | ardt_polarisable;
     else
-        return fileColourType;
+        return fileDataType;
 }
 
 - (void) _extractPixelChannelToD
@@ -810,15 +810,15 @@ while (0);
             space, since this encompasses all RGB spaces.
     ------------------------------------------------------------------ */
 
-    fileColourType = arspectrum_unknown;
+    fileDataType = ardt_unknown;
 
     switch ( channels )
     {
-        case 3:   fileColourType = arspectrum_ciexyz; break;
-        case 8:   fileColourType = arspectrum_spectrum8; break;
-        case 11:  fileColourType = arspectrum_spectrum11; break;
-        case 18:  fileColourType = arspectrum_spectrum18; break;
-        case 46:  fileColourType = arspectrum_spectrum46; break;
+        case 3:   fileDataType = ardt_ciexyz; break;
+        case 8:   fileDataType = ardt_spectrum8; break;
+        case 11:  fileDataType = ardt_spectrum11; break;
+        case 18:  fileDataType = ardt_spectrum18; break;
+        case 46:  fileDataType = ardt_spectrum46; break;
     }
 
     /* ------------------------------------------------------------------
@@ -829,7 +829,7 @@ while (0);
     if (    LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE
          && fileContainsPolarisationData )
     {
-        fileColourType = fileColourType | arspectrum_polarisable;
+        fileDataType = fileDataType | ardt_polarisable;
         ARREFFRAME_RF_I( referenceFrame, 0 ) = VEC3D( 1.0, 0.0, 0.0 );
         ARREFFRAME_RF_I( referenceFrame, 1 ) = VEC3D( 0.0, 1.0, 0.0 );
     }
@@ -839,15 +839,15 @@ while (0);
          for scanlines and individual pixels.
     ------------------------------------------------------------------ */
 
-    unsigned int  imageColourType = fileColourType;
+    unsigned int  imageDataType = fileDataType;
 
     ArnImageInfo  * imageInfo;
 
     imageInfo =
         [ ALLOC_INIT_OBJECT(ArnImageInfo)
             :   size
-            :   imageColourType
-            :   fileColourType
+            :   imageDataType
+            :   fileDataType
             :   resolution
             ];
 
@@ -1094,7 +1094,7 @@ while (0);
     time_t timer;
     struct tm *tblock;
 
-    channels = ARSPECTRUM_NUMCHANNELS([imageInfo fileColourType]);
+    channels = ARDATATYPE_NUMCHANNELS([imageInfo fileDataType]);
 
     if ([file open :arfile_write] & arstream_invalid)
         ART_ERRORHANDLING_FATAL_ERROR(
@@ -1226,7 +1226,7 @@ while (0);
     else
         [ file printf: "plain "];
 
-    if ( art_foundation_isr( art_gv ) == arspectrum_ut_rgb )
+    if ( art_foundation_isr( art_gv ) == ardt_ut_xyz )
         [ file printf: "CIEXYZ "];
     else
         [ file printf: "spectrum "];
@@ -1376,8 +1376,8 @@ while (0);
         {
             ArSpectrum  * spc = spc_alloc( art_gv );
 
-            if (   art_foundation_isr(art_gv) == arspectrum_ut_rgb
-                || art_foundation_isr(art_gv) == arspectrum_ut_rgb_polarisable
+            if (   art_foundation_isr(art_gv) == ardt_ut_xyz
+                || art_foundation_isr(art_gv) == ardt_ut_xyz_polarisable
                )
             {
                 ArCIEXYZ  xyz;

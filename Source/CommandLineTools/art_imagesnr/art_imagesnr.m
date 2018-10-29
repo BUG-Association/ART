@@ -136,8 +136,8 @@ int art_imagesnr(
     ArfARTRAW  * rawImageReference = (ArfARTRAW *) inputFileImageReference->imageFile;
     ArfARTRAW  * rawImageCompare   = (ArfARTRAW *) inputFileImageCompare->imageFile;
 
-    ArSpectrumType  rawContentTypeReference = [ rawImageReference fileColourType ];
-    ArSpectrumType  rawContentTypeCompare   = [ rawImageCompare   fileColourType ];
+    ArDataType  rawContentTypeReference = [ rawImageReference fileDataType ];
+    ArDataType  rawContentTypeCompare   = [ rawImageCompare   fileDataType ];
     
     if ( rawContentTypeReference != rawContentTypeCompare ) {
         ART_ERRORHANDLING_FATAL_ERROR("comparison and reference images have different spectrums");
@@ -169,34 +169,24 @@ int art_imagesnr(
         
         [ ART_GLOBAL_REPORTER printf
          :   "Default ISR was : %s\n"
-         ,   arspectrumtype_name( art_isr( art_gv ) )
+         ,   ardatatype_name( art_isr( art_gv ) )
          ];
         
         [ ART_GLOBAL_REPORTER printf
          :   "ARTRAW content is : %s\n"
-         ,   arspectrumtype_name( rawContentTypeReference )
+         ,   ardatatype_name( rawContentTypeReference )
          ];
-        
-        if ( rawContentTypeReference == arspectrum_ciexyz ) {
-            rawContentTypeReference = arspectrum_ut_rgb;
-            rawContentTypeCompare   = arspectrum_ut_rgb;
-        }
-        
-        if ( rawContentTypeReference == arspectrum_ciexyz_polarisable ) {
-            rawContentTypeReference = arspectrum_ut_rgb_polarisable;
-            rawContentTypeCompare   = arspectrum_ut_rgb_polarisable;
-        }
         
         [ ART_GLOBAL_REPORTER printf
              :   "ISR will be set as: %s\n"
-             ,   arspectrumtype_name( rawContentTypeReference )
+             ,   ardatatype_name( rawContentTypeReference )
              ];
         
         art_set_isr( art_gv, rawContentTypeReference );
         
         [ ART_GLOBAL_REPORTER printf
              :   "ISR is now set to : %s\n"
-             ,   arspectrumtype_name( art_isr( art_gv ) )
+             ,   ardatatype_name( art_isr( art_gv ) )
              ];
         
         [ ART_GLOBAL_REPORTER printf

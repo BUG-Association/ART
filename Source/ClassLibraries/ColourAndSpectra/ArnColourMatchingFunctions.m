@@ -47,7 +47,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourMatchingFunctions)
 
 - init
         : (ArNodeRefDynArray *) newSubnodeArray
-        : (ArColourType) newTargetType
+        : (ArDataType) newTargetType
         : (ArCMFNormalisation *) newNormalisationType
 {
     self =
@@ -58,7 +58,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourMatchingFunctions)
     if ( self )
     {
         validCMF = NO;
-        colourMatchingFunctions.resultColourType = newTargetType;
+        colourMatchingFunctions.resultDataType = newTargetType;
         normalisationType = newNormalisationType;
     }
     
@@ -72,7 +72,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourMatchingFunctions)
     {
         int  masterIndex = -1;
         int  i, numChannels =
-             ARSPECTRUM_NUMCHANNELS(colourMatchingFunctions.resultColourType);
+             ARDATATYPE_NUMCHANNELS(colourMatchingFunctions.resultDataType);
         int  currentNormalisation = 0;
         double  area = 0.0;
 
@@ -180,9 +180,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourMatchingFunctions)
     int  i, numChannels;
 
     [ super code: coder ];
-    [ coder codeInt: ((int*)&colourMatchingFunctions.resultColourType) ];
+    [ coder codeInt: ((int*)&colourMatchingFunctions.resultDataType) ];
 
-    numChannels = ARSPECTRUM_NUMCHANNELS(colourMatchingFunctions.resultColourType);
+    numChannels = ARDATATYPE_NUMCHANNELS(colourMatchingFunctions.resultDataType);
 
     if ( [ coder isReading ] )
     {

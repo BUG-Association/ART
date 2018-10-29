@@ -24,30 +24,50 @@
 
 =========================================================================== */
 
-#ifndef _ART_FOUNDATION_COLOUR_AND_LIGHT_H_
-#define _ART_FOUNDATION_COLOUR_AND_LIGHT_H_
+#define ART_MODULE_NAME     IVec3D
 
-#include "ART_Foundation_System.h"
+#include "IVec3D.h"
 
-ART_LIBRARY_INTERFACE(ART_Foundation_ColourAndSpectra)
+ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
-#include "ArDataType.h"
-#include "ArCMF.h"
+ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-#include "ArColourSpace.h"
-#include "ArColourTransform.h"
-#include "ColourAndSpectralDataConversion.h"
-#include "ArSpectrumSubsystemManagement.h"
 
-#include "ArSpectrum.h"
-#include "ArSpectralSample.h"
+ARARRAY_IMPLEMENTATION_FOR_TYPE(IVec3D, ivec3d);
 
-#include "ArUntaggedRGB.h"
-#include "ArSpectrum8.h"
-#include "ArSpectrum11.h"
-#include "ArSpectrum18.h"
-#include "ArSpectrum46.h"
-#include "ArSpectrum500.h"
+void ivec3d_d_mul_v(
+        const double    d0,
+              IVec3D  * vr
+        )
+{
+    XC(*vr) *= d0;
+    YC(*vr) *= d0;
+    ZC(*vr) *= d0;
+}
 
-#endif /* _ART_FOUNDATION_COLOUR_AND_LIGHT_H_ */
+void ivec3d_dv_mul_v(
+        const double    d0,
+        const IVec3D  * v0,
+              IVec3D  * vr
+        )
+{
+    XC(*vr) = (int) ( XC(*v0) * d0 );
+    YC(*vr) = (int) ( YC(*v0) * d0 );
+    ZC(*vr) = (int) ( ZC(*v0) * d0 );
+}
+
+void ipnt3d_vp_add_p(
+        const IVec3D  * v0,
+        const IPnt3D  * p0,
+              IPnt3D  * pr
+        )
+{
+    ic3_cc_add_c(
+        & v0->c,
+        & p0->c,
+        & pr->c
+        );
+}
+
+
 /* ======================================================================== */

@@ -150,24 +150,24 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTRAWLinearPolarisingFi
              image manipulation we have to specify what colour type the
              result image will have.
 
-             imageColourType = what we are going to feed it
-             fileColourType  = what we want it to write to disk for us
+             imageDataType = what we are going to feed it
+             fileDataType  = what we want it to write to disk for us
         ---------------------------------------------------------------aw- */
 
         //   The image colour type is always "native" (i.e. whatever model we
         //   are using), except for RGB images: to avoid issues with different
         //   RGB colour spaces, any RGB results get written to disk as CIE XYZ
 
-        if (   art_isr( art_gv ) == arspectrum_ut_rgb
-            || art_isr( art_gv ) == arspectrum_ut_rgb_polarisable )
-            destinationImageColourType = arspectrum_ciexyz;
+        if (   art_isr( art_gv ) == ardt_ut_xyz
+            || art_isr( art_gv ) == ardt_ut_xyz_polarisable )
+            destinationImageDataType = ardt_ciexyz;
         else
-            destinationImageColourType = art_isr( art_gv );
+            destinationImageDataType = art_isr( art_gv );
 
         //   In the case of a renderer directly writing its output to file, the
         //   image and file colour data types are the same.
 
-        destinationFileColourType = destinationImageColourType;
+        destinationFileDataType = destinationImageDataType;
 
 
         /* ------------------------------------------------------------------
@@ -558,12 +558,12 @@ void  lch_to_lab(
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_ciexyz;
-    destinationFileColourType  = arspectrum_ciexyz;
+    destinationImageDataType = ardt_ciexyz;
+    destinationFileDataType  = ardt_ciexyz;
 
     numberOfDestinationsPerSource = 1;
 

@@ -41,10 +41,10 @@ ART_MODULE_INTERFACE(ArpImage)
 @protocol ArpBasicImageInfo
 
 /* ---------------------------------------------------------------------------
-    'colourType'
+    'dataType'
         Returns the colour type stored by the image.
 --------------------------------------------------------------------------- */
-- (ArColourType) colourType
+- (ArDataType) dataType
         ;
 
 /* ---------------------------------------------------------------------------
@@ -82,8 +82,8 @@ ART_MODULE_INTERFACE(ArpImage)
         : (IVec2D) newSize
         ;
 
-- (void) setColourType
-        : (ArColourType) newColourType
+- (void) setDataType
+        : (ArDataType) newDataType
         ;
 
 @end
@@ -95,7 +95,7 @@ ART_MODULE_INTERFACE(ArpImage)
 =========================================================================== */
 @protocol ArpAdditionalImageInfo
 
-- (ArColourType) fileColourType
+- (ArDataType) fileDataType
         ;
 
 - (FVec2D) resolution
@@ -114,8 +114,8 @@ ART_MODULE_INTERFACE(ArpImage)
 
 @protocol ArpSetAdditionalImageInfo
 
-- (void) setFileColourType
-        : (ArColourType) newFileColourType
+- (void) setFileDataType
+        : (ArDataType) newFileDataType
         ;
 
 - (void) setResolution

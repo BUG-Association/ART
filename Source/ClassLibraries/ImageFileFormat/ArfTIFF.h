@@ -39,9 +39,9 @@ ART_MODULE_INTERFACE(ArfTIFF)
 {
     void          *  tiffFile;            // this is actually a TIFF * pointer
                                           // which we refer to as void * here
-    ArColourType     colourType;          // so we can include tiff.h in the
-    ArColourType     originalColourType;  // .m file
-    ArColourType     tiffType;
+    ArDataType     dataType;          // so we can include tiff.h in the
+    ArDataType     originalDataType;  // .m file
+    ArDataType     tiffType;
 
     void          * fileLine;
     void          * dataLine;

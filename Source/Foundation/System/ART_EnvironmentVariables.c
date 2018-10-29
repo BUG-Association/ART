@@ -32,7 +32,9 @@
 #include "ArStringArray.h"
 #include "ART_PathAndDirectoryTools.h"
 #include "ART_ErrorHandling.h"
+#include "ArDataType.h"
 
+ #include <string.h>
 
 /* ---------------------------------------------------------------------------
 
@@ -67,19 +69,21 @@
 
 typedef struct ART_EnvironmentVariables_GV
 {
-    ArStringArray  art_resource_paths;
-    ArString       art_resource_pathlist;
-    ArStringArray  art_library_paths;
-    ArStringArray  art_include_paths;
-    ArStringArray  art_execute_paths;
-    ArStringArray  art_subprocess_envp;
+    ArStringArray   art_resource_paths;
+    ArString        art_resource_pathlist;
+    ArStringArray   art_library_paths;
+    ArStringArray   art_include_paths;
+    ArStringArray   art_execute_paths;
+    ArStringArray   art_subprocess_envp;
 #ifdef __APPLE__
-    ArString       art_osx_isysroot;
+    ArString        art_osx_isysroot;
 #endif
-    ArString       art_viewer;
-    ArString       arm2art_sed_path;
-    ArString       arm2art_compiler_path;
-    ArString       arm2art_stub_path;
+    ArString        art_viewer;
+    ArString        art_default_isr_string;
+    ArDataType  art_default_isr;
+    ArString        arm2art_sed_path;
+    ArString        arm2art_compiler_path;
+    ArString        arm2art_stub_path;
 }
 ART_EnvironmentVariables_GV;
 
@@ -94,6 +98,8 @@ ART_EnvironmentVariables_GV;
 #define ART_EV_OSX_ISYSROOT             ART_EV_GV->art_osx_isysroot
 #endif
 #define ART_EV_VIEWER                   ART_EV_GV->art_viewer
+#define ART_EV_DEFAULT_ISR_STRING       ART_EV_GV->art_default_isr_string
+#define ART_EV_DEFAULT_ISR              ART_EV_GV->art_default_isr
 #define ART_EV_ARM2ART_SED_PATH         ART_EV_GV->arm2art_sed_path
 #define ART_EV_ARM2ART_COMPILER_PATH    ART_EV_GV->arm2art_compiler_path
 #define ART_EV_ARM2ART_STUB_PATH        ART_EV_GV->arm2art_stub_path
@@ -251,6 +257,8 @@ ART_MODULE_INITIALISATION_FUNCTION
     ART_EV_ARM2ART_COMPILER_PATH  = 0;
     ART_EV_ARM2ART_STUB_PATH      = 0;
     ART_EV_VIEWER                 = 0;
+    ART_EV_DEFAULT_ISR_STRING     = 0;
+    ART_EV_DEFAULT_ISR            = 0;
 )
 
 ART_MODULE_SHUTDOWN_FUNCTION
@@ -622,6 +630,42 @@ ArConstString  art_ev_viewer(
     }
 
     return (ArConstString) ART_EV_VIEWER;
+}
+/*
+#define ART_EV_DEFAULT_ISR_STRING          ART_EV_GV->art_default_isr_string
+#define ART_EV_DEFAULT_ISR              ART_EV_GV->art_default_isr
+
+*/
+unsigned int  art_default_isr(
+        const ART_GV  * art_gv
+        )
+{
+    if ( ! ART_EV_DEFAULT_ISR_STRING )
+    {
+        ART_EV_DEFAULT_ISR_STRING = getenv( "ART_DEFAULT_ISR" );
+
+        //   we only supply a default if none was specified
+
+        if (   ! ART_EV_DEFAULT_ISR_STRING
+            || strlen(ART_EV_DEFAULT_ISR_STRING) == 0 )
+        {
+            ART_EV_DEFAULT_ISR = ardt_spectrum8;
+        }
+        else
+        {
+            ART_EV_DEFAULT_ISR =
+                ardatatype_from_string(ART_EV_DEFAULT_ISR_STRING);
+
+            if ( ART_EV_DEFAULT_ISR == ardt_unknown )
+                ART_ERRORHANDLING_FATAL_ERROR(
+                    "unsuitable string '%s' specified for ART_DEFAULT_ISR"
+                    "envvar. Use 's8v', 's11e', 's18v' or 's46e'.",
+                    ART_EV_DEFAULT_ISR_STRING
+                    );
+        }
+    }
+
+    return (unsigned int) ART_EV_DEFAULT_ISR;
 }
 
 static ArConstString arm2art_sed_executable_name = "sed";

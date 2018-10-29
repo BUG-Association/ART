@@ -86,8 +86,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPartImage)
 - (IVec2D) size
     { return [ DATAIMAGE size ]; }
 
-- (ArColourType) colourType
-    { return [ DATAIMAGE colourType ]; }
+- (ArDataType) dataType
+    { return [ DATAIMAGE dataType ]; }
 
 - (ArNode *) baseImage
     { return [ BASEIMAGE baseImage ]; }

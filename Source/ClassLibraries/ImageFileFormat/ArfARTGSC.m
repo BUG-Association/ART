@@ -377,16 +377,16 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(GreyAlpha,artgsc)
          for scanlines and individual pixels.
     ------------------------------------------------------------------ */
 
-    unsigned int  imageColourType;
-    unsigned int  fileColourType = 0;     // init to make gcc happy
+    unsigned int  imageDataType;
+    unsigned int  fileDataType = 0;     // init to make gcc happy
 
-    imageColourType = fileColourType;
+    imageDataType = fileDataType;
 
     ArnImageInfo  * imageInfo =
         [ ALLOC_INIT_OBJECT(ArnImageInfo)
             :   size
-            :   imageColourType
-            :   fileColourType
+            :   imageDataType
+            :   fileDataType
             :   resolution
             ];
 

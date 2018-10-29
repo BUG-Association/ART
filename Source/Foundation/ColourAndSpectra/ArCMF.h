@@ -31,7 +31,7 @@
 
 ART_MODULE_INTERFACE(ArCMF)
 
-#include "ArSpectrumType.h"
+#include "ArDataType.h"
 #include "ArPSSpectrum.h"
 
 typedef enum ArCMFNormalisation
@@ -67,16 +67,16 @@ ArCMFNormalisation;
 
 typedef struct ArCMF
 {
-    ArColourType    resultColourType;
+    ArDataType      resultDataType;
     ArPSSpectrum  * cmfCurves;
 }
 ArCMF;
 
 //   Access macros
 
-#define ARCMF_RESULT_COLOURTYPE(__cmf)      (__cmf).resultColourType
+#define ARCMF_RESULT_DATATYPE(__cmf)      (__cmf).resultDataType
 #define ARCMF_RESULT_CHANNELS(__cmf)        \
-        ARSPECTRUM_NUMCHANNELS(ARCMF_RESULT_COLOURTYPE(__cmf))
+        ARDATATYPE_NUMCHANNELS(ARCMF_RESULT_DATATYPE(__cmf))
 #define ARCMF_CURVES(__cmf)                 (__cmf).cmfCurves
 #define ARCMF_CURVE(__cmf,__i)              (__cmf).cmfCurves[(__i)]
 #define ARCMF_CURVE_SCALE(__cmf,__i)        \

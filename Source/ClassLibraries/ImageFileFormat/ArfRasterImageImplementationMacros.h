@@ -42,11 +42,11 @@
     implementations.
 -----------------------------------------------------------------------aw- */
 
-#define ARFRASTERIMAGE_DEFAULT_NCC_IMPLEMENTATION(__contentColourType) \
+#define ARFRASTERIMAGE_DEFAULT_NCC_IMPLEMENTATION(__contentDataType) \
 \
 - (Class) nativeContentClass \
 { \
-    return [ Arn##__contentColourType##Image class ]; \
+    return [ Arn##__contentDataType##Image class ]; \
 }
 
 #define ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(__name) \
@@ -76,9 +76,9 @@
     return arf##__name##_long_class_name; \
 }
 
-#define ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(__contentColourType,__name) \
+#define ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(__contentDataType,__name) \
 \
-ARFRASTERIMAGE_DEFAULT_NCC_IMPLEMENTATION(__contentColourType) \
+ARFRASTERIMAGE_DEFAULT_NCC_IMPLEMENTATION(__contentDataType) \
 ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(__name)
 
 

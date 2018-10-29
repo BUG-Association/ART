@@ -79,7 +79,7 @@ const char * armmdirectattenuationsample_act_string(
         const ART_GV  * art_gv
         )
 {
-    return "Mueller Matrix Attenuation";
+    return "Mueller matrix attenuation";
 }
 
 ArMMDirectAttenuationSample * armmdirectattenuationsample_alloc(

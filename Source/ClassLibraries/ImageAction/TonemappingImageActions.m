@@ -93,12 +93,12 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_ciexyz;
-    destinationFileColourType  = arspectrum_ciexyz;
+    destinationImageDataType = ardt_ciexyz;
+    destinationFileDataType  = ardt_ciexyz;
 
 
     /* ------------------------------------------------------------------
@@ -296,12 +296,12 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_ciexyz;
-    destinationFileColourType  = arspectrum_ciexyz;
+    destinationImageDataType = ardt_ciexyz;
+    destinationFileDataType  = ardt_ciexyz;
 
 
     /* ------------------------------------------------------------------
@@ -577,12 +577,12 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnMonochromeInteractiveCal
          image manipulation we have to specify what colour type the
          result image will have.
 
-         imageColourType = what we are going to feed it
-         fileColourType  = what we want it to write to disk for us
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageColourType = arspectrum_ciexyz;
-    destinationFileColourType  = arspectrum_ciexyz;
+    destinationImageDataType = ardt_ciexyz;
+    destinationFileDataType  = ardt_ciexyz;
 
 
     /* ------------------------------------------------------------------

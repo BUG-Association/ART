@@ -62,6 +62,7 @@ ART_LIBRARY_INTERFACE(ART_Foundation_Geometry)
 #include "IPnt4D.h"
 
 #include "IVec2D.h"
+#include "IVec3D.h"
 
 #include "Box.h"
 #include "Interpolation.h"

@@ -47,8 +47,8 @@ extern "C"{
 
 typedef struct ArfOpenEXR_members
 {
-    unsigned int               colourType;
-    unsigned int               filecolourType;
+    unsigned int               dataType;
+    unsigned int               fileDataType;
     IVec2D                     imageSize;
     Imf::RgbaOutputFile      * exrfile_out;
     ArRGBA                   * pixels_art;
@@ -114,8 +114,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
     ArnImageInfo * imageInfo =
         [ ALLOC_INIT_OBJECT(ArnImageInfo)
             :   IMAGE_SIZE
-            :   arspectrum_rgba
-            :   arspectrum_rgba
+            :   ardt_rgba
+            :   ardt_rgba
             :   resolution
             ];
 
@@ -175,9 +175,9 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
 
     IMAGE_SIZE = [ imageInfo size ];
 
-    switch ( [ imageInfo colourType ] )
+    switch ( [ imageInfo dataType ] )
     {
-        case arspectrum_rgba:
+        case ardt_rgba:
             EXRFILE_OUT = new Imf::RgbaOutputFile(
                     [ self->file name ],
                     XC(IMAGE_SIZE),
@@ -192,7 +192,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
                     XC(IMAGE_SIZE)*YC(IMAGE_SIZE)
                     );
             break;
-        case arspectrum_grey:
+        case ardt_grey:
             ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
             //  this is BAD behaviour: we are just writing RGBA images
             //  with R = G = B
@@ -213,7 +213,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
         default:
             ART_ERRORHANDLING_FATAL_ERROR(
                 "unsupported EXR colour type %d requested",
-                [ imageInfo colourType ]
+                [ imageInfo dataType ]
                 );
     }
 

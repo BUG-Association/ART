@@ -156,7 +156,7 @@ const char * arsvlight_lct_string(
         const ART_GV  * art_gv
         )
 {
-    return "Stokes Vector Light";
+    return "Stokes vector light";
 }
 
 ArSVLight * arsvlight_alloc(

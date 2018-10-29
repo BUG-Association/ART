@@ -80,10 +80,10 @@ ART_MODULE_INTERFACE(ArfARTRAW)
     unsigned char      * charBuffer;
     int                  channels;
     BOOL                 fileContainsPolarisationData;
-    ArSpectrumType       fileColourType;
+    ArDataType       fileDataType;
 }
 
-- (ArSpectrumType) fileColourType
+- (ArDataType) fileDataType
         ;
 
 @end

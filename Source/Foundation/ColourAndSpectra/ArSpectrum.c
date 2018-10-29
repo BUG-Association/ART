@@ -349,14 +349,10 @@ ART_SPECTRUM_MODULE_INITIALISATION_FUNCTION
     }
 )
 
-void  arspectrum_printf_current_isr(
+void  ardt_printf_current_isr(
         const ART_GV  * art_gv
         )
 {
-    printf( "Status of the colour subsystem\n");
-    printf( "------------------------------\n");
-    printf( "Current colour computation type: ");
-
     if ( ISR_HAS_BEEN_INITIALISED )
         printf( "%s\n", spc_typename_string(art_gv) );
     else

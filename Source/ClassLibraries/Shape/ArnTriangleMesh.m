@@ -366,13 +366,13 @@ ArNode  * arntrianglemesh_heightfield_from_image(
         :   ((ArnPlainImage *)sourceImageBuffer)
         ];
     
-    switch ( imageInfo.fileColourType )
+    switch ( imageInfo.fileDataType )
     {
-        case arcolour_grey8:
+        case ardt_grey8:
             debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey8 image found.\n")
             break;
     
-        case arcolour_grey16:
+        case ardt_grey16:
             debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey16 image found.\n")
             break;
 
@@ -404,13 +404,13 @@ ArNode  * arntrianglemesh_heightfield_from_image(
             PNT3D_I(vertex,0) = x / ((float)XC(imageSize) - 1);
             
             // z coordinate
-            switch ( imageInfo.fileColourType )
+            switch ( imageInfo.fileDataType )
             {
-                case arcolour_grey8:
+                case ardt_grey8:
                     PNT3D_I(vertex, 2) = GREY8_SOURCE_BUFFER(x, y, imageSize);
                     PNT3D_I(vertex, 2) = PNT3D_I(vertex, 2) / 255.0f;
                     break;
-                case arcolour_grey16:
+                case ardt_grey16:
                     PNT3D_I(vertex, 2) = GREY16_SOURCE_BUFFER(x, y, imageSize);
                     PNT3D_I(vertex, 2) = PNT3D_I(vertex, 2) / 65535.0f;
                     break;

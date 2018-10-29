@@ -628,8 +628,8 @@ static int positionTM[2];
         ArnImageInfo  * secondaryImageInfo =
             [ ALLOC_INIT_OBJECT(ArnImageInfo)
                 :   [ outImage[0] size ]
-                :   arspectrum_grey
-                :   arspectrum_grey
+                :   ardt_grey
+                :   ardt_grey
                 :   FVEC2D(72.0, 72.0)
                 ];
 

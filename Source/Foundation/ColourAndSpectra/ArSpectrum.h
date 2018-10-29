@@ -57,7 +57,7 @@ typedef struct ArSpectrum
 }
 ArSpectrum;
 
-void  arspectrum_printf_current_isr(
+void  ardt_printf_current_isr(
         const ART_GV  * art_gv
         );
 

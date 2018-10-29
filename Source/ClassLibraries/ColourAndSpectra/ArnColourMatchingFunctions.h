@@ -41,7 +41,7 @@ ART_MODULE_INTERFACE(ArnColourMatchingFunctions)
 
 - init
         : (ArNodeRefDynArray *) newSubnodeArray
-        : (ArColourType) newTargetType
+        : (ArDataType) newTargetType
         : (ArCMFNormalisation *) newNormalisationType
         ;
 

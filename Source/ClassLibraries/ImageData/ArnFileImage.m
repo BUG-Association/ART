@@ -188,9 +188,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
         :   fileName ];
 }
 
-- (ArColourType) colourType
+- (ArDataType) dataType
 {
-    return imageInfo->colourType;
+    return imageInfo->dataType;
 }
 
 - (IVec2D) size
@@ -208,9 +208,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     return [ imageInfo samplecountString];
 }
 
-- (ArColourType) fileColourType
+- (ArDataType) fileDataType
 {
-    return [ imageInfo fileColourType ];
+    return [ imageInfo fileDataType ];
 }
 
 - (double) quality
@@ -326,8 +326,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
 {
     if ( ! imageFile )
     {
-        [ imageInfo setFileColourType: ART_CURRENT_ISR ];
-        imageInfo->colourType     = ART_CURRENT_ISR;
+        [ imageInfo setFileDataType: ART_CURRENT_ISR ];
+        imageInfo->dataType     = ART_CURRENT_ISR;
         imageFile =
             (ArNode <ArpImageFile> *) [ self _imageFileWithSearch: NO ];
         [ imageFile useImageInfo: imageInfo ];

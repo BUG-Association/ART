@@ -102,10 +102,10 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(tiff)
 - (void) useImageInfo
         : (ArnImageInfo *) imageInfo
 {
-    if ( originalColourType == arspectrum_unknown )
+    if ( originalDataType == ardt_unknown )
     {
-        colourType         = imageInfo->colourType;
-        originalColourType = imageInfo->colourType;
+        dataType         = imageInfo->dataType;
+        originalDataType = imageInfo->dataType;
     }
 }
 
@@ -115,22 +115,22 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(tiff)
 
     cc = [ ArnRGBAImage class ];
 
-    if ( colourType == arspectrum_grey )
+    if ( dataType == ardt_grey )
         cc = [ ArnGreyImage class ];
 
-    if ( colourType == arspectrum_greyalpha )
+    if ( dataType == ardt_grey_alpha )
         cc = [ ArnGreyAlphaImage class ];
 
-    if ( originalColourType == arspectrum_rgba32 )
+    if ( originalDataType == ardt_rgba32 )
         cc = [ ArnRGBA32Image class ];
 
-    if ( originalColourType == arspectrum_rgba64 )
+    if ( originalDataType == ardt_rgba64 )
         cc = [ ArnRGBA64Image class ];
 
-    if ( originalColourType == arspectrum_grey8 )
+    if ( originalDataType == ardt_grey8 )
         cc = [ ArnGrey8Image class ];
 
-    if ( originalColourType == arspectrum_grey16 )
+    if ( originalDataType == ardt_grey16 )
         cc = [ ArnGrey16Image class ];
 
     return cc;
@@ -148,22 +148,18 @@ unsigned int arftifftype(
         {
             switch ( bitsPerSample )
             {
-                case 1:                 return arspectrum_grey1_negative;
-                case 4:                 return arspectrum_grey4_negative;
-                case 8:                 return arspectrum_grey8_negative;
-                case 16:                return arspectrum_grey16_negative;
-                default:                return arspectrum_unknown;
+                case 8:                 return ardt_grey8_negative;
+                case 16:                return ardt_grey16_negative;
+                default:                return ardt_unknown;
             }
         }
         case PHOTOMETRIC_MINISBLACK:
         {
             switch ( bitsPerSample )
             {
-                case 1:                 return arspectrum_grey1;
-                case 4:                 return arspectrum_grey4;
-                case 8:                 return arspectrum_grey8;
-                case 16:                return arspectrum_grey16;
-                default:                return arspectrum_unknown;
+                case 8:                 return ardt_grey8;
+                case 16:                return ardt_grey16;
+                default:                return ardt_unknown;
             }
         }
         case PHOTOMETRIC_RGB:
@@ -174,29 +170,26 @@ unsigned int arftifftype(
                 {
                     switch (samplesPerPixel)
                     {
-                        case 3:         return arspectrum_rgb24;
-                        case 4:         return arspectrum_rgba32;
-                        default:        return arspectrum_unknown;
+                        case 3:         return ardt_rgb24;
+                        case 4:         return ardt_rgba32;
+                        default:        return ardt_unknown;
                     }
                 }
                 case 16:
                 {
                     switch (samplesPerPixel)
                     {
-                        case 3:         return arspectrum_rgb48;
-                        case 4:         return arspectrum_rgba64;
-                        default:        return arspectrum_unknown;
+                        case 3:         return ardt_rgb48;
+                        case 4:         return ardt_rgba64;
+                        default:        return ardt_unknown;
                     }
                 }
-                default:                return arspectrum_unknown;
+                default:                return ardt_unknown;
             }
         }
-#ifndef _ART_WITHOUT_TIFFLOGLUV_
-        case PHOTOMETRIC_LOGLUV:        return arspectrum_logluv;
-#endif
-        default:                        return arspectrum_unknown;
+        default:                        return ardt_unknown;
     }
-    return arspectrum_unknown;
+    return ardt_unknown;
 }
 
 #define BYTE_FILE       ((Byte *)fileLine)
@@ -303,7 +296,7 @@ unsigned int arftifftype(
 
     switch (((unsigned int)tiffType))
     {
-        case arspectrum_unknown:
+        case ardt_unknown:
         {
             ART_ERRORHANDLING_FATAL_ERROR(
                 "%s has unsupported type (photometric:%d, bits:%d, samples:%d)"
@@ -315,93 +308,61 @@ unsigned int arftifftype(
 
             break;
         }
-        case arspectrum_grey1:
-        case arspectrum_grey1_negative:
-        {
-            BYTE_FILE_NC = ALLOC_ARRAY(Byte, (XC(size)-1)/8 + 1);
-            G8_DATA_NC = ALLOC_ARRAY(ArGrey8, XC(size));
-            colourType = arspectrum_grey1;
-            break;
-        }
-        case arspectrum_grey4:
-        case arspectrum_grey4_negative:
-        {
-            BYTE_FILE_NC = ALLOC_ARRAY(Byte, (XC(size)-2)/2 + 1);
-            G8_DATA_NC = ALLOC_ARRAY(ArGrey8, XC(size));
-            colourType = arspectrum_grey1;
-            break;
-        }
-        case arspectrum_grey8:
-        case arspectrum_grey8_negative:
+        case ardt_grey8:
+        case ardt_grey8_negative:
         {
             G8_FILE_NC = ALLOC_ARRAY(ArGrey8, XC(size));
             G8_DATA_NC = G8_FILE;
-            colourType = arspectrum_grey8;
+            dataType = ardt_grey8;
             break;
         }
-        case arspectrum_grey16:
-        case arspectrum_grey16_negative:
+        case ardt_grey16:
+        case ardt_grey16_negative:
         {
             G16_FILE_NC = ALLOC_ARRAY(ArGrey16, XC(size));
             G16_DATA_NC = G16_FILE;
-            colourType = arspectrum_grey16;
+            dataType = ardt_grey16;
             break;
         }
-        case arspectrum_rgb24:
+        case ardt_rgb24:
         {
             RGB24_FILE_NC = ALLOC_ARRAY(ArRGB24, XC(size));
             RGBA32_DATA_NC = ALLOC_ARRAY(ArRGBA32, XC(size));
-            colourType = arspectrum_rgba32;
+            dataType = ardt_rgba32;
             break;
         }
-        case arspectrum_rgba32:
+        case ardt_rgba32:
         {
             RGBA32_FILE_NC = ALLOC_ARRAY(ArRGBA32, XC(size));
             RGBA32_DATA_NC = RGBA32_FILE;
-            colourType = arspectrum_rgba32;
+            dataType = ardt_rgba32;
             break;
         }
-        case arspectrum_rgb48:
+        case ardt_rgb48:
         {
             RGB48_FILE_NC = ALLOC_ARRAY(ArRGB48, XC(size));
             RGB_DATA_NC = ALLOC_ARRAY(ArRGB, XC(size));
-            colourType = arspectrum_rgb;
+            dataType = ardt_rgb;
             break;
         }
-        case arspectrum_rgba64:
+        case ardt_rgba64:
         {
             RGBA64_FILE_NC = ALLOC_ARRAY(ArRGBA64, XC(size));
             RGB_DATA_NC = ALLOC_ARRAY(ArRGB, XC(size));
-            colourType = arspectrum_rgb;
+            dataType = ardt_rgb;
             break;
         }
-#ifndef _ART_WITHOUT_TIFFLOGLUV_
-        case arspectrum_logluv:
-        {
-            FCIE_FILE_NC = ALLOC_ARRAY(ArUTF_CIEXYZ, XC(size));
-            CIE_DATA_NC = ALLOC_ARRAY(ArCIEXYZ, XC(size));
-            colourType = arspectrum_ciexyz;
-
-            TIFFSetField(tiffFile,TIFFTAG_SGILOGDATAFMT,SGILOGDATAFMT_FLOAT);
-            if (planarconfig != PLANARCONFIG_CONTIG)
-                ART_ERRORHANDLING_FATAL_ERROR(
-                    "%s has separate Luv planes"
-                    ,   [ file name ]
-                    );
-            break;
-        }
-#endif
     }
 
     imageInfo =
         [ ALLOC_INIT_OBJECT(ArnImageInfo)
             :   size
-            :   colourType
+            :   dataType
             :   tiffType
             :   resolution
             ];
 
-    originalColourType = colourType;
+    originalDataType = dataType;
 
     return imageInfo;
 }
@@ -412,52 +373,8 @@ unsigned int arftifftype(
 {
     switch (((unsigned int)tiffType))
     {
-        case arspectrum_grey1:
-        case arspectrum_grey1_negative:
-        {
-            for ( long y = 0; y < YC(image->size); y++)
-            {
-                if (TIFFReadScanline(tiffFile, BYTE_FILE, YC(start)+y, 0) < 0)
-                    ART_ERRORHANDLING_FATAL_ERROR(
-                        "error reading scanline from %s"
-                        ,   [ file name ]
-                        );
-                if (tiffType == arspectrum_grey1_negative)
-                    for ( long x = 0; x < (XC(image->size)-1)/8+1; x++)
-                        BYTE_FILE[x] ^= 0xff;
-
-                for ( long x = 0; x < XC(image->size); x++ )
-                    G8_DATA[x] = (BYTE_FILE[x/8] << x%8) & 0x80;
-
-                [image setGrey8Region
-                    :IPNT2D(0,y) :IVEC2D(XC(image->size),1) :G8_DATA :0];
-            }
-            break;
-        }
-        case arspectrum_grey4:
-        case arspectrum_grey4_negative:
-        {
-            for ( long y = 0; y < YC(image->size); y++)
-            {
-                if (TIFFReadScanline(tiffFile, BYTE_FILE, YC(start)+y, 0) < 0)
-                    ART_ERRORHANDLING_FATAL_ERROR(
-                        "error reading scanline from %s"
-                        ,   [ file name ]
-                        );
-                if (tiffType == arspectrum_grey4_negative)
-                    for ( long x = 0; x < (XC(image->size)-1)/2+1; x++)
-                        BYTE_FILE[x] ^= 0xff;
-
-                for ( long x = 0; x < XC(image->size); x++)
-                    G8_DATA[x] = (BYTE_FILE[x/2] << (4*(x&1))) & 0xf0;
-
-                [image setGrey8Region
-                    :IPNT2D(0,y) :IVEC2D(XC(image->size),1) :G8_DATA :0];
-            }
-            break;
-        }
-        case arspectrum_grey8:
-        case arspectrum_grey8_negative:
+        case ardt_grey8:
+        case ardt_grey8_negative:
         {
             for ( long y = 0; y < YC(image->size); y++)
             {
@@ -466,7 +383,7 @@ unsigned int arftifftype(
                         "error reading scanline from %s"
                         ,   [ file name ]
                         );
-                if (tiffType == arspectrum_grey8_negative)
+                if (tiffType == ardt_grey8_negative)
                     for ( long x = 0; x < XC(image->size); x++)
                         G8_DATA[x] ^= 0xff;
                 [image setGrey8Region
@@ -474,8 +391,8 @@ unsigned int arftifftype(
             }
             break;
         }
-        case arspectrum_grey16:
-        case arspectrum_grey16_negative:
+        case ardt_grey16:
+        case ardt_grey16_negative:
         {
             for ( long y = 0; y < YC(image->size); y++)
             {
@@ -484,7 +401,7 @@ unsigned int arftifftype(
                         "error reading scanline from %s"
                         ,   [ file name ]
                         );
-                if (tiffType == arspectrum_grey16_negative)
+                if (tiffType == ardt_grey16_negative)
                     for ( long x = 0; x < XC(image->size); x++)
                         G16_DATA[x] ^= 0xffff;
                 [image setGrey16Region
@@ -492,7 +409,7 @@ unsigned int arftifftype(
             }
             break;
         }
-        case arspectrum_rgb24:
+        case ardt_rgb24:
         {
             for ( long y = 0; y < YC(image->size); y++)
             {
@@ -509,7 +426,7 @@ unsigned int arftifftype(
             }
             break;
         }
-        case arspectrum_rgba32:
+        case ardt_rgba32:
         {
             for ( long y = 0; y < YC(image->size); y++)
             {
@@ -524,7 +441,7 @@ unsigned int arftifftype(
             }
             break;
         }
-        case arspectrum_rgb48:
+        case ardt_rgb48:
         {
             for ( long y = 0; y < YC(image->size); y++)
             {
@@ -541,7 +458,7 @@ unsigned int arftifftype(
             }
             break;
         }
-        case arspectrum_rgba64:
+        case ardt_rgba64:
         {
             for ( long y = 0; y < YC(image->size); y++)
             {
@@ -558,28 +475,6 @@ unsigned int arftifftype(
             }
             break;
         }
-#ifndef _ART_WITHOUT_TIFFLOGLUV_
-        case arspectrum_logluv:
-        {
-            for ( long y = 0; y < YC(image->size); y++)
-            {
-                if (TIFFReadScanline(tiffFile, FCIE_FILE, YC(start)+y, 0) < 0)
-                    ART_ERRORHANDLING_FATAL_ERROR(
-                        "error reading scanline from %s"
-                        ,   [ file name ]
-                        );
-                for ( long x = 0; x < XC(image->size); x++)
-                {
-                    utf_xyz_to_xyz(art_gv,&FCIE_FILE[x],&CIE_DATA[x]);
-                    xyz_d_mul_c(art_gv,stonits,&CIE_DATA[x]);
-                }
-
-                [image setCIEXYZRegion
-                    :IPNT2D(0,y) :IVEC2D(XC(image->size),1) :CIE_DATA :0];
-            }
-            break;
-        }
-#endif
     }
 }
 
@@ -588,7 +483,7 @@ unsigned int arftifftype(
 {
     IVec2D size =       [imageInfo size];
     FVec2D resolution = [imageInfo resolution];
-    unsigned int        fileColourType;
+    unsigned int        fileDataType;
 
     uint16              photometricType = PHOTOMETRIC_RGB;   // default type
     unsigned short      bitsPerSample = (unsigned short) 8;  //  colour32
@@ -609,53 +504,13 @@ unsigned int arftifftype(
             ,    [ file name ]
             );
 
-    colourType = [imageInfo colourType];
-    originalColourType = colourType;
-    fileColourType = [imageInfo fileColourType];
-    tiffType = colourType;
-    switch (colourType)
+    dataType = [imageInfo dataType];
+    originalDataType = dataType;
+    fileDataType = [imageInfo fileDataType];
+    tiffType = dataType;
+    switch (dataType)
     {
-        case arspectrum_grey1:
-        {
-            photometricType = PHOTOMETRIC_MINISBLACK;
-            samplesPerPixel = (unsigned short) 1;
-            bitsPerSample = (unsigned short) 1;
-
-            G8_DATA_NC = ALLOC_ARRAY(ArGrey8,XC(size));
-            BYTE_FILE_NC = ALLOC_ARRAY(Byte, (XC(size)-1)/8 + 1);
-            break;
-        }
-        case arspectrum_grey1_negative:
-        {
-            photometricType = PHOTOMETRIC_MINISWHITE;
-            samplesPerPixel = (unsigned short) 1;
-            bitsPerSample = (unsigned short) 1;
-
-            G8_DATA_NC = ALLOC_ARRAY(ArGrey8,XC(size));
-            BYTE_FILE_NC = ALLOC_ARRAY(Byte, (XC(size)-1)/8 + 1);
-            break;
-        }
-        case arspectrum_grey4:
-        {
-            photometricType = PHOTOMETRIC_MINISBLACK;
-            samplesPerPixel = (unsigned short) 1;
-            bitsPerSample = (unsigned short) 4;
-
-            G8_DATA_NC = ALLOC_ARRAY(ArGrey8,XC(size));
-            BYTE_FILE_NC = ALLOC_ARRAY(Byte, (XC(size)-1)/2 + 1);
-            break;
-        }
-        case arspectrum_grey4_negative:
-        {
-            photometricType = PHOTOMETRIC_MINISWHITE;
-            samplesPerPixel = (unsigned short) 1;
-            bitsPerSample = (unsigned short) 4;
-
-            G8_DATA_NC = ALLOC_ARRAY(ArGrey8,XC(size));
-            BYTE_FILE_NC = ALLOC_ARRAY(Byte, (XC(size)-1)/2 + 1);
-            break;
-        }
-        case arspectrum_grey8:
+        case ardt_grey8:
         {
             photometricType = PHOTOMETRIC_MINISBLACK;
             samplesPerPixel = (unsigned short) 1;
@@ -664,7 +519,7 @@ unsigned int arftifftype(
             G8_FILE_NC = G8_DATA;
             break;
         }
-        case arspectrum_grey8_negative:
+        case ardt_grey8_negative:
         {
             photometricType = PHOTOMETRIC_MINISWHITE;
             samplesPerPixel = (unsigned short) 1;
@@ -673,7 +528,7 @@ unsigned int arftifftype(
             G8_FILE_NC = G8_DATA;
             break;
         }
-        case arspectrum_grey16:
+        case ardt_grey16:
         {
             photometricType = PHOTOMETRIC_MINISBLACK;
             samplesPerPixel = (unsigned short) 1;
@@ -683,7 +538,7 @@ unsigned int arftifftype(
             G16_FILE_NC = G16_DATA;
             break;
         }
-        case arspectrum_grey16_negative:
+        case ardt_grey16_negative:
         {
             photometricType = PHOTOMETRIC_MINISWHITE;
             samplesPerPixel = (unsigned short) 1;
@@ -693,7 +548,7 @@ unsigned int arftifftype(
             G16_FILE_NC = G16_DATA;
             break;
         }
-        case arspectrum_rgb24:
+        case ardt_rgb24:
         {
             samplesPerPixel = (unsigned short) 3;
 
@@ -701,154 +556,154 @@ unsigned int arftifftype(
             RGB24_FILE_NC = ALLOC_ARRAY(ArRGB24,XC(size));
             break;
         }
-        case arspectrum_rgba32:
+        case ardt_rgba32:
         {
             RGBA32_DATA_NC = ALLOC_ARRAY(ArRGBA32,XC(size));
             RGBA32_FILE_NC = RGBA32_DATA;
-            tiffType = arspectrum_rgba32;
+            tiffType = ardt_rgba32;
             break;
         }
-        case arspectrum_rgba64:
+        case ardt_rgba64:
         {
             RGBA32_DATA_NC = ALLOC_ARRAY(ArRGBA32,XC(size));
             RGBA32_FILE_NC = RGBA32_DATA;
-            tiffType = arspectrum_rgba32;
+            tiffType = ardt_rgba32;
             break;
         }
-        case arspectrum_rgb:
+        case ardt_rgb:
         {
             RGB_DATA_NC = ALLOC_ARRAY(ArRGB, XC(size));
-            switch (fileColourType)
+            switch (fileDataType)
             {
-                case arspectrum_rgba32:
+                case ardt_rgba32:
                 {
                     RGBA32_FILE_NC = ALLOC_ARRAY(ArRGBA32,XC(size));
-                    tiffType = arspectrum_rgba32;
+                    tiffType = ardt_rgba32;
                     break;
                 }
-                case arspectrum_rgba64:
+                case ardt_rgba64:
                 {
                     samplesPerPixel = (unsigned short) 4;
                     bitsPerSample = (unsigned short) 16;
                     RGBA64_FILE_NC = ALLOC_ARRAY(ArRGBA64,XC(size));
-                    tiffType = arspectrum_rgba64;
+                    tiffType = ardt_rgba64;
                     break;
                 }
                 default:
                 {
                     ART_ERRORHANDLING_FATAL_ERROR(
                         "cannot write image of type %x"
-                        ,   fileColourType
+                        ,   fileDataType
                         );
                 }
             }
             break;
         }
-        case arspectrum_rgba:
+        case ardt_rgba:
         {
             RGBA_DATA_NC = ALLOC_ARRAY(ArRGBA, XC(size));
-            switch (fileColourType)
+            switch (fileDataType)
             {
-                case arspectrum_rgba32:
+                case ardt_rgba32:
                 {
                     RGBA32_FILE_NC = ALLOC_ARRAY(ArRGBA32,XC(size));
-                    tiffType = arspectrum_rgba32;
+                    tiffType = ardt_rgba32;
                     break;
                 }
-                case arspectrum_rgba64:
+                case ardt_rgba64:
                 {
                     samplesPerPixel = (unsigned short) 4;
                     bitsPerSample = (unsigned short) 16;
                     RGBA64_FILE_NC = ALLOC_ARRAY(ArRGBA64,XC(size));
-                    tiffType = arspectrum_rgba64;
+                    tiffType = ardt_rgba64;
                     break;
                 }
                 default:
                 {
                     ART_ERRORHANDLING_FATAL_ERROR(
                         "cannot write image of type %x"
-                        ,   fileColourType
+                        ,   fileDataType
                         );
                 }
             }
             break;
         }
-        case arspectrum_grey:
+        case ardt_grey:
         {
             G_DATA_NC = ALLOC_ARRAY(ArGrey, XC(size));
             photometricType = PHOTOMETRIC_MINISBLACK;
             samplesPerPixel = (unsigned short) 1;
 
-            switch (fileColourType)
+            switch (fileDataType)
             {
-                case arspectrum_grey8:
+                case ardt_grey8:
                 {
                     G8_FILE_NC = ALLOC_ARRAY(ArGrey8,XC(size));
-                    tiffType = arspectrum_grey8;
+                    tiffType = ardt_grey8;
                     break;
                 }
-                case arspectrum_grey16:
+                case ardt_grey16:
                 {
                     bitsPerSample = (unsigned short) 16;
                     G16_FILE_NC = ALLOC_ARRAY(ArGrey16,XC(size));
-                    tiffType = arspectrum_grey16;
+                    tiffType = ardt_grey16;
                     break;
                 }
-                case arspectrum_rgb24:
-                case arspectrum_rgb24falsecolour:
+                case ardt_rgb24:
+                case ardt_rgb24_falsecolour:
                 {
                     photometricType = PHOTOMETRIC_RGB;
                     samplesPerPixel = (unsigned short) 3;
                     bitsPerSample = (unsigned short) 8;
                     RGB24_FILE_NC = ALLOC_ARRAY(ArRGB24,XC(size));
-                    tiffType = fileColourType;
+                    tiffType = fileDataType;
                     break;
                 }
-                case arspectrum_rgb48:
-                case arspectrum_rgb48falsecolour:
+                case ardt_rgb48:
+                case ardt_rgb48_falsecolour:
                 {
                     photometricType = PHOTOMETRIC_RGB;
                     samplesPerPixel = (unsigned short) 3;
                     bitsPerSample = (unsigned short) 16;
                     RGB48_FILE_NC = ALLOC_ARRAY(ArRGB48,XC(size));
-                    tiffType = fileColourType;
+                    tiffType = fileDataType;
                     break;
                 }
                 default:
                 {
                     ART_ERRORHANDLING_FATAL_ERROR(
                         "cannot write image of type %x"
-                        ,   fileColourType
+                        ,   fileDataType
                         );
                 }
             }
             break;
         }
-        case arspectrum_greyalpha:
+        case ardt_grey_alpha:
         {
             GA_DATA_NC = ALLOC_ARRAY(ArGreyAlpha, XC(size));
             photometricType = PHOTOMETRIC_MINISBLACK;
-            tiffType = fileColourType;
+            tiffType = fileDataType;
 
-            switch (fileColourType)
+            switch (fileDataType)
             {
-                case arspectrum_grey16:
+                case ardt_grey16:
                 {
                     G8_FILE_NC = ALLOC_ARRAY(ArGrey16,XC(size));
                     bitsPerSample = (unsigned short) 8;
                     samplesPerPixel = (unsigned short) 2;
                     break;
                 }
-                case arspectrum_grey32:
+                case ardt_grey32:
                 {
                     G16_FILE_NC = ALLOC_ARRAY(ArGrey32,XC(size));
                     bitsPerSample = (unsigned short) 16;
                     samplesPerPixel = (unsigned short) 2;
                     break;
                 }
-                case arspectrum_rgba32:
-                case arspectrum_rgba32falsecolour:
-                case arspectrum_rgba32plusminus:
+                case ardt_rgba32:
+                case ardt_rgba32_falsecolour:
+                case ardt_rgba32_plusminus:
                 {
                     photometricType = PHOTOMETRIC_RGB;
                     samplesPerPixel = (unsigned short) 4;
@@ -856,9 +711,9 @@ unsigned int arftifftype(
                     RGBA32_FILE_NC = ALLOC_ARRAY(ArRGBA32,XC(size));
                     break;
                 }
-                case arspectrum_rgba64:
-                case arspectrum_rgba64falsecolour:
-                case arspectrum_rgba64plusminus:
+                case ardt_rgba64:
+                case ardt_rgba64_falsecolour:
+                case ardt_rgba64_plusminus:
                 {
                     photometricType = PHOTOMETRIC_RGB;
                     samplesPerPixel = (unsigned short) 4;
@@ -870,39 +725,18 @@ unsigned int arftifftype(
                 {
                     ART_ERRORHANDLING_FATAL_ERROR(
                         "cannot write image of type %x"
-                        ,   fileColourType
+                        ,   fileDataType
                         );
                 }
             }
             break;
         }
-#ifndef _ART_WITHOUT_TIFFLOGLUV_
-        case arspectrum_ciexyz:
-        {
-            photometricType = PHOTOMETRIC_LOGLUV;
-            bitsPerSample = (unsigned short) 32;
-            samplesPerPixel = (unsigned short) 3;
-            compression = COMPRESSION_SGILOG;
 
-            CIE_DATA_NC = ALLOC_ARRAY(ArCIEXYZ, XC(size));
-            FCIE_FILE_NC = ALLOC_ARRAY(ArUTF_CIEXYZ, XC(size));
-            tiffType = arspectrum_logluv;
-            break;
-        }
-#else
-        case arspectrum_ciexyz:
-        {
-            ART_ERRORHANDLING_FATAL_ERROR(
-                "ART was compiled without TIFF logluv"
-                ,   colourType
-                );
-        }
-#endif
         default:
         {
             ART_ERRORHANDLING_FATAL_ERROR(
                 "cannot write image of type %x"
-                ,   colourType
+                ,   dataType
                 );
         }
     }
@@ -921,12 +755,6 @@ unsigned int arftifftype(
     TIFFSetField(tiffFile, TIFFTAG_RESOLUTIONUNIT,      resolutionUnit);
     TIFFSetField(tiffFile, TIFFTAG_ROWSPERSTRIP, (uint32) rowsPerStrip);
 
-#ifndef _ART_WITHOUT_TIFFLOGLUV_
-
-    if (tiffType == arspectrum_logluv)
-        TIFFSetField(tiffFile, TIFFTAG_SGILOGDATAFMT, SGILOGDATAFMT_FLOAT);
-
-#endif
     if ( imageInfo->destinationCSR )
     {
         TIFFSetField(
@@ -941,89 +769,37 @@ unsigned int arftifftype(
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
-    switch ( ((unsigned int)colourType) )
+    switch ( ((unsigned int)dataType) )
     {
-        case arspectrum_grey1:
-        case arspectrum_grey1_negative:
-        {
-            for ( long y = 0; y < ARNIMG_YSIZE(image); y++)
-            {
-                [ image getGrey8Region
-                    :   IPNT2D( 0, y )
-                    :   IVEC2D( ARNIMG_XSIZE(image), 1 )
-                    :   G8_DATA
-                    :   0];
-
-                for ( long x = 0;
-                      x < ( ARNIMG_XSIZE(image) - 1 ) / 8 + 1;
-                      x++ )
-                    BYTE_FILE[x] = 0;
-
-                for ( long x = 0;
-                      x < ARNIMG_XSIZE(image);
-                      x++ )
-                    BYTE_FILE[x/8] |= ( G8_DATA[x] & 0x80 ) >> x%8;
-
-                if ( tiffType == arspectrum_grey1_negative )
-                    for ( long x = 0;
-                          x < ( ARNIMG_XSIZE(image) - 1 ) / 8 + 1;
-                          x++ )
-                        BYTE_FILE[x] ^= 0xff;
-
-                TIFFWriteScanline( tiffFile, BYTE_FILE, YC(start) + y, 0 );
-            }
-            break;
-        }
-        case arspectrum_grey4:
-        case arspectrum_grey4_negative:
-        {
-            for ( long y = 0; y < ARNIMG_YSIZE(image); y++)
-            {
-                [image getGrey8Region
-                    :IPNT2D(0, y) :IVEC2D(ARNIMG_XSIZE(image), 1) :G8_DATA :0];
-
-                for (long x = 0; x < (ARNIMG_XSIZE(image)-1)/2+1; x++)
-                    BYTE_FILE[x] = 0;
-                for (long x = 0; x < ARNIMG_XSIZE(image); x++)
-                    BYTE_FILE[x/2] |= (G8_DATA[x] & 0xf0) >> (4 * (x&1));
-
-                if (tiffType == arspectrum_grey4_negative)
-                    for (long x = 0; x < (ARNIMG_XSIZE(image)-1)/2+1; x++)
-                        BYTE_FILE[x] ^= 0xff;
-
-                TIFFWriteScanline(tiffFile, BYTE_FILE, YC(start)+y, 0);
-            }
-            break;
-        }
-        case arspectrum_grey8:
-        case arspectrum_grey8_negative:
+        case ardt_grey8:
+        case ardt_grey8_negative:
         {
             for (long y = 0; y < ARNIMG_YSIZE(image); y++)
             {
                 [image getGrey8Region
                     :IPNT2D(0, y) :IVEC2D(ARNIMG_XSIZE(image), 1) :G8_DATA :0];
-                if (tiffType == arspectrum_grey8_negative)
+                if (tiffType == ardt_grey8_negative)
                     for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         G8_DATA[x] ^= 0xff;
                 TIFFWriteScanline(tiffFile, G8_FILE, YC(start)+y, 0);
             }
             break;
         }
-        case arspectrum_grey16:
-        case arspectrum_grey16_negative:
+        case ardt_grey16:
+        case ardt_grey16_negative:
         {
             for (long y = 0; y < ARNIMG_YSIZE(image); y++)
             {
                 [image getGrey16Region
                  :IPNT2D(0, y) :IVEC2D(ARNIMG_XSIZE(image), 1) :G16_DATA :0];
-                if (tiffType == arspectrum_grey16_negative)
+                if (tiffType == ardt_grey16_negative)
                     for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         G16_DATA[x] ^= 0xffff;
                 TIFFWriteScanline(tiffFile, G16_FILE, YC(start)+y, 0);
             }
             break;
         }
-        case arspectrum_rgb24:
+        case ardt_rgb24:
         {
             for (long y = 0; y < ARNIMG_YSIZE(image); y++)
             {
@@ -1037,7 +813,7 @@ unsigned int arftifftype(
             }
             break;
         }
-        case arspectrum_rgba32:
+        case ardt_rgba32:
         {
             for (long y = 0; y < ARNIMG_YSIZE(image); y++)
             {
@@ -1048,7 +824,7 @@ unsigned int arftifftype(
             break;
         }
 
-        case arspectrum_rgb:
+        case ardt_rgb:
         {
             for ( long y = 0; y < ARNIMG_YSIZE(image); y++ )
             {
@@ -1060,7 +836,7 @@ unsigned int arftifftype(
 
                 switch ( ((unsigned int)tiffType) )
                 {
-                    case arspectrum_rgba32:
+                    case ardt_rgba32:
                     {
                         for ( long x = 0; x < ARNIMG_XSIZE(image); x++ )
                         {
@@ -1078,7 +854,7 @@ unsigned int arftifftype(
 
                         break;
                     }
-                    case arspectrum_rgba64:
+                    case ardt_rgba64:
                     {
                         for ( long x = 0; x < ARNIMG_XSIZE(image); x++ )
                         {
@@ -1100,7 +876,7 @@ unsigned int arftifftype(
             break;
         }
 
-        case arspectrum_rgba:
+        case ardt_rgba:
         {
             for ( long y = 0; y < ARNIMG_YSIZE(image); y++ )
             {
@@ -1109,7 +885,7 @@ unsigned int arftifftype(
 
                 switch (((unsigned int)tiffType))
                 {
-                    case arspectrum_rgba32:
+                    case ardt_rgba32:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1121,7 +897,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, RGBA32_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_rgba64:
+                    case ardt_rgba64:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1136,7 +912,7 @@ unsigned int arftifftype(
             }
             break;
         }
-        case arspectrum_grey:
+        case ardt_grey:
         {
             for ( long y = 0; y < ARNIMG_YSIZE(image); y++ )
             {
@@ -1145,7 +921,7 @@ unsigned int arftifftype(
 
                 switch (((unsigned int)tiffType))
                 {
-                    case arspectrum_grey8:
+                    case ardt_grey8:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1157,7 +933,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, G8_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_grey16:
+                    case ardt_grey16:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1169,7 +945,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, G16_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_rgb24:
+                    case ardt_rgb24:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1181,7 +957,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, RGB24_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_rgb24falsecolour:
+                    case ardt_rgb24_falsecolour:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1198,7 +974,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, RGB24_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_rgb48:
+                    case ardt_rgb48:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1210,7 +986,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, RGB48_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_rgb48falsecolour:
+                    case ardt_rgb48_falsecolour:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1231,7 +1007,7 @@ unsigned int arftifftype(
             }
             break;
         }
-        case arspectrum_greyalpha:
+        case ardt_grey_alpha:
         {
             for ( long y = 0; y < ARNIMG_YSIZE(image); y++ )
             {
@@ -1244,7 +1020,7 @@ unsigned int arftifftype(
 
                 switch (((unsigned int)tiffType))
                 {
-                    case arspectrum_grey16:
+                    case ardt_grey16:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1262,7 +1038,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, GA16_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_grey32:
+                    case ardt_grey32:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1280,7 +1056,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, GA32_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_rgba32:
+                    case ardt_rgba32:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1298,7 +1074,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, RGBA32_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_rgba32plusminus:
+                    case ardt_rgba32_plusminus:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1326,7 +1102,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, RGBA32_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_rgba32falsecolour:
+                    case ardt_rgba32_falsecolour:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1354,7 +1130,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, RGBA32_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_rgba64:
+                    case ardt_rgba64:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1372,7 +1148,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, RGBA64_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_rgba64plusminus:
+                    case ardt_rgba64_plusminus:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1400,7 +1176,7 @@ unsigned int arftifftype(
                         TIFFWriteScanline(tiffFile, RGBA64_FILE, YC(start)+y, 0);
                         break;
                     }
-                    case arspectrum_rgba64falsecolour:
+                    case ardt_rgba64_falsecolour:
                     {
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
@@ -1433,7 +1209,7 @@ unsigned int arftifftype(
             break;
         }
 #ifndef _ART_WITHOUT_TIFFLOGLUV_
-        case arspectrum_ciexyz:
+        case ardt_ciexyz:
         {
             for ( long y = 0; y < ARNIMG_YSIZE(image); y++ )
             {

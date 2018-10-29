@@ -62,7 +62,7 @@ typedef struct ArSpectrum_GV
 #endif // ARSPECTRUM_DEBUG_ASSERTIONS
 
     unsigned int    isr_has_been_initialised;
-    ArSpectrumType  current_isr;
+    ArDataType  current_isr;
     unsigned int    number_of_channels;
 
     struct ArSpectrum  * spc_zero;

@@ -92,13 +92,13 @@ void arlightandattenuation_printf_current_subsystem_state(
     printf( "Status of the light and attenuation subsystem\n");
     printf( "---------------------------------------------\n");
 
-    printf( "Current light computation type      : ");
+    printf( "ArLight is set to      : ");
     if ( art_gv->arlight_gv->lct_has_been_initialised )
         printf( "%s\n", arlight_lct_string(art_gv) );
     else
         printf( "(subsystem not initialised yet)\n");
 
-    printf( "Current attenuation computation type: ");
+    printf( "ArAttenuation is set to: ");
     if ( art_gv->arlight_gv->lct_has_been_initialised )
         printf( "%s\n", ardirectattenuation_act_string(art_gv) );
     else
@@ -161,7 +161,7 @@ unsigned int arlightandattenuation_support_polarisation(
         const ART_GV  * art_gv
         )
 {
-    return (art_gv->arspectrum_gv->current_isr & arspectrum_polarisable);
+    return (art_gv->arspectrum_gv->current_isr & ardt_polarisable);
 }
 
 /* ======================================================================== */
