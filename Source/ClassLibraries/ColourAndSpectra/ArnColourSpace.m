@@ -37,40 +37,10 @@ typedef struct ArnColourSpace_GV
 ArnColourSpace_GV;
 
 
-ArColourSpace const  * ARCOLOURSPACEREF_sRGB;
-ArColourSpace const  * ARCOLOURSPACEREF_AdobeRGB;
-ArColourSpace const  * ARCOLOURSPACEREF_WideGamutRGB;
-
 ART_MODULE_INITIALISATION_FUNCTION
 (
     [ ArnColourSpace registerWithRuntime ];
     [ ArnDefaultRGBColourSpace registerWithRuntime ];
-
-    ArnColourSpace  * ics0 =
-        ART_PARSE_EXISTING_FILE_SEARCH_LIB_PATH(
-            "sRGB.icm",
-            ArnColourSpace
-            );
-
-    ArnColourSpace  * ics1 =
-        ART_PARSE_EXISTING_FILE_SEARCH_LIB_PATH(
-            "AdobeRGB1998.icc",
-            ArnColourSpace
-            );
-
-    ArnColourSpace  * ics2 =
-        ART_PARSE_EXISTING_FILE_SEARCH_LIB_PATH(
-            "WideGamutRGB.icc",
-            ArnColourSpace
-            );
-
-    ARCOLOURSPACEREF_sRGB         = [ ics0 colourSpaceRef ];
-    ARCOLOURSPACEREF_AdobeRGB     = [ ics1 colourSpaceRef ];
-    ARCOLOURSPACEREF_WideGamutRGB = [ ics2 colourSpaceRef ];
-
-    RELEASE_OBJECT( ics0 );
-    RELEASE_OBJECT( ics1 );
-    RELEASE_OBJECT( ics2 );
 
     set_default_rgbspace_ref( art_gv, ARCOLOURSPACEREF_sRGB );
     set_rgb_computationspace_ref( art_gv, ARCOLOURSPACEREF_sRGB );
@@ -114,7 +84,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourSpace)
         : (ArColourSpaceRef) newColourSpaceRef
 {
     self = [ super init ];
-//printf(">>>> %s <<<<",ARCSR_NAME(newColourSpaceRef));fflush(stdout);
 
     if ( self )
     {

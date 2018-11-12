@@ -155,6 +155,26 @@ void trafo3d_hd_invert_h(
               HTrafo3D  * hr
         );
 
+//   Generates a Mat3 transformation matrix which makes v1 identical to v0
+//   (this can involve scaling, so neither of them needs to be normalised)
+//   (also, not all special cases are properly handled yet, so use with
+//   care)
+
+void trafo3d_vv_align_m(
+        const Vec3D  * v0,
+        const Vec3D  * v1,
+              Mat3   * mr
+        );
+
+//   Generates a Trafo3D which makes v1 identical to v0
+//   (this uses the function above, so similar restrictions apply)
+
+void trafo3d_vv_align_t(
+        const Vec3D    * v0,
+        const Vec3D    * v1,
+              Trafo3D  * tr
+        );
+
 void pnt3d_p_trafo3d_p(
         const Pnt3D    * p0,
         const Trafo3D  * t0,

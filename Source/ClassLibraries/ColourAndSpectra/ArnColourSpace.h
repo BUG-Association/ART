@@ -86,12 +86,4 @@ ArnDefaultRGBColourSpace  * arndefault_rgb_colourspace_singleton(
 #define DEFAULT_RGB_COLOURSPACE \
     arndefault_rgb_colourspace_singleton(art_gv)
 
-extern ArColourSpace const  * ARCOLOURSPACEREF_sRGB;
-extern ArColourSpace const  * ARCOLOURSPACEREF_AdobeRGB;
-extern ArColourSpace const  * ARCOLOURSPACEREF_WideGamutRGB;
-
-#define ARCSR_sRGB              ARCOLOURSPACEREF_sRGB
-#define ARCSR_AdobeRGB          ARCOLOURSPACEREF_AdobeRGB
-#define ARCSR_WideGamutRGB      ARCOLOURSPACEREF_WideGamutRGB
-
 // ===========================================================================

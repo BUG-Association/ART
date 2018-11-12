@@ -569,7 +569,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             :   newRemoveOption
             :   newColourSpace
             :   [ ALLOC_INIT_OBJECT(ArnColourTransform) : arintent_perceptual ]
-            :   newNumberOfBits ];
+            :   newNumberOfBits
+            ];
 }
 
 - init
@@ -1118,7 +1119,6 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
     ---------------------------------------------------------------aw- */
 
     destinationImageDataType = ardt_rgba;
-
     destinationFileDataType  = ardt_rgba;
 
 

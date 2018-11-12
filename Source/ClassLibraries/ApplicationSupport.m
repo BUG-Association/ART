@@ -1040,7 +1040,7 @@ int art_print_banner_and_process_standard_commandline_options(
 
     if ( [ ARGB_OPT hasBeenSpecified ] )
     {
-        art_set_default_rgbspace_ref ( art_gv, ARCSR_AdobeRGB );
+        art_set_default_rgbspace_ref ( art_gv, ARCSR_aRGB );
         numberOfRequestedWorkingSpaces++;
     }
 
@@ -1048,7 +1048,7 @@ int art_print_banner_and_process_standard_commandline_options(
 
     if ( [ WRGB_OPT hasBeenSpecified ] )
     {
-        art_set_default_rgbspace_ref ( art_gv, ARCSR_WideGamutRGB );
+        art_set_default_rgbspace_ref ( art_gv, ARCSR_wRGB );
         numberOfRequestedWorkingSpaces++;
     }
 

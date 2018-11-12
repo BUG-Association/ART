@@ -399,5 +399,76 @@ void trafo3d_v_world2local_from_worldspace_normal_t(
     trafo3d_transpose_t( out_world2local );
 }
 
+void trafo3d_vv_align_m(
+        const Vec3D  * v0,
+        const Vec3D  * v1,
+              Mat3   * mr
+        )
+{
+    double v0_len = vec3d_v_len(v0);
+    double v1_len = vec3d_v_len(v1);
+
+    Vec3D  v0_norm, v1_norm;
+
+    vec3d_dv_mul_v( 1. / v0_len, v0, & v0_norm );
+    vec3d_dv_mul_v( 1. / v1_len, v1, & v1_norm );
+
+    Vec3D   rotation_axis;
+    
+    vec3d_vv_cross_v( & v0_norm, & v1_norm, & rotation_axis );
+
+    double rcos = vec3d_vv_dot( & v0_norm, & v1_norm );
+    double rsin = vec3d_v_len( & rotation_axis );
+    
+    Mat3  rm;
+    
+    if ( rsin > 0. )
+    {
+        double  norm_factor = 1. / rsin;
+
+        double u = XC(rotation_axis) * norm_factor;
+        double v = YC(rotation_axis) * norm_factor;
+        double w = ZC(rotation_axis) * norm_factor;
+
+        rm.x[0][0] =      rcos + u*u*(1-rcos);
+        rm.x[1][0] =  w * rsin + v*u*(1-rcos);
+        rm.x[2][0] = -v * rsin + w*u*(1-rcos);
+        rm.x[0][1] = -w * rsin + u*v*(1-rcos);
+        rm.x[1][1] =      rcos + v*v*(1-rcos);
+        rm.x[2][1] =  u * rsin + w*v*(1-rcos);
+        rm.x[0][2] =  v * rsin + u*w*(1-rcos);
+        rm.x[1][2] = -u * rsin + v*w*(1-rcos);
+        rm.x[2][2] =      rcos + w*w*(1-rcos);
+
+        c3_transpose_m( mr );
+    }
+    else
+    {
+        rm = MAT3_UNIT;
+    }
+
+    double  sr = v0_len / v1_len;
+    
+    Mat3  sm =
+            MAT3( sr,  0,  0,
+                   0, sr,  0,
+                   0,  0, sr);
+
+    c3_mm_mul_m( & rm, & sm, mr );
+}
+
+void trafo3d_vv_align_t(
+        const Vec3D    * v0,
+        const Vec3D    * v1,
+              Trafo3D  * tr
+        )
+{
+    trafo3d_vv_align_m(
+          v0,
+          v1,
+        & tr->m
+        );
+}
+
 
 /* ======================================================================== */

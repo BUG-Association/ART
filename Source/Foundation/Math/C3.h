@@ -61,6 +61,7 @@ extern Mat3 C3_M_UNIT;
             ((Mat3){{{(_d00),(_d01),(_d02)}, \
                      {(_d10),(_d11),(_d12)}, \
                      {(_d20),(_d21),(_d22)}}})
+#define MAT3_UNIT               MAT3(1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0)
 
 #define C3_C_FORMAT(_form)      "CRD3(" _form "," _form "," _form ")"
 #define C3_C_PRINTF(_crd)       (_crd).x[0],(_crd).x[1],(_crd).x[2]

@@ -293,6 +293,15 @@ void xyza_s_debugprintf(
 
 #define xyza_c_debugprintf      xyza_s_debugprintf
 
+Mat3  xyz2rgb_via_primaries(
+              ART_GV    * art_gv,
+        const Pnt2D     * r,
+        const Pnt2D     * g,
+        const Pnt2D     * b,
+        const ArCIEXYZ  * w_xyz
+        );
+
+
 
 #endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARCIECOLOURVALUES_H_ */
 /* ======================================================================== */

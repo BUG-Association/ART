@@ -24,8 +24,8 @@
 
 =========================================================================== */
 
-#ifndef _ART_FOUNDATION_COLOURANDSPECTRA_ARSPECTRUMSPACE_H_
-#define _ART_FOUNDATION_COLOURANDSPECTRA_ARSPECTRUMSPACE_H_
+#ifndef _ART_FOUNDATION_COLOURANDSPECTRA_ARCOLOURSPACE_H_
+#define _ART_FOUNDATION_COLOURANDSPECTRA_ARCOLOURSPACE_H_
 
 #include "ART_Foundation_System.h"
 
@@ -36,6 +36,7 @@ ART_MODULE_INTERFACE(ArColourSpace)
 #endif
 
 #include "ART_Foundation_Math.h"
+#include "ART_Foundation_Geometry.h"
 
 /* ---------------------------------------------------------------------------
 
@@ -107,9 +108,13 @@ ArColourSpaceType;
              for details.
 
     'profile'
-             A handle to the LCMS ICC profile associated with the colour
-             space.
-             NOTE: this field is only present when ART is compiled with LCMS
+    'linear_profile'
+             Handles to the LCMS ICC profiles associated with the colour
+             space. The first one is a version of the profile with its
+             associated gamma, and the second one is a linear RGB space which
+             uses the same white point and primaries as the main one.
+ 
+             These fields are only present when ART is compiled with LCMS
              support.
 
 ------------------------------------------------------------------------aw- */
@@ -120,44 +125,65 @@ typedef struct ArColourSpace
     ArSymbol           name;
     Mat3               xyz_to_rgb;
     Mat3               rgb_to_xyz;
+    Crd3               whitepoint;
     double             gamma;
+    double             (* gammafunction) ( const double, const double );
 #ifndef _ART_WITHOUT_LCMS_
     cmsHPROFILE        profile;
-    size_t             profileBufferSize;
+    cmsUInt32Number    profileBufferSize;
     cmsUInt8Number   * profileBuffer;
+    cmsHPROFILE        linear_profile;
+    cmsUInt32Number    linear_profileBufferSize;
+    cmsUInt8Number   * linear_profileBuffer;
 #endif
 }
 ArColourSpace;
 
 //  access macros
 
-#define ARSPECTRUMSPACE_TYPE(__cs)                    (__cs).type
-#define ARSPECTRUMSPACE_NAME(__cs)                    (__cs).name
-#define ARSPECTRUMSPACE_XYZ_TO_RGB(__cs)              (__cs).xyz_to_rgb
-#define ARSPECTRUMSPACE_RGB_TO_XYZ(__cs)              (__cs).rgb_to_xyz
-#define ARSPECTRUMSPACE_GAMMA(__cs)                   (__cs).gamma
+#define ARCOLOURSPACE_TYPE(__cs)                    (__cs).type
+#define ARCOLOURSPACE_NAME(__cs)                    (__cs).name
+#define ARCOLOURSPACE_XYZ_TO_RGB(__cs)              (__cs).xyz_to_rgb
+#define ARCOLOURSPACE_RGB_TO_XYZ(__cs)              (__cs).rgb_to_xyz
+#define ARCOLOURSPACE_WHITEPOINT(__cs)              (__cs).whitepoint
+#define ARCOLOURSPACE_GAMMA(__cs)                   (__cs).gamma
+#define ARCOLOURSPACE_GAMMAFUNCTION(__cs,__d) \
+    (*(__cs).gammafunction)(ARCOLOURSPACE_GAMMA(__cs),(__d))
 
 #ifndef _ART_WITHOUT_LCMS_
 
-#define ARSPECTRUMSPACE_PROFILE(__cs)                 (__cs).profile
-#define ARSPECTRUMSPACE_PROFILEBUFFERSIZE(__cs)       (__cs).profileBufferSize
-#define ARSPECTRUMSPACE_PROFILEBUFFER(__cs)           (__cs).profileBuffer
+#define ARCOLOURSPACE_PROFILE(__cs)                 (__cs).profile
+#define ARCOLOURSPACE_PROFILEBUFFERSIZE(__cs)       (__cs).profileBufferSize
+#define ARCOLOURSPACE_PROFILEBUFFER(__cs)           (__cs).profileBuffer
+
+#define ARCOLOURSPACE_LINEAR_PROFILE(__cs)          \
+    (__cs).linear_profile
+#define ARCOLOURSPACE_LINEAR_PROFILEBUFFERSIZE(__cs)\
+    (__cs).linear_profileBufferSize
+#define ARCOLOURSPACE_LINEAR_PROFILEBUFFER(__cs)    \
+    (__cs).linear_profileBuffer
 
 #endif
 
 //  shorthand versions
 
-#define ARCS_TYPE                       ARSPECTRUMSPACE_TYPE
-#define ARCS_NAME                       ARSPECTRUMSPACE_NAME
-#define ARCS_XYZ_TO_RGB                 ARSPECTRUMSPACE_XYZ_TO_RGB
-#define ARCS_RGB_TO_XYZ                 ARSPECTRUMSPACE_RGB_TO_XYZ
-#define ARCS_GAMMA                      ARSPECTRUMSPACE_GAMMA
+#define ARCS_TYPE                       ARCOLOURSPACE_TYPE
+#define ARCS_NAME                       ARCOLOURSPACE_NAME
+#define ARCS_XYZ_TO_RGB                 ARCOLOURSPACE_XYZ_TO_RGB
+#define ARCS_RGB_TO_XYZ                 ARCOLOURSPACE_RGB_TO_XYZ
+#define ARCS_WHITEPOINT                 ARCOLOURSPACE_WHITEPOINT
+#define ARCS_GAMMA                      ARCOLOURSPACE_GAMMA
+#define ARCS_GAMMAFUNCTION              ARCOLOURSPACE_GAMMAFUNCTION
 
 #ifndef _ART_WITHOUT_LCMS_
 
-#define ARCS_PROFILE                    ARSPECTRUMSPACE_PROFILE
-#define ARCS_PROFILEBUFFERSIZE          ARSPECTRUMSPACE_PROFILEBUFFERSIZE
-#define ARCS_PROFILEBUFFER              ARSPECTRUMSPACE_PROFILEBUFFER
+#define ARCS_PROFILE                    ARCOLOURSPACE_PROFILE
+#define ARCS_PROFILEBUFFERSIZE          ARCOLOURSPACE_PROFILEBUFFERSIZE
+#define ARCS_PROFILEBUFFER              ARCOLOURSPACE_PROFILEBUFFER
+
+#define ARCS_LINEAR_PROFILE             ARCOLOURSPACE_LINEAR_PROFILE
+#define ARCS_LINEAR_PROFILEBUFFERSIZE   ARCOLOURSPACE_LINEAR_PROFILEBUFFERSIZE
+#define ARCS_LINEAR_PROFILEBUFFER       ARCOLOURSPACE_LINEAR_PROFILEBUFFER
 
 #endif
 
@@ -166,6 +192,16 @@ ARTABLE_INTERFACE_FOR_STRUCTURE_WITH_ARSYMBOL_INDEX_FIELD(
         cs,
         name
         )
+
+double arcolourspace_standard_gamma(
+        const double gamma,
+        const double value
+        );
+
+double arcolourspace_srgb_gamma(
+        const double gamma,
+        const double value
+        );
 
 /* ---------------------------------------------------------------------------
 
@@ -198,17 +234,30 @@ typedef ArColourSpace   * ArColourSpaceRef;
 
 //  access macros
 
-#define ARCOLOURSPACEREF_TYPE(__cs)                 ARSPECTRUMSPACE_TYPE(*(__cs))
-#define ARCOLOURSPACEREF_NAME(__cs)                 ARSPECTRUMSPACE_NAME(*(__cs))
-#define ARCOLOURSPACEREF_XYZ_TO_RGB(__cs)           ARSPECTRUMSPACE_XYZ_TO_RGB(*(__cs))
-#define ARCOLOURSPACEREF_RGB_TO_XYZ(__cs)           ARSPECTRUMSPACE_RGB_TO_XYZ(*(__cs))
-#define ARCOLOURSPACEREF_GAMMA(__cs)                ARSPECTRUMSPACE_GAMMA(*(__cs))
+#define ARCOLOURSPACEREF_TYPE(__cs)         ARCOLOURSPACE_TYPE(*(__cs))
+#define ARCOLOURSPACEREF_NAME(__cs)         ARCOLOURSPACE_NAME(*(__cs))
+#define ARCOLOURSPACEREF_XYZ_TO_RGB(__cs)   ARCOLOURSPACE_XYZ_TO_RGB(*(__cs))
+#define ARCOLOURSPACEREF_RGB_TO_XYZ(__cs)   ARCOLOURSPACE_RGB_TO_XYZ(*(__cs))
+#define ARCOLOURSPACEREF_WHITEPOINT(__cs)   ARCOLOURSPACE_WHITEPOINT(*(__cs))
+#define ARCOLOURSPACEREF_GAMMA(__cs)        ARCOLOURSPACE_GAMMA(*(__cs))
+#define ARCOLOURSPACEREF_GAMMAFUNCTION(__cs) \
+    ARCOLOURSPACE_GAMMAFUNCTION(*(__cs))
 
 #ifndef _ART_WITHOUT_LCMS_
 
-#define ARCOLOURSPACEREF_PROFILE(__cs)              ARSPECTRUMSPACE_PROFILE(*(__cs))
-#define ARCOLOURSPACEREF_PROFILEBUFFERSIZE(__cs)    ARSPECTRUMSPACE_PROFILEBUFFERSIZE(*(__cs))
-#define ARCOLOURSPACEREF_PROFILEBUFFER(__cs)        ARSPECTRUMSPACE_PROFILEBUFFER(*(__cs))
+#define ARCOLOURSPACEREF_PROFILE(__cs)          \
+    ARCOLOURSPACE_PROFILE(*(__cs))
+#define ARCOLOURSPACEREF_PROFILEBUFFERSIZE(__cs)\
+    ARCOLOURSPACE_PROFILEBUFFERSIZE(*(__cs))
+#define ARCOLOURSPACEREF_PROFILEBUFFER(__cs)    \
+    ARCOLOURSPACE_PROFILEBUFFER(*(__cs))
+
+#define ARCOLOURSPACEREF_LINEAR_PROFILE(__cs)          \
+    ARCOLOURSPACE_LINEAR_PROFILE(*(__cs))
+#define ARCOLOURSPACEREF_LINEAR_PROFILEBUFFERSIZE(__cs)\
+    ARCOLOURSPACE_LINEAR_PROFILEBUFFERSIZE(*(__cs))
+#define ARCOLOURSPACEREF_LINEAR_PROFILEBUFFER(__cs)    \
+    ARCOLOURSPACE_LINEAR_PROFILEBUFFER(*(__cs))
 
 #endif
 
@@ -218,13 +267,22 @@ typedef ArColourSpace   * ArColourSpaceRef;
 #define ARCSR_NAME                          ARCOLOURSPACEREF_NAME
 #define ARCSR_XYZ_TO_RGB                    ARCOLOURSPACEREF_XYZ_TO_RGB
 #define ARCSR_RGB_TO_XYZ                    ARCOLOURSPACEREF_RGB_TO_XYZ
+#define ARCSR_WHITEPOINT                    ARCOLOURSPACEREF_WHITEPOINT
 #define ARCSR_GAMMA                         ARCOLOURSPACEREF_GAMMA
+#define ARCSR_GAMMAFUNCTION                 ARCOLOURSPACEREF_GAMMAFUNCTION
 
 #ifndef _ART_WITHOUT_LCMS_
 
 #define ARCSR_PROFILE                       ARCOLOURSPACEREF_PROFILE
 #define ARCSR_PROFILEBUFFERSIZE             ARCOLOURSPACEREF_PROFILEBUFFERSIZE
 #define ARCSR_PROFILEBUFFER                 ARCOLOURSPACEREF_PROFILEBUFFER
+
+#define ARCSR_LINEAR_PROFILE                \
+    ARCOLOURSPACEREF_LINEAR_PROFILE
+#define ARCSR_LINEAR_PROFILEBUFFERSIZE      \
+    ARCOLOURSPACEREF_LINEAR_PROFILEBUFFERSIZE
+#define ARCSR_LINEAR_PROFILEBUFFER          \
+    ARCOLOURSPACEREF_LINEAR_PROFILEBUFFER
 
 #endif
 
@@ -257,11 +315,22 @@ ArColourSpace const * arcolourspace_sRGB(
         const ART_GV  * art_gv
         );
 
+ArColourSpace const * arcolourspace_aRGB(
+        const ART_GV  * art_gv
+        );
+
+ArColourSpace const * arcolourspace_wRGB(
+        const ART_GV  * art_gv
+        );
+
 
 #define ARCOLOURSPACEREF_CIEXYZ   arcolourspace_CIEXYZ(art_gv)
 #define ARCOLOURSPACEREF_CIExyY   arcolourspace_CIExyY(art_gv)
 #define ARCOLOURSPACEREF_CIELab   arcolourspace_CIELab(art_gv)
 #define ARCOLOURSPACEREF_CIELuv   arcolourspace_CIELuv(art_gv)
+#define ARCOLOURSPACEREF_sRGB     arcolourspace_sRGB(art_gv)
+#define ARCOLOURSPACEREF_aRGB     arcolourspace_aRGB(art_gv)
+#define ARCOLOURSPACEREF_wRGB     arcolourspace_wRGB(art_gv)
 
 //   shorthand for the previous variables
 
@@ -269,6 +338,9 @@ ArColourSpace const * arcolourspace_sRGB(
 #define ARCSR_CIExyY              ARCOLOURSPACEREF_CIExyY
 #define ARCSR_CIELab              ARCOLOURSPACEREF_CIELab
 #define ARCSR_CIELuv              ARCOLOURSPACEREF_CIELuv
+#define ARCSR_sRGB                ARCOLOURSPACEREF_sRGB
+#define ARCSR_aRGB                ARCOLOURSPACEREF_aRGB
+#define ARCSR_wRGB                ARCOLOURSPACEREF_wRGB
 
 ArColourSpaceRef register_arcolourspace(
         ART_GV         * art_gv,
@@ -294,6 +366,5 @@ void arcolourspace_debugprintf(
         ArColourSpaceRef    csr
         );
 
-
-#endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARSPECTRUMSPACE_H_ */
+#endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARCOLOURSPACE_H_ */
 /* ======================================================================== */

@@ -58,8 +58,8 @@ ART_MODULE_INTERFACE(ArTristimulusColourValue)
 
 typedef struct ArTristimulusColourValue
 {
-    Crd3                   c;
-    ArColourSpace const  * s;
+    Crd3                          c;
+    struct ArColourSpace const  * s;
 }
 ArTristimulusColourValue;
 

@@ -33,6 +33,7 @@ ART_MODULE_INTERFACE(ArCMF)
 
 #include "ArDataType.h"
 #include "ArPSSpectrum.h"
+#include "ArSpectrum500.h"
 
 typedef enum ArCMFNormalisation
 {
@@ -106,6 +107,10 @@ void arcmf_c_copy_c(
 
 void arcmf_free(
         ArCMF   * cmf_r
+        );
+
+ArSpectrum500 const * arcmf_vlambda500(
+        const ART_GV  * art_gv
         );
 
 #endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARCMF_H_ */

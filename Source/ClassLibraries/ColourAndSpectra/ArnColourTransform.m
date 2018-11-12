@@ -63,7 +63,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourTransform)
               TYPE_Lab_DBL,
               ARCSR_PROFILE(destination),
               TYPE_RGB_DBL,
-              renderingIntent, 0);
+              renderingIntent,
+              0
+              );
 }
 
 - (ArColourTransformRef) transformRef

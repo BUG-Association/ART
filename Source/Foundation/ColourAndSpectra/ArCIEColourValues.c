@@ -620,4 +620,61 @@ double lab_delta_E2000(
     return sqrt( pow((dL/Sl),2.0) + pow((dC/Sc),2.0) + pow((dH/Sh),2.0) + RT*(dC/Sc)*(dH/Sh) );
 }
 
+Mat3  xyz2rgb_via_primaries(
+              ART_GV    * art_gv,
+        const Pnt2D     * r,
+        const Pnt2D     * g,
+        const Pnt2D     * b,
+        const ArCIEXYZ  * w_xyz
+        )
+{
+    ArCIEXYZ r_xyz, g_xyz, b_xyz;
+    
+    ARCIEXYZ_X(r_xyz) = XC(*r)/YC(*r);
+    ARCIEXYZ_Y(r_xyz) = 1;
+    ARCIEXYZ_Z(r_xyz) = (1-XC(*r)-YC(*r))/YC(*r);
+    
+    ARCIEXYZ_X(g_xyz) = XC(*g)/YC(*g);
+    ARCIEXYZ_Y(g_xyz) = 1;
+    ARCIEXYZ_Z(g_xyz) = (1-XC(*g)-YC(*g))/YC(*g);
+    
+    ARCIEXYZ_X(b_xyz) = XC(*b)/YC(*b);
+    ARCIEXYZ_Y(b_xyz) = 1;
+    ARCIEXYZ_Z(b_xyz) = (1-XC(*b)-YC(*b))/YC(*b);
+    
+    Mat3  rgb2xyz =
+        MAT3( ARCIEXYZ_X(r_xyz), ARCIEXYZ_X(g_xyz), ARCIEXYZ_X(b_xyz),
+              ARCIEXYZ_Y(r_xyz), ARCIEXYZ_Y(g_xyz), ARCIEXYZ_Y(b_xyz),
+              ARCIEXYZ_Z(r_xyz), ARCIEXYZ_Z(g_xyz), ARCIEXYZ_Z(b_xyz));
+
+//    c3_transpose_m( & rgb2xyz );
+
+    double  det = c3_m_det( & rgb2xyz );
+
+    Mat3  xyz2srgb;
+    
+    c3_md_invert_m( & rgb2xyz, det, & xyz2srgb );
+    
+    ArCIEXYZ  w_rgb;
+    c3_transpose_m( & xyz2srgb );
+
+    c3_cm_mul_c(&w_xyz->c,&xyz2srgb,&w_rgb.c);
+    
+    Mat3  rgb2xyz_final =
+        MAT3( ARCIEXYZ_X(r_xyz)*XC(w_rgb), ARCIEXYZ_X(g_xyz)*YC(w_rgb), ARCIEXYZ_X(b_xyz)*ZC(w_rgb),
+              ARCIEXYZ_Y(r_xyz)*XC(w_rgb), ARCIEXYZ_Y(g_xyz)*YC(w_rgb), ARCIEXYZ_Y(b_xyz)*ZC(w_rgb),
+              ARCIEXYZ_Z(r_xyz)*XC(w_rgb), ARCIEXYZ_Z(g_xyz)*YC(w_rgb), ARCIEXYZ_Z(b_xyz)*ZC(w_rgb));
+    
+    det = c3_m_det( & rgb2xyz_final );
+
+    Mat3  xyz2srgb_final;
+    
+    c3_md_invert_m( & rgb2xyz_final, det, & xyz2srgb_final );
+    
+    c3_transpose_m( & xyz2srgb_final );
+
+    return  xyz2srgb_final;
+}
+
+
 /* ======================================================================== */
