@@ -27,14 +27,329 @@
 #define ART_MODULE_NAME     ArCIEColourConversions
 
 #include "ArCIEColourConversions.h"
+#include "ArUntaggedRGB.h"
 
-ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
+#include <pthread.h>
 
-ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
+typedef struct ArCIEColourConversions_GV
+{
+    pthread_mutex_t          mutex;
+
+    ArRGBGamutMappingMethod  gm_method;
+    int                      recursion_depth;
+    double                   focus_luminance;
+    ArUT_RGB                 negative_flag_colour;
+    ArUT_RGB                 above_one_flag_colour;
+}
+ArCIEColourConversions_GV;
+
+#define ARCIECV_GV                  art_gv->arciecolourconversions_gv
+#define ARCIECV_MUTEX               ARCIECV_GV->mutex
+#define ARCIECV_GM_METHOD           ARCIECV_GV->gm_method
+#define ARCIECV_GM_RECDEPTH         ARCIECV_GV->recursion_depth
+#define ARCIECV_GM_FOCUS            ARCIECV_GV->focus_luminance
+#define ARCIECV_NEG_FLAG_RGB        ARCIECV_GV->negative_flag_colour
+#define ARCIECV_POS_FLAG_RGB        ARCIECV_GV->above_one_flag_colour
+
+ART_MODULE_INITIALISATION_FUNCTION
+(
+    ARCIECV_GV = ALLOC(ArCIEColourConversions_GV);
+
+    pthread_mutex_init( & ARCIECV_MUTEX, NULL );
+ 
+#ifndef _ART_WITHOUT_LCMS_
+    ARCIECV_GM_METHOD    = arrgb_gm_lcms;
+//    ARCIECV_GM_METHOD    = arrgb_gm_linear;
+#else
+    ARCIECV_GM_METHOD    = arrgb_gm_linear;
+#endif
+    ARCIECV_GM_RECDEPTH  = 20;
+    ARCIECV_GM_FOCUS     = 0.1;
+    ARCIECV_POS_FLAG_RGB = ARUT_RGB(1,0,0);
+    ARCIECV_NEG_FLAG_RGB = ARUT_RGB(0,0,1);
+)
+
+ART_MODULE_SHUTDOWN_FUNCTION
+(
+    pthread_mutex_destroy( & ARCIECV_MUTEX );
+
+    FREE( ARCIECV_GV );
+)
+
 
 #include "ART_Foundation_Math.h"
 
+void setRGBGamutMappingMethod(
+              ART_GV                   * art_gv,
+        const ArRGBGamutMappingMethod    method,
+        const double                     focus_luminance
+        )
+{
+    pthread_mutex_lock( & ARCIECV_MUTEX );
+    
+    ARCIECV_GM_METHOD = method;
+
+    if ( focus_luminance >= 0. && focus_luminance <= 1. )
+        ARCIECV_GM_FOCUS = focus_luminance;
+    
+    pthread_mutex_unlock( & ARCIECV_MUTEX );
+}
+
 #include "ColourAndSpectralDataConversion_ImplementationMacros.h"
+
+void xyz_move2unit_gamut(
+        const ART_GV    * art_gv,
+        const ArCIEXYZ  * outside,
+        const ArCIEXYZ  * inside,
+        const Mat3      * xyz2rgb,
+        const int         depth,
+              ArRGB     * finalRGB
+        )
+{
+    ArCIEXYZ  midpoint;
+    ArRGB     midpointRGB;
+    
+    XC(midpoint) = ( XC(*outside) + XC(*inside) ) / 2.0;
+    YC(midpoint) = ( YC(*outside) + YC(*inside) ) / 2.0;
+    ZC(midpoint) = ( ZC(*outside) + ZC(*inside) ) / 2.0;
+    
+    c3_cm_mul_c( & midpoint.c, xyz2rgb, & midpointRGB.c );
+
+    if ( depth > 0 )
+    {
+    if (   XC(midpointRGB)<0.0 || YC(midpointRGB)<0.0 || ZC(midpointRGB)<0.0
+        || XC(midpointRGB)>1.0 || YC(midpointRGB)>1.0 || ZC(midpointRGB)>1.0)
+        xyz_move2unit_gamut(art_gv,&midpoint, inside, xyz2rgb, depth-1, finalRGB);
+    else
+        xyz_move2unit_gamut(art_gv,outside, &midpoint, xyz2rgb, depth-1, finalRGB);
+    }
+    else
+    {
+    if (   XC(midpointRGB)<0.0 || YC(midpointRGB)<0.0 || ZC(midpointRGB)<0.0
+        || XC(midpointRGB)>1.0 || YC(midpointRGB)>1.0 || ZC(midpointRGB)>1.0)
+        c3_cm_mul_c( &inside->c, xyz2rgb, &finalRGB->c );
+    else
+        *finalRGB = midpointRGB;
+    }
+}
+
+void xyz_move2gamut(
+        const ART_GV    * art_gv,
+        const ArCIEXYZ  * outside,
+        const ArCIEXYZ  * inside,
+        const Mat3      * xyz2rgb,
+        const int         depth,
+              ArRGB     * finalRGB
+        )
+{
+    ArCIEXYZ  midpoint;
+    ArRGB     midpointRGB;
+    
+    XC(midpoint) = ( XC(*outside) + XC(*inside) ) / 2.0;
+    YC(midpoint) = ( YC(*outside) + YC(*inside) ) / 2.0;
+    ZC(midpoint) = ( ZC(*outside) + ZC(*inside) ) / 2.0;
+    
+    c3_cm_mul_c( & midpoint.c, xyz2rgb, & midpointRGB.c );
+
+    if ( depth > 0 )
+    {
+    if ( XC(midpointRGB)<0.0 || YC(midpointRGB)<0.0 || ZC(midpointRGB)<0.0 )
+        xyz_move2gamut(art_gv,&midpoint, inside, xyz2rgb, depth-1, finalRGB);
+    else
+        xyz_move2gamut(art_gv,outside, &midpoint, xyz2rgb, depth-1, finalRGB);
+    }
+    else
+    {
+    if ( XC(midpointRGB)<0.0 || YC(midpointRGB)<0.0 || ZC(midpointRGB)<0.0)
+        c3_cm_mul_c( &inside->c, xyz2rgb, &finalRGB->c );
+    else
+        *finalRGB = midpointRGB;
+    }
+}
+
+void xyz_conversion_to_unit_rgb_with_gamma(
+        const ART_GV    * art_gv,
+        const ArCIEXYZ  * xyz_0,
+              ArRGB     * rgb_r
+        )
+{
+#ifndef _ART_WITHOUT_LCMS_
+        if ( ( ARCIECV_GM_METHOD & arrgb_gm_technique_mask ) == arrgb_gm_lcms )
+        {
+            cmsDoTransform(
+                   ARCSR_XYZ_TO_RGB_TRAFO(DEFAULT_RGB_SPACE_REF),
+                 & ARCIEXYZ_C(*xyz_0),
+                 & ARRGB_C(*rgb_r),
+                   1
+                 );
+            
+            goto gammacorrection;
+        }
+        else
+        {
+#endif
+            c3_cm_mul_c(
+                & ARCIEXYZ_C(*xyz_0),
+                & ARCSR_XYZ_TO_RGB(DEFAULT_RGB_SPACE_REF),
+                & ARRGB_C(*rgb_r)
+                );
+
+        //   Nothing to do if we are already in gamut
+
+        if (   ARRGB_R(*rgb_r) < 0. || ARRGB_R(*rgb_r) > 1.
+            || ARRGB_G(*rgb_r) < 0. || ARRGB_G(*rgb_r) > 1.
+            || ARRGB_B(*rgb_r) < 0. || ARRGB_B(*rgb_r) > 1. )
+        {
+            if ( ( ARCIECV_GM_METHOD & arrgb_gm_technique_mask ) == arrgb_gm_linear )
+            {
+                //   ART internal "move to gamut" functionality
+                
+                double  focusdelta = ARCIECV_GM_FOCUS - YC(*xyz_0);
+                double  focus = ARCIECV_GM_FOCUS - focusdelta;
+                
+                focus = M_CLAMP(focus, 0.1, 0.9);
+                
+                ArCIEXYZ  inside_xyy =
+                    ARCIExyY(
+                        XC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
+                        YC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
+                        focus
+                        );
+                
+                ArCIEXYZ  inside_xyz;
+                
+                xyy_to_xyz(art_gv, & inside_xyy, & inside_xyz );
+                
+                xyz_move2unit_gamut(
+                      art_gv,
+                      xyz_0,
+                    & inside_xyz,
+                    & ARCSR_XYZ_TO_RGB(DEFAULT_RGB_SPACE_REF),
+                      ARCIECV_GM_RECDEPTH,
+                      rgb_r
+                    );
+                
+                goto gammacorrection;
+            }
+        }
+        
+        //   Default behaviour: clamping. In this case, we might flag
+        //   out of gamut colours before clamping
+
+        if ( ( ARCIECV_GM_METHOD & arrgb_gm_feature_mask ) == arrgb_gm_flag_neg )
+        {
+            if (   ARRGB_R(*rgb_r) < 0.
+                || ARRGB_R(*rgb_r) < 0.
+                || ARRGB_R(*rgb_r) < 0. )
+                ARRGB_C(*rgb_r) = ARCIECV_NEG_FLAG_RGB.c;
+        }
+
+        if ( ( ARCIECV_GM_METHOD & arrgb_gm_feature_mask ) == arrgb_gm_flag_above_one )
+        {
+            if (   ARRGB_R(*rgb_r) > 1.
+                || ARRGB_R(*rgb_r) > 1.
+                || ARRGB_R(*rgb_r) > 1. )
+                ARRGB_C(*rgb_r) = ARCIECV_POS_FLAG_RGB.c;
+        }
+#ifndef _ART_WITHOUT_LCMS_
+    }
+#endif
+
+    gammacorrection:
+
+    //   Clamp the result of all preceding operations to positive values
+
+    rgb_dd_clamp_c( art_gv, 0.0, 1.0, rgb_r );
+    
+#ifndef _ART_WITHOUT_LCMS_
+    if ( ( ARCIECV_GM_METHOD & arrgb_gm_technique_mask ) != arrgb_gm_lcms )
+    {
+#endif
+        ARRGB_R(*rgb_r) = ARCSR_GAMMAFUNCTION(DEFAULT_RGB_SPACE_REF,ARRGB_R(*rgb_r));
+        ARRGB_G(*rgb_r) = ARCSR_GAMMAFUNCTION(DEFAULT_RGB_SPACE_REF,ARRGB_G(*rgb_r));
+        ARRGB_B(*rgb_r) = ARCSR_GAMMAFUNCTION(DEFAULT_RGB_SPACE_REF,ARRGB_B(*rgb_r));
+#ifndef _ART_WITHOUT_LCMS_
+    }
+#endif
+
+    //   Set the correct colour space ref in the result
+
+    ARRGB_S(*rgb_r) = DEFAULT_RGB_SPACE_REF;
+}
+
+void xyz_conversion_to_linear_rgb(
+        const ART_GV    * art_gv,
+        const ArCIEXYZ  * xyz_0,
+              ArRGB     * rgb_r
+        )
+{
+    c3_cm_mul_c(
+        & ARCIEXYZ_C(*xyz_0),
+        & ARCSR_XYZ_TO_RGB(DEFAULT_RGB_SPACE_REF),
+        & ARRGB_C(*rgb_r)
+        );
+
+    if ( ( ARCIECV_GM_METHOD & arrgb_gm_technique_mask ) == arrgb_gm_clipping )
+    {
+        if ( ( ARCIECV_GM_METHOD & arrgb_gm_feature_mask ) == arrgb_gm_flag_neg )
+        {
+            if (   ARRGB_R(*rgb_r) < 0.
+                || ARRGB_R(*rgb_r) < 0.
+                || ARRGB_R(*rgb_r) < 0. )
+                ARRGB_C(*rgb_r) = ARCIECV_NEG_FLAG_RGB.c;
+        }
+
+        if ( ( ARCIECV_GM_METHOD & arrgb_gm_feature_mask ) == arrgb_gm_flag_above_one )
+        {
+            if (   ARRGB_R(*rgb_r) > 1.
+                || ARRGB_R(*rgb_r) > 1.
+                || ARRGB_R(*rgb_r) > 1. )
+                ARRGB_C(*rgb_r) = ARCIECV_POS_FLAG_RGB.c;
+        }
+
+        //   Clamp the result of all preceding operations to positive values
+
+        rgb_dd_clamp_c( art_gv, 0.0, MATH_HUGE_DOUBLE, rgb_r );
+    }
+    else
+    {
+        //   Nothing to do if we are already in gamut
+
+        if (   ARRGB_R(*rgb_r) < 0.
+            || ARRGB_G(*rgb_r) < 0.
+            || ARRGB_B(*rgb_r) < 0. )
+        {
+            //   As this is gamut mapping in an open ended HDR RGB space,
+            //   we move towards the neutral axis only, i.e. towards
+            //   a point with the same CIE Y coordinate, but on the main
+            //   diagonal
+            
+            ArCIEXYZ  inside_xyy =
+                ARCIExyY(
+                    XC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
+                    YC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
+                    YC(*xyz_0)
+                    );
+            
+            ArCIEXYZ  inside_xyz;
+            
+            xyy_to_xyz(art_gv, & inside_xyy, & inside_xyz );
+
+            xyz_move2gamut(
+                  art_gv,
+                  xyz_0,
+                & inside_xyz,
+                & ARCSR_XYZ_TO_RGB(DEFAULT_RGB_SPACE_REF),
+                  ARCIECV_GM_RECDEPTH,
+                  rgb_r
+                );
+        }
+    }
+    
+    //   Set the correct colour space ref in the result
+
+    ARRGB_S(*rgb_r) = DEFAULT_RGB_SPACE_REF;
+}
 
 void lab_find_nearest_below_L100(
         const ART_GV         * art_gv,
@@ -97,158 +412,6 @@ void lab_move_luminance_below_100(
 
 #ifdef _ART_WITHOUT_LCMS_
 
-/*
-void moveToGamut(
-        const ArCIEXYZ       * xyz_out,
-        const ArCIEXYZ       * xyz_in,
-        const ArColourSpace  * colourspace,
-        const int              maximalRecursion,
-              ArRGB          * rgb_r
-        )
-{
-    ArCIEXYZ  midpoint;
-    ArRGB     midpointRGB;
-
-    CIEXYZ_XC(midpoint) = (CIEXYZ_XC(*outside) + CIEXYZ_XC(*inside)) / 2.0;
-    CIEXYZ_YC(midpoint) = (CIEXYZ_YC(*outside) + CIEXYZ_YC(*inside)) / 2.0;
-    CIEXYZ_ZC(midpoint) = (CIEXYZ_ZC(*outside) + CIEXYZ_ZC(*inside)) / 2.0;
-
-    c3_cm_mul_c( &midpoint.c, &colourspace->ciexyz_to_rgb, &midpointRGB.c );
-
-    if (depth > 0)
-    {
-        if (   RC(midpointRGB)<0.0 || GC(midpointRGB)<0.0 || BC(midpointRGB)<0.0
-            || RC(midpointRGB)>1.0 || GC(midpointRGB)>1.0 || BC(midpointRGB)>1.0)
-            moveToGamut(&midpoint, inside, colourspace, depth-1, finalRGB);
-        else
-            moveToGamut(outside, &midpoint, colourspace, depth-1, finalRGB);
-    }
-    else
-    {
-        if (   RC(midpointRGB)<0.0 || GC(midpointRGB)<0.0 || BC(midpointRGB)<0.0
-            || RC(midpointRGB)>1.0 || GC(midpointRGB)>1.0 || BC(midpointRGB)>1.0)
-            c3_cm_mul_c( &inside->c, &colourspace->ciexyz_to_rgb,
-                         &finalRGB->c );
-        else
-            *finalRGB = midpointRGB;
-    }
-}
-*/
-
-void xyz_conversion_to_rgb(
-        const ART_GV                * art_gv,
-        const ArCIEXYZ              * xyz_0,
-        const ArColourSpaceRef        rgb_colourspace_ref,
-        const ArColourTransformRef    transform,
-              ArRGB                 * rgb_r
-        )
-{
-// -----   apply XYZ -> RGB transformation matrix   ----------------------------
-
-    c3_cm_mul_c(
-        & ARCIEXYZ_C(*xyz_0),
-        & ARCSR_XYZ_TO_RGB(rgb_colourspace_ref),
-        & ARRGB_C(*rgb_r) );
-
-/*
-    if(     gamutmapping->method == arrgb_gamutmapping_linear
-        && (   RC(*result) < 0.0 || GC(*result) < 0.0 || BC(*result) < 0.0
-            || RC(*result) > 1.0 || GC(*result) > 1.0 || BC(*result) > 1.0 ) )
-    {
-        RGB        rgbWhite = RGB_WHITE;
-        ART_CIEXYZ     sciexyz, greyPoint, whitePoint;
-        ShearZX3D  whiteShear;
-
-        c3_cm_mul_c( &rgbWhite.c, &colourspace->rgb_to_ciexyz, &whitePoint.c );
-        XC(whiteShear) = CIEXYZ_XC(whitePoint) / CIEXYZ_YC(whitePoint);
-        YC(whiteShear) = CIEXYZ_ZC(whitePoint) / CIEXYZ_YC(whitePoint);
-        g3d_p_shearzx_p(((Pnt3D*) & cciexyz),&whiteShear,((Pnt3D*) &sciexyz));
-
-        if ( CIEXYZ_YC(sciexyz) < gamutmapping->threshold[0] )
-        {
-            double  cdist, k, whiteY;
-
-            cdist = sqrt(  CIEXYZ_XC(sciexyz)*CIEXYZ_XC(sciexyz)
-                         + CIEXYZ_ZC(sciexyz)*CIEXYZ_ZC(sciexyz));
-            k =   ( YC(gamutmapping->focus[0]) - CIEXYZ_YC(sciexyz) )
-                / ( cdist + XC(gamutmapping->focus[0]) );
-            whiteY = cdist * k + CIEXYZ_YC(sciexyz);
-            CIEXYZ_XC(greyPoint) = whiteY * CIEXYZ_XC(whitePoint);
-            CIEXYZ_YC(greyPoint) = whiteY * CIEXYZ_YC(whitePoint);
-            CIEXYZ_ZC(greyPoint) = whiteY * CIEXYZ_ZC(whitePoint);
-        }
-        else
-        {
-            if ( CIEXYZ_YC(cciexyz) > gamutmapping->threshold[1] )
-            {
-                double  cdist, k, whiteY;
-
-                cdist = sqrt(  CIEXYZ_XC(sciexyz)*CIEXYZ_XC(sciexyz)
-                             + CIEXYZ_ZC(sciexyz)*CIEXYZ_ZC(sciexyz));
-                k =   (   CIEXYZ_YC(sciexyz)
-                        - YC(gamutmapping->focus[1]) )
-                    / ( cdist + XC(gamutmapping->focus[1]) );
-                whiteY =   XC(gamutmapping->focus[1]) * k
-                         + YC(gamutmapping->focus[1]);
-                CIEXYZ_XC(greyPoint) = whiteY * CIEXYZ_XC(whitePoint);
-                CIEXYZ_YC(greyPoint) = whiteY * CIEXYZ_YC(whitePoint);
-                CIEXYZ_ZC(greyPoint) = whiteY * CIEXYZ_ZC(whitePoint);
-            }
-            else
-            {
-                CIEXYZ_XC(greyPoint) =   CIEXYZ_YC(sciexyz)
-                                       * CIEXYZ_XC(whitePoint);
-                CIEXYZ_YC(greyPoint) =   CIEXYZ_YC(sciexyz)
-                                       * CIEXYZ_YC(whitePoint);
-                CIEXYZ_ZC(greyPoint) =   CIEXYZ_YC(sciexyz)
-                                       * CIEXYZ_ZC(whitePoint);
-            }
-        }
-
-        if ( CIEXYZ_YC(greyPoint) > CIEXYZ_YC(whitePoint) )
-            *result = RGB_WHITE;
-        else
-            moveToGamut(&cciexyz, &greyPoint, colourspace, 20, result);
-    }
-*/
-// -----   paint out-of-gamut colours according to specifications   ------------
-
-/*
-    unsigned int  outOfGamutColourIndex = 0;
-
-    if (    ARRGB_GM_FLAG_VALUES_BELOW_ZERO(*gamutmapping)
-        && (   ARRGB_R(*rgb_r) < 0.0
-            || ARRGB_G(*rgb_r) < 0.0
-            || ARRGB_B(*rgb_r) < 0.0 ) )
-        outOfGamutColourIndex |= 0x01;
-
-    if (    ARRGB_GM_FLAG_VALUES_ABOVE_ONE(*gamutmapping)
-        && (   ARRGB_R(*rgb_r) > 1.0
-            || ARRGB_G(*rgb_r) > 1.0
-            || ARRGB_B(*rgb_r) > 1.0 ) )
-        outOfGamutColourIndex |= 0x02;
-*/
-    //   If the out of gamut colour index is > 0 convert the untagged
-    //   RGB colour which is provided by the gamut mapping struct for flagging
-    //   purposes to the target RGB colour space; this ensures that the flag
-    //   colour is always a maximal RGB colour regardless of target colour
-    //   space.
-
-/*
-    if ( outOfGamutColourIndex != 0 )
-        utf_rgb_cs_to_rgb(
-            & ARRGB_GM_OOGC_I( *gamutmapping, outOfGamutColourIndex ),
-              rgb_colourspace_ref,
-              rgb_r );
-*/
-    //   Clamp the result of all preceding operations to positive values
-
-    rgb_dd_clamp_c( 0.0, MATH_HUGE_DOUBLE, rgb_r );
-
-    //   Set the correct colour space ref in the result
-
-    ARRGB_S(*rgb_r) = rgb_colourspace_ref;
-}
 
 void lab_conversion_to_rgb(
         const ArCIELab              * lab_0,
@@ -257,34 +420,10 @@ void lab_conversion_to_rgb(
               ArRGB                 * rgb_r
         )
 {
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 #else  // _ART_WITHOUT_LCMS_
-
-void xyz_conversion_to_rgb(
-        const ART_GV                * art_gv,
-        const ArCIEXYZ              * xyz_0,
-        const ArColourSpaceRef        rgb_colourspace_ref,
-        const ArColourTransformRef    transform,
-              ArRGB                 * rgb_r
-        )
-{
-    CC_START_DEBUGPRINTF( xyz_conversion_to_rgb )
-    ArCIELab  labValue;
-
-    xyz_to_lab(
-          art_gv,
-          xyz_0,
-        & labValue );
-
-    lab_conversion_to_rgb(
-          art_gv,
-        & labValue,
-          rgb_colourspace_ref,
-          transform,
-          rgb_r );
-    CC_END_DEBUGPRINTF( xyz_conversion_to_rgb )
-}
 
 void lab_conversion_to_rgb(
         const ART_GV                * art_gv,

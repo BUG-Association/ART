@@ -48,6 +48,9 @@ typedef struct ArCIEColourValues_GV
     ArCIEXYZ         XYZ_SYSWHITE;
     ArSymbol         syswhite_symbol;
     int              manual_syswhite;
+    
+    Mat3             ma;
+    Mat3             ma_inv;
 
     ArCIExyY         xyY_BLACK;
     ArCIExyY         xyY_WHITE;
@@ -87,10 +90,32 @@ ArCIEColourValues_GV;
 #define ARCIECV_XYZ_SYSWHITE    ARCIECV_GV->XYZ_SYSWHITE
 #define ARCIECV_SYSWHITE_SYMBOL ARCIECV_GV->syswhite_symbol
 #define ARCIECV_MANUAL_SYSWHITE ARCIECV_GV->manual_syswhite
+#define ARCIECV_MA              ARCIECV_GV->ma
+#define ARCIECV_MA_INV          ARCIECV_GV->ma_inv
 #define ARCIECV_Lab_BLACK       ARCIECV_GV->Lab_BLACK
 #define ARCIECV_Lab_WHITE       ARCIECV_GV->Lab_WHITE
 #define ARCIECV_Luv_BLACK       ARCIECV_GV->Luv_BLACK
 #define ARCIECV_Luv_WHITE       ARCIECV_GV->Luv_WHITE
+
+Mat3 bradford_ma()
+{
+    return
+        MAT3(
+             0.8951000,  0.2664000, -0.1614000,
+            -0.7502000,  1.7135000,  0.0367000,
+             0.0389000, -0.0685000,  1.0296000
+             );
+}
+
+Mat3 cat02_suesstrunk_ma()
+{
+    return
+        MAT3(
+             0.7328, 0.4296, -0.1624,
+            -0.7036, 1.6975,  0.0061,
+             0.0000, 0.0000,  1.0000
+             );
+}
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
@@ -127,6 +152,14 @@ ART_MODULE_INITIALISATION_FUNCTION
     ARCIECV_SYSWHITE_SYMBOL = NULL;
     art_set_system_white_point_by_desc(art_gv, "D50");
  
+    ARCIECV_MA = C3_M_UNIT;
+
+    c3_transpose_m(&ARCIECV_MA);
+ 
+    double  det = c3_m_det( & ARCIECV_MA );
+ 
+    c3_md_invert_m( & ARCIECV_MA, det, & ARCIECV_MA_INV );
+
     ARCIECV_Lab_BLACK = ARCIELab(   0.0, 0.0, 0.0 );
     ARCIECV_Lab_WHITE = ARCIELab( 100.0, 0.0, 0.0 );
 
@@ -181,6 +214,64 @@ ArCIEXYZ const * art_system_white_point_xyz(
         )
 {
     return & ARCIECV_XYZ_SYSWHITE;
+}
+
+Mat3 art_chromatic_adaptation_matrix(
+              ART_GV  * art_gv,
+        const double    target_x,
+        const double    target_y
+        )
+{
+    ArCIEXYZ source, target;
+    
+    source = ARCIECV_XYZ_SYSWHITE;
+    
+    ARCIEXYZ_X(target) = target_x/target_y;
+    ARCIEXYZ_Y(target) = 1;
+    ARCIEXYZ_Z(target) = (1-target_x-target_y)/target_y;
+    
+//    ARCIEXYZ_X(source) = 0.96422;
+//    ARCIEXYZ_Y(source) = 1;
+//    ARCIEXYZ_Z(source) = 0.82521;
+//
+//    ARCIEXYZ_X(target) = 0.95047;
+//    ARCIEXYZ_Y(target) = 1;
+//    ARCIEXYZ_Z(target) = 1.08883;
+//
+    ArCIEXYZ source_crs, target_crs;
+    
+    c3_cm_mul_c(&ARCIEXYZ_C(source), &ARCIECV_MA, &ARCIEXYZ_C(source_crs));
+    c3_cm_mul_c(&ARCIEXYZ_C(target), &ARCIECV_MA, &ARCIEXYZ_C(target_crs));
+
+    double  xf = 1.; double  yf = 1.; double  zf = 1.;
+    
+    if ( ARCIEXYZ_X(source_crs) > 0. )
+        xf = ARCIEXYZ_X(target_crs) / ARCIEXYZ_X(source_crs);
+    if ( ARCIEXYZ_Y(source_crs) > 0. )
+        yf = ARCIEXYZ_Y(target_crs) / ARCIEXYZ_Y(source_crs);
+    if ( ARCIEXYZ_Z(source_crs) > 0. )
+        zf = ARCIEXYZ_Z(target_crs) / ARCIEXYZ_Z(source_crs);
+
+    Mat3  scale =
+        MAT3(
+             xf, 0., 0.,
+             0., yf, 0.,
+             0., 0., zf
+             );
+    
+    Mat3  tmp;
+    
+    c3_mm_mul_m(&scale, &ARCIECV_MA_INV, &tmp);
+    
+    Mat3  cam;
+
+    c3_mm_mul_m(&ARCIECV_MA, &tmp,&cam);
+    c3_transpose_m(&cam);
+    
+//    debugprintf("\n"C3_M_FORMAT("%f")"\n",C3_M_PRINTF(cam))
+//
+//    cam = MAT3_UNIT;
+    return cam;
 }
 
 //   This thing lives elsewhere in ART, and in lieu of including that
@@ -621,14 +712,14 @@ double lab_delta_E2000(
 }
 
 Mat3  xyz2rgb_via_primaries(
-              ART_GV    * art_gv,
-        const Pnt2D     * r,
-        const Pnt2D     * g,
-        const Pnt2D     * b,
-        const ArCIEXYZ  * w_xyz
+              ART_GV  * art_gv,
+        const Pnt2D   * r,
+        const Pnt2D   * g,
+        const Pnt2D   * b,
+        const Pnt2D   * w
         )
 {
-    ArCIEXYZ r_xyz, g_xyz, b_xyz;
+    ArCIEXYZ r_xyz, g_xyz, b_xyz, w_xyz;
     
     ARCIEXYZ_X(r_xyz) = XC(*r)/YC(*r);
     ARCIEXYZ_Y(r_xyz) = 1;
@@ -641,6 +732,10 @@ Mat3  xyz2rgb_via_primaries(
     ARCIEXYZ_X(b_xyz) = XC(*b)/YC(*b);
     ARCIEXYZ_Y(b_xyz) = 1;
     ARCIEXYZ_Z(b_xyz) = (1-XC(*b)-YC(*b))/YC(*b);
+    
+    ARCIEXYZ_X(w_xyz) = XC(*w)/YC(*w);
+    ARCIEXYZ_Y(w_xyz) = 1;
+    ARCIEXYZ_Z(w_xyz) = (1-XC(*w)-YC(*w))/YC(*w);
     
     Mat3  rgb2xyz =
         MAT3( ARCIEXYZ_X(r_xyz), ARCIEXYZ_X(g_xyz), ARCIEXYZ_X(b_xyz),
@@ -658,7 +753,7 @@ Mat3  xyz2rgb_via_primaries(
     ArCIEXYZ  w_rgb;
     c3_transpose_m( & xyz2srgb );
 
-    c3_cm_mul_c(&w_xyz->c,&xyz2srgb,&w_rgb.c);
+    c3_cm_mul_c(&w_xyz.c,&xyz2srgb,&w_rgb.c);
     
     Mat3  rgb2xyz_final =
         MAT3( ARCIEXYZ_X(r_xyz)*XC(w_rgb), ARCIEXYZ_X(g_xyz)*YC(w_rgb), ARCIEXYZ_X(b_xyz)*ZC(w_rgb),

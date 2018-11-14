@@ -446,16 +446,20 @@ void pss_to_s##_n ( \
     CC_START_DEBUGPRINTF( pss_to_s##_n ) \
     CC_OPERAND_DEBUGPRINTF( pss, spectrum ) \
     for ( int i = 0; i < s##_n##_channels(art_gv); i++ ) \
-        s##_n##_set_sid( \
-            art_gv, \
-            target, \
-            i, \
+    { \
+        double  value = \
             pss_inner_product( \
                   art_gv, \
                   spectrum, \
                   s##_n##_sample_basis(art_gv,i) \
-                ) \
+                ); \
+        s##_n##_set_sid( \
+            art_gv, \
+            target, \
+            i, \
+            value \
             ); \
+    } \
     CC_OPERAND_DEBUGPRINTF( s##_n, target ) \
     CC_END_DEBUGPRINTF( pss_to_s##_n ) \
 }

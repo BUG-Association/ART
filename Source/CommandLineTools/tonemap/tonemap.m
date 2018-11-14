@@ -173,6 +173,13 @@ int tonemap(
             :   "luminance clipping white luminance"
             ];
 
+    id  rgbClippingOpt =
+        [ FLAG_OPTION
+            :   "clipRGB"
+            :   "crgb"
+            :   "clip out of gamut RGB values"
+            ];
+
     id  lpFilterOpt =
         [ FLOAT_OPTION
             :   "linearFilter"
@@ -259,6 +266,12 @@ int tonemap(
         ,   XC( [ inputImage size ] )
         ,   YC( [ inputImage size ] )
         ];
+
+    if ( [ rgbClippingOpt hasBeenSpecified ] )
+    {
+//        setRGBGamutMappingMethod(art_gv, arrgb_gm_clipping | arrgb_gm_flag_neg, 0.);
+        setRGBGamutMappingMethod(art_gv, arrgb_gm_clipping , 0.);
+    }
 
     /* ------------------------------------------------------------------
          Action sequence assembly.

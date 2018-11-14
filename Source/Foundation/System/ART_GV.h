@@ -135,6 +135,7 @@ typedef struct ART_GV
     struct ArSpectrum_GV                * arspectrum_gv;
     struct ArSpectralSample_GV          * arspectralsample_gv;
     struct ArCIEColourValues_GV         * arciecolourvalues_gv;
+    struct ArCIEColourConversions_GV    * arciecolourconversions_gv;
     struct ArColourSpace_GV             * arcolourspace_gv;
     struct ArCMF_GV                     * arcmf_gv;
     struct ArRGB_GV                     * arrgb_gv;

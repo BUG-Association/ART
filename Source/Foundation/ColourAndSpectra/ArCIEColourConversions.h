@@ -48,12 +48,37 @@ ART_MODULE_INTERFACE(ArCIEColourConversions)
 
 ------------------------------------------------------------------------aw- */
 
-void xyz_conversion_to_rgb(
-        const ART_GV                * art_gv,
-        const ArCIEXYZ              * xyz_0,
-        const ArColourSpaceRef        rgb_colourspace_ref,
-        const ArColourTransformRef    transform,
-              ArRGB                 * rgb_r
+typedef enum ArRGBGamutMappingMethod
+{
+    arrgb_gm_clipping       = 0x00,
+    arrgb_gm_linear         = 0x01,
+#ifndef _ART_WITHOUT_LCMS_
+    arrgb_gm_lcms           = 0x02,
+#endif
+    arrgb_gm_flag_neg       = 0x10,
+    arrgb_gm_flag_above_one = 0x20,
+
+    arrgb_gm_technique_mask = 0x0F,
+    arrgb_gm_feature_mask   = 0xF0,
+}
+ArRGBGamutMappingMethod;
+
+void setRGBGamutMappingMethod(
+              ART_GV                   * art_gv,
+        const ArRGBGamutMappingMethod    method,
+        const double                     focus_luminance
+        );
+
+void xyz_conversion_to_linear_rgb(
+        const ART_GV    * art_gv,
+        const ArCIEXYZ  * xyz_0,
+              ArRGB     * rgb_r
+        );
+
+void xyz_conversion_to_unit_rgb_with_gamma(
+        const ART_GV    * art_gv,
+        const ArCIEXYZ  * xyz_0,
+              ArRGB     * rgb_r
         );
 
 void xyy_to_xyz(

@@ -639,16 +639,28 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
 
     if ( numberOfSourceImages > 1 )
         [ REPORTER beginTimedAction
-            :   "converting colourspace images to %d bpc %s TIFFs"
+            :   "converting to %d bpc %s TIFFs"
             ,   destinationBitsPerChannel
             ,   ARCSR_NAME( DESTINATION_COLOURSPACE_REF )
             ];
     else
         [ REPORTER beginTimedAction
-            :   "converting colourspace image to %d bpc %s TIFF"
+            :   "converting to %d bpc %s TIFF"
             ,   destinationBitsPerChannel
             ,   ARCSR_NAME( DESTINATION_COLOURSPACE_REF )
             ];
+    
+    //   Transform from the system white point to the white
+    //   point of the image format
+    
+    Mat3  xyz_whitebalance_xyz =
+        art_chromatic_adaptation_matrix(
+              art_gv,
+              0.3457,
+              0.3585
+//              XC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
+//              YC(ARCSR_W(DEFAULT_RGB_SPACE_REF))
+            );
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.
@@ -664,38 +676,28 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
 
             for ( long x = 0; x < XC(destinationImageSize); x++ )
             {
-                ArCIELab  labValue;
-
     #ifdef IMAGECONVERSION_DEBUGPRINTF
                 xyz_c_debugprintf( art_gv,& XYZA_SOURCE_BUFFER_XYZ(x) );
     #endif
-
-                //   Convert the pixel to L*a*b* colour space
-
-                xyz_to_lab(
-                      art_gv,
-                    & XYZA_SOURCE_BUFFER_XYZ(x),
-                    & labValue
+                ArCIEXYZ  xyz_wb;
+                
+                c3_cm_mul_c(
+                    & ARCIEXYZ_C(XYZA_SOURCE_BUFFER_XYZ(x)),
+                    & xyz_whitebalance_xyz,
+                    & ARCIEXYZ_C(xyz_wb)
                     );
 
-    #ifdef IMAGECONVERSION_DEBUGPRINTF
-                lab_c_debugprintf( art_gv,& labValue );
-    #endif
-
-                //   Bound its luminance to the range in which L*a*b* is defined
-
-                m_dd_clamp_d( 0.0, 100.0, & ARCIELab_L(labValue) );
-
-                //   Convert it to the selected RGB space using the specified
-                //   mapping
-
-                lab_conversion_to_rgb(
+                xyz_conversion_to_unit_rgb_with_gamma(
                       art_gv,
-                    & labValue,
-                      DESTINATION_COLOURSPACE_REF,
-                      COLOUR_TRANSFORM_REF,
+                    & xyz_wb,
                     & RGBA_DESTINATION_BUFFER_RGB(x)
                     );
+//
+//                xyz_conversion_to_unit_rgb_with_gamma(
+//                      art_gv,
+//                    & XYZA_SOURCE_BUFFER_XYZ(x),
+//                    & RGBA_DESTINATION_BUFFER_RGB(x)
+//                    );
 
     #ifdef IMAGECONVERSION_DEBUGPRINTF
                 rgb_c_debugprintf( art_gv,& RGBA_DESTINATION_BUFFER_RGB(x) );
@@ -847,14 +849,24 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
 
     if ( numberOfSourceImages > 1 )
         [ REPORTER beginTimedAction
-            :   "converting colourspace images to %s OpenEXRs"
+            :   "converting to %s OpenEXRs"
             ,   ARCSR_NAME( DESTINATION_COLOURSPACE_REF )
             ];
     else
         [ REPORTER beginTimedAction
-            :   "converting colourspace image to %s OpenEXR"
+            :   "converting to %s OpenEXR"
             ,   ARCSR_NAME( DESTINATION_COLOURSPACE_REF )
             ];
+
+    //   Transform from the system white point to the white
+    //   point of the image format
+    
+    Mat3  xyz_whitebalance_xyz =
+        art_chromatic_adaptation_matrix(
+              art_gv,
+              XC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
+              YC(ARCSR_W(DEFAULT_RGB_SPACE_REF))
+            );
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.
@@ -873,9 +885,17 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
     #ifdef IMAGECONVERSION_DEBUGPRINTF
                 xyz_c_debugprintf( art_gv,& XYZA_SOURCE_BUFFER_XYZ(x) );
     #endif
-                xyz_to_rgb(
+                ArCIEXYZ  xyz_wb;
+                
+                c3_cm_mul_c(
+                    & ARCIEXYZ_C(XYZA_SOURCE_BUFFER_XYZ(x)),
+                    & xyz_whitebalance_xyz,
+                    & ARCIEXYZ_C(xyz_wb)
+                    );
+                
+                xyz_conversion_to_linear_rgb(
                       art_gv,
-                    & XYZA_SOURCE_BUFFER_XYZ(x),
+                    & xyz_wb,
                     & RGBA_DESTINATION_BUFFER_RGB(x)
                     );
 

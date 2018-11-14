@@ -44,6 +44,8 @@ extern "C"{
 #include <OpenEXR/ImfArray.h>
 #include <OpenEXR/ImfConvert.h>
 #include <OpenEXR/half.h>
+#include <OpenEXR/Iex.h>
+#include <ImfStandardAttributes.h>
 
 typedef struct ArfOpenEXR_members
 {
@@ -161,6 +163,11 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
     }
 }
 
+#define RED     ARCSR_R(cs)
+#define GREEN   ARCSR_G(cs)
+#define BLUE    ARCSR_B(cs)
+#define WHITE   ARCSR_W(cs)
+
 - (void) open
         : (ArnImageInfo *) imageInfo
 {
@@ -175,13 +182,31 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
 
     IMAGE_SIZE = [ imageInfo size ];
 
+    Imf::Header newHeader (XC(IMAGE_SIZE), YC(IMAGE_SIZE));
+    
+    ArColourSpace  const * cs = DEFAULT_RGB_SPACE_REF;
+
+    //   Rec. 709 a.k.a. sRGB is assumed in OpenEXRs if the
+    //   primaries are not specified in the header
+    
+    if ( DEFAULT_RGB_SPACE_REF != ARCSR_sRGB )
+    {
+        Imf::Chromaticities exrChr = Imf::Chromaticities
+            (Imath::V2f (XC(RED),   YC(RED)),
+             Imath::V2f (XC(GREEN), YC(GREEN)),
+             Imath::V2f (XC(BLUE),  YC(BLUE)),
+             Imath::V2f (XC(WHITE), YC(WHITE)));
+
+        addChromaticities (newHeader, exrChr);
+        addAdoptedNeutral (newHeader, exrChr.white);
+    }
+    
     switch ( [ imageInfo dataType ] )
     {
         case ardt_rgba:
             EXRFILE_OUT = new Imf::RgbaOutputFile(
                     [ self->file name ],
-                    XC(IMAGE_SIZE),
-                    YC(IMAGE_SIZE),
+                    newHeader,
                     Imf::WRITE_RGBA
                     );
 
@@ -192,6 +217,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
                     XC(IMAGE_SIZE)*YC(IMAGE_SIZE)
                     );
             break;
+            
         case ardt_grey:
             ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
             //  this is BAD behaviour: we are just writing RGBA images

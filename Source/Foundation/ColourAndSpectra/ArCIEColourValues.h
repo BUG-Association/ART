@@ -249,6 +249,12 @@ void art_set_system_white_point(
         const double    y
         );
 
+Mat3 art_chromatic_adaptation_matrix(
+              ART_GV  * art_gv,
+        const double    target_x,
+        const double    target_y
+        );
+
 ArSymbol art_system_white_point_symbol(
         const ART_GV  * art_gv
         );
@@ -294,11 +300,11 @@ void xyza_s_debugprintf(
 #define xyza_c_debugprintf      xyza_s_debugprintf
 
 Mat3  xyz2rgb_via_primaries(
-              ART_GV    * art_gv,
-        const Pnt2D     * r,
-        const Pnt2D     * g,
-        const Pnt2D     * b,
-        const ArCIEXYZ  * w_xyz
+              ART_GV  * art_gv,
+        const Pnt2D   * r,
+        const Pnt2D   * g,
+        const Pnt2D   * b,
+        const Pnt2D   * w
         );
 
 

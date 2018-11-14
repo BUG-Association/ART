@@ -85,24 +85,17 @@ void initLCMSProfileBuffer(
 }
 
 void createLCMSProfileFromARTColours(
-        const Pnt2D            * r,
-        const Pnt2D            * g,
-        const Pnt2D            * b,
-        const ArCIEXYZ         * whitepoint,
+              ArColourSpace    * cs,
         const char             * description,
         const double             gamma,
               cmsHPROFILE      * profile
         )
 {
-    cmsCIEXYZ lcms_white_xyz;
- 
-    lcms_white_xyz.X = XC(*whitepoint);
-    lcms_white_xyz.Y = YC(*whitepoint);
-    lcms_white_xyz.Z = ZC(*whitepoint);
-
     cmsCIExyY lcms_white_xyy;
- 
-    cmsXYZ2xyY( & lcms_white_xyy, & lcms_white_xyz);
+
+    lcms_white_xyy.x = XC(ARCS_W(*cs));
+    lcms_white_xyy.y = YC(ARCS_W(*cs));
+    lcms_white_xyy.Y = 1.0;
 
     cmsToneCurve  * gammacurve = cmsBuildGamma(NULL, gamma);
     cmsToneCurve  * gamma_rgb[3];
@@ -113,16 +106,16 @@ void createLCMSProfileFromARTColours(
  
     cmsCIExyYTRIPLE rgb_primaries;
  
-    rgb_primaries.Red.x = XC(*r);
-    rgb_primaries.Red.y = YC(*r);
+    rgb_primaries.Red.x = XC(ARCS_R(*cs));
+    rgb_primaries.Red.y = YC(ARCS_R(*cs));
     rgb_primaries.Red.Y = 1.0;
 
-    rgb_primaries.Green.x = XC(*g);
-    rgb_primaries.Green.y = YC(*g);
+    rgb_primaries.Green.x = XC(ARCS_G(*cs));
+    rgb_primaries.Green.y = YC(ARCS_G(*cs));
     rgb_primaries.Green.Y = 1.0;
 
-    rgb_primaries.Blue.x = XC(*b);
-    rgb_primaries.Blue.y = YC(*b);
+    rgb_primaries.Blue.x = XC(ARCS_B(*cs));
+    rgb_primaries.Blue.y = YC(ARCS_B(*cs));
     rgb_primaries.Blue.Y = 1.0;
 
     *profile =
@@ -143,10 +136,7 @@ void createLCMSProfileFromARTColours(
 }
 
 void createCompleteLCMSProfileFromARTColours(
-        const Pnt2D            * r,
-        const Pnt2D            * g,
-        const Pnt2D            * b,
-        const ArCIEXYZ         * whitepoint,
+              ArColourSpace    * cs,
         const char             * description,
         const double             gamma,
               cmsHPROFILE      * profile,
@@ -155,10 +145,7 @@ void createCompleteLCMSProfileFromARTColours(
         )
 {
     createLCMSProfileFromARTColours(
-          r,
-          g,
-          b,
-          whitepoint,
+          cs,
           description,
           gamma,
           profile
@@ -175,23 +162,16 @@ void createCompleteLCMSProfileFromARTColours(
 
 void calculateColourspaceMatrices(
               ART_GV         * art_gv,
-        const Pnt2D          * r,
-        const Pnt2D          * g,
-        const Pnt2D          * b,
-        const ArCIEXYZ       * whitepoint,
-        const double           gamma,
               ArColourSpace  * cs
         )
 {
-    ARCS_WHITEPOINT(*cs) = whitepoint->c;
-    
     ARCS_XYZ_TO_RGB( *cs ) =
         xyz2rgb_via_primaries(
               art_gv,
-              r,
-              g,
-              b,
-              whitepoint
+            & ARCS_R(*cs),
+            & ARCS_G(*cs),
+            & ARCS_B(*cs),
+            & ARCS_W(*cs)
             );
  
     double  det = c3_m_det( & ARCS_XYZ_TO_RGB( *cs  ) );
@@ -201,11 +181,58 @@ void calculateColourspaceMatrices(
           det,
         & ARCS_RGB_TO_XYZ( *cs  )
         );
-
-    ARCS_GAMMA( *cs  ) = gamma;
- 
 }
 
+#define  R_x        C2_0(ARCS_R(cs))
+#define  R_y        C2_1(ARCS_R(cs))
+#define  G_x        C2_0(ARCS_G(cs))
+#define  G_y        C2_1(ARCS_G(cs))
+#define  B_x        C2_0(ARCS_B(cs))
+#define  B_y        C2_1(ARCS_B(cs))
+#define  W_x        C2_0(ARCS_W(cs))
+#define  W_y        C2_1(ARCS_W(cs))
+
+#define TYPE            ARCS_TYPE(cs)
+#define NAME            ARCS_NAME(cs)
+
+#define RED             ARCS_R(cs)
+#define GREEN           ARCS_G(cs)
+#define BLUE            ARCS_B(cs)
+#define WHITE           ARCS_W(cs)
+#define GAMMA           ARCS_GAMMA(cs)
+#define GAMMAFUNCTION   cs.gammafunction
+
+#define XYZ_TO_RGB      ARCS_XYZ_TO_RGB(cs)
+#define RGB_TO_XYZ      ARCS_RGB_TO_XYZ(cs)
+
+#define CALCULATE_MATRICES  calculateColourspaceMatrices( art_gv, & cs );
+
+#ifndef _ART_WITHOUT_LCMS_
+#define PROFILE                     ARCS_PROFILE(cs)
+#define LINEAR_PROFILE              ARCS_LINEAR_PROFILE(cs)
+#define XYZ_TO_RGB_TRAFO            ARCS_XYZ_TO_RGB_TRAFO(cs)
+#define XYZ_TO_LINEAR_RGB_TRAFO     ARCS_XYZ_TO_LINEAR_RGB_TRAFO(cs)
+
+#define CREATE_LCMS_PROFILE(__desc) \
+    createCompleteLCMSProfileFromARTColours( \
+        & cs, \
+          (__desc), \
+          ARCS_GAMMA(cs), \
+        & ARCS_LINEAR_PROFILE(cs), \
+        & ARCS_LINEAR_PROFILEBUFFERSIZE(cs), \
+        & ARCS_LINEAR_PROFILEBUFFER(cs) \
+        );
+
+#define CREATE_LINEAR_LCMS_PROFILE(__desc) \
+    createCompleteLCMSProfileFromARTColours( \
+        & cs, \
+          (__desc), \
+          1.0, \
+        & ARCS_LINEAR_PROFILE(cs), \
+        & ARCS_LINEAR_PROFILEBUFFERSIZE(cs), \
+        & ARCS_LINEAR_PROFILEBUFFER(cs) \
+        );
+#endif
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
@@ -215,173 +242,161 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     ARCS_TABLE = artable_alloc_init();
 
-    Pnt2D  r; Pnt2D  g; Pnt2D  b;
+    Pnt2D  d65_xy = PNT2D(0.3127,0.3290);
+    Pnt2D  d50_xy = PNT2D(0.3457,0.3585);
 
-    ArCIEXYZ d65_xyz = ARCIEXYZ(0.95047,1.000,1.08883);
-    ArCIEXYZ d50_xyz = ARCIEXYZ(0.96422,1.000,0.82521);
-
-    ArColourSpace  temp;
+    ArColourSpace  cs;
  
     //   ------  CIE XYZ   ------------------------------------------------
 
-    ARCS_TYPE(temp) = arcolourspacetype_ciexyz;
-    ARCS_NAME(temp) = arsymbol( art_gv, "CIE XYZ" );
+    TYPE = arcolourspacetype_ciexyz;
+    NAME = arsymbol( art_gv, "CIE XYZ" );
  
-    ARCS_XYZ_TO_RGB(temp) =
-        MAT3(  1.0, 0.0, 0.0,
-               0.0, 1.0, 0.0,
-               0.0, 0.0, 1.0 );
-    ARCS_RGB_TO_XYZ(temp) =
-        MAT3(  1.0, 0.0, 0.0,
-               0.0, 1.0, 0.0,
-               0.0, 0.0, 1.0 );
- 
-    ARCS_WHITEPOINT(temp) = d50_xyz.c;
-    ARCS_GAMMA(temp) = 1.0;
+    RED   = PNT2D(1,0);
+    GREEN = PNT2D(0,1);
+    BLUE  = PNT2D(0,0);
+    WHITE = d50_xy;
+    GAMMA = 1.0;
 
+    XYZ_TO_RGB =
+        MAT3(  1.0, 0.0, 0.0,
+               0.0, 1.0, 0.0,
+               0.0, 0.0, 1.0 );
+    RGB_TO_XYZ =
+        MAT3(  1.0, 0.0, 0.0,
+               0.0, 1.0, 0.0,
+               0.0, 0.0, 1.0 );
+ 
 #ifndef _ART_WITHOUT_LCMS_
-    ARCS_PROFILE(temp) = cmsCreateXYZProfile();
-    ARCS_LINEAR_PROFILE(temp) = cmsCreateXYZProfile();
+    cmsHPROFILE  xyz_profile = cmsCreateXYZProfile();
+    PROFILE = xyz_profile;
+    LINEAR_PROFILE = xyz_profile;
 #endif
-    ARCS_XYZ = register_arcolourspace( art_gv, & temp );
+
+    ARCS_XYZ = register_arcolourspace( art_gv, & cs );
 
     //   ------  CIE xyY   ------------------------------------------------
 
-    ARCS_TYPE(temp) = arcolourspacetype_ciexyy;
-    ARCS_NAME(temp) = arsymbol( art_gv, "CIE xyY" );
-    ARCS_WHITEPOINT(temp) = d50_xyz.c;
-    ARCS_XYY = register_arcolourspace( art_gv, & temp );
+    TYPE = arcolourspacetype_ciexyy;
+    NAME = arsymbol( art_gv, "CIE xyY" );
+    ARCS_W(cs) = d50_xy;
+    ARCS_XYY = register_arcolourspace( art_gv, & cs );
 
     //   ------  CIE L*a*b*   ---------------------------------------------
 
-    ARCS_TYPE(temp) = arcolourspacetype_cielab;
-    ARCS_NAME(temp) = arsymbol( art_gv, "CIE L*a*b*" );
-    ARCS_WHITEPOINT(temp) = d50_xyz.c;
+    TYPE = arcolourspacetype_cielab;
+    NAME = arsymbol( art_gv, "CIE L*a*b*" );
+    ARCS_W(cs) = d50_xy;
 #ifndef _ART_WITHOUT_LCMS_
-    ARCS_PROFILE(temp) = cmsCreateLab4Profile( 0 );
+    ARCS_PROFILE(cs) = cmsCreateLab4Profile( 0 );
 #endif
-    ARCS_LAB = register_arcolourspace( art_gv, & temp );
+    ARCS_LAB = register_arcolourspace( art_gv, & cs );
 
     //   ------  CIE L*u*v*   ---------------------------------------------
 
-    ARCS_TYPE(temp) = arcolourspacetype_cieluv;
-    ARCS_NAME(temp) = arsymbol( art_gv, "CIE L*u*v*" );
-    ARCS_WHITEPOINT(temp) = d50_xyz.c;
-    ARCS_LUV = register_arcolourspace( art_gv, & temp );
+    TYPE = arcolourspacetype_cieluv;
+    NAME = arsymbol( art_gv, "CIE L*u*v*" );
+    ARCS_W(cs) = d50_xy;
+    ARCS_LUV = register_arcolourspace( art_gv, & cs );
 
     //   ------  sRGB   ---------------------------------------------------
 
-    ARCS_TYPE(temp) = arcolourspacetype_rgb;
-    ARCS_NAME(temp) = arsymbol( art_gv, "sRGB" );
+    TYPE = arcolourspacetype_rgb;
+    NAME = arsymbol( art_gv, "sRGB" );
 
-    XC(r) = .64; YC(r) = .33;
-    XC(g) = .30; YC(g) = .60;
-    XC(b) = .15; YC(b) = .06;
+    RED   = PNT2D(.64,.33);
+    GREEN = PNT2D(.30,.60);
+    BLUE  = PNT2D(.15,.06);
+    WHITE = d65_xy;
+    GAMMA = 2.2;
 
-    calculateColourspaceMatrices(
-          art_gv,
-        & r, & g, & b, & d65_xyz, 2.2,
-        & temp
-        );
+    GAMMAFUNCTION = arcolourspace_srgb_gamma;
+
+    CALCULATE_MATRICES;
  
-    temp.gammafunction = arcolourspace_srgb_gamma;
-
 #ifndef _ART_WITHOUT_LCMS_
 
-    ARCS_PROFILE(temp) = cmsCreate_sRGBProfile();
+    PROFILE = cmsCreate_sRGBProfile();
 
     initLCMSProfileBuffer(
-          ARCS_PROFILE(temp),
-        & ARCS_PROFILEBUFFERSIZE(temp),
-        & ARCS_PROFILEBUFFER(temp)
+          ARCS_PROFILE(cs),
+        & ARCS_PROFILEBUFFERSIZE(cs),
+        & ARCS_PROFILEBUFFER(cs)
         );
+        
+    XYZ_TO_RGB_TRAFO =
+        cmsCreateTransform(
+              xyz_profile,
+              TYPE_XYZ_DBL,
+              PROFILE,
+              TYPE_RGB_DBL,
+              INTENT_RELATIVE_COLORIMETRIC,
+              0
+              );
 
-    createCompleteLCMSProfileFromARTColours(
-        & r, & g, & b, & d65_xyz,
-          "linear sRGB",
-          1.0,
-        & ARCS_LINEAR_PROFILE(temp),
-        & ARCS_LINEAR_PROFILEBUFFERSIZE(temp),
-        & ARCS_LINEAR_PROFILEBUFFER(temp)
-        );
+    CREATE_LINEAR_LCMS_PROFILE("linear Rec. 709");
+
+    XYZ_TO_LINEAR_RGB_TRAFO =
+        cmsCreateTransform(
+              xyz_profile,
+              TYPE_XYZ_DBL,
+              LINEAR_PROFILE,
+              TYPE_RGB_DBL,
+              INTENT_RELATIVE_COLORIMETRIC,
+              0
+              );
+
 #endif
-    ARCS_SRGB = register_arcolourspace( art_gv, & temp );
+
+    ARCS_SRGB = register_arcolourspace( art_gv, & cs );
 
     //   ------  Adobe RGB (1998)  ----------------------------------------
 
-    ARCS_TYPE(temp) = arcolourspacetype_rgb;
-    ARCS_NAME(temp) = arsymbol( art_gv, "Adobe RGB (1998)" );
+    TYPE = arcolourspacetype_rgb;
+    NAME = arsymbol( art_gv, "Adobe RGB (1998)" );
 
-    XC(r) = .64; YC(r) = .33;
-    XC(g) = .21; YC(g) = .71;
-    XC(b) = .15; YC(b) = .06;
+    RED   = PNT2D(.64,.33);
+    GREEN = PNT2D(.21,.71);
+    BLUE  = PNT2D(.15,.06);
+    WHITE = d65_xy;
+    GAMMA = 563. / 256.;
 
-    calculateColourspaceMatrices(
-          art_gv,
-        & r, & g, & b, & d65_xyz, 563. / 256.,
-        & temp
-        );
+    GAMMAFUNCTION = arcolourspace_standard_gamma;
+
+    CALCULATE_MATRICES;
  
-    temp.gammafunction = arcolourspace_standard_gamma;
-
 #ifndef _ART_WITHOUT_LCMS_
-    createCompleteLCMSProfileFromARTColours(
-        & r, & g, & b, & d65_xyz,
-          "Adobe RGB (1998)",
-          ARCS_GAMMA(temp),
-        & ARCS_PROFILE(temp),
-        & ARCS_PROFILEBUFFERSIZE(temp),
-        & ARCS_PROFILEBUFFER(temp)
-        );
 
-    createCompleteLCMSProfileFromARTColours(
-        & r, & g, & b, & d65_xyz,
-          "linear Adobe RGB (1998)",
-          1.0,
-        & ARCS_LINEAR_PROFILE(temp),
-        & ARCS_LINEAR_PROFILEBUFFERSIZE(temp),
-        & ARCS_LINEAR_PROFILEBUFFER(temp)
-        );
+    CREATE_LCMS_PROFILE("Adobe RGB (1998)");
+    CREATE_LINEAR_LCMS_PROFILE("linear Adobe RGB (1998)");
+
 #endif
-    ARCS_ARGB = register_arcolourspace( art_gv, & temp );
+
+    ARCS_ARGB = register_arcolourspace( art_gv, & cs );
 
     //   ------  Adobe Wide Gamut RGB -------------------------------------
 
-    ARCS_TYPE(temp) = arcolourspacetype_rgb;
-    ARCS_NAME(temp) = arsymbol( art_gv, "Adobe Wide Gamut RGB" );
+    TYPE = arcolourspacetype_rgb;
+    NAME = arsymbol( art_gv, "Adobe Wide Gamut RGB" );
 
-    XC(r) = 0.7347; YC(r) = 0.2653;
-    XC(g) = 0.1152; YC(g) = 0.8264;
-    XC(b) = 0.1566; YC(b) = 0.0177;
+    RED   = PNT2D(0.7347,0.2653);
+    GREEN = PNT2D(0.1152,0.8264);
+    BLUE  = PNT2D(0.1566,0.0177);
+    WHITE = d50_xy;
+    GAMMA = 563. / 256.;
 
-    calculateColourspaceMatrices(
-          art_gv,
-        & r, & g, & b, & d50_xyz, 563. / 256.,
-        & temp
-        );
+    GAMMAFUNCTION = arcolourspace_standard_gamma;
+
+    CALCULATE_MATRICES;
  
-    temp.gammafunction = arcolourspace_standard_gamma;
-
 #ifndef _ART_WITHOUT_LCMS_
-    createCompleteLCMSProfileFromARTColours(
-        & r, & g, & b, & d50_xyz,
-          "Adobe Wide Gamut RGB",
-          ARCS_GAMMA(temp),
-        & ARCS_PROFILE(temp),
-        & ARCS_PROFILEBUFFERSIZE(temp),
-        & ARCS_PROFILEBUFFER(temp)
-        );
 
-    createCompleteLCMSProfileFromARTColours(
-        & r, & g, & b, & d50_xyz,
-          "linear Adobe Wide Gamut RGB",
-          1.0,
-        & ARCS_LINEAR_PROFILE(temp),
-        & ARCS_LINEAR_PROFILEBUFFERSIZE(temp),
-        & ARCS_LINEAR_PROFILEBUFFER(temp)
-        );
+    CREATE_LCMS_PROFILE("Adobe Wide Gamut RGB");
+    CREATE_LINEAR_LCMS_PROFILE("linear Adobe Wide Gamut RGB");
+
 #endif
-    ARCS_WRGB = register_arcolourspace( art_gv, & temp );
+
+    ARCS_WRGB = register_arcolourspace( art_gv, & cs );
 )
 
 ART_MODULE_SHUTDOWN_FUNCTION
@@ -528,39 +543,39 @@ ArColourSpaceRef create_and_register_arcolourspace_from_icc(
         return 0;
     }
 
-    ArColourSpace  temp;
+    ArColourSpace  cs;
 
-    ARCS_PROFILEBUFFERSIZE(temp) = 0;
-    ARCS_PROFILEBUFFER(temp) = 0;
-    ARCS_RGB_TO_XYZ(temp) = C3_M_UNIT;
-    ARCS_XYZ_TO_RGB(temp) = C3_M_UNIT;
+    ARCS_PROFILEBUFFERSIZE(cs) = 0;
+    ARCS_PROFILEBUFFER(cs) = 0;
+    ARCS_RGB_TO_XYZ(cs) = C3_M_UNIT;
+    ARCS_XYZ_TO_RGB(cs) = C3_M_UNIT;
 
     //   Sanity check #2 - inspection of the colour space the profile uses
 
     switch ( cmsGetColorSpace( profile ) )
     {
         case cmsSigXYZData:
-            ARCS_TYPE(temp) = arcolourspacetype_ciexyz;
+            ARCS_TYPE(cs) = arcolourspacetype_ciexyz;
             break;
 
         case cmsSigLabData:
-            ARCS_TYPE(temp) = arcolourspacetype_cielab;
+            ARCS_TYPE(cs) = arcolourspacetype_cielab;
             break;
 
         case cmsSigLuvData:
-            ARCS_TYPE(temp) = arcolourspacetype_cieluv;
+            ARCS_TYPE(cs) = arcolourspacetype_cieluv;
             break;
 
         case cmsSigYxyData:
-            ARCS_TYPE(temp) = arcolourspacetype_ciexyy;
+            ARCS_TYPE(cs) = arcolourspacetype_ciexyy;
             break;
 
         case cmsSigRgbData:
-            ARCS_TYPE(temp) = arcolourspacetype_rgb;
+            ARCS_TYPE(cs) = arcolourspacetype_rgb;
             break;
 
         default:
-            ARCS_TYPE(temp) = arcolourspacetype_none;
+            ARCS_TYPE(cs) = arcolourspacetype_none;
 
             ART_ERRORHANDLING_FATAL_ERROR(
                 "ICC profile '%s' is for an unsupported colour space"
@@ -570,9 +585,9 @@ ArColourSpaceRef create_and_register_arcolourspace_from_icc(
             break;
     }
 
-    ARCS_NAME(temp) = arsymbol( art_gv, profileInfoDescriptionBuffer );
+    ARCS_NAME(cs) = arsymbol( art_gv, profileInfoDescriptionBuffer );
 
-    if ( ARCS_TYPE(temp) == arcolourspacetype_rgb )
+    if ( ARCS_TYPE(cs) == arcolourspacetype_rgb )
     {
         //   Sanity check #3 - if this is a RGB space, it has to be a matrix shaper
         //                     for us to be able to extract the transform matrices
@@ -580,7 +595,7 @@ ArColourSpaceRef create_and_register_arcolourspace_from_icc(
         if ( ! cmsIsMatrixShaper( profile ) )
             ART_ERRORHANDLING_FATAL_ERROR(
                 "ICC profile '%s' contains a non-matrix shaper RGB space"
-                ,   ARCS_NAME(temp)
+                ,   ARCS_NAME(cs)
                 );
 
         //   Extraction of RGB primaries from profile
@@ -595,23 +610,23 @@ ArColourSpaceRef create_and_register_arcolourspace_from_icc(
 
         //   Assembly of RGB -> XYZ transform matrix from primaries
 
-        ARCS_RGB_TO_XYZ(temp) =
+        ARCS_RGB_TO_XYZ(cs) =
             MAT3(
                 primary_R->X, primary_G->X, primary_B->X,
                 primary_R->Y, primary_G->Y, primary_B->Y,
                 primary_R->Z, primary_G->Z, primary_B->Z
                 );
 
-       c3_transpose_m( & ARCS_RGB_TO_XYZ(temp) );
+       c3_transpose_m( & ARCS_RGB_TO_XYZ(cs) );
 
         //   The XYZ -> RGB matrix is the inverse of the RGB -> XYZ matrix
 
-        double  det = c3_m_det( & ARCS_RGB_TO_XYZ(temp) );
+        double  det = c3_m_det( & ARCS_RGB_TO_XYZ(cs) );
 
         c3_md_invert_m(
-            & ARCS_RGB_TO_XYZ(temp),
+            & ARCS_RGB_TO_XYZ(cs),
               det,
-            & ARCS_XYZ_TO_RGB(temp)
+            & ARCS_XYZ_TO_RGB(cs)
             );
 
         //   Estimation of the RGB colour space gamma; for the sake of simplicity
@@ -620,7 +635,7 @@ ArColourSpaceRef create_and_register_arcolourspace_from_icc(
         cmsToneCurve * greenToneCuve =
             (cmsToneCurve *) cmsReadTag( profile, cmsSigGreenTRCTag );
 
-        ARCS_GAMMA(temp) = cmsEstimateGamma( greenToneCuve, 1.0 );
+        ARCS_GAMMA(cs) = cmsEstimateGamma( greenToneCuve, 1.0 );
 
 #ifdef ARCOLOURSPACE_DEBUGPRINTF_ON_LOADING
         ArCIEXYZ  xyz = ARCIEXYZ(whitepoint.X,whitepoint.Y,whitepoint.Z);
@@ -641,18 +656,18 @@ ArColourSpaceRef create_and_register_arcolourspace_from_icc(
         xyz = ARCIEXYZ(primaries.Blue.X,primaries.Blue.Y,primaries.Blue.Z);
         printf("BLUE : ");xyz_c_debugprintf( & xyz ); xyz_to_xyy( & xyz, & xyy );
         printf("       ");xyy_c_debugprintf( & xyy );
-        printf("GAMMA: %f\n",ARCS_GAMMA(temp));
+        printf("GAMMA: %f\n",ARCS_GAMMA(cs));
 
-        printf("\n"C3_M_FORMAT("%6.5f") "\n",C3_M_PRINTF(ARCS_RGB_TO_XYZ(temp)));fflush(stdout);
-        printf(C3_M_FORMAT("%6.5f") "\n",C3_M_PRINTF(ARCS_XYZ_TO_RGB(temp)));fflush(stdout);
+        printf("\n"C3_M_FORMAT("%6.5f") "\n",C3_M_PRINTF(ARCS_RGB_TO_XYZ(cs)));fflush(stdout);
+        printf(C3_M_FORMAT("%6.5f") "\n",C3_M_PRINTF(ARCS_XYZ_TO_RGB(cs)));fflush(stdout);
 #endif
     }
     else
-        ARCS_GAMMA(temp) = 1.0;
+        ARCS_GAMMA(cs) = 1.0;
 
-    ARCS_PROFILE(temp) = profile;
+    ARCS_PROFILE(cs) = profile;
 
-    ArColourSpaceRef  csr = register_arcolourspace( art_gv, & temp );
+    ArColourSpaceRef  csr = register_arcolourspace( art_gv, & cs );
 
 #ifdef ARCOLOURSPACE_DEBUGPRINTF_ON_LOADING
     arcolourspace_debugprintf( csr );
@@ -694,8 +709,8 @@ void arcolourspace_debugprintf(
         printf("BLUE : ");xyz_c_debugprintf( & xyz ); xyz_to_xyy( & xyz, & xyy );
         printf("       ");xyy_c_debugprintf( & xyy );
 
-        printf("\n"C3_M_FORMAT("%6.5f") "\n",C3_M_PRINTF(ARCS_RGB_TO_XYZ(temp)));fflush(stdout);
-        printf(C3_M_FORMAT("%6.5f") "\n",C3_M_PRINTF(ARCS_XYZ_TO_RGB(temp)));fflush(stdout);
+        printf("\n"C3_M_FORMAT("%6.5f") "\n",C3_M_PRINTF(ARCS_RGB_TO_XYZ(cs)));fflush(stdout);
+        printf(C3_M_FORMAT("%6.5f") "\n",C3_M_PRINTF(ARCS_XYZ_TO_RGB(cs)));fflush(stdout);
 */
 }
 
