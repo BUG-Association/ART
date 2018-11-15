@@ -40,6 +40,7 @@ typedef struct ArCIEColourConversions_GV
     double                   focus_luminance;
     ArUT_RGB                 negative_flag_colour;
     ArUT_RGB                 above_one_flag_colour;
+    ArUT_RGB                 both_flag_colour;
 }
 ArCIEColourConversions_GV;
 
@@ -50,6 +51,7 @@ ArCIEColourConversions_GV;
 #define ARCIECV_GM_FOCUS            ARCIECV_GV->focus_luminance
 #define ARCIECV_NEG_FLAG_RGB        ARCIECV_GV->negative_flag_colour
 #define ARCIECV_POS_FLAG_RGB        ARCIECV_GV->above_one_flag_colour
+#define ARCIECV_BOTH_FLAG_RGB       ARCIECV_GV->both_flag_colour
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
@@ -58,15 +60,16 @@ ART_MODULE_INITIALISATION_FUNCTION
     pthread_mutex_init( & ARCIECV_MUTEX, NULL );
  
 #ifndef _ART_WITHOUT_LCMS_
-    ARCIECV_GM_METHOD    = arrgb_gm_lcms;
+    ARCIECV_GM_METHOD     = arrgb_gm_lcms;
 //    ARCIECV_GM_METHOD    = arrgb_gm_linear;
 #else
-    ARCIECV_GM_METHOD    = arrgb_gm_linear;
+    ARCIECV_GM_METHOD     = arrgb_gm_linear;
 #endif
-    ARCIECV_GM_RECDEPTH  = 20;
-    ARCIECV_GM_FOCUS     = 0.1;
-    ARCIECV_POS_FLAG_RGB = ARUT_RGB(1,0,0);
-    ARCIECV_NEG_FLAG_RGB = ARUT_RGB(0,0,1);
+    ARCIECV_GM_RECDEPTH   = 20;
+    ARCIECV_GM_FOCUS      = 0.1;
+    ARCIECV_POS_FLAG_RGB  = ARUT_RGB(0,0,0);
+    ARCIECV_NEG_FLAG_RGB  = ARUT_RGB(1,1,1);
+    ARCIECV_BOTH_FLAG_RGB = ARUT_RGB(1,0,0);
 )
 
 ART_MODULE_SHUTDOWN_FUNCTION
@@ -243,20 +246,33 @@ void xyz_conversion_to_unit_rgb_with_gamma(
         //   Default behaviour: clamping. In this case, we might flag
         //   out of gamut colours before clamping
 
-        if ( ( ARCIECV_GM_METHOD & arrgb_gm_feature_mask ) == arrgb_gm_flag_neg )
+        int  flags = 0;
+        
+        if ( ( ARCIECV_GM_METHOD & arrgb_gm_feature_mask ) & arrgb_gm_flag_neg )
         {
             if (   ARRGB_R(*rgb_r) < 0.
                 || ARRGB_R(*rgb_r) < 0.
                 || ARRGB_R(*rgb_r) < 0. )
+            {
                 ARRGB_C(*rgb_r) = ARCIECV_NEG_FLAG_RGB.c;
+                flags++;
+            }
         }
 
-        if ( ( ARCIECV_GM_METHOD & arrgb_gm_feature_mask ) == arrgb_gm_flag_above_one )
+        if ( ( ARCIECV_GM_METHOD & arrgb_gm_feature_mask ) & arrgb_gm_flag_above_one )
         {
             if (   ARRGB_R(*rgb_r) > 1.
                 || ARRGB_R(*rgb_r) > 1.
                 || ARRGB_R(*rgb_r) > 1. )
+            {
                 ARRGB_C(*rgb_r) = ARCIECV_POS_FLAG_RGB.c;
+                flags++;
+            }
+        }
+        
+        if ( flags == 2 )
+        {
+            ARRGB_C(*rgb_r) = ARCIECV_BOTH_FLAG_RGB.c;
         }
 #ifndef _ART_WITHOUT_LCMS_
     }

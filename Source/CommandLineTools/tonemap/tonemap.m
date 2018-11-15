@@ -170,7 +170,7 @@ int tonemap(
             :   "lcWhiteLuminance"
             :   "lcw"
             :   "<luminance>"
-            :   "luminance clipping white luminance"
+            :   "clip to given white luminance"
             ];
 
     id  rgbClippingOpt =
@@ -281,7 +281,7 @@ int tonemap(
 
     if ( [ rgbFlagOpt hasBeenSpecified ] )
     {
-        setRGBGamutMappingMethod(art_gv, arrgb_gm_clipping | arrgb_gm_flag_neg, 0.);
+        setRGBGamutMappingMethod(art_gv, arrgb_gm_clipping | arrgb_gm_flag_neg | arrgb_gm_flag_above_one, 0.);
     }
 
     /* ------------------------------------------------------------------
@@ -612,6 +612,7 @@ int tonemap(
         if (   [ noLuminanceClippingOpt hasBeenSpecified ]
 #ifdef ART_WITH_OPENEXR
             || [ directEXROpt hasBeenSpecified ]
+            || [ outputEXROpt hasBeenSpecified ]
 #endif
             )
             luminanceClippingAction =

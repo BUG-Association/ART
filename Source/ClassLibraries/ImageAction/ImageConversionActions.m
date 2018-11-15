@@ -710,12 +710,6 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
                     & xyz_wb,
                     & RGBA_DESTINATION_BUFFER_RGB(x)
                     );
-//
-//                xyz_conversion_to_unit_rgb_with_gamma(
-//                      art_gv,
-//                    & XYZA_SOURCE_BUFFER_XYZ(x),
-//                    & RGBA_DESTINATION_BUFFER_RGB(x)
-//                    );
 
     #ifdef IMAGECONVERSION_DEBUGPRINTF
                 rgb_c_debugprintf( art_gv,& RGBA_DESTINATION_BUFFER_RGB(x) );
@@ -876,15 +870,14 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             ,   ARCSR_NAME( DESTINATION_COLOURSPACE_REF )
             ];
 
-    //   Transform from the system white point to the white
-    //   point of the image format
+    Mat3  xyz_whitebalance_xyz;
     
-    Mat3  xyz_whitebalance_xyz =
+    xyz_whitebalance_xyz =
         art_chromatic_adaptation_matrix(
-              art_gv,
-              XC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
-              YC(ARCSR_W(DEFAULT_RGB_SPACE_REF))
-            );
+          art_gv,
+          XC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
+          YC(ARCSR_W(DEFAULT_RGB_SPACE_REF))
+        );
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.

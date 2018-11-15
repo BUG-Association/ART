@@ -152,6 +152,7 @@ typedef struct ArColourSpace
     Mat3               rgb_to_xyz;
     double             gamma;
     double             (* gammafunction) ( const double, const double );
+    double             (* inv_gammafunction) ( const double, const double );
 #ifndef _ART_WITHOUT_LCMS_
     cmsHPROFILE        profile;
     cmsUInt32Number    profileBufferSize;
@@ -178,6 +179,8 @@ ArColourSpace;
 #define ARCOLOURSPACE_GAMMA(__cs)                   (__cs).gamma
 #define ARCOLOURSPACE_GAMMAFUNCTION(__cs,__d) \
     (*(__cs).gammafunction)(ARCOLOURSPACE_GAMMA(__cs),(__d))
+#define ARCOLOURSPACE_INV_GAMMAFUNCTION(__cs,__d) \
+    (*(__cs).inv_gammafunction)(ARCOLOURSPACE_GAMMA(__cs),(__d))
 
 #ifndef _ART_WITHOUT_LCMS_
 
@@ -209,6 +212,7 @@ ArColourSpace;
 #define ARCS_RGB_TO_XYZ                 ARCOLOURSPACE_RGB_TO_XYZ
 #define ARCS_GAMMA                      ARCOLOURSPACE_GAMMA
 #define ARCS_GAMMAFUNCTION              ARCOLOURSPACE_GAMMAFUNCTION
+#define ARCS_INVGAMMAFUNCTION           ARCOLOURSPACE_INV_GAMMAFUNCTION
 
 #ifndef _ART_WITHOUT_LCMS_
 
@@ -235,7 +239,17 @@ double arcolourspace_standard_gamma(
         const double value
         );
 
+double arcolourspace_standard_inv_gamma(
+        const double gamma,
+        const double value
+        );
+
 double arcolourspace_srgb_gamma(
+        const double gamma,
+        const double value
+        );
+
+double arcolourspace_srgb_inv_gamma(
         const double gamma,
         const double value
         );
@@ -282,6 +296,8 @@ typedef ArColourSpace   * ArColourSpaceRef;
 #define ARCOLOURSPACEREF_GAMMA(__cs)        ARCOLOURSPACE_GAMMA(*(__cs))
 #define ARCOLOURSPACEREF_GAMMAFUNCTION(__cs,__d) \
     (*(__cs)->gammafunction)(ARCOLOURSPACEREF_GAMMA(__cs),(__d))
+#define ARCOLOURSPACEREF_INV_GAMMAFUNCTION(__cs,__d) \
+    (*(__cs)->inv_gammafunction)(ARCOLOURSPACEREF_GAMMA(__cs),(__d))
 
 #ifndef _ART_WITHOUT_LCMS_
 
@@ -317,6 +333,7 @@ typedef ArColourSpace   * ArColourSpaceRef;
 #define ARCSR_RGB_TO_XYZ                    ARCOLOURSPACEREF_RGB_TO_XYZ
 #define ARCSR_GAMMA                         ARCOLOURSPACEREF_GAMMA
 #define ARCSR_GAMMAFUNCTION                 ARCOLOURSPACEREF_GAMMAFUNCTION
+#define ARCSR_INV_GAMMAFUNCTION             ARCOLOURSPACEREF_INV_GAMMAFUNCTION
 
 #ifndef _ART_WITHOUT_LCMS_
 

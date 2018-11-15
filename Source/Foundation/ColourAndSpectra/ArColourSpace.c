@@ -201,27 +201,19 @@ void calculateColourspaceMatrices(
         );
 }
 
-#define  R_x        C2_0(ARCS_R(cs))
-#define  R_y        C2_1(ARCS_R(cs))
-#define  G_x        C2_0(ARCS_G(cs))
-#define  G_y        C2_1(ARCS_G(cs))
-#define  B_x        C2_0(ARCS_B(cs))
-#define  B_y        C2_1(ARCS_B(cs))
-#define  W_x        C2_0(ARCS_W(cs))
-#define  W_y        C2_1(ARCS_W(cs))
+#define TYPE                        ARCS_TYPE(cs)
+#define NAME                        ARCS_NAME(cs)
 
-#define TYPE            ARCS_TYPE(cs)
-#define NAME            ARCS_NAME(cs)
+#define RED                         ARCS_R(cs)
+#define GREEN                       ARCS_G(cs)
+#define BLUE                        ARCS_B(cs)
+#define WHITE                       ARCS_W(cs)
+#define GAMMA                       ARCS_GAMMA(cs)
+#define GAMMAFUNCTION               cs.gammafunction
+#define INV_GAMMAFUNCTION           cs.inv_gammafunction
 
-#define RED             ARCS_R(cs)
-#define GREEN           ARCS_G(cs)
-#define BLUE            ARCS_B(cs)
-#define WHITE           ARCS_W(cs)
-#define GAMMA           ARCS_GAMMA(cs)
-#define GAMMAFUNCTION   cs.gammafunction
-
-#define XYZ_TO_RGB      ARCS_XYZ_TO_RGB(cs)
-#define RGB_TO_XYZ      ARCS_RGB_TO_XYZ(cs)
+#define XYZ_TO_RGB                  ARCS_XYZ_TO_RGB(cs)
+#define RGB_TO_XYZ                  ARCS_RGB_TO_XYZ(cs)
 
 #define CALCULATE_MATRICES  calculateColourspaceMatrices( art_gv, & cs );
 
@@ -250,6 +242,28 @@ void calculateColourspaceMatrices(
         & ARCS_LINEAR_PROFILEBUFFERSIZE(cs), \
         & ARCS_LINEAR_PROFILEBUFFER(cs) \
         );
+
+#define CREATE_LCMS_TRANSFORMS \
+    XYZ_TO_RGB_TRAFO = \
+        cmsCreateTransform( \
+              xyz_profile, \
+              TYPE_XYZ_DBL, \
+              PROFILE, \
+              TYPE_RGB_DBL, \
+              INTENT_RELATIVE_COLORIMETRIC, \
+              cmsFLAGS_BLACKPOINTCOMPENSATION | cmsFLAGS_NOOPTIMIZE \
+              ); \
+\
+    XYZ_TO_LINEAR_RGB_TRAFO = \
+        cmsCreateTransform( \
+              xyz_profile, \
+              TYPE_XYZ_DBL, \
+              LINEAR_PROFILE, \
+              TYPE_RGB_DBL, \
+              INTENT_RELATIVE_COLORIMETRIC, \
+              cmsFLAGS_BLACKPOINTCOMPENSATION | cmsFLAGS_NOOPTIMIZE \
+              );
+
 #endif
 
 ART_MODULE_INITIALISATION_FUNCTION
@@ -329,6 +343,7 @@ ART_MODULE_INITIALISATION_FUNCTION
     GAMMA = 2.2;
 
     GAMMAFUNCTION = arcolourspace_srgb_gamma;
+    INV_GAMMAFUNCTION = arcolourspace_srgb_inv_gamma;
 
     CALCULATE_MATRICES;
  
@@ -344,28 +359,9 @@ ART_MODULE_INITIALISATION_FUNCTION
         & ARCS_PROFILEBUFFER(cs)
         );
         
-    XYZ_TO_RGB_TRAFO =
-        cmsCreateTransform(
-              xyz_profile,
-              TYPE_XYZ_DBL,
-              PROFILE,
-              TYPE_RGB_DBL,
-              INTENT_RELATIVE_COLORIMETRIC,
-              cmsFLAGS_BLACKPOINTCOMPENSATION | cmsFLAGS_NOOPTIMIZE
-              );
-
     CREATE_LINEAR_LCMS_PROFILE("linear Rec. 709");
 
-    XYZ_TO_LINEAR_RGB_TRAFO =
-        cmsCreateTransform(
-              xyz_profile,
-              TYPE_XYZ_DBL,
-              LINEAR_PROFILE,
-              TYPE_RGB_DBL,
-              INTENT_RELATIVE_COLORIMETRIC,
-              cmsFLAGS_BLACKPOINTCOMPENSATION | cmsFLAGS_NOOPTIMIZE
-              );
-
+    CREATE_LCMS_TRANSFORMS;
 #endif
 
     ARCS_SRGB = register_arcolourspace( art_gv, & cs );
@@ -382,6 +378,7 @@ ART_MODULE_INITIALISATION_FUNCTION
     GAMMA = 563. / 256.;
 
     GAMMAFUNCTION = arcolourspace_standard_gamma;
+    INV_GAMMAFUNCTION = arcolourspace_standard_inv_gamma;
 
     CALCULATE_MATRICES;
  
@@ -389,6 +386,7 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     CREATE_LCMS_PROFILE("Adobe RGB (1998)");
     CREATE_LINEAR_LCMS_PROFILE("linear Adobe RGB (1998)");
+    CREATE_LCMS_TRANSFORMS;
 
 #endif
 
@@ -406,6 +404,7 @@ ART_MODULE_INITIALISATION_FUNCTION
     GAMMA = 563. / 256.;
 
     GAMMAFUNCTION = arcolourspace_standard_gamma;
+    INV_GAMMAFUNCTION = arcolourspace_standard_inv_gamma;
 
     CALCULATE_MATRICES;
  
@@ -413,6 +412,7 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     CREATE_LCMS_PROFILE("Adobe Wide Gamut RGB");
     CREATE_LINEAR_LCMS_PROFILE("linear Adobe Wide Gamut RGB");
+    CREATE_LCMS_TRANSFORMS;
 
 #endif
 
@@ -438,6 +438,14 @@ double arcolourspace_standard_gamma(
     return m_dd_pow( value, 1 / gamma);
 }
 
+double arcolourspace_standard_inv_gamma(
+        const double  gamma,
+        const double  value
+        )
+{
+    return m_dd_pow( value, gamma);
+}
+
 double arcolourspace_srgb_gamma(
         const double  gamma,
         const double  value
@@ -453,6 +461,26 @@ double arcolourspace_srgb_gamma(
     else
     {
         result = ( 1 + a ) * m_dd_pow(result, 1 / gamma) - a;
+    }
+    
+    return result;
+}
+
+double arcolourspace_srgb_inv_gamma(
+        const double  gamma,
+        const double  value
+        )
+{
+    double  a      = 0.055;
+    double  result = value;
+
+    if ( result < 0.04045 )
+    {
+        result /= 12.92;
+    }
+    else
+    {
+        result = m_dd_pow((result+a)/(1.+a), gamma);
     }
     
     return result;
