@@ -87,6 +87,7 @@ typedef struct ApplicationSupport_GV
     id  srgbOpt;
     id  argbOpt;
     id  wrgbOpt;
+    id  acesrgbOpt;
     id  cctOpt;
     id  iccOpt;
     id  isrOpt;
@@ -158,6 +159,7 @@ ApplicationSupport_GV;
 #define SRGB_OPT        APPSUPPORT_GV->srgbOpt
 #define ARGB_OPT        APPSUPPORT_GV->argbOpt
 #define WRGB_OPT        APPSUPPORT_GV->wrgbOpt
+#define ACESRGB_OPT     APPSUPPORT_GV->acesrgbOpt
 #define IRGB_OPT        APPSUPPORT_GV->iccOpt
 #define CCT_OPT         APPSUPPORT_GV->cctOpt
 #define ISR_OPT         APPSUPPORT_GV->isrOpt
@@ -220,6 +222,7 @@ ART_MODULE_INITIALISATION_FUNCTION
     SRGB_OPT        = NULL;
     ARGB_OPT        = NULL;
     WRGB_OPT        = NULL;
+    ACESRGB_OPT     = NULL;
     IRGB_OPT        = NULL;
     CCT_OPT         = NULL;
     ISR_OPT         = NULL;
@@ -574,6 +577,13 @@ void art_define_standard_commandline_options(
                 :   "WideGamutRGB"
                 :   "wrgb"
                 :   "use Adobe Wide Gamut RGB"
+                ];
+
+        ACESRGB_OPT =
+            [ FLAG_OPTION
+                :   "ACESRGB"
+                :   "aces"
+                :   "use ACES AP0 RGB"
                 ];
 
         IRGB_OPT =
@@ -1049,6 +1059,14 @@ int art_print_banner_and_process_standard_commandline_options(
     if ( [ WRGB_OPT hasBeenSpecified ] )
     {
         art_set_default_rgbspace_ref ( art_gv, ARCSR_wRGB );
+        numberOfRequestedWorkingSpaces++;
+    }
+
+    //   ACES AP0 RGB
+
+    if ( [ ACESRGB_OPT hasBeenSpecified ] )
+    {
+        art_set_default_rgbspace_ref ( art_gv, ARCSR_acesRGB );
         numberOfRequestedWorkingSpaces++;
     }
 

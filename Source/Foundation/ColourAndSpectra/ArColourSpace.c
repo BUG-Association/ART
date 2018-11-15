@@ -49,6 +49,7 @@ typedef struct ArColourSpace_GV
     ArColourSpaceRef    sRGB;
     ArColourSpaceRef    aRGB;
     ArColourSpaceRef    wRGB;
+    ArColourSpaceRef    acesRGB;
 }
 ArColourSpace_GV;
 
@@ -62,6 +63,7 @@ ArColourSpace_GV;
 #define ARCS_SRGB       ARCS_GV->sRGB
 #define ARCS_ARGB       ARCS_GV->aRGB
 #define ARCS_WRGB       ARCS_GV->wRGB
+#define ARCS_ACESRGB    ARCS_GV->acesRGB
 
 #ifndef _ART_WITHOUT_LCMS_
 void initLCMSProfileBuffer(
@@ -228,9 +230,9 @@ void calculateColourspaceMatrices(
         & cs, \
           (__desc), \
           ARCS_GAMMA(cs), \
-        & ARCS_LINEAR_PROFILE(cs), \
-        & ARCS_LINEAR_PROFILEBUFFERSIZE(cs), \
-        & ARCS_LINEAR_PROFILEBUFFER(cs) \
+        & ARCS_PROFILE(cs), \
+        & ARCS_PROFILEBUFFERSIZE(cs), \
+        & ARCS_PROFILEBUFFER(cs) \
         );
 
 #define CREATE_LINEAR_LCMS_PROFILE(__desc) \
@@ -274,8 +276,8 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     ARCS_TABLE = artable_alloc_init();
 
-    Pnt2D  d65_xy = PNT2D(0.3127,0.3290);
     Pnt2D  d50_xy = PNT2D(0.3457,0.3585);
+    Pnt2D  d65_xy = PNT2D(0.3127,0.3290);
 
     ArColourSpace  cs;
  
@@ -417,6 +419,32 @@ ART_MODULE_INITIALISATION_FUNCTION
 #endif
 
     ARCS_WRGB = register_arcolourspace( art_gv, & cs );
+
+    //   ------  ACES A0 RGB ----------------------------------------------
+
+    TYPE = arcolourspacetype_rgb;
+    NAME = arsymbol( art_gv, "ACES AP0 RGB" );
+
+    RED   = PNT2D( 0.73470,  0.26530 );
+    GREEN = PNT2D( 0.00000,  1.00000 );
+    BLUE  = PNT2D( 0.00010, -0.07700 );
+    WHITE = PNT2D( 0.32168,  0.33767 );
+    GAMMA = 563. / 256.;
+
+    GAMMAFUNCTION = arcolourspace_standard_gamma;
+    INV_GAMMAFUNCTION = arcolourspace_standard_inv_gamma;
+
+    CALCULATE_MATRICES;
+ 
+#ifndef _ART_WITHOUT_LCMS_
+
+    CREATE_LCMS_PROFILE("ACES AP0 RGB");
+    CREATE_LINEAR_LCMS_PROFILE("linear ACES AP0 RGB");
+    CREATE_LCMS_TRANSFORMS;
+
+#endif
+
+    ARCS_ACESRGB = register_arcolourspace( art_gv, & cs );
 )
 
 ART_MODULE_SHUTDOWN_FUNCTION
@@ -533,6 +561,13 @@ ArColourSpace const * arcolourspace_wRGB(
         )
 {
     return ARCS_WRGB;
+}
+
+ArColourSpace const * arcolourspace_acesRGB(
+        const ART_GV  * art_gv
+        )
+{
+    return ARCS_ACESRGB;
 }
 
 ArColourSpaceRef register_arcolourspace(

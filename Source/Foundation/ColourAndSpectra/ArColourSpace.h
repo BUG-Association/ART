@@ -391,14 +391,19 @@ ArColourSpace const * arcolourspace_wRGB(
         const ART_GV  * art_gv
         );
 
+ArColourSpace const * arcolourspace_acesRGB(
+        const ART_GV  * art_gv
+        );
 
-#define ARCOLOURSPACEREF_CIEXYZ   arcolourspace_CIEXYZ(art_gv)
-#define ARCOLOURSPACEREF_CIExyY   arcolourspace_CIExyY(art_gv)
-#define ARCOLOURSPACEREF_CIELab   arcolourspace_CIELab(art_gv)
-#define ARCOLOURSPACEREF_CIELuv   arcolourspace_CIELuv(art_gv)
-#define ARCOLOURSPACEREF_sRGB     arcolourspace_sRGB(art_gv)
-#define ARCOLOURSPACEREF_aRGB     arcolourspace_aRGB(art_gv)
-#define ARCOLOURSPACEREF_wRGB     arcolourspace_wRGB(art_gv)
+
+#define ARCOLOURSPACEREF_CIEXYZ     arcolourspace_CIEXYZ(art_gv)
+#define ARCOLOURSPACEREF_CIExyY     arcolourspace_CIExyY(art_gv)
+#define ARCOLOURSPACEREF_CIELab     arcolourspace_CIELab(art_gv)
+#define ARCOLOURSPACEREF_CIELuv     arcolourspace_CIELuv(art_gv)
+#define ARCOLOURSPACEREF_sRGB       arcolourspace_sRGB(art_gv)
+#define ARCOLOURSPACEREF_aRGB       arcolourspace_aRGB(art_gv)
+#define ARCOLOURSPACEREF_wRGB       arcolourspace_wRGB(art_gv)
+#define ARCOLOURSPACEREF_acesRGB    arcolourspace_acesRGB(art_gv)
 
 //   shorthand for the previous variables
 
@@ -409,6 +414,7 @@ ArColourSpace const * arcolourspace_wRGB(
 #define ARCSR_sRGB                ARCOLOURSPACEREF_sRGB
 #define ARCSR_aRGB                ARCOLOURSPACEREF_aRGB
 #define ARCSR_wRGB                ARCOLOURSPACEREF_wRGB
+#define ARCSR_acesRGB             ARCOLOURSPACEREF_acesRGB
 
 ArColourSpaceRef register_arcolourspace(
         ART_GV         * art_gv,
