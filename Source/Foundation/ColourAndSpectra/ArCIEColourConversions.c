@@ -95,6 +95,13 @@ void setRGBGamutMappingMethod(
     pthread_mutex_unlock( & ARCIECV_MUTEX );
 }
 
+ArRGBGamutMappingMethod currentRGBGamutMappingMethod(
+        ART_GV  * art_gv
+        )
+{
+    return  ARCIECV_GM_METHOD;
+}
+
 #include "ColourAndSpectralDataConversion_ImplementationMacros.h"
 
 void xyz_move2unit_gamut(

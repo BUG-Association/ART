@@ -454,6 +454,11 @@ ArConstStringArray  art_ev_include_paths(
 
         //   Create a resource directory path for all locations
         //   in the candidate list
+        
+        //   This call makes sure ART_EV_RESOURCE_PATHLIST is actually
+        //   initialised before we use it further down
+        
+        ART_RESOURCE_PATHS;
 
         create_stringarray_from_two_spliced_pathlists(
             & resource_include_path_stringarray,

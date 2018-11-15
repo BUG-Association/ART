@@ -653,14 +653,32 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
     //   Transform from the system white point to the white
     //   point of the image format
     
-    Mat3  xyz_whitebalance_xyz =
-        art_chromatic_adaptation_matrix(
+    Mat3  xyz_whitebalance_xyz;
+    
+    if ( RGB_GAMUT_MAPPING == arrgb_gm_lcms )
+    {
+        //   If littlecms does the work for us, we only correct to
+        //   the white point of XYZ (lcms will do the rest)
+
+        xyz_whitebalance_xyz =
+            art_chromatic_adaptation_matrix(
               art_gv,
-              0.3457,
-              0.3585
-//              XC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
-//              YC(ARCSR_W(DEFAULT_RGB_SPACE_REF))
+              XC(ARCSR_W(ARCSR_CIEXYZ)),
+              YC(ARCSR_W(ARCSR_CIEXYZ))
             );
+    }
+    else
+    {
+        //   If we are on our own, we have to do the entire correction
+        //   by ourselves
+        
+        xyz_whitebalance_xyz =
+            art_chromatic_adaptation_matrix(
+              art_gv,
+              XC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
+              YC(ARCSR_W(DEFAULT_RGB_SPACE_REF))
+            );
+    }
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.

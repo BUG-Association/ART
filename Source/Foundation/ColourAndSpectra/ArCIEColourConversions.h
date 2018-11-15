@@ -63,6 +63,13 @@ typedef enum ArRGBGamutMappingMethod
 }
 ArRGBGamutMappingMethod;
 
+ArRGBGamutMappingMethod currentRGBGamutMappingMethod(
+        ART_GV  * art_gv
+        );
+
+#define RGB_GAMUT_MAPPING \
+    (currentRGBGamutMappingMethod(art_gv) & arrgb_gm_technique_mask)
+
 void setRGBGamutMappingMethod(
               ART_GV                   * art_gv,
         const ArRGBGamutMappingMethod    method,

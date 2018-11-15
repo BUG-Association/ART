@@ -34,6 +34,7 @@
 
 //#define ARCOLOURSPACE_DEBUGPRINTF_ON_LOADING
 
+#include <stdio.h>
 #include <pthread.h>
 
 typedef struct ArColourSpace_GV
@@ -84,6 +85,30 @@ void initLCMSProfileBuffer(
         );
 }
 
+void setICCProfileDescription(
+              cmsHPROFILE    profile,
+        const char         * description
+        )
+{
+    char  copyrightString[2048];
+    
+    sprintf(
+        copyrightString,
+        "Public Domain, created by the %s %s via littlecms 2.x routines",
+        art_long_name_string,
+        art_version_string
+        );
+
+    cmsMLU *mlu0 = cmsMLUalloc(NULL, 1);
+    cmsMLUsetASCII(mlu0, "en", "US", copyrightString);
+    cmsMLU *mlu1 = cmsMLUalloc(NULL, 1);
+    cmsMLUsetASCII(mlu1, "en", "US", description);
+    cmsWriteTag( profile, cmsSigCopyrightTag,          mlu0);
+    cmsWriteTag( profile, cmsSigProfileDescriptionTag, mlu1);
+    cmsMLUfree(mlu0);
+    cmsMLUfree(mlu1);
+}
+
 void createLCMSProfileFromARTColours(
               ArColourSpace    * cs,
         const char             * description,
@@ -124,15 +149,8 @@ void createLCMSProfileFromARTColours(
             & rgb_primaries,
               gamma_rgb
             );
-
-    cmsMLU *mlu0 = cmsMLUalloc(NULL, 1);
-    cmsMLUsetASCII(mlu0, "en", "US", "Public Domain, created by the Advanced Rendering Toolkit via littlecms routines");
-    cmsMLU *mlu1 = cmsMLUalloc(NULL, 1);
-    cmsMLUsetASCII(mlu1, "en", "US", description);
-    cmsWriteTag(*profile, cmsSigCopyrightTag,          mlu0);
-    cmsWriteTag(*profile, cmsSigProfileDescriptionTag, mlu1);
-    cmsMLUfree(mlu0);
-    cmsMLUfree(mlu1);
+    
+    setICCProfileDescription( *profile, description );
 }
 
 void createCompleteLCMSProfileFromARTColours(
@@ -318,6 +336,8 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     PROFILE = cmsCreate_sRGBProfile();
 
+    setICCProfileDescription( PROFILE, "sRGB" );
+
     initLCMSProfileBuffer(
           ARCS_PROFILE(cs),
         & ARCS_PROFILEBUFFERSIZE(cs),
@@ -331,7 +351,7 @@ ART_MODULE_INITIALISATION_FUNCTION
               PROFILE,
               TYPE_RGB_DBL,
               INTENT_RELATIVE_COLORIMETRIC,
-              0
+              cmsFLAGS_BLACKPOINTCOMPENSATION | cmsFLAGS_NOOPTIMIZE
               );
 
     CREATE_LINEAR_LCMS_PROFILE("linear Rec. 709");
@@ -343,7 +363,7 @@ ART_MODULE_INITIALISATION_FUNCTION
               LINEAR_PROFILE,
               TYPE_RGB_DBL,
               INTENT_RELATIVE_COLORIMETRIC,
-              0
+              cmsFLAGS_BLACKPOINTCOMPENSATION | cmsFLAGS_NOOPTIMIZE
               );
 
 #endif
@@ -470,21 +490,21 @@ ArColourSpace const * arcolourspace_sRGB(
         const ART_GV  * art_gv
         )
 {
-    return art_gv->arcolourspace_gv->sRGB;
+    return ARCS_SRGB;
 }
 
 ArColourSpace const * arcolourspace_aRGB(
         const ART_GV  * art_gv
         )
 {
-    return art_gv->arcolourspace_gv->aRGB;
+    return ARCS_ARGB;
 }
 
 ArColourSpace const * arcolourspace_wRGB(
         const ART_GV  * art_gv
         )
 {
-    return art_gv->arcolourspace_gv->wRGB;
+    return ARCS_WRGB;
 }
 
 ArColourSpaceRef register_arcolourspace(

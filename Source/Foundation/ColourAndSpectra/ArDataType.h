@@ -84,7 +84,7 @@
 //   The following file contains various #defines needed to allow a concise
 //   definition of the actual enum values further down.
 
-#import "ArDataType_PreDefinitionMacros.h"
+#include "ArDataType_PreDefinitionMacros.h"
 
 typedef enum ArDataType
 {
@@ -207,7 +207,7 @@ ArDataType;
 //   The various shortcuts used there have far too generic names to be
 //   allowed to exist outside this header.
 
-#import "ArDataType_PostDefinitionMacros.h"
+#include "ArDataType_PostDefinitionMacros.h"
 
 const char * ardatatype_name(
         ArDataType  dataType

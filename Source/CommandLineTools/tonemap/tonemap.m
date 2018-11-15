@@ -176,8 +176,15 @@ int tonemap(
     id  rgbClippingOpt =
         [ FLAG_OPTION
             :   "clipRGB"
-            :   "crgb"
+            :   "cl"
             :   "clip out of gamut RGB values"
+            ];
+
+    id  rgbFlagOpt =
+        [ FLAG_OPTION
+            :   "flagRGB"
+            :   "fl"
+            :   "flag out of gamut RGB values"
             ];
 
     id  lpFilterOpt =
@@ -269,8 +276,12 @@ int tonemap(
 
     if ( [ rgbClippingOpt hasBeenSpecified ] )
     {
-//        setRGBGamutMappingMethod(art_gv, arrgb_gm_clipping | arrgb_gm_flag_neg, 0.);
-        setRGBGamutMappingMethod(art_gv, arrgb_gm_clipping , 0.);
+        setRGBGamutMappingMethod(art_gv, arrgb_gm_clipping , 0.5);
+    }
+
+    if ( [ rgbFlagOpt hasBeenSpecified ] )
+    {
+        setRGBGamutMappingMethod(art_gv, arrgb_gm_clipping | arrgb_gm_flag_neg, 0.);
     }
 
     /* ------------------------------------------------------------------
