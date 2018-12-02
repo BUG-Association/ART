@@ -560,19 +560,6 @@ void arcobjccoder_write_to_stream(
                     ARGREY_PRINTF(*codeGrey)];
 }
 
-- (void) codeArUTF_RGB
-        : (ArUTF_RGB *) codeUTF_RGB
-{
-    [ stream prints
-        :   prefix
-        ];
-
-    [ stream printf
-        :  ARUTF_RGB_FORMAT(ARCOBJCCODER_FLOAT_PRINT_FORMAT)
-        ,  ARUTF_RGB_PRINTF(*codeUTF_RGB)
-        ];
-}
-
 COLOURTYPE_DEFAULT_IO(ArRGB,arrgb);
 COLOURTYPE_DEFAULT_IO(ArCIEXYZ,arciexyz);
 COLOURTYPE_DEFAULT_IO(ArCIExyY,arciexyy);
@@ -1225,19 +1212,6 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
     [ stream scanf
         :   ARGREY_FORMAT(ARCOBJCCODER_DOUBLE_SCAN_FORMAT)
         ,   ARGREY_SCANF(*codeGrey)
-        ];
-}
-
-- (void) codeArUTF_RGB
-        : (ArUTF_RGB *) codeUTF_RGB
-{
-    [ stream scans
-        :   prefix
-        ];
-
-    [ stream scanf
-        :   ARUTF_RGB_FORMAT(ARCOBJCCODER_FLOAT_SCAN_FORMAT)
-        ,   ARUTF_RGB_SCANF(*codeUTF_RGB)
         ];
 }
 

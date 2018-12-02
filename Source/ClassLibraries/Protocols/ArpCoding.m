@@ -94,7 +94,7 @@ void arpcoder_arcolour(
     }
     else
     {
-        if ( art_foundation_isr(art_gv) == ardt_ut_xyz )
+        if ( art_foundation_isr(art_gv) == ardt_xyz )
             [ coder codeArRGB: ((ArRGB*)spc->value) ];
 
         if ( art_foundation_isr(art_gv) == ardt_spectrum8 )
@@ -120,27 +120,9 @@ void arpcoder_##__type ( \
 { \
     ArSymbol  colourspaceName;  \
 \
-    [ coder codeDouble: & ARTCV_CI(*c,0) ]; \
-    [ coder codeDouble: & ARTCV_CI(*c,1) ]; \
-    [ coder codeDouble: & ARTCV_CI(*c,2) ]; \
-\
-    if ( ! [ coder isReading ] ) \
-        colourspaceName = ARTCV_CSNAME(*c); \
-\
-    [ coder codeSymbol: & colourspaceName ]; \
-\
-    if ( [ coder isReading ] ) \
-    { \
-        if ( ! ( ARTCV_S(*c) = \
-            arcolourspaceref_for_csname( \
-                art_gv, \
-                colourspaceName \
-                ) ) ) \
-            ART_ERRORHANDLING_FATAL_ERROR( \
-                "invalid colourspace name '%s'" \
-                ,   colourspaceName \
-                ); \
-    } \
+    [ coder codeDouble: & C3_CI(c->c,0) ]; \
+    [ coder codeDouble: & C3_CI(c->c,1) ]; \
+    [ coder codeDouble: & C3_CI(c->c,2) ]; \
 }
 
 ARPCODER_COLOURTYPE_IMPLEMENTATION(ArRGB,arrgb);

@@ -32,7 +32,10 @@
 ART_MODULE_INTERFACE(ArCIEColourConversions)
 
 #include "ArRGB.h"
-#include "ArCIEColourValues.h"
+#include "ArCIExyY.h"
+#include "ArCIEXYZ.h"
+#include "ArCIELab.h"
+#include "ArCIELuv.h"
 #include "ArColourTransform.h"
 
 /* ---------------------------------------------------------------------------
@@ -48,7 +51,7 @@ ART_MODULE_INTERFACE(ArCIEColourConversions)
 
 ------------------------------------------------------------------------aw- */
 
-typedef enum ArRGBGamutMappingMethod
+typedef enum ArRGBGamutMapping
 {
     arrgb_gm_clipping       = 0x00,
     arrgb_gm_linear         = 0x01,
@@ -61,19 +64,19 @@ typedef enum ArRGBGamutMappingMethod
     arrgb_gm_technique_mask = 0x0F,
     arrgb_gm_feature_mask   = 0xF0,
 }
-ArRGBGamutMappingMethod;
+ArRGBGamutMapping;
 
-ArRGBGamutMappingMethod currentRGBGamutMappingMethod(
-        ART_GV  * art_gv
+ArRGBGamutMapping currentRGBGamutMappingMethod(
+        const ART_GV  * art_gv
         );
 
 #define RGB_GAMUT_MAPPING \
     (currentRGBGamutMappingMethod(art_gv) & arrgb_gm_technique_mask)
 
 void setRGBGamutMappingMethod(
-              ART_GV                   * art_gv,
-        const ArRGBGamutMappingMethod    method,
-        const double                     focus_luminance
+              ART_GV             * art_gv,
+        const ArRGBGamutMapping    method,
+        const double               focus_luminance
         );
 
 void xyz_conversion_to_linear_rgb(
@@ -114,12 +117,6 @@ void lab_conversion_to_rgb(
               ArRGB                 * rgb_r
         );
 
-void lab_move_luminance_below_100(
-        const ART_GV    * art_gv,
-        const double      focusLuminance,
-              ArCIELab  * lab_r
-        );
-
 void lab_wp_to_xyz(
         const ART_GV    * art_gv,
         const ArCIELab  * lab_0,
@@ -154,12 +151,12 @@ void xyz_to_luv(
 
 double luv_u_prime_from_xyz(
         const ART_GV    * art_gv,
-        const ArCIELuv  * luv_0
+        const ArCIEXYZ  * xyz_0
         );
 
 double luv_v_prime_from_xyz(
         const ART_GV    * art_gv,
-        const ArCIELuv  * luv_0
+        const ArCIEXYZ  * xyz_0
         );
 
 void xyz_d_mul_c(

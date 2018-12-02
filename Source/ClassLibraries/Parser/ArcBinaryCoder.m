@@ -515,14 +515,6 @@ void arcbinarycoder_write_to_stream(
         [self codeBinary8 : &(codeRGB->c.x[i])];
 }
 
-- (void) codeArUTF_RGB
-        : (ArUTF_RGB *) codeUTF_RGB
-{
-    int i;
-    for (i=0; i<3; i++)
-        [self codeBinary8 : &(ARUTF_RGB_CI(*codeUTF_RGB,i))];
-}
-
 - (void) codeArSpectrum8
         : (ArSpectrum8 *) codeSpectrum8
 {
@@ -1124,14 +1116,6 @@ void arcbinarycoder_write_to_stream(
     int i;
     for (i=0; i<3; i++)
         [self codeBinary8 : &(codeArRGB->c.x[i])];
-}
-
-- (void) codeArUTF_RGB
-        : (ArUTF_RGB *) codeArUTF_RGB
-{
-    int i;
-    for (i=0; i<3; i++)
-        [self codeBinary8 : &(ARUTF_RGB_CI(*codeArUTF_RGB,i))];
 }
 
 - (void) codeArSpectrum8

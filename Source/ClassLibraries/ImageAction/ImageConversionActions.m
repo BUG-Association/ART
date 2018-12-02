@@ -67,8 +67,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageDataType = ardt_ciexyz;
-    destinationFileDataType  = ardt_ciexyz;
+    destinationImageDataType = ardt_xyz;
+    destinationFileDataType  = ardt_xyz;
 
 
     /* ------------------------------------------------------------------
@@ -198,8 +198,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageDataType = ardt_ciexyz;
-    destinationFileDataType  = ardt_ciexyz;
+    destinationImageDataType = ardt_xyz;
+    destinationFileDataType  = ardt_xyz;
 
     numberOfDestinationsPerSource = 1;
     
@@ -288,13 +288,13 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
                           temp_col
                         );
 
-                ArUT_RGB  rgb;
+                ArRGB  rgb;
                 
-                ARUT_RGB_R(rgb) = intensity;
-                ARUT_RGB_G(rgb) = intensity;
-                ARUT_RGB_B(rgb) = intensity;
+                ARRGB_R(rgb) = intensity;
+                ARRGB_G(rgb) = intensity;
+                ARRGB_B(rgb) = intensity;
 
-                ut_rgb_to_xyz(
+                rgb_to_xyz(
                       art_gv,
                     & rgb,
                     & XYZA_DESTINATION_BUFFER_XYZ(x)
@@ -396,8 +396,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
          content of TIFF files) for us.
     ---------------------------------------------------------------aw- */
 
-    destinationImageDataType = ardt_ciexyz;
-    destinationFileDataType  = ardt_ciexyz;
+    destinationImageDataType = ardt_xyz;
+    destinationFileDataType  = ardt_xyz;
 
 
     /* ------------------------------------------------------------------
@@ -663,20 +663,18 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
         xyz_whitebalance_xyz =
             art_chromatic_adaptation_matrix(
               art_gv,
-              XC(ARCSR_W(ARCSR_CIEXYZ)),
-              YC(ARCSR_W(ARCSR_CIEXYZ))
+            & ARCSR_W(ARCSR_CIEXYZ)
             );
     }
     else
     {
         //   If we are on our own, we have to do the entire correction
         //   by ourselves
-        
+
         xyz_whitebalance_xyz =
             art_chromatic_adaptation_matrix(
               art_gv,
-              XC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
-              YC(ARCSR_W(DEFAULT_RGB_SPACE_REF))
+            & ARCSR_W(DEFAULT_RGB_SPACE_REF)
             );
     }
 
@@ -871,12 +869,11 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             ];
 
     Mat3  xyz_whitebalance_xyz;
-    
+
     xyz_whitebalance_xyz =
         art_chromatic_adaptation_matrix(
           art_gv,
-          XC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
-          YC(ARCSR_W(DEFAULT_RGB_SPACE_REF))
+        & ARCSR_W(DEFAULT_RGB_SPACE_REF)
         );
 
     /* ------------------------------------------------------------------

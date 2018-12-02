@@ -27,20 +27,25 @@
 #define ART_MODULE_NAME     ArCIEColourConversions
 
 #include "ArCIEColourConversions.h"
-#include "ArUntaggedRGB.h"
+#include "ArRGB.h"
+#include "ArCIExy.h"
+#include "ArCIExyY.h"
+#include "ArCIEXYZ.h"
+#include "ColourAndSpectralDataConversion.h"
+#include "SystemWhitepoint.h"
 
 #include <pthread.h>
 
 typedef struct ArCIEColourConversions_GV
 {
-    pthread_mutex_t          mutex;
+    pthread_mutex_t    mutex;
 
-    ArRGBGamutMappingMethod  gm_method;
-    int                      recursion_depth;
-    double                   focus_luminance;
-    ArUT_RGB                 negative_flag_colour;
-    ArUT_RGB                 above_one_flag_colour;
-    ArUT_RGB                 both_flag_colour;
+    ArRGBGamutMapping  gm_method;
+    int                recursion_depth;
+    double             focus_luminance;
+    ArRGB              negative_flag_colour;
+    ArRGB              above_one_flag_colour;
+    ArRGB              both_flag_colour;
 }
 ArCIEColourConversions_GV;
 
@@ -67,9 +72,9 @@ ART_MODULE_INITIALISATION_FUNCTION
 #endif
     ARCIECV_GM_RECDEPTH   = 20;
     ARCIECV_GM_FOCUS      = 0.1;
-    ARCIECV_POS_FLAG_RGB  = ARUT_RGB(0,0,0);
-    ARCIECV_NEG_FLAG_RGB  = ARUT_RGB(1,1,1);
-    ARCIECV_BOTH_FLAG_RGB = ARUT_RGB(1,0,0);
+    ARCIECV_POS_FLAG_RGB  = ARRGB(0,0,0);
+    ARCIECV_NEG_FLAG_RGB  = ARRGB(1,1,1);
+    ARCIECV_BOTH_FLAG_RGB = ARRGB(1,0,0);
 )
 
 ART_MODULE_SHUTDOWN_FUNCTION
@@ -80,12 +85,10 @@ ART_MODULE_SHUTDOWN_FUNCTION
 )
 
 
-#include "ART_Foundation_Math.h"
-
 void setRGBGamutMappingMethod(
-              ART_GV                   * art_gv,
-        const ArRGBGamutMappingMethod    method,
-        const double                     focus_luminance
+              ART_GV             * art_gv,
+        const ArRGBGamutMapping    method,
+        const double               focus_luminance
         )
 {
     pthread_mutex_lock( & ARCIECV_MUTEX );
@@ -98,8 +101,8 @@ void setRGBGamutMappingMethod(
     pthread_mutex_unlock( & ARCIECV_MUTEX );
 }
 
-ArRGBGamutMappingMethod currentRGBGamutMappingMethod(
-        ART_GV  * art_gv
+ArRGBGamutMapping currentRGBGamutMappingMethod(
+        const ART_GV  * art_gv
         )
 {
     return  ARCIECV_GM_METHOD;
@@ -219,7 +222,7 @@ void xyz_conversion_to_unit_rgb_with_gamma(
                 
                 focus = M_CLAMP(focus, 0.1, 0.9);
                 
-                ArCIEXYZ  inside_xyy =
+                ArCIExyY  inside_xyy =
                     ARCIExyY(
                         XC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
                         YC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
@@ -294,10 +297,6 @@ void xyz_conversion_to_unit_rgb_with_gamma(
 #ifndef _ART_WITHOUT_LCMS_
     }
 #endif
-
-    //   Set the correct colour space ref in the result
-
-    ARRGB_S(*rgb_r) = DEFAULT_RGB_SPACE_REF;
 }
 
 void xyz_conversion_to_linear_rgb(
@@ -314,7 +313,7 @@ void xyz_conversion_to_linear_rgb(
 
     if ( ( ARCIECV_GM_METHOD & arrgb_gm_technique_mask ) == arrgb_gm_clipping )
     {
-        if ( ( ARCIECV_GM_METHOD & arrgb_gm_feature_mask ) == arrgb_gm_flag_neg )
+        if ( ( ARCIECV_GM_METHOD & arrgb_gm_feature_mask ) & arrgb_gm_flag_neg )
         {
             if (   ARRGB_R(*rgb_r) < 0.
                 || ARRGB_R(*rgb_r) < 0.
@@ -322,7 +321,7 @@ void xyz_conversion_to_linear_rgb(
                 ARRGB_C(*rgb_r) = ARCIECV_NEG_FLAG_RGB.c;
         }
 
-        if ( ( ARCIECV_GM_METHOD & arrgb_gm_feature_mask ) == arrgb_gm_flag_above_one )
+        if ( ( ARCIECV_GM_METHOD & arrgb_gm_feature_mask ) & arrgb_gm_flag_above_one )
         {
             if (   ARRGB_R(*rgb_r) > 1.
                 || ARRGB_R(*rgb_r) > 1.
@@ -347,7 +346,7 @@ void xyz_conversion_to_linear_rgb(
             //   a point with the same CIE Y coordinate, but on the main
             //   diagonal
             
-            ArCIEXYZ  inside_xyy =
+            ArCIExyY  inside_xyy =
                 ARCIExyY(
                     XC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
                     YC(ARCSR_W(DEFAULT_RGB_SPACE_REF)),
@@ -367,69 +366,6 @@ void xyz_conversion_to_linear_rgb(
                   rgb_r
                 );
         }
-    }
-    
-    //   Set the correct colour space ref in the result
-
-    ARRGB_S(*rgb_r) = DEFAULT_RGB_SPACE_REF;
-}
-
-void lab_find_nearest_below_L100(
-        const ART_GV         * art_gv,
-        const ArCIELab       * lab_outside,
-        const ArCIELab       * lab_inside,
-        const int              recursionDepth,
-              ArCIELab       * lab_r
-        )
-{
-    ArCIELab  midpoint;
-
-    ARCIELab_L( midpoint ) = ( ARCIELab_L(*lab_outside) + ARCIELab_L(*lab_inside) ) / 2.0;
-    ARCIELab_a( midpoint ) = ( ARCIELab_a(*lab_outside) + ARCIELab_a(*lab_inside) ) / 2.0;
-    ARCIELab_b( midpoint ) = ( ARCIELab_b(*lab_outside) + ARCIELab_b(*lab_inside) ) / 2.0;
-
-    if ( recursionDepth > 0 )
-    {
-        if ( ARCIELab_L( midpoint ) > 100.0 )
-            lab_find_nearest_below_L100(
-                  art_gv,
-                & midpoint,
-                  lab_inside,
-                  recursionDepth - 1,
-                  lab_r );
-        else
-            lab_find_nearest_below_L100(
-                  art_gv,
-                  lab_outside,
-                & midpoint,
-                  recursionDepth - 1,
-                  lab_r );
-    }
-    else
-    {
-        if ( ARCIELab_L( midpoint ) > 100.0 )
-            *lab_r = *lab_inside;
-        else
-            *lab_r = midpoint;
-    }
-}
-
-void lab_move_luminance_below_100(
-        const ART_GV    * art_gv,
-        const double      focusLuminance,
-              ArCIELab  * lab_r
-        )
-{
-    if ( ARCIELab_L( *lab_r ) > 100.0 )
-    {
-        ArCIELab  focusPoint = ARCIELab( focusLuminance, 0.0, 0.0 );
-
-        lab_find_nearest_below_L100(
-              art_gv,
-              lab_r,
-            & focusPoint,
-              20,
-              lab_r );
     }
 }
 
@@ -478,7 +414,6 @@ void lab_conversion_to_rgb(
     ARRGB_R(*rgb_r) = rgbArray[0];
     ARRGB_G(*rgb_r) = rgbArray[1];
     ARRGB_B(*rgb_r) = rgbArray[2];
-    ARRGB_S(*rgb_r) = rgb_colourspace_ref;
     CC_END_DEBUGPRINTF( lab_conversion_to_rgb )
 }
 
@@ -499,7 +434,6 @@ void xyy_to_xyz(
                           - ARCIExyY_x(*xyy_0)
                           - ARCIExyY_y(*xyy_0) ) * Yy;
 
-    ARTCV_S(*xyz_r) = ARCSR_CIEXYZ;
     CC_END_DEBUGPRINTF( xyy_to_xyz )
 }
 
@@ -527,7 +461,6 @@ void xyz_to_xyy(
 
     ARCIExyY_Y(*xyy_r) = ARCIEXYZ_Y(*xyz_0);
 
-    ARTCV_S(*xyy_r) = ARCSR_CIExyY;
     CC_END_DEBUGPRINTF( xyz_to_xyy )
 }
 
@@ -564,7 +497,6 @@ void lab_wp_to_xyz(
         ARCIEXYZ_Z(*xyz_r) =   ( f_Z - 16.0 / 116.0 )
                              * DELTA_SQR_MUL_3 * ARCIEXYZ_Z(*xyz_w);
 
-    ARCIEXYZ_S(*xyz_r) = ARCSR_CIEXYZ;
     CC_END_DEBUGPRINTF( lab_wp_to_xyz )
 }
 
@@ -615,7 +547,6 @@ void xyz_wp_to_lab(
         ARCIELab_b(*lab_r) = 0.;
     }
 
-    ARCIELab_S(*lab_r) = ARCSR_CIELab;
     CC_END_DEBUGPRINTF( xyz_wp_to_lab )
 }
 
@@ -765,8 +696,6 @@ void xyz_wp_to_luv(
         ARCIELuv_v(*luv_r) = 0.;
     }
 
-    ARTCV_S(*luv_r) = ARCSR_CIELuv;
-
     CC_END_DEBUGPRINTF( xyz_wp_to_luv )
 }
 
@@ -826,8 +755,6 @@ void luv_wp_to_xyz(
         ARCIEXYZ_Z(*xyz_r) = 0.;
     }
 
-    ARTCV_S(*xyz_r) = ARCSR_CIEXYZ;
-    
     CC_END_DEBUGPRINTF( luv_to_xyz )
 }
 
@@ -844,17 +771,5 @@ void luv_to_xyz(
     CC_END_DEBUGPRINTF( luv_to_xyz )
 }
 
-void xyz_d_mul_c(
-        const ART_GV    * art_gv,
-        const double      d0,
-              ArCIEXYZ  * cr
-        )
-{
-    ArCIExyY  temp;
-
-    xyz_to_xyy( art_gv, cr, & temp );
-    ARCIExyY_Y(temp) *= d0;
-    xyy_to_xyz( art_gv, & temp, cr );
-}
 
 /* ======================================================================== */

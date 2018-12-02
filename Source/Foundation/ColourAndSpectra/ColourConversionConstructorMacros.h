@@ -80,26 +80,26 @@
                                             ART_UINT16_MAX \
                                             )
 
-#define ARUT_RGB_OF_ARGREY(_c)              ARUT_RGB( \
+#define ARRGB_OF_ARGREY(_c)                 ARRGB( \
                                             ARGREY_G(_c), \
                                             ARGREY_G(_c), \
                                             ARGREY_G(_c) \
                                             )
 
-#define ARUTF_RGB_OF_ARGREY(_c)             ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARGREY(_c)            ARFLOATRGB( \
                                             ARGREY_G(_c), \
                                             ARGREY_G(_c), \
                                             ARGREY_G(_c) \
                                             )
 
-#define ARUT_RGBA_OF_ARGREY(_c)             ARUT_RGBA( \
+#define ARRGBA_OF_ARGREY(_c)                ARRGBA( \
                                             ARGREY_G(_c), \
                                             ARGREY_G(_c), \
                                             ARGREY_G(_c), \
                                             1.0 \
                                             )
 
-#define ARUTF_RGBA_OF_ARGREY(_c)            ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARGREY(_c)           ARFLOATRGBA( \
                                             ARGREY_G(_c), \
                                             ARGREY_G(_c), \
                                             ARGREY_G(_c), \
@@ -171,26 +171,26 @@
                                             ARGREYALPHA_A(_c) * INTCOL_I16_OF_DBL \
                                             )
 
-#define ARUT_RGB_OF_ARGREYALPHA(_c)         ARUT_RGB( \
+#define ARRGB_OF_ARGREYALPHA(_c)            ARRGB( \
                                             ARGREYALPHA_G(_c), \
                                             ARGREYALPHA_G(_c), \
                                             ARGREYALPHA_G(_c) \
                                             )
 
-#define ARUTF_RGB_OF_ARGREYALPHA(_c)        ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARGREYALPHA(_c)       ARFLOATRGB( \
                                             ARGREYALPHA_G(_c), \
                                             ARGREYALPHA_G(_c), \
                                             ARGREYALPHA_G(_c) \
                                             )
 
-#define ARUT_RGBA_OF_ARGREYALPHA(_c)        ARUT_RGBA( \
+#define ARRGBA_OF_ARGREYALPHA(_c)           ARRGBA( \
                                             ARGREYALPHA_G(_c), \
                                             ARGREYALPHA_G(_c), \
                                             ARGREYALPHA_G(_c), \
                                             ARGREYALPHA_A(_c) \
                                             )
 
-#define ARUTF_RGBA_OF_ARGREYALPHA(_c)       ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARGREYALPHA(_c)      ARFLOATRGBA( \
                                             ARGREYALPHA_G(_c), \
                                             ARGREYALPHA_G(_c), \
                                             ARGREYALPHA_G(_c), \
@@ -263,26 +263,26 @@
                                             ART_UINT16_MAX \
                                             )
 
-#define ARUT_RGB_OF_ARGREY8(_c)             ARUT_RGB( \
+#define ARRGB_OF_ARGREY8(_c)                ARRGB( \
                                             (_c) * INTCOL_DBL_OF_I8, \
                                             (_c) * INTCOL_DBL_OF_I8, \
                                             (_c) * INTCOL_DBL_OF_I8 \
                                             )
 
-#define ARUTF_RGB_OF_ARGREY8(_c)            ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARGREY8(_c)           ARFLOATRGB( \
                                             (_c) * INTCOL_DBL_OF_I8, \
                                             (_c) * INTCOL_DBL_OF_I8, \
                                             (_c) * INTCOL_DBL_OF_I8 \
                                             )
 
-#define ARUT_RGBA_OF_ARGREY8(_c)            ARUT_RGBA( \
+#define ARRGBA_OF_ARGREY8(_c)               ARRGBA( \
                                             (_c) * INTCOL_DBL_OF_I8, \
                                             (_c) * INTCOL_DBL_OF_I8, \
                                             (_c) * INTCOL_DBL_OF_I8, \
                                             1.0 \
                                             )
 
-#define ARUTF_RGBA_OF_ARGREY8(_c)           ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARGREY8(_c)           ARFLOATRGBA( \
                                             (_c) * INTCOL_DBL_OF_I8, \
                                             (_c) * INTCOL_DBL_OF_I8, \
                                             (_c) * INTCOL_DBL_OF_I8, \
@@ -355,25 +355,25 @@
                                             ART_UINT16_MAX \
                                             )
 
-#define ARUT_RGB_OF_ARGREY16(_c)            ARUT_RGB( \
+#define ARRGB_OF_ARGREY16(_c)               ARRGB( \
                                             (_c) * INTCOL_DBL_OF_I16, \
                                             (_c) * INTCOL_DBL_OF_I16, \
                                             (_c) * INTCOL_DBL_OF_I16 \
                                             )
 
-#define ARUTF_RGB_OF_ARGREY16(_c)           ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARGREY16(_c)          ARFLOATRGB( \
                                             (_c) * INTCOL_DBL_OF_I16, \
                                             (_c) * INTCOL_DBL_OF_I16, \
                                             (_c) * INTCOL_DBL_OF_I16 \
                                             )
 
-#define ARUT_RGBA_OF_ARGREY16(_c)           ARUT_RGBA( \
+#define ARRGBA_OF_ARGREY16(_c)              ARRGBA( \
                                             (_c) * INTCOL_DBL_OF_I16, \
                                             (_c) * INTCOL_DBL_OF_I16, \
                                             (_c) * INTCOL_DBL_OF_I16, \
                                             1.0 )
 
-#define ARUTF_RGBA_OF_ARGREY16(_c)          ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARGREY16(_c)          ARFLOATRGBA( \
                                             (_c) * INTCOL_DBL_OF_I16, \
                                             (_c) * INTCOL_DBL_OF_I16, \
                                             (_c) * INTCOL_DBL_OF_I16, \
@@ -441,26 +441,26 @@
                                             ARGREYALPHA16_A(_c) * INTCOL_I16_OF_I8 \
                                             )
 
-#define ARUT_RGB_OF_ARGREYALPHA16(_c)       ARUT_RGB( \
+#define ARRGB_OF_ARGREYALPHA16(_c)          ARRGB( \
                                             ARGREYALPHA16_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARGREYALPHA16_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARGREYALPHA16_G(_c) * INTCOL_DBL_OF_I8 \
                                             )
 
-#define ARUTF_RGB_OF_ARGREYALPHA16(_c)      ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARGREYALPHA16(_c)     ARFLOATRGB( \
                                             ARGREYALPHA16_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARGREYALPHA16_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARGREYALPHA16_G(_c) * INTCOL_DBL_OF_I8 \
                                             )
 
-#define ARUT_RGBA_OF_ARGREYALPHA16(_c)      ARUT_RGBA( \
+#define ARRGBA_OF_ARGREYALPHA16(_c)         ARRGBA( \
                                             ARGREYALPHA16_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARGREYALPHA16_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARGREYALPHA16_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARGREYALPHA16_A(_c) * INTCOL_DBL_OF_I8 \
                                             )
 
-#define ARUTF_RGBA_OF_ARGREYALPHA16(_c)     ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARGREYALPHA16(_c)    ARFLOATRGBA( \
                                             ARGREYALPHA16_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARGREYALPHA16_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARGREYALPHA16_G(_c) * INTCOL_DBL_OF_I8, \
@@ -528,26 +528,26 @@
                                             ARGREYALPHA32_A(_c) * INTCOL_I8_OF_I16 \
                                             )
 
-#define ARUT_RGB_OF_ARGREYALPHA32(_c)       ARUT_RGB( \
+#define ARRGB_OF_ARGREYALPHA32(_c)          ARRGB( \
                                             ARGREYALPHA32_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARGREYALPHA32_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARGREYALPHA32_G(_c) * INTCOL_DBL_OF_I16 \
                                             )
 
-#define ARUTF_RGB_OF_ARGREYALPHA32(_c)      ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARGREYALPHA32(_c)     ARFLOATRGB( \
                                             ARGREYALPHA32_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARGREYALPHA32_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARGREYALPHA32_G(_c) * INTCOL_DBL_OF_I16 \
                                             )
 
-#define ARUT_RGBA_OF_ARGREYALPHA32(_c)      ARUT_RGBA( \
+#define ARRGBA_OF_ARGREYALPHA32(_c)         ARRGBA( \
                                             ARGREYALPHA32_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARGREYALPHA32_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARGREYALPHA32_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARGREYALPHA32_A(_c) * INTCOL_DBL_OF_I16 \
                                             )
 
-#define ARUTF_RGBA_OF_ARGREYALPHA32(_c)     ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARGREYALPHA32(_c)    ARFLOATRGBA( \
                                             ARGREYALPHA32_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARGREYALPHA32_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARGREYALPHA32_G(_c) * INTCOL_DBL_OF_I16, \
@@ -604,19 +604,37 @@
                                             1.0 \
                                             )
 
+#define ARFLOATCIEXYZA_OF_ARCIEXYZ(_c)      ARFLOATCIEXYZA( \
+                                            ARCIEXYZ_X(_c), \
+                                            ARCIEXYZ_Y(_c), \
+                                            ARCIEXYZ_Z(_c) \
+                                            )
+
+// =====   ArCIEXYZA   =======================================================
+
+
+#define ARCIEXYZ_OF_ARCIEXYZA(_c)           ARCIEXYZ( \
+                                            ARCIEXYZA_X(_c), \
+                                            ARCIEXYZA_Y(_c), \
+                                            ARCIEXYZA_Z(_c) \
+                                            )
+
+#define ARFLOATCIEXYZ_OF_ARCIEXYZA(_c)      ARFLOATCIEXYZ( \
+                                            ARCIEXYZA_X(_c), \
+                                            ARCIEXYZA_Y(_c), \
+                                            ARCIEXYZA_Z(_c) \
+                                            )
 
 // =====   ArRGB   ===========================================================
 
 
-#define ARGREY_OF_ARRGB(_c)                 ARGREY_CS( \
-                                            ARRGB_G(_c), \
-                                            ARRGB_S(_c) \
+#define ARGREY_OF_ARRGB(_c)                 ARGREY( \
+                                            ARRGB_G(_c) \
                                             )
 
-#define ARGREYALPHA_OF_ARRGB(_c)            ARGREYALPHA_CS( \
+#define ARGREYALPHA_OF_ARRGB(_c)            ARGREYALPHA( \
                                             ARRGB_G(_c), \
-                                            1.0, \
-                                            ARRGB_S(_c) \
+                                            1.0 \
                                             )
 
 #define ARGREY8_OF_ARRGB(_c)                ARGREY8( \
@@ -637,13 +655,13 @@
                                             ART_UINT16_MAX \
                                             )
 
-#define ARUT_RGB_OF_ARRGB(_c)               ARUT_RGB( \
+#define ARRGB_OF_ARRGB(_c)                  ARRGB( \
                                             ARRGB_R(_c), \
                                             ARRGB_G(_c), \
                                             ARRGB_B(_c) \
                                             )
 
-#define ARUTF_RGB_OF_ARRGB(_c)              ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARRGB(_c)             ARFLOATRGB( \
                                             ARRGB_R(_c), \
                                             ARRGB_G(_c), \
                                             ARRGB_B(_c) \
@@ -656,14 +674,14 @@
                                             1.0 \
                                             )
 
-#define ARUT_RGBA_OF_ARRGB(_c)              ARUT_RGBA( \
+#define ARRGBA_OF_ARRGB(_c)                 ARRGBA( \
                                             ARRGB_R(_c), \
                                             ARRGB_G(_c), \
                                             ARRGB_B(_c), \
                                             1.0 \
                                             )
 
-#define ARUTF_RGBA_OF_ARRGB(_c)             ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARRGB(_c)            ARFLOATRGBA( \
                                             ARRGB_R(_c), \
                                             ARRGB_G(_c), \
                                             ARRGB_B(_c), \
@@ -710,208 +728,105 @@
                                             )
 
 
-// =====   ArUT_RGB   ========================================================
+// =====   ArFLOATRGB   =======================================================
 
 
-#define ARGREY_OF_ARUT_RGB(_c)              ARGREY( \
-                                            ARUT_RGB_G(_c) \
+#define ARGREY_OF_ARFLOATRGB(_c)            ARGREY( \
+                                            ARFLOATRGB_G(_c) \
                                             )
 
-#define ARGREYALPHA_OF_ARUT_RGB(_c)         ARGREYALPHA( \
-                                            ARUT_RGB_G(_c), \
+#define ARGREYALPHA_OF_ARFLOATRGB(_c)       ARGREYALPHA( \
+                                            ARFLOATRGB_G(_c), \
                                             1.0 \
                                             )
 
-#define ARGREY8_OF_ARUT_RGB(_c)             ARGREY8( \
-                                            ARUT_RGB_G(_c) * INTCOL_I8_OF_DBL \
+#define ARGREY8_OF_ARFLOATRGB(_c)           ARGREY8( \
+                                            ARFLOATRGB_G(_c) * INTCOL_I8_OF_DBL \
                                             )
 
-#define ARGREY16_OF_ARUT_RGB(_c)            ARGREY16( \
-                                            ARUT_RGB_G(_c) * INTCOL_I16_OF_DBL \
+#define ARGREY16_OF_ARFLOATRGB(_c)          ARGREY16( \
+                                            ARFLOATRGB_G(_c) * INTCOL_I16_OF_DBL \
                                             )
 
-#define ARGREYALPHA16_OF_ARUT_RGB(_c)       ARGREYALPHA16( \
-                                            ARUT_RGB_G(_c) * INTCOL_I8_OF_DBL, \
+#define ARGREYALPHA16_OF_ARFLOATRGB(_c)     ARGREYALPHA16( \
+                                            ARFLOATRGB_G(_c) * INTCOL_I8_OF_DBL, \
                                             ART_UINT8_MAX \
                                             )
 
-#define ARGREYALPHA32_OF_ARUT_RGB(_c)       ARGREYALPHA32( \
-                                            ARUT_RGB_G(_c) * INTCOL_I16_OF_DBL, \
+#define ARGREYALPHA32_OF_ARFLOATRGB(_c)     ARGREYALPHA32( \
+                                            ARFLOATRGB_G(_c) * INTCOL_I16_OF_DBL, \
                                             ART_UINT16_MAX \
                                             )
 
-#define ARRGB_OF_ARUT_RGB(_c)               ARRGB( \
-                                            ARUT_RGB_R(_c), \
-                                            ARUT_RGB_G(_c), \
-                                            ARUT_RGB_B(_c) \
+#define ARRGB_OF_ARFLOATRGB(_c)             ARRGB( \
+                                            ARFLOATRGB_R(_c), \
+                                            ARFLOATRGB_G(_c), \
+                                            ARFLOATRGB_B(_c) \
                                             )
 
-#define ARUTF_RGB_OF_ARUT_RGB(_c)           ARUTF_RGB( \
-                                            ARUT_RGB_R(_c), \
-                                            ARUT_RGB_G(_c), \
-                                            ARUT_RGB_B(_c) \
+#define ARRGB_OF_ARFLOATRGB(_c)             ARRGB( \
+                                            ARFLOATRGB_R(_c), \
+                                            ARFLOATRGB_G(_c), \
+                                            ARFLOATRGB_B(_c) \
                                             )
 
-#define ARRGBA_OF_ARUT_RGB(_c)              ARRGBA( \
-                                            ARUT_RGB_R(_c), \
-                                            ARUT_RGB_G(_c), \
-                                            ARUT_RGB_B(_c), \
+#define ARRGBA_OF_ARFLOATRGB(_c)            ARRGBA( \
+                                            ARFLOATRGB_R(_c), \
+                                            ARFLOATRGB_G(_c), \
+                                            ARFLOATRGB_B(_c), \
                                             1.0 \
                                             )
 
-#define ARUT_RGBA_OF_ARUT_RGB(_c)           ARUT_RGBA( \
-                                            ARUT_RGB_R(_c), \
-                                            ARUT_RGB_G(_c), \
-                                            ARUT_RGB_B(_c), \
+#define ARRGBA_OF_ARFLOATRGB(_c)            ARRGBA( \
+                                            ARFLOATRGB_R(_c), \
+                                            ARFLOATRGB_G(_c), \
+                                            ARFLOATRGB_B(_c), \
                                             1.0 \
                                             )
 
-#define ARUTF_RGBA_OF_ARUT_RGB(_c)          ARUTF_RGBA( \
-                                            ARUT_RGB_R(_c), \
-                                            ARUT_RGB_G(_c), \
-                                            ARUT_RGB_B(_c), \
+#define ARFLOATRGBA_OF_ARFLOATRGB(_c)       ARFLOATRGBA( \
+                                            ARFLOATRGB_R(_c), \
+                                            ARFLOATRGB_G(_c), \
+                                            ARFLOATRGB_B(_c), \
                                             1.0 \
                                             )
 
-#define ARRGB24_OF_ARUT_RGB(_c)             ARRGB24( \
-                                            ARUT_RGB_R(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUT_RGB_G(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUT_RGB_B(_c) * INTCOL_I8_OF_DBL \
+#define ARRGB24_OF_ARFLOATRGB(_c)           ARRGB24( \
+                                            ARFLOATRGB_R(_c) * INTCOL_I8_OF_DBL, \
+                                            ARFLOATRGB_G(_c) * INTCOL_I8_OF_DBL, \
+                                            ARFLOATRGB_B(_c) * INTCOL_I8_OF_DBL \
                                             )
 
-#define ARRGBA32_OF_ARUT_RGB(_c)            ARRGBA32( \
-                                            ARUT_RGB_R(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUT_RGB_G(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUT_RGB_B(_c) * INTCOL_I8_OF_DBL, \
+#define ARRGBA32_OF_ARFLOATRGB(_c)          ARRGBA32( \
+                                            ARFLOATRGB_R(_c) * INTCOL_I8_OF_DBL, \
+                                            ARFLOATRGB_G(_c) * INTCOL_I8_OF_DBL, \
+                                            ARFLOATRGB_B(_c) * INTCOL_I8_OF_DBL, \
                                             ART_UINT8_MAX \
                                             )
 
-#define ARRGB48_OF_ARUT_RGB(_c)             ARRGB48( \
-                                            ARUT_RGB_R(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUT_RGB_G(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUT_RGB_B(_c) * INTCOL_I16_OF_DBL \
+#define ARRGB48_OF_ARFLOATRGB(_c)           ARRGB48( \
+                                            ARFLOATRGB_R(_c) * INTCOL_I16_OF_DBL, \
+                                            ARFLOATRGB_G(_c) * INTCOL_I16_OF_DBL, \
+                                            ARFLOATRGB_B(_c) * INTCOL_I16_OF_DBL \
                                             )
 
-#define ARRGBA64_OF_ARUT_RGB(_c)            ARRGBA64( \
-                                            ARUT_RGB_R(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUT_RGB_G(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUT_RGB_B(_c) * INTCOL_I16_OF_DBL, \
+#define ARRGBA64_OF_ARFLOATRGB(_c)          ARRGBA64( \
+                                            ARFLOATRGB_R(_c) * INTCOL_I16_OF_DBL, \
+                                            ARFLOATRGB_G(_c) * INTCOL_I16_OF_DBL, \
+                                            ARFLOATRGB_B(_c) * INTCOL_I16_OF_DBL, \
                                             ART_UINT16_MAX \
                                             )
 
-#define ARRGB96_OF_ARUT_RGB(_c)             ARRGB96( \
-                                            ARUT_RGB_R(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUT_RGB_G(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUT_RGB_B(_c) * INTCOL_I32_OF_DBL \
+#define ARRGB96_OF_ARFLOATRGB(_c)           ARRGB96( \
+                                            ARFLOATRGB_R(_c) * INTCOL_I32_OF_DBL, \
+                                            ARFLOATRGB_G(_c) * INTCOL_I32_OF_DBL, \
+                                            ARFLOATRGB_B(_c) * INTCOL_I32_OF_DBL \
                                             )
 
-#define ARRGBA128_OF_ARUT_RGB(_c)           ARRGBA128( \
-                                            ARUT_RGB_R(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUT_RGB_G(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUT_RGB_B(_c) * INTCOL_I32_OF_DBL, \
-                                            ART_UINT32_MAX \
-                                            )
-
-
-// =====   ArUTF_RGB   =======================================================
-
-
-#define ARGREY_OF_ARUTF_RGB(_c)             ARGREY( \
-                                            ARUTF_RGB_G(_c) \
-                                            )
-
-#define ARGREYALPHA_OF_ARUTF_RGB(_c)        ARGREYALPHA( \
-                                            ARUTF_RGB_G(_c), \
-                                            1.0 \
-                                            )
-
-#define ARGREY8_OF_ARUTF_RGB(_c)            ARGREY8( \
-                                            ARUTF_RGB_G(_c) * INTCOL_I8_OF_DBL \
-                                            )
-
-#define ARGREY16_OF_ARUTF_RGB(_c)           ARGREY16( \
-                                            ARUTF_RGB_G(_c) * INTCOL_I16_OF_DBL \
-                                            )
-
-#define ARGREYALPHA16_OF_ARUTF_RGB(_c)      ARGREYALPHA16( \
-                                            ARUTF_RGB_G(_c) * INTCOL_I8_OF_DBL, \
-                                            ART_UINT8_MAX \
-                                            )
-
-#define ARGREYALPHA32_OF_ARUTF_RGB(_c)      ARGREYALPHA32( \
-                                            ARUTF_RGB_G(_c) * INTCOL_I16_OF_DBL, \
-                                            ART_UINT16_MAX \
-                                            )
-
-#define ARRGB_OF_ARUTF_RGB(_c)              ARRGB( \
-                                            ARUTF_RGB_R(_c), \
-                                            ARUTF_RGB_G(_c), \
-                                            ARUTF_RGB_B(_c) \
-                                            )
-
-#define ARUT_RGB_OF_ARUTF_RGB(_c)           ARUT_RGB( \
-                                            ARUTF_RGB_R(_c), \
-                                            ARUTF_RGB_G(_c), \
-                                            ARUTF_RGB_B(_c) \
-                                            )
-
-#define ARRGBA_OF_ARUTF_RGB(_c)             ARRGBA( \
-                                            ARUTF_RGB_R(_c), \
-                                            ARUTF_RGB_G(_c), \
-                                            ARUTF_RGB_B(_c), \
-                                            1.0 \
-                                            )
-
-#define ARUT_RGBA_OF_ARUTF_RGB(_c)          ARUT_RGBA( \
-                                            ARUTF_RGB_R(_c), \
-                                            ARUTF_RGB_G(_c), \
-                                            ARUTF_RGB_B(_c), \
-                                            1.0 \
-                                            )
-
-#define ARUTF_RGBA_OF_ARUTF_RGB(_c)         ARUTF_RGBA( \
-                                            ARUTF_RGB_R(_c), \
-                                            ARUTF_RGB_G(_c), \
-                                            ARUTF_RGB_B(_c), \
-                                            1.0 \
-                                            )
-
-#define ARRGB24_OF_ARUTF_RGB(_c)            ARRGB24( \
-                                            ARUTF_RGB_R(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUTF_RGB_G(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUTF_RGB_B(_c) * INTCOL_I8_OF_DBL \
-                                            )
-
-#define ARRGBA32_OF_ARUTF_RGB(_c)           ARRGBA32( \
-                                            ARUTF_RGB_R(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUTF_RGB_G(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUTF_RGB_B(_c) * INTCOL_I8_OF_DBL, \
-                                            ART_UINT8_MAX \
-                                            )
-
-#define ARRGB48_OF_ARUTF_RGB(_c)            ARRGB48( \
-                                            ARUTF_RGB_R(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUTF_RGB_G(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUTF_RGB_B(_c) * INTCOL_I16_OF_DBL \
-                                            )
-
-#define ARRGBA64_OF_ARUTF_RGB(_c)           ARRGBA64( \
-                                            ARUTF_RGB_R(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUTF_RGB_G(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUTF_RGB_B(_c) * INTCOL_I16_OF_DBL, \
-                                            ART_UINT16_MAX \
-                                            )
-
-#define ARRGB96_OF_ARUTF_RGB(_c)            ARRGB96( \
-                                            ARUTF_RGB_R(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUTF_RGB_G(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUTF_RGB_B(_c) * INTCOL_I32_OF_DBL \
-                                            )
-
-#define ARRGBA128_OF_ARUTF_RGB(_c)          ARRGBA128( \
-                                            ARUTF_RGB_R(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUTF_RGB_G(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUTF_RGB_B(_c) * INTCOL_I32_OF_DBL, \
+#define ARRGBA128_OF_ARFLOATRGB(_c)         ARRGBA128( \
+                                            ARFLOATRGB_R(_c) * INTCOL_I32_OF_DBL, \
+                                            ARFLOATRGB_G(_c) * INTCOL_I32_OF_DBL, \
+                                            ARFLOATRGB_B(_c) * INTCOL_I32_OF_DBL, \
                                             ART_UINT32_MAX \
                                             )
 
@@ -919,15 +834,13 @@
 // =====   ArRGBA   ==========================================================
 
 
-#define ARGREY_OF_ARRGBA(_c)                ARGREY_CS( \
-                                            ARRGBA_G(_c) , \
-                                            ARRGBA_S(_c) \
+#define ARGREY_OF_ARRGBA(_c)                ARGREY( \
+                                            ARRGBA_G(_c) \
                                             )
 
-#define ARGREYALPHA_OF_ARRGBA(_c)           ARGREYALPHA_CS( \
+#define ARGREYALPHA_OF_ARRGBA(_c)           ARGREYALPHA( \
                                             ARRGBA_G(_c), \
-                                            ARRGBA_A(_c), \
-                                            ARRGBA_S(_c) \
+                                            ARRGBA_A(_c) \
                                             )
 
 #define ARGREY8_OF_ARRGBA(_c)               ARGREY8( \
@@ -948,33 +861,26 @@
                                             ARRGBA_A(_c) * INTCOL_I16_OF_DBL \
                                             )
 
-#define ARRGB_OF_ARRGBA(_c)                 ARRGB_CS( \
-                                            ARRGBA_R(_c), \
-                                            ARRGBA_G(_c), \
-                                            ARRGBA_B(_c), \
-                                            ARRGBA_S(_c) \
-                                            )
-
-#define ARUT_RGB_OF_ARRGBA(_c)              ARUT_RGB( \
+#define ARRGB_OF_ARRGBA(_c)                 ARRGB( \
                                             ARRGBA_R(_c), \
                                             ARRGBA_G(_c), \
                                             ARRGBA_B(_c) \
                                             )
 
-#define ARUTF_RGB_OF_ARRGBA(_c)             ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARRGBA(_c)            ARFLOATRGB( \
                                             ARRGBA_R(_c), \
                                             ARRGBA_G(_c), \
                                             ARRGBA_B(_c) \
                                             )
 
-#define ARUT_RGBA_OF_ARRGBA(_c)             ARUT_RGBA( \
+#define ARRGBA_OF_ARRGBA(_c)                ARRGBA( \
                                             ARRGBA_R(_c), \
                                             ARRGBA_G(_c), \
                                             ARRGBA_B(_c), \
                                             ARRGBA_A(_c) \
                                             )
 
-#define ARUTF_RGBA_OF_ARRGBA(_c)            ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARRGBA(_c)           ARFLOATRGBA( \
                                             ARRGBA_R(_c), \
                                             ARRGBA_G(_c), \
                                             ARRGBA_B(_c), \
@@ -1021,207 +927,105 @@
                                             )
 
 
-// =====   ArUT_RGBA   =======================================================
+// =====   ArFLOATRGBA   ======================================================
 
 
-#define ARGREY_OF_ARUT_RGBA(_c)             ARGREY( \
-                                            ARUT_RGBA_G(_c) \
+#define ARGREY_OF_ARFLOATRGBA(_c)           ARGREY( \
+                                            ARFLOATRGBA_G(_c) \
                                             )
 
-#define ARGREYALPHA_OF_ARUT_RGBA(_c)        ARGREYALPHA( \
-                                            ARUT_RGBA_G(_c), \
-                                            ARUT_RGBA_A(_c) \
+#define ARGREYALPHA_OF_ARFLOATRGBA(_c)      ARGREYALPHA( \
+                                            ARFLOATRGBA_G(_c), \
+                                            ARFLOATRGBA_A(_c) \
                                             )
 
-#define ARGREY8_OF_ARUT_RGBA(_c)            ARGREY8( \
-                                            ARUT_RGBA_G(_c) * INTCOL_I8_OF_DBL \
+#define ARGREY8_OF_ARFLOATRGBA(_c)          ARGREY8( \
+                                            ARFLOATRGBA_G(_c) * INTCOL_I8_OF_DBL \
                                             )
 
-#define ARGREY16_OF_ARUT_RGBA(_c)           ARGREY16( \
-                                            ARUT_RGBA_G(_c) * INTCOL_I16_OF_DBL \
+#define ARGREY16_OF_ARFLOATRGBA(_c)         ARGREY16( \
+                                            ARFLOATRGBA_G(_c) * INTCOL_I16_OF_DBL \
                                             )
 
-#define ARGREYALPHA16_OF_ARUT_RGBA(_c)      ARGREYALPHA16( \
-                                            ARUT_RGB_G(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUT_RGB_A(_c) * INTCOL_I8_OF_DBL \
+#define ARGREYALPHA16_OF_ARFLOATRGBA(_c)    ARGREYALPHA16( \
+                                            ARFLOATRGB_G(_c) * INTCOL_I8_OF_DBL, \
+                                            ARFLOATRGB_A(_c) * INTCOL_I8_OF_DBL \
                                             )
 
-#define ARGREYALPHA32_OF_ARUT_RGBA(_c)      ARGREYALPHA32( \
-                                            ARUT_RGB_G(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUT_RGB_A(_c) * INTCOL_I16_OF_DBL \
+#define ARGREYALPHA32_OF_ARFLOATRGBA(_c)    ARGREYALPHA32( \
+                                            ARFLOATRGB_G(_c) * INTCOL_I16_OF_DBL, \
+                                            ARFLOATRGB_A(_c) * INTCOL_I16_OF_DBL \
                                             )
 
-#define ARRGB_OF_ARUT_RGBA(_c)              ARRGB( \
-                                            ARUT_RGBA_R(_c), \
-                                            ARUT_RGBA_G(_c), \
-                                            ARUT_RGBA_B(_c) \
+#define ARRGB_OF_ARFLOATRGBA(_c)            ARRGB( \
+                                            ARFLOATRGBA_R(_c), \
+                                            ARFLOATRGBA_G(_c), \
+                                            ARFLOATRGBA_B(_c) \
                                             )
 
-#define ARUT_RGB_OF_ARUT_RGBA(_c)           ARUT_RGB( \
-                                            ARUT_RGBA_R(_c), \
-                                            ARUT_RGBA_G(_c), \
-                                            ARUT_RGBA_B(_c) \
+#define ARRGB_OF_ARFLOATRGBA(_c)            ARRGB( \
+                                            ARFLOATRGBA_R(_c), \
+                                            ARFLOATRGBA_G(_c), \
+                                            ARFLOATRGBA_B(_c) \
                                             )
 
-#define ARUTF_RGB_OF_ARUT_RGBA(_c)          ARUTF_RGB( \
-                                            ARUT_RGBA_R(_c), \
-                                            ARUT_RGBA_G(_c), \
-                                            ARUT_RGBA_B(_c) \
+#define ARFLOATRGB_OF_ARFLOATRGBA(_c)       ARFLOATRGB( \
+                                            ARFLOATRGBA_R(_c), \
+                                            ARFLOATRGBA_G(_c), \
+                                            ARFLOATRGBA_B(_c) \
                                             )
 
-#define ARRGBA_OF_ARUT_RGBA(_c)             ARRGBA( \
-                                            ARUT_RGBA_R(_c), \
-                                            ARUT_RGBA_G(_c), \
-                                            ARUT_RGBA_B(_c), \
-                                            ARUT_RGBA_A(_c) \
+#define ARRGBA_OF_ARFLOATRGBA(_c)           ARRGBA( \
+                                            ARFLOATRGBA_R(_c), \
+                                            ARFLOATRGBA_G(_c), \
+                                            ARFLOATRGBA_B(_c), \
+                                            ARFLOATRGBA_A(_c) \
                                             )
 
-#define ARUTF_RGBA_OF_ARUT_RGBA(_c)         ARUTF_RGBA( \
-                                            ARUT_RGBA_R(_c), \
-                                            ARUT_RGBA_G(_c), \
-                                            ARUT_RGBA_B(_c), \
-                                            ARUT_RGBA_A(_c) \
+#define ARRGBA_OF_ARFLOATRGBA(_c)           ARRGBA( \
+                                            ARFLOATRGBA_R(_c), \
+                                            ARFLOATRGBA_G(_c), \
+                                            ARFLOATRGBA_B(_c), \
+                                            ARFLOATRGBA_A(_c) \
                                             )
 
-#define ARRGB24_OF_ARUT_RGBA(_c)            ARRGB24( \
-                                            ARUT_RGBA_R(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUT_RGBA_G(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUT_RGBA_B(_c) * INTCOL_I8_OF_DBL \
+#define ARRGB24_OF_ARFLOATRGBA(_c)          ARRGB24( \
+                                            ARFLOATRGBA_R(_c) * INTCOL_I8_OF_DBL, \
+                                            ARFLOATRGBA_G(_c) * INTCOL_I8_OF_DBL, \
+                                            ARFLOATRGBA_B(_c) * INTCOL_I8_OF_DBL \
                                             )
 
-#define ARRGBA32_OF_ARUT_RGBA(_c)           ARRGBA32( \
-                                            ARUT_RGBA_R(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUT_RGBA_G(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUT_RGBA_B(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUT_RGBA_A(_c) * INTCOL_I8_OF_DBL \
+#define ARRGBA32_OF_ARFLOATRGBA(_c)         ARRGBA32( \
+                                            ARFLOATRGBA_R(_c) * INTCOL_I8_OF_DBL, \
+                                            ARFLOATRGBA_G(_c) * INTCOL_I8_OF_DBL, \
+                                            ARFLOATRGBA_B(_c) * INTCOL_I8_OF_DBL, \
+                                            ARFLOATRGBA_A(_c) * INTCOL_I8_OF_DBL \
                                             )
 
-#define ARRGB48_OF_ARUT_RGBA(_c)            ARRGB48( \
-                                            ARUT_RGBA_R(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUT_RGBA_G(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUT_RGBA_B(_c) * INTCOL_I16_OF_DBL \
+#define ARRGB48_OF_ARFLOATRGBA(_c)          ARRGB48( \
+                                            ARFLOATRGBA_R(_c) * INTCOL_I16_OF_DBL, \
+                                            ARFLOATRGBA_G(_c) * INTCOL_I16_OF_DBL, \
+                                            ARFLOATRGBA_B(_c) * INTCOL_I16_OF_DBL \
                                             )
 
-#define ARRGBA64_OF_ARUT_RGBA(_c)           ARRGBA64( \
-                                            ARUT_RGBA_R(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUT_RGBA_G(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUT_RGBA_B(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUT_RGBA_A(_c) * INTCOL_I16_OF_DBL \
+#define ARRGBA64_OF_ARFLOATRGBA(_c)         ARRGBA64( \
+                                            ARFLOATRGBA_R(_c) * INTCOL_I16_OF_DBL, \
+                                            ARFLOATRGBA_G(_c) * INTCOL_I16_OF_DBL, \
+                                            ARFLOATRGBA_B(_c) * INTCOL_I16_OF_DBL, \
+                                            ARFLOATRGBA_A(_c) * INTCOL_I16_OF_DBL \
                                             )
 
-#define ARRGB96_OF_ARUT_RGBA(_c)            ARRGB96( \
-                                            ARUT_RGBA_R(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUT_RGBA_G(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUT_RGBA_B(_c) * INTCOL_I32_OF_DBL \
+#define ARRGB96_OF_ARFLOATRGBA(_c)          ARRGB96( \
+                                            ARFLOATRGBA_R(_c) * INTCOL_I32_OF_DBL, \
+                                            ARFLOATRGBA_G(_c) * INTCOL_I32_OF_DBL, \
+                                            ARFLOATRGBA_B(_c) * INTCOL_I32_OF_DBL \
                                             )
 
-#define ARRGBA128_OF_ARUT_RGBA(_c)          ARRGBA128( \
-                                            ARUT_RGBA_R(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUT_RGBA_G(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUT_RGBA_B(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUT_RGBA_A(_c) * INTCOL_I32_OF_DBL \
-                                            )
-
-
-// =====   ArUTF_RGBA   ======================================================
-
-
-#define ARGREY_OF_ARUTF_RGBA(_c)            ARGREY( \
-                                            ARUTF_RGBA_G(_c) \
-                                            )
-
-#define ARGREYALPHA_OF_ARUTF_RGBA(_c)       ARGREYALPHA( \
-                                            ARUTF_RGBA_G(_c), \
-                                            ARUTF_RGBA_A(_c) \
-                                            )
-
-#define ARGREY8_OF_ARUTF_RGBA(_c)           ARGREY8( \
-                                            ARUTF_RGBA_G(_c) * INTCOL_I8_OF_DBL \
-                                            )
-
-#define ARGREY16_OF_ARUTF_RGBA(_c)          ARGREY16( \
-                                            ARUTF_RGBA_G(_c) * INTCOL_I16_OF_DBL \
-                                            )
-
-#define ARGREYALPHA16_OF_ARUTF_RGBA(_c)     ARGREYALPHA16( \
-                                            ARUTF_RGB_G(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUTF_RGB_A(_c) * INTCOL_I8_OF_DBL \
-                                            )
-
-#define ARGREYALPHA32_OF_ARUTF_RGBA(_c)     ARGREYALPHA32( \
-                                            ARUTF_RGB_G(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUTF_RGB_A(_c) * INTCOL_I16_OF_DBL \
-                                            )
-
-#define ARRGB_OF_ARUTF_RGBA(_c)             ARRGB( \
-                                            ARUTF_RGBA_R(_c), \
-                                            ARUTF_RGBA_G(_c), \
-                                            ARUTF_RGBA_B(_c) \
-                                            )
-
-#define ARUT_RGB_OF_ARUTF_RGBA(_c)          ARUT_RGB( \
-                                            ARUTF_RGBA_R(_c), \
-                                            ARUTF_RGBA_G(_c), \
-                                            ARUTF_RGBA_B(_c) \
-                                            )
-
-#define ARUTF_RGB_OF_ARUTF_RGBA(_c)         ARUTF_RGB( \
-                                            ARUTF_RGBA_R(_c), \
-                                            ARUTF_RGBA_G(_c), \
-                                            ARUTF_RGBA_B(_c) \
-                                            )
-
-#define ARRGBA_OF_ARUTF_RGBA(_c)            ARRGBA( \
-                                            ARUTF_RGBA_R(_c), \
-                                            ARUTF_RGBA_G(_c), \
-                                            ARUTF_RGBA_B(_c), \
-                                            ARUTF_RGBA_A(_c) \
-                                            )
-
-#define ARUT_RGBA_OF_ARUTF_RGBA(_c)         ARUT_RGBA( \
-                                            ARUTF_RGBA_R(_c), \
-                                            ARUTF_RGBA_G(_c), \
-                                            ARUTF_RGBA_B(_c), \
-                                            ARUTF_RGBA_A(_c) \
-                                            )
-
-#define ARRGB24_OF_ARUTF_RGBA(_c)           ARRGB24( \
-                                            ARUTF_RGBA_R(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUTF_RGBA_G(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUTF_RGBA_B(_c) * INTCOL_I8_OF_DBL \
-                                            )
-
-#define ARRGBA32_OF_ARUTF_RGBA(_c)          ARRGBA32( \
-                                            ARUTF_RGBA_R(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUTF_RGBA_G(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUTF_RGBA_B(_c) * INTCOL_I8_OF_DBL, \
-                                            ARUTF_RGBA_A(_c) * INTCOL_I8_OF_DBL \
-                                            )
-
-#define ARRGB48_OF_ARUTF_RGBA(_c)           ARRGB48( \
-                                            ARUTF_RGBA_R(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUTF_RGBA_G(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUTF_RGBA_B(_c) * INTCOL_I16_OF_DBL \
-                                            )
-
-#define ARRGBA64_OF_ARUTF_RGBA(_c)          ARRGBA64( \
-                                            ARUTF_RGBA_R(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUTF_RGBA_G(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUTF_RGBA_B(_c) * INTCOL_I16_OF_DBL, \
-                                            ARUTF_RGBA_A(_c) * INTCOL_I16_OF_DBL \
-                                            )
-
-#define ARRGB96_OF_ARUTF_RGBA(_c)           ARRGB96( \
-                                            ARUTF_RGBA_R(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUTF_RGBA_G(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUTF_RGBA_B(_c) * INTCOL_I32_OF_DBL \
-                                            )
-
-#define ARRGBA128_OF_ARUTF_RGBA(_c)         ARRGBA128( \
-                                            ARUTF_RGBA_R(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUTF_RGBA_G(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUTF_RGBA_B(_c) * INTCOL_I32_OF_DBL, \
-                                            ARUTF_RGBA_A(_c) * INTCOL_I32_OF_DBL \
+#define ARRGBA128_OF_ARFLOATRGBA(_c)        ARRGBA128( \
+                                            ARFLOATRGBA_R(_c) * INTCOL_I32_OF_DBL, \
+                                            ARFLOATRGBA_G(_c) * INTCOL_I32_OF_DBL, \
+                                            ARFLOATRGBA_B(_c) * INTCOL_I32_OF_DBL, \
+                                            ARFLOATRGBA_A(_c) * INTCOL_I32_OF_DBL \
                                             )
 
 
@@ -1255,26 +1059,26 @@
                                             ART_UINT16_MAX \
                                             )
 
-#define ARUT_RGB_OF_ARRGB24(_c)             ARUT_RGB( \
+#define ARRGB_OF_ARRGB24(_c)                ARRGB( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I8 \
                                             )
 
-#define ARUTF_RGB_OF_ARRGB24(_c)            ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARRGB24(_c)           ARFLOATRGB( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I8 \
                                             )
 
-#define ARUT_RGBA_OF_ARRGB24(_c)            ARUT_RGBA( \
+#define ARRGBA_OF_ARRGB24(_c)               ARRGBA( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I8, \
                                             1.0 \
                                             )
 
-#define ARUTF_RGBA_OF_ARRGB24(_c)           ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARRGB24(_c)          ARFLOATRGBA( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I8, \
@@ -1345,26 +1149,26 @@
                                             ARRGBXX_A(_c) * INTCOL_I16_OF_I8 \
                                             )
 
-#define ARUT_RGB_OF_ARRGBA32(_c)            ARUT_RGB( \
+#define ARRGB_OF_ARRGBA32(_c)               ARRGB( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I8 \
                                             )
 
-#define ARUTF_RGB_OF_ARRGBA32(_c)           ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARRGBA32(_c)          ARFLOATRGB( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I8 \
                                             )
 
-#define ARUT_RGBA_OF_ARRGBA32(_c)           ARUT_RGBA( \
+#define ARRGBA_OF_ARRGBA32(_c)              ARRGBA( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_A(_c) * INTCOL_DBL_OF_I8 \
                                             )
 
-#define ARUTF_RGBA_OF_ARRGBA32(_c)          ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARRGBA32(_c)         ARFLOATRGBA( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I8, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I8, \
@@ -1434,26 +1238,26 @@
                                             ART_UINT16_MAX \
                                             )
 
-#define ARUT_RGB_OF_ARRGB48(_c)             ARUT_RGB( \
+#define ARRGB_OF_ARRGB48(_c)                ARRGB( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I16 \
                                             )
 
-#define ARUTF_RGB_OF_ARRGB48(_c)            ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARRGB48(_c)           ARFLOATRGB( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I16 \
                                             )
 
-#define ARUT_RGBA_OF_ARRGB48(_c)            ARUT_RGBA( \
+#define ARRGBA_OF_ARRGB48(_c)               ARRGBA( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I16, \
                                             1.0 \
                                             )
 
-#define ARUTF_RGBA_OF_ARRGB48(_c)           ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARRGB48(_c)          ARFLOATRGBA( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I16, \
@@ -1524,26 +1328,26 @@
                                             ARRGBXX_A(_c) \
                                             )
 
-#define ARUT_RGB_OF_ARRGBA64(_c)            ARUT_RGB( \
+#define ARRGB_OF_ARRGBA64(_c)               ARRGB( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I16 \
                                             )
 
-#define ARUTF_RGB_OF_ARRGBA64(_c)           ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARRGBA64(_c)          ARFLOATRGB( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I16 \
                                             )
 
-#define ARUT_RGBA_OF_ARRGBA64(_c)           ARUT_RGBA( \
+#define ARRGBA_OF_ARRGBA64(_c)              ARRGBA( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_A(_c) * INTCOL_DBL_OF_I16 \
                                             )
 
-#define ARUTF_RGBA_OF_ARRGBA64(_c)          ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARRGBA64(_c)         ARFLOATRGBA( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I16, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I16, \
@@ -1613,25 +1417,25 @@
                                             ART_UINT16_MAX \
                                             )
 
-#define ARUT_RGB_OF_ARRGB96(_c)             ARUT_RGB( \
+#define ARRGB_OF_ARRGB96(_c)                ARRGB( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I32 \
                                             )
 
-#define ARUTF_RGB_OF_ARRGB96(_c)            ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARRGB96(_c)           ARFLOATRGB( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I32 \
                                             )
 
-#define ARUT_RGBA_OF_ARRGB96(_c)            ARUT_RGBA( \
+#define ARRGBA_OF_ARRGB96(_c)               ARRGBA( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I32, \
                                             1.0 )
 
-#define ARUTF_RGBA_OF_ARRGB96(_c)           ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARRGB96(_c)          ARFLOATRGBA( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I32, \
@@ -1701,26 +1505,26 @@
                                             ARRGBXX_A(_c) * INTCOL_I16_OF_I32 \
                                             )
 
-#define ARUT_RGB_OF_ARRGBA128(_c)           ARUT_RGB( \
+#define ARRGB_OF_ARRGBA128(_c)              ARRGB( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I32 \
                                             )
 
-#define ARUTF_RGB_OF_ARRGBA128(_c)          ARUTF_RGB( \
+#define ARFLOATRGB_OF_ARRGBA128(_c)          ARFLOATRGB( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I32 \
                                             )
 
-#define ARUT_RGBA_OF_ARRGBA128(_c)          ARUT_RGBA( \
+#define ARRGBA_OF_ARRGBA128(_c)             ARRGBA( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_A(_c) * INTCOL_DBL_OF_I32 \
                                             )
 
-#define ARUTF_RGBA_OF_ARRGBA128(_c)         ARUTF_RGBA( \
+#define ARFLOATRGBA_OF_ARRGBA128(_c)        ARFLOATRGBA( \
                                             ARRGBXX_R(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_G(_c) * INTCOL_DBL_OF_I32, \
                                             ARRGBXX_B(_c) * INTCOL_DBL_OF_I32, \

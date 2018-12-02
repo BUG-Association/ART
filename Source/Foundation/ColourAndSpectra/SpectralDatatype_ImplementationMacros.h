@@ -32,7 +32,7 @@
 #include "ColourAndSpectralDataConversion.h"
 #include "FoundationAssertionMacros.h"
 
-#define CANONICAL_GV_FOR_ISR_WITH_ADDITIONAL_FIELD(_Type,_fieldType,_fieldName) \
+#define CANONICAL_GV_FOR_ISR_WITH_ADDITIONAL_FIELDS(_Type,_fieldDefinitions) \
 \
 typedef struct _Type##_GV \
 { \
@@ -50,12 +50,12 @@ typedef struct _Type##_GV \
     char          * shortname_string; \
     char          * typename_string; \
     char          * description_string; \
-    _fieldType      _fieldName;\
+    _fieldDefinitions\
 } \
 _Type##_GV;
 
 #define CANONICAL_GV_FOR_ISR(_Type) \
-    CANONICAL_GV_FOR_ISR_WITH_ADDITIONAL_FIELD(_Type,,)
+    CANONICAL_GV_FOR_ISR_WITH_ADDITIONAL_FIELDS(_Type,)
 
 /* ---------------------------------------------------------------------------
 
@@ -391,15 +391,15 @@ void switch_isr_to_##_typeShort( \
     art_gv->arspectrum_gv->_acf_##_vtype##_to_rgb = \
         ( void (*) ( const ART_GV *, const void *, ArRGB * ) ) \
         _typeShort##_to_rgb;\
-    art_gv->arspectrum_gv->_acf_##_vtype##_to_ut_rgb = \
-        ( void (*) ( const ART_GV *, const void *, ArUT_RGB * ) ) \
-        _typeShort##_to_ut_rgb;\
+    art_gv->arspectrum_gv->_acf_##_vtype##_to_rgb = \
+        ( void (*) ( const ART_GV *, const void *, ArRGB * ) ) \
+        _typeShort##_to_rgb;\
     art_gv->arspectrum_gv->_acf_##_vtype##_to_rgba = \
         ( void (*) ( const ART_GV *, const void *, ArRGBA * ) ) \
         _typeShort##_to_rgba;\
-    art_gv->arspectrum_gv->_acf_##_vtype##_to_ut_rgba = \
-        ( void (*) ( const ART_GV *, const void *, ArUT_RGBA * ) ) \
-        _typeShort##_to_ut_rgba;\
+    art_gv->arspectrum_gv->_acf_##_vtype##_to_rgba = \
+        ( void (*) ( const ART_GV *, const void *, ArRGBA * ) ) \
+        _typeShort##_to_rgba;\
     art_gv->arspectrum_gv->_acf_##_vtype##_to_rgb24 = \
         ( void (*) ( const ART_GV *, const void *, ArRGB24 * ) ) \
         _typeShort##_to_rgb24;\
@@ -458,15 +458,15 @@ void switch_isr_to_##_typeShort( \
     art_gv->arspectrum_gv->_acf_rgb_to_##_vtype = \
         ( void (*) ( const ART_GV *, const ArRGB * , void * ) ) \
         rgb_to_##_typeShort;\
-    art_gv->arspectrum_gv->_acf_ut_rgb_to_##_vtype = \
-        ( void (*) ( const ART_GV *, const ArUT_RGB * , void * ) ) \
-        ut_rgb_to_##_typeShort;\
+    art_gv->arspectrum_gv->_acf_rgb_to_##_vtype = \
+        ( void (*) ( const ART_GV *, const ArRGB * , void * ) ) \
+        rgb_to_##_typeShort;\
     art_gv->arspectrum_gv->_acf_rgba_to_##_vtype = \
         ( void (*) ( const ART_GV *, const ArRGBA * , void * ) ) \
         rgba_to_##_typeShort;\
-    art_gv->arspectrum_gv->_acf_ut_rgba_to_##_vtype = \
-        ( void (*) ( const ART_GV *, const ArUT_RGBA * , void * ) ) \
-        ut_rgba_to_##_typeShort;\
+    art_gv->arspectrum_gv->_acf_rgba_to_##_vtype = \
+        ( void (*) ( const ART_GV *, const ArRGBA * , void * ) ) \
+        rgba_to_##_typeShort;\
     art_gv->arspectrum_gv->_acf_rgb24_to_##_vtype = \
         ( void (*) ( const ART_GV *, const ArRGB24 * , void * ) ) \
         rgb24_to_##_typeShort;\

@@ -134,14 +134,18 @@ typedef struct ART_GV
     
     struct ArSpectrum_GV                * arspectrum_gv;
     struct ArSpectralSample_GV          * arspectralsample_gv;
-    struct ArCIEColourValues_GV         * arciecolourvalues_gv;
+    struct ArCIExy_GV                   * arciexy_gv;
+    struct ArCIExyY_GV                  * arciexyy_gv;
+    struct ArCIEXYZ_GV                  * arciexyz_gv;
+    struct ArCIELab_GV                  * arcielab_gv;
+    struct ArCIELuv_GV                  * arcieluv_gv;
     struct ArCIEColourConversions_GV    * arciecolourconversions_gv;
     struct ArColourSpace_GV             * arcolourspace_gv;
+    struct SystemWhitepoint_GV          * systemwhitepoint_gv;
     struct ArCMF_GV                     * arcmf_gv;
+    struct ArGrey_GV                    * argrey_gv;
     struct ArRGB_GV                     * arrgb_gv;
     struct ArRGBA_GV                    * arrgba_gv;
-    struct ArGrey_GV                    * argrey_gv;
-    struct ArUT_RGB_GV                  * arut_rgb_gv;
     struct ArSpectrum8_GV               * arspectrum8_gv;
     struct ArSpectrum11_GV              * arspectrum11_gv;
     struct ArSpectrum18_GV              * arspectrum18_gv;

@@ -24,43 +24,42 @@
 
 =========================================================================== */
 
-#define ART_MODULE_NAME     ArRGBA
+#ifndef _ART_FOUNDATION_COLOURANDSPECTRA_ARCIEXYZA_H_
+#define _ART_FOUNDATION_COLOURANDSPECTRA_ARCIEXYZA_H_
 
-#include "ArRGBA.h"
+#include "ART_Foundation_System.h"
+#include "ART_Foundation_Math.h"
+#include "ArCIEXYZ.h"
 
-ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
+ART_MODULE_INTERFACE(ArCIEXYZA)
 
-ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-void rgba_s_debugprintf(
+typedef struct ArCIEXYZA
+{
+    ArCIEXYZ  xyz;
+    double    alpha;
+}
+ArCIEXYZA;
+
+#define ARCIEXYZA_C(_c)         (_c).xyz
+#define ARCIEXYZA_A(_c)         (_c).alpha
+#define ARCIEXYZA_CI(_c,_i)     ARCIEXYZ_CI( ARCIEXYZA_C(_c), (_i) )
+
+#define ARCIEXYZA_X(_c)         ARCIEXYZ_X(ARCIEXYZA_C(_c))
+#define ARCIEXYZA_Y(_c)         ARCIEXYZ_Y(ARCIEXYZA_C(_c))
+#define ARCIEXYZA_Z(_c)         ARCIEXYZ_Z(ARCIEXYZA_C(_c))
+
+#define ARCIEXYZA(_X,_Y,_Z,_A)  ((ArCIEXYZA){ ARCIEXYZ( (_X), (_Y), (_Z) ), (_A) })
+#define ARCIEXYZA_GREY(_g)      ARCIEXYZA( (_g), (_g), (_g), 1.0 )
+
+#define ARCIEXYZA_FORMAT(_form) "ARCIEXYZA(" _form "," _form "," _form "," _form ")"
+#define ARCIEXYZA_PRINTF(_c)    ARCIEXYZA_X(_c),ARCIEXYZA_Y(_c),ARCIEXYZA_Z(_c),ARCIEXYZA_A(_c)
+#define ARCIEXYZA_SCANF(_c)     &ARCIEXYZA_X(_c),&ARCIEXYZA_Y(_c),&ARCIEXYZA_Z(_c),&ARCIEXYZA_A(_c)
+
+void xyza_c_debugprintf(
         const ART_GV     * art_gv,
-        const ArRGBA  * c_0
-        )
-{
-    printf( "ArRGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
-        ARRGBA_R(*c_0),
-        ARRGBA_G(*c_0),
-        ARRGBA_B(*c_0),
-        ARRGBA_A(*c_0)
+        const ArCIEXYZA  * c_0
         );
 
-    fflush(stdout);
-}
-
-void frgba_s_debugprintf(
-        const ART_GV      * art_gv,
-        const ArFloatRGBA  * c_0
-        )
-{
-    printf( "ArUTF_RGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
-        ARRGBA_R(*c_0),
-        ARRGBA_G(*c_0),
-        ARRGBA_B(*c_0),
-        ARRGBA_A(*c_0)
-        );
-
-    fflush(stdout);
-}
-
-
+#endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARCIEXYZA_H_ */
 /* ======================================================================== */

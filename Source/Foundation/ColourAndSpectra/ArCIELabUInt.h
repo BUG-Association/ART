@@ -24,43 +24,32 @@
 
 =========================================================================== */
 
-#define ART_MODULE_NAME     ArRGBA
+#ifndef _ART_FOUNDATION_COLOURANDSPECTRA_ARCIELABUINT_H_
+#define _ART_FOUNDATION_COLOURANDSPECTRA_ARCIELABUINT_H_
 
-#include "ArRGBA.h"
+#include "ART_Foundation_Math.h"
 
-ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
+#include "ArRGBUInt.h"
 
-ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
+ART_MODULE_INTERFACE(ArCIELabUInt)
 
-void rgba_s_debugprintf(
-        const ART_GV     * art_gv,
-        const ArRGBA  * c_0
-        )
-{
-    printf( "ArRGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
-        ARRGBA_R(*c_0),
-        ARRGBA_G(*c_0),
-        ARRGBA_B(*c_0),
-        ARRGBA_A(*c_0)
-        );
+//  This module was created because there is an integer L*a*b* mode
+//  of TIFF images. Which we don't currently use - but if we ever get around
+//  to adding this, the data types are already here. ;)
 
-    fflush(stdout);
-}
+typedef  ArRGB24  ArCIELab24;
+typedef  ArRGB48  ArCIELab48;
 
-void frgba_s_debugprintf(
-        const ART_GV      * art_gv,
-        const ArFloatRGBA  * c_0
-        )
-{
-    printf( "ArUTF_RGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
-        ARRGBA_R(*c_0),
-        ARRGBA_G(*c_0),
-        ARRGBA_B(*c_0),
-        ARRGBA_A(*c_0)
-        );
+#define ARCIELab24(_L,_a,_b)    ((ArCIELab24){{ (_L), (_a), (_b) }})
+#define ARCIELab48(_L,_a,_b)    ((ArCIELab48){{ (_L), (_a), (_b) }})
 
-    fflush(stdout);
-}
+#define ARCIELab24_L(_c)        ((_c).c[0])
+#define ARCIELab24_a(_c)        ((_c).c[1])
+#define ARCIELab24_b(_c)        ((_c).c[2])
 
+#define ARCIELab48_L            ARCIELab24_L
+#define ARCIELab48_a            ARCIELab24_a
+#define ARCIELab48_b            ARCIELab24_b
 
+#endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARCIELABUINT_H_ */
 /* ======================================================================== */

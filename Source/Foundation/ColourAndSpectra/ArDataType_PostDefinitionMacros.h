@@ -33,7 +33,6 @@
 #undef XYZA
 #undef SPC
 
-#undef UT
 #undef POL
 #undef NEG
 #undef PM

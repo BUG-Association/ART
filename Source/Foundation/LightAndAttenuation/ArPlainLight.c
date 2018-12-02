@@ -185,54 +185,61 @@ void arplainlight_ws_add_l(
     ASSERT_VALID_SPECTRUMTYPE( sps, ArSpectralSample, s0, s )
     ASSERT_VALID_SPECTRUM( lr )
 
-    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+    if ( art_foundation_isr(art_gv) == ardt_xyz )
     {
-        ASSERT_DOUBLE_LARGER_THAN(
-            NANO_FROM_UNIT(ARWL_WI(*w0,i)),
-            sd->s500_range_start
-            )
-        
-        ASSERT_DOUBLE_LESS_THAN(
-            NANO_FROM_UNIT(ARWL_WI(*w0,i)),
-            sd->s500_range_end
-            )
-        
-        unsigned int  s500_index =
-            (unsigned int)(   NANO_FROM_UNIT(ARWL_WI(*w0,i))
-                            - sd->s500_range_start );
-
-        if ( sd->splatChannel0[s500_index] != INVALID_SPLAT_CHANNEL)
+    
+    }
+    else
+    {
+        for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
         {
-            double  temp =
-                arplainlight_li(
+            ASSERT_DOUBLE_LARGER_THAN(
+                NANO_FROM_UNIT(ARWL_WI(*w0,i)),
+                sd->s500_range_start
+                )
+            
+            ASSERT_DOUBLE_LESS_THAN(
+                NANO_FROM_UNIT(ARWL_WI(*w0,i)),
+                sd->s500_range_end
+                )
+            
+            unsigned int  s500_index =
+                (unsigned int)(   NANO_FROM_UNIT(ARWL_WI(*w0,i))
+                                - sd->s500_range_start );
+
+            if ( sd->splatChannel0[s500_index] != INVALID_SPLAT_CHANNEL)
+            {
+                double  temp =
+                    arplainlight_li(
+                          art_gv,
+                          lr,
+                          sd->splatChannel0[s500_index]
+                        );
+
+                arplainlight_set_lid(
                       art_gv,
                       lr,
-                      sd->splatChannel0[s500_index]
+                      sd->splatChannel0[s500_index],
+                      temp + SPS_CI(*s0, i) * sd->splatFactor0[s500_index]
                     );
+            }
 
-            arplainlight_set_lid(
-                  art_gv,
-                  lr,
-                  sd->splatChannel0[s500_index],
-                  temp + SPS_CI(*s0, i) * sd->splatFactor0[s500_index]
-                );
-        }
+            if ( sd->splatChannel1[s500_index] != INVALID_SPLAT_CHANNEL)
+            {
+                double  temp =
+                    arplainlight_li(
+                          art_gv,
+                          lr,
+                          sd->splatChannel1[s500_index]
+                        );
 
-        if ( sd->splatChannel1[s500_index] != INVALID_SPLAT_CHANNEL)
-        {
-            double  temp =
-                arplainlight_li(
+                arplainlight_set_lid(
                       art_gv,
                       lr,
-                      sd->splatChannel1[s500_index]
+                      sd->splatChannel1[s500_index],
+                      temp + SPS_CI(*s0, i) * sd->splatFactor1[s500_index]
                     );
-
-            arplainlight_set_lid(
-                  art_gv,
-                  lr,
-                  sd->splatChannel1[s500_index],
-                  temp + SPS_CI(*s0, i) * sd->splatFactor1[s500_index]
-                );
+            }
         }
     }
 }

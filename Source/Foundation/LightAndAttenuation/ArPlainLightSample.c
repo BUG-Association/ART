@@ -160,9 +160,9 @@ void arplainlightsample_lld_sloppy_add_l(
 void arplainlightsample_dld_mul_sloppy_add_l(
         const ART_GV                * art_gv,
         const double                  d0,
-        const ArPlainLightSample      * l0,
+        const ArPlainLightSample    * l0,
         const double                  d1,
-              ArPlainLightSample      * lr
+              ArPlainLightSample    * lr
         )
 {
     arplainlightsample_dl_mul_add_l(

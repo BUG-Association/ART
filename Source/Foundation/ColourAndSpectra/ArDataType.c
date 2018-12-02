@@ -26,7 +26,8 @@
 
 #include "ArDataType.h"
 
-#include "ArUntaggedRGB.h"
+#include "ArCIEXYZ.h"
+#include "ArRGB.h"
 #include "ArSpectrum8.h"
 #include "ArSpectrum11.h"
 #include "ArSpectrum18.h"
@@ -68,23 +69,23 @@ const ArDataTypeMap spectrumTypeMap[] =
     { ardt_rgba64_plusminus      , "ardt_rgba64_plusminus" },
     { ardt_rgb96                 , "ardt_rgb96" },
     
-    { ardt_ut_rgb                , "ardt_ut_rgb" },
-    { ardt_ut_rgb_polarisable    , "ardt_ut_rgb_polarisable" },
+    { ardt_rgb                   , "ardt_rgb" },
+    { ardt_rgb_polarisable       , "ardt_rgb_polarisable" },
     { ardt_frgb                  , "ardt_frgb" },
     { ardt_rgb                   , "ardt_rgb" },
-    { ardt_ut_rgba               , "ardt_ut_rgba" },
-    { ardt_ut_rgba_polarisable   , "ardt_ut_rgba_polarisable" },
+    { ardt_rgba                  , "ardt_rgba" },
+    { ardt_rgba_polarisable      , "ardt_rgba_polarisable" },
     { ardt_frgba                 , "ardt_frgba" },
     { ardt_rgba                  , "ardt_rgba" },
 
-    { ardt_ut_xyz                , "ardt_ut_xyz" },
-    { ardt_ut_xyz_polarisable    , "ardt_ut_xyz_polarisable" },
-    { ardt_fciexyz               , "ardt_fciexyz" },
-    { ardt_ciexyz                , "ardt_ciexyz" },
-    { ardt_ut_xyza               , "ardt_ut_xyza" },
-    { ardt_ut_xyza_polarisable   , "ardt_ut_xyza_polarisable" },
-    { ardt_fciexyza              , "ardt_fciexyza" },
-    { ardt_ciexyza               , "ardt_ciexyza" },
+    { ardt_xyz                   , "ardt_xyz" },
+    { ardt_xyz_polarisable       , "ardt_xyz_polarisable" },
+    { ardt_fxyz                  , "ardt_fxyz" },
+    { ardt_xyz                   , "ardt_xyz" },
+    { ardt_xyza                  , "ardt_xyza" },
+    { ardt_xyza_polarisable      , "ardt_xyza_polarisable" },
+    { ardt_fxyza                 , "ardt_fxyza" },
+    { ardt_xyza                  , "ardt_xyza" },
 
     { ardt_fspectrum8            , "ardt_fspectrum8" },
     { ardt_spectrum8             , "ardt_spectrum8" },
@@ -125,9 +126,9 @@ const char * ardatatype_long_name_string(
 {
     switch ( dataType )
     {
-        case ardt_ut_xyz:
-        case ardt_ut_xyz_polarisable:
-            return ut_rgb_typename_string(art_gv);
+        case ardt_xyz:
+        case ardt_xyz_polarisable:
+            return rgb_typename_string(art_gv);
             break;
 
         case ardt_spectrum8:
@@ -177,10 +178,10 @@ ArDataType ardatatype_from_string(
     ArDataType  result = ardt_unknown;
     
     if ( strcmp( datatype_string, "csp" ) == 0 )
-        result = ardt_ut_xyz;
+        result = ardt_xyz;
 
     if ( strcmp( datatype_string, "xyz" ) == 0 )
-        result = ardt_ut_xyz;
+        result = ardt_xyz;
 
     if ( strcmp( datatype_string, "s8v" ) == 0 )
         result = ardt_spectrum8;

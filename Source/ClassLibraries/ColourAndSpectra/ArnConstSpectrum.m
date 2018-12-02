@@ -39,17 +39,16 @@ ArnColour_GV;
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
-    [ ArnValConstSpectrum     registerWithRuntime ];
+    [ ArnValConstSpectrum       registerWithRuntime ];
 
-    [ ArnVal_const_g        registerWithRuntime ];
-    [ ArnVal_const_rgb      registerWithRuntime ];
-    [ ArnVal_const_utf_rgb  registerWithRuntime ];
-    [ ArnVal_const_xyz      registerWithRuntime ];
-    [ ArnVal_const_s8       registerWithRuntime ];
-    [ ArnVal_const_s18      registerWithRuntime ];
-    [ ArnVal_const_s46      registerWithRuntime ];
-    [ ArnVal_const_pss      registerWithRuntime ];
-    [ ArnVal_const_rss      registerWithRuntime ];
+    [ ArnVal_const_g            registerWithRuntime ];
+    [ ArnVal_const_rgb          registerWithRuntime ];
+    [ ArnVal_const_xyz          registerWithRuntime ];
+    [ ArnVal_const_s8           registerWithRuntime ];
+    [ ArnVal_const_s18          registerWithRuntime ];
+    [ ArnVal_const_s46          registerWithRuntime ];
+    [ ArnVal_const_pss          registerWithRuntime ];
+    [ ArnVal_const_rss          registerWithRuntime ];
 
     ArnColour_GV  * arncolour_gv;
 
@@ -168,16 +167,15 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnValConstSpectrum)
 
 @end
 
-ARNVAL_CONST_COLOUR_IMPL(Grey,       g,   g);
-ARNVAL_CONST_COLOUR_IMPL(RGB,        rgb, rgb);
-ARNVAL_CONST_COLOUR_IMPL(UTF_RGB,    utf_rgb, utf_rgb);
-ARNVAL_CONST_COLOUR_IMPL(CIEXYZ,     xyz, xyz);
-ARNVAL_CONST_COLOUR_IMPL(Spectrum8,  s8,  s8);
-ARNVAL_CONST_COLOUR_IMPL(Spectrum18, s18, s18);
-ARNVAL_CONST_COLOUR_IMPL(Spectrum46, s46, s46);
-ARNVAL_CONST_COLOUR_IMPL(PSSpectrum, pss, pss);
-ARNVAL_CONST_COLOUR_IMPL(RSSpectrum, rss, rss);
-ARNVAL_CONST_COLOUR_IMPL(RSSpectrum, rss, archive_rss);
+ARNVAL_CONST_COLOUR_IMPL(Grey,       g,    g);
+ARNVAL_CONST_COLOUR_IMPL(RGB,        rgb,  rgb);
+ARNVAL_CONST_COLOUR_IMPL(CIEXYZ,     xyz,  xyz);
+ARNVAL_CONST_COLOUR_IMPL(Spectrum8,  s8,   s8);
+ARNVAL_CONST_COLOUR_IMPL(Spectrum18, s18,  s18);
+ARNVAL_CONST_COLOUR_IMPL(Spectrum46, s46,  s46);
+ARNVAL_CONST_COLOUR_IMPL(PSSpectrum, pss,  pss);
+ARNVAL_CONST_COLOUR_IMPL(RSSpectrum, rss,  rss);
+ARNVAL_CONST_COLOUR_IMPL(RSSpectrum, rss,  archive_rss);
 
 @implementation ArnVal_const_archive_rss (archiveData)
 

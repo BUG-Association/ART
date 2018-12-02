@@ -34,7 +34,8 @@
 
 #include "SpectralDatatype_InterfaceMacros.h"
 
-SWITCHING_INTERFACE_FOR_ISR( ArUT_RGB, ut_rgb );
+SWITCHING_INTERFACE_FOR_ISR( ArRGB, rgb );
+SWITCHING_INTERFACE_FOR_ISR( ArXYZ, xyz );
 SWITCHING_INTERFACE_FOR_ISR( ArSpectrum8, s8 );
 SWITCHING_INTERFACE_FOR_ISR( ArSpectrum11, s11 );
 SWITCHING_INTERFACE_FOR_ISR( ArSpectrum18, s18 );
@@ -47,9 +48,9 @@ void art_foundation_set_isr(
 {
     switch (isr)
     {
-        case ardt_ut_xyz:
-        case ardt_ut_xyz_polarisable:
-            switch_isr_to_ut_rgb( art_gv );
+        case ardt_xyz:
+        case ardt_xyz_polarisable:
+            switch_isr_to_xyz( art_gv );
             art_gv->arspectrum_gv->current_isr = isr;
             break;
 
@@ -86,7 +87,7 @@ void art_foundation_set_isr(
 }
 
 ArDataType  art_foundation_isr(
-        ART_GV  * art_gv
+        const ART_GV  * art_gv
         )
 {
     return
@@ -97,8 +98,6 @@ void art_foundation_initialise_spectral_subsystem(
         ART_GV  * art_gv
         )
 {
-    INITIALISE_COLOUR_MODULE( ArRGB );
-    INITIALISE_COLOUR_MODULE( ArRGBA );
     INITIALISE_COLOUR_MODULE( ArSpectrum );
 }
 

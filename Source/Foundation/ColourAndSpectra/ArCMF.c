@@ -505,7 +505,7 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     arcmf_gv->cie31_2deg_cmf = ALLOC(ArCMF);
 
-    ARCMF_RESULT_DATATYPE( *arcmf_gv->cie31_2deg_cmf  ) = ardt_ciexyz;
+    ARCMF_RESULT_DATATYPE( *arcmf_gv->cie31_2deg_cmf  ) = ardt_xyz;
     ARCMF_CURVES( *arcmf_gv->cie31_2deg_cmf  ) = ALLOC_ARRAY( ArPSSpectrum, 3 );
 
     rss_to_pss_new(
@@ -538,7 +538,7 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     arcmf_gv->cie06_2deg_cmf = ALLOC(ArCMF);
 
-    ARCMF_RESULT_DATATYPE( *arcmf_gv->cie06_2deg_cmf  ) = ardt_ciexyz;
+    ARCMF_RESULT_DATATYPE( *arcmf_gv->cie06_2deg_cmf  ) = ardt_xyz;
     ARCMF_CURVES( *arcmf_gv->cie06_2deg_cmf  ) = ALLOC_ARRAY( ArPSSpectrum, 3 );
 
     rss_to_pss_new(
@@ -568,8 +568,8 @@ ART_MODULE_INITIALISATION_FUNCTION
 
 //  You can switch ART to using the old CIE 1931 primaries here
 
-    arcmf_gv->default_cmf = arcmf_gv->cie06_2deg_cmf;
-//    arcmf_gv->default_cmf = arcmf_gv->cie31_2deg_cmf;
+//    arcmf_gv->default_cmf = arcmf_gv->cie06_2deg_cmf;
+    arcmf_gv->default_cmf = arcmf_gv->cie31_2deg_cmf;
 
     rss_to_s500(art_gv, &CIE_VLAMBDA_RSS, &arcmf_gv->vlambda500);
     art_gv->arcmf_gv = arcmf_gv;

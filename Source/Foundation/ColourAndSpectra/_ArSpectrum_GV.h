@@ -343,14 +343,8 @@ typedef struct ArSpectrum_GV
     void (* _acf_s_to_rgb)
     ( const ART_GV *, const void *, ArRGB * );
 
-    void (* _acf_s_to_ut_rgb)
-    ( const ART_GV *, const void *, ArUT_RGB * );
-
     void (* _acf_s_to_rgba)
     ( const ART_GV *, const void *, ArRGBA * );
-
-    void (* _acf_s_to_ut_rgba)
-    ( const ART_GV *, const void *, ArUT_RGBA * );
 
     void (* _acf_s_to_rgb24)
     ( const ART_GV *, const void *, ArRGB24 * );
@@ -418,14 +412,8 @@ typedef struct ArSpectrum_GV
     void (* _acf_rgb_to_s)
     ( const ART_GV *, const ArRGB *, void * );
 
-    void (* _acf_ut_rgb_to_s)
-    ( const ART_GV *, const ArUT_RGB *, void * );
-
     void (* _acf_rgba_to_s)
     ( const ART_GV *, const ArRGBA *, void * );
-
-    void (* _acf_ut_rgba_to_s)
-    ( const ART_GV *, const ArUT_RGBA *, void * );
 
     void (* _acf_rgb24_to_s)
     ( const ART_GV *, const ArRGB24 *, void * );

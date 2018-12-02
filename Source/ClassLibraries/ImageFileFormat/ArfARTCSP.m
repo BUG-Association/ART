@@ -155,12 +155,6 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(CIEXYZA,artcsp)
     unsigned char  buffer[4];
     double         d;
 
-    //   This has to be explicitly set since all tristimulus colour
-    //   values are internally the same type with the colourspace ID
-    //   as their only differentiation.
-
-    ARCIEXYZA_S(*pixel) = ARCSR_CIEXYZ;
-
     for ( int c = 0; c < channels; c++ )
     {
         [ file read : buffer : 1 : 4 ];

@@ -146,7 +146,6 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
             ARRGBA_G(PIXELS_ART[x]) = PIXELS_EXR_IN[y][x].g;
             ARRGBA_B(PIXELS_ART[x]) = PIXELS_EXR_IN[y][x].b;
             ARRGBA_A(PIXELS_ART[x]) = PIXELS_EXR_IN[y][x].a;
-            ARRGBA_S(PIXELS_ART[x]) = ARCSR_sRGB;
         }
 
     /* ------------------------------------------------------------------

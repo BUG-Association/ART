@@ -200,8 +200,8 @@ int art_imagediff(
 
         for (size_t x = 0; x < XC(sizeReference); x++)
         {
-            ArTristimulusColourValue valueReference = (((ArnCIEXYZAImage*)imageReferenceScanline)->data[ x ]).tcv;
-            ArTristimulusColourValue valueCompare   = (((ArnCIEXYZAImage*)imageCompareScanline)->data[ x ]).tcv;
+            ArCIEXYZ valueReference = (((ArnCIEXYZAImage*)imageReferenceScanline)->data[ x ]).xyz;
+            ArCIEXYZ valueCompare   = (((ArnCIEXYZAImage*)imageCompareScanline)->data[ x ]).xyz;
 
             
             double xA = ARCIEXYZ_X(valueReference);

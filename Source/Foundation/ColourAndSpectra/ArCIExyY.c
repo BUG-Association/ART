@@ -24,43 +24,28 @@
 
 =========================================================================== */
 
-#define ART_MODULE_NAME     ArRGBA
+#define ART_MODULE_NAME     ArCIExyY
 
-#include "ArRGBA.h"
+#include "ArCIExyY.h"
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-void rgba_s_debugprintf(
-        const ART_GV     * art_gv,
-        const ArRGBA  * c_0
+
+void xyy_c_debugprintf(
+        const ART_GV    * art_gv,
+        const ArCIExyY  * c0
         )
 {
-    printf( "ArRGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
-        ARRGBA_R(*c_0),
-        ARRGBA_G(*c_0),
-        ARRGBA_B(*c_0),
-        ARRGBA_A(*c_0)
+    printf(
+        "CIE xyY ( % 5.3f, % 5.3f, % 5.3f )\n",
+        ARCIExyY_x(*c0),
+        ARCIExyY_y(*c0),
+        ARCIExyY_Y(*c0)
         );
 
     fflush(stdout);
 }
-
-void frgba_s_debugprintf(
-        const ART_GV      * art_gv,
-        const ArFloatRGBA  * c_0
-        )
-{
-    printf( "ArUTF_RGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
-        ARRGBA_R(*c_0),
-        ARRGBA_G(*c_0),
-        ARRGBA_B(*c_0),
-        ARRGBA_A(*c_0)
-        );
-
-    fflush(stdout);
-}
-
 
 /* ======================================================================== */

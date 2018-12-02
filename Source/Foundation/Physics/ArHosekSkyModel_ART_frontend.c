@@ -40,8 +40,8 @@ void arhosekskymodel_spc(
         ArSpectrum             * result
         )
 {
-    if (   ART_CURRENT_ISR == ardt_ut_xyz
-        || ART_CURRENT_ISR == ardt_ut_xyz_polarisable )
+    if (   ART_CURRENT_ISR == ardt_xyz
+        || ART_CURRENT_ISR == ardt_xyz_polarisable )
     {
         ArCIEXYZ  xyz;
 
@@ -98,8 +98,8 @@ void arhosekskymodel_solar_spc(
         ArSpectrum               * result
         )
 {
-    if (   ART_CURRENT_ISR == ardt_ut_xyz
-        || ART_CURRENT_ISR == ardt_ut_xyz_polarisable )
+    if (   ART_CURRENT_ISR == ardt_xyz
+        || ART_CURRENT_ISR == ardt_xyz_polarisable )
     {
         ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 //        ArSpectrum46  * sr_s46;
@@ -303,8 +303,8 @@ void  arhosekskymodel_sps(
               ArSpectralSample       * spectral_sample
         )
 {
-    if (   ART_CURRENT_ISR == ardt_ut_xyz
-        || ART_CURRENT_ISR == ardt_ut_xyz_polarisable )
+    if (   ART_CURRENT_ISR == ardt_xyz
+        || ART_CURRENT_ISR == ardt_xyz_polarisable )
     {
         ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     }
@@ -333,8 +333,8 @@ void arhosekskymodel_solar_sps(
               ArSpectralSample       * spectral_sample
         )
 {
-    if (   ART_CURRENT_ISR == ardt_ut_xyz
-        || ART_CURRENT_ISR == ardt_ut_xyz_polarisable )
+    if (   ART_CURRENT_ISR == ardt_xyz
+        || ART_CURRENT_ISR == ardt_xyz_polarisable )
     {
         ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     }

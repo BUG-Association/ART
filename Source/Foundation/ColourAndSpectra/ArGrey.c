@@ -139,7 +139,7 @@ void g_to_falsecolour_rgb(
 
     d = (d - dmin) / (dmax - dmin);
 
-    rgb_ccd_interpol_c( art_gv, & cmin, & cmax, d, r_r );
+    rgb_dcc_interpol_c( art_gv, d, & cmin, & cmax, r_r );
 }
 
 

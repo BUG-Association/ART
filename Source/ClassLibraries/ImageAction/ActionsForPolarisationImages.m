@@ -158,9 +158,9 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTRAWLinearPolarisingFi
         //   are using), except for RGB images: to avoid issues with different
         //   RGB colour spaces, any RGB results get written to disk as CIE XYZ
 
-        if (   art_isr( art_gv ) == ardt_ut_xyz
-            || art_isr( art_gv ) == ardt_ut_xyz_polarisable )
-            destinationImageDataType = ardt_ciexyz;
+        if (   art_isr( art_gv ) == ardt_xyz
+            || art_isr( art_gv ) == ardt_xyz_polarisable )
+            destinationImageDataType = ardt_xyz;
         else
             destinationImageDataType = art_isr( art_gv );
 
@@ -382,26 +382,26 @@ void arlight_l_polarisation_stats(
     arstokesvector_free( art_gv, sv0 );
 }
 
-void binary_polvis_colour_to_ut_rgb(
+void binary_polvis_colour_to_rgb(
         ART_GV          * art_gv,
         ArPolVisColour  * pvc,
         double            value,
-        ArUT_RGB        * ut_rgb
+        ArRGB        * rgb
         )
 {
     switch( *pvc )
     {
         case arpolviscolour_RG:
             if ( value > 0.0 )
-                *ut_rgb = ARUT_RGB(0,1,0);
+                *rgb = ARRGB(0,1,0);
             else
-                *ut_rgb = ARUT_RGB(1,0,0);
+                *rgb = ARRGB(1,0,0);
             break;
         case arpolviscolour_BY:
             if ( value < 0.0 )
-                *ut_rgb = ARUT_RGB(0,0,1);
+                *rgb = ARRGB(0,0,1);
             else
-                *ut_rgb = ARUT_RGB(1,1,0);
+                *rgb = ARRGB(1,1,0);
             break;
         default:
             ART_ERRORHANDLING_FATAL_ERROR(
@@ -410,37 +410,37 @@ void binary_polvis_colour_to_ut_rgb(
     }
 }
 
-void polvis_colour_to_ut_rgb(
+void polvis_colour_to_rgb(
         ART_GV          * art_gv,
         ArPolVisColour  * pvc,
-        ArUT_RGB        * ut_rgb
+        ArRGB        * rgb
         )
 {
     switch( *pvc )
     {
         case arpolviscolour_R:
-            *ut_rgb = ARUT_RGB(1,0,0);
+            *rgb = ARRGB(1,0,0);
             break;
         case arpolviscolour_G:
-            *ut_rgb = ARUT_RGB(0,1,0);
+            *rgb = ARRGB(0,1,0);
             break;
         case arpolviscolour_B:
-            *ut_rgb = ARUT_RGB(0,0,1);
+            *rgb = ARRGB(0,0,1);
             break;
         case arpolviscolour_C:
-            *ut_rgb = ARUT_RGB(0,1,1);
+            *rgb = ARRGB(0,1,1);
             break;
         case arpolviscolour_Y:
-            *ut_rgb = ARUT_RGB(1,1,0);
+            *rgb = ARRGB(1,1,0);
             break;
         case arpolviscolour_M:
-            *ut_rgb = ARUT_RGB(1,0,1);
+            *rgb = ARRGB(1,0,1);
             break;
         case arpolviscolour_K:
-            *ut_rgb = ARUT_RGB(0,0,0);
+            *rgb = ARRGB(0,0,0);
             break;
         case arpolviscolour_W:
-            *ut_rgb = ARUT_RGB(1,1,1);
+            *rgb = ARRGB(1,1,1);
             break;
         default:
             ART_ERRORHANDLING_FATAL_ERROR(
@@ -562,8 +562,8 @@ void  lch_to_lab(
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageDataType = ardt_ciexyz;
-    destinationFileDataType  = ardt_ciexyz;
+    destinationImageDataType = ardt_xyz;
+    destinationFileDataType  = ardt_xyz;
 
     numberOfDestinationsPerSource = 1;
 
@@ -638,8 +638,8 @@ void  lch_to_lab(
 
             for ( long x = 0; x < XC(destinationImageSize); x++ )
             {
-                ArUT_RGB  ut_rgb_fg = ARUT_RGB(0.0,0.0,0.0);
-                ArUT_RGB  ut_rgb_bg = ARUT_RGB(0.0,0.0,0.0);
+                ArRGB  rgb_fg = ARRGB(0.0,0.0,0.0);
+                ArRGB  rgb_bg = ARRGB(0.0,0.0,0.0);
 
                 double  dop, rel_dop_cir, rel_dop_lin, abs_dop_cir, abs_dop_lin;
                 double  avg_sc[4];
@@ -681,92 +681,92 @@ void  lch_to_lab(
 
                         for ( int j = 0; j < 3; j++ )
                         {
-                            ArUT_RGB  ut_rgb_sc = ARUT_RGB(0.0,0.0,0.0);
+                            ArRGB  rgb_sc = ARRGB(0.0,0.0,0.0);
 
                             if ( scColour[j] != arpolviscolour_none )
                             {
-                                binary_polvis_colour_to_ut_rgb(
+                                binary_polvis_colour_to_rgb(
                                       art_gv,
                                     & scColour[j],
                                       avg_sc[j+1],
-                                    & ut_rgb_sc
+                                    & rgb_sc
                                     );
 
                                 if (   avg_sc[0] > 0.0
                                     && normalise )
-                                    ut_rgb_d_mul_c(
+                                    rgb_d_mul_c(
                                           art_gv,
                                           fabs( avg_sc[j+1] ) / avg_sc[0],
-                                        & ut_rgb_sc
+                                        & rgb_sc
                                         );
                             }
 
-                            ut_rgb_c_add_c(
+                            rgb_c_add_c(
                                   art_gv,
-                                & ut_rgb_sc,
-                                & ut_rgb_fg
+                                & rgb_sc,
+                                & rgb_fg
                                 );
                         }
                     }
 
                     if ( dopColour != arpolviscolour_none )
                     {
-                        polvis_colour_to_ut_rgb(
+                        polvis_colour_to_rgb(
                               art_gv,
                             & dopColour,
-                            & ut_rgb_fg
+                            & rgb_fg
                             );
                     }
 
                     if ( fppColour != arpolviscolour_none )
                     {
-                        ArUT_RGB  ut_rgb_lin = ARUT_RGB(0.0,0.0,0.0);
-                        ArUT_RGB  ut_rgb_cir = ARUT_RGB(0.0,0.0,0.0);
+                        ArRGB  rgb_lin = ARRGB(0.0,0.0,0.0);
+                        ArRGB  rgb_cir = ARRGB(0.0,0.0,0.0);
 
-                        polvis_colour_to_ut_rgb(
+                        polvis_colour_to_rgb(
                               art_gv,
                             & fppColour,
-                            & ut_rgb_lin
+                            & rgb_lin
                             );
 
-                        ut_rgb_d_mul_c(
+                        rgb_d_mul_c(
                               art_gv,
                               rel_dop_lin,
-                            & ut_rgb_lin
+                            & rgb_lin
                             );
 
-                        polvis_colour_to_ut_rgb(
+                        polvis_colour_to_rgb(
                               art_gv,
                             & fipColour,
-                            & ut_rgb_cir
+                            & rgb_cir
                             );
 
-                        ut_rgb_d_mul_c(
+                        rgb_d_mul_c(
                               art_gv,
                               M_ABS(rel_dop_cir),
-                            & ut_rgb_cir
+                            & rgb_cir
                             );
 
-                        ut_rgb_cc_add_c(
+                        rgb_cc_add_c(
                               art_gv,
-                            & ut_rgb_lin,
-                            & ut_rgb_cir,
-                            & ut_rgb_fg
+                            & rgb_lin,
+                            & rgb_cir,
+                            & rgb_fg
                             );
                     }
 
-                    ut_rgb_d_mul_c(
+                    rgb_d_mul_c(
                           art_gv,
                           coverFactor,
-                        & ut_rgb_fg
+                        & rgb_fg
                         );
                 }
 
                 if ( upcColour == arpolviscolour_A )
                 {
-                    ut_rgb_to_xyz(
+                    rgb_to_xyz(
                           art_gv,
-                        & ut_rgb_fg,
+                        & rgb_fg,
                         & XYZA_DESTINATION_BUFFER_XYZ(x)
                         );
 
@@ -774,28 +774,28 @@ void  lch_to_lab(
                 }
                 else
                 {
-                    polvis_colour_to_ut_rgb(
+                    polvis_colour_to_rgb(
                           art_gv,
                         & upcColour,
-                        & ut_rgb_bg
+                        & rgb_bg
                         );
 
-                    ut_rgb_d_mul_c(
+                    rgb_d_mul_c(
                           art_gv,
                           1.0 - coverFactor,
-                        & ut_rgb_bg
+                        & rgb_bg
                         );
 
-                    ArUT_RGB  result;
+                    ArRGB  result;
 
-                    ut_rgb_cc_add_c(
+                    rgb_cc_add_c(
                           art_gv,
-                        & ut_rgb_bg,
-                        & ut_rgb_fg,
+                        & rgb_bg,
+                        & rgb_fg,
                         & result
                         );
 
-                    ut_rgb_to_xyz(
+                    rgb_to_xyz(
                           art_gv,
                         & result,
                         & XYZA_DESTINATION_BUFFER_XYZ(x)

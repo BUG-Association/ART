@@ -24,12 +24,13 @@
 
 =========================================================================== */
 
-#define ART_MODULE_NAME     ArTristimulusColourValue
+#define ART_MODULE_NAME     ArCIELabUInt
 
-#include "ArTristimulusColourValue.h"
+#include "ArCIELabUInt.h"
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
+
 
 /* ======================================================================== */

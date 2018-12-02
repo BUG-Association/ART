@@ -265,7 +265,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,artraw)
     { \
         case 3: \
         { \
-            (__variable) = ALLOC_ARRAY( ArUT_RGB, (__number) ); \
+            (__variable) = ALLOC_ARRAY( ArRGB, (__number) ); \
             break; \
         } \
         case 8: \
@@ -343,9 +343,9 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,artraw)
     {
         case 3:
         {
-            ut_rgb_set_sid(
+            rgb_set_sid(
                   art_gv,
-                & ((ArUT_RGB*)  buffer)[x],
+                & ((ArRGB*)  buffer)[x],
                   c,
                   d
                 );
@@ -411,9 +411,9 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,artraw)
 
                 ArCIEXYZ  xyz =
                     ARCIEXYZ(
-                        ARUT_RGB_R(((ArUT_RGB*) inBuf)[x]),
-                        ARUT_RGB_G(((ArUT_RGB*) inBuf)[x]),
-                        ARUT_RGB_B(((ArUT_RGB*) inBuf)[x]) );
+                        ARRGB_R(((ArRGB*) inBuf)[x]),
+                        ARRGB_G(((ArRGB*) inBuf)[x]),
+                        ARRGB_B(((ArRGB*) inBuf)[x]) );
 
 #ifdef ARFARTRAW_DEBUGPRINTF
             xyz_c_debugprintf( & xyz );
@@ -734,8 +734,7 @@ while (0);
             art_set_system_white_point(
                   art_gv,
                   wp_desc,
-                  x,
-                  y
+                & ARCIExy( x, y )
                 );
         }
         
@@ -814,7 +813,7 @@ while (0);
 
     switch ( channels )
     {
-        case 3:   fileDataType = ardt_ciexyz; break;
+        case 3:   fileDataType = ardt_xyz; break;
         case 8:   fileDataType = ardt_spectrum8; break;
         case 11:  fileDataType = ardt_spectrum11; break;
         case 18:  fileDataType = ardt_spectrum18; break;
@@ -1226,7 +1225,7 @@ while (0);
     else
         [ file printf: "plain "];
 
-    if ( art_foundation_isr( art_gv ) == ardt_ut_xyz )
+    if ( art_foundation_isr( art_gv ) == ardt_xyz )
         [ file printf: "CIEXYZ "];
     else
         [ file printf: "spectrum "];
@@ -1376,8 +1375,8 @@ while (0);
         {
             ArSpectrum  * spc = spc_alloc( art_gv );
 
-            if (   art_foundation_isr(art_gv) == ardt_ut_xyz
-                || art_foundation_isr(art_gv) == ardt_ut_xyz_polarisable
+            if (   art_foundation_isr(art_gv) == ardt_xyz
+                || art_foundation_isr(art_gv) == ardt_xyz_polarisable
                )
             {
                 ArCIEXYZ  xyz;

@@ -24,43 +24,45 @@
 
 =========================================================================== */
 
-#define ART_MODULE_NAME     ArRGBA
+#ifndef _ART_FOUNDATION_COLOURANDSPECTRA_ARCIELUV_H_
+#define _ART_FOUNDATION_COLOURANDSPECTRA_ARCIELUV_H_
 
-#include "ArRGBA.h"
+#include "ART_Foundation_System.h"
+#include "ART_Foundation_Math.h"
 
-ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
+ART_MODULE_INTERFACE(ArCIELuv)
 
-ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-void rgba_s_debugprintf(
-        const ART_GV     * art_gv,
-        const ArRGBA  * c_0
-        )
+typedef struct ArCIELuv
 {
-    printf( "ArRGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
-        ARRGBA_R(*c_0),
-        ARRGBA_G(*c_0),
-        ARRGBA_B(*c_0),
-        ARRGBA_A(*c_0)
+    Crd3  c;
+}
+ArCIELuv;
+
+#define ARCIELuv_C(_c)          (_c).c
+#define ARCIELuv_CI(_c,_i)      C3_CI( ARCIELuv_C(_c), (_i) )
+
+#define ARCIELuv_L(_c)          ARCIELuv_CI((_c),0)
+#define ARCIELuv_u(_c)          ARCIELuv_CI((_c),1)
+#define ARCIELuv_v(_c)          ARCIELuv_CI((_c),2)
+
+#define ARCIELuv(_L,_u,_v)      ((ArCIELuv){CRD3( (_L), (_u), (_v) ) })
+#define ARCIELuv_GREY(_L)       ARCIELuv( (_L), 0.0, 0.0 )
+
+#define ARCIELuv_FORMAT(_form)  "ARCIELuv(" _form "," _form "," _form ")"
+#define ARCIELuv_PRINTF(_c)     ARCIELuv_L(_c),ARCIELuv_u(_c),ARCIELuv_v(_c)
+#define ARCIELuv_SCANF(_c)      &ARCIELuv_L(_c),&ARCIELuv_u(_c),&ARCIELuv_v(_c)
+
+double luv_delta_E(
+        const ArCIELuv  * luv0,
+        const ArCIELuv  * luv1
         );
 
-    fflush(stdout);
-}
-
-void frgba_s_debugprintf(
-        const ART_GV      * art_gv,
-        const ArFloatRGBA  * c_0
-        )
-{
-    printf( "ArUTF_RGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
-        ARRGBA_R(*c_0),
-        ARRGBA_G(*c_0),
-        ARRGBA_B(*c_0),
-        ARRGBA_A(*c_0)
+void luv_c_debugprintf(
+        const ART_GV    * art_gv,
+        const ArCIELuv  * c0
         );
 
-    fflush(stdout);
-}
 
-
+#endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARCIELUV_H_ */
 /* ======================================================================== */

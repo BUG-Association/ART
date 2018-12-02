@@ -31,6 +31,22 @@
 
 ART_LIBRARY_INTERFACE(ART_Foundation_ColourAndSpectra)
 
+#include "ArCIExyY.h"
+#include "ArCIEXYZ.h"
+#include "ArCIELab.h"
+#include "ArCIELabUInt.h"
+#include "ArCIELuv.h"
+#include "ArRGB.h"
+#include "ArRGBUInt.h"
+#include "ArSpectrum8.h"
+#include "ArSpectrum11.h"
+#include "ArSpectrum18.h"
+#include "ArSpectrum46.h"
+#include "ArSpectrum500.h"
+
+#include "ArSpectrum.h"
+#include "ArSpectralSample.h"
+
 #include "ArDataType.h"
 #include "ArCMF.h"
 
@@ -38,16 +54,7 @@ ART_LIBRARY_INTERFACE(ART_Foundation_ColourAndSpectra)
 #include "ArColourTransform.h"
 #include "ColourAndSpectralDataConversion.h"
 #include "ArSpectrumSubsystemManagement.h"
-
-#include "ArSpectrum.h"
-#include "ArSpectralSample.h"
-
-#include "ArUntaggedRGB.h"
-#include "ArSpectrum8.h"
-#include "ArSpectrum11.h"
-#include "ArSpectrum18.h"
-#include "ArSpectrum46.h"
-#include "ArSpectrum500.h"
+#include "SystemWhitepoint.h"
 
 #endif /* _ART_FOUNDATION_COLOUR_AND_LIGHT_H_ */
 /* ======================================================================== */

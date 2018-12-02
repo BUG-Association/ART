@@ -291,25 +291,25 @@ int art_imagesnr(
             sumRefSquared  += spc_s_l1_norm(art_gv, spectrumReferenceSqr);
             sumDiffSquared += spc_s_l1_norm(art_gv, spectrumDiffSqr);
 
-            ArUT_RGB  referenceRGB;
-            ArUT_RGB  compareRGB;
+            ArRGB  referenceRGB;
+            ArRGB  compareRGB;
             
-            spc_to_ut_rgb( art_gv, spectrumReference, & referenceRGB );
-            spc_to_ut_rgb( art_gv, spectrumCompare, & compareRGB );
+            spc_to_rgb( art_gv, spectrumReference, & referenceRGB );
+            spc_to_rgb( art_gv, spectrumCompare, & compareRGB );
             
-            referenceRGB = ARUT_RGB( 0, ARUT_RGB_G(referenceRGB) , 0 );
-            compareRGB = ARUT_RGB( 0, ARUT_RGB_G(compareRGB) , 0 );
+            referenceRGB = ARRGB( 0, ARRGB_G(referenceRGB) , 0 );
+            compareRGB = ARRGB( 0, ARRGB_G(compareRGB) , 0 );
 
-            ArUT_RGB  referenceRGBSqr;
-            ArUT_RGB  diffRGB;
-            ArUT_RGB  diffRGBSqr;
+            ArRGB  referenceRGBSqr;
+            ArRGB  diffRGB;
+            ArRGB  diffRGBSqr;
 
-            ut_rgb_ds_pow_s(art_gv, 2.0, & referenceRGB, & referenceRGBSqr);
-            ut_rgb_ss_sub_s(art_gv, & referenceRGB, & compareRGB, & diffRGB);
-            ut_rgb_ds_pow_s(art_gv, 2.0, & diffRGB, & diffRGBSqr);
+            rgb_ds_pow_s(art_gv, 2.0, & referenceRGB, & referenceRGBSqr);
+            rgb_ss_sub_s(art_gv, & referenceRGB, & compareRGB, & diffRGB);
+            rgb_ds_pow_s(art_gv, 2.0, & diffRGB, & diffRGBSqr);
             
-            sumRefSquaredRGB  += ut_rgb_s_l1_norm(art_gv, & referenceRGBSqr);
-            sumDiffSquaredRGB += ut_rgb_s_l1_norm(art_gv, & diffRGBSqr);
+            sumRefSquaredRGB  += rgb_s_l1_norm(art_gv, & referenceRGBSqr);
+            sumDiffSquaredRGB += rgb_s_l1_norm(art_gv, & diffRGBSqr);
         }
     }
 

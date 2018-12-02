@@ -196,11 +196,11 @@ void readInputImageAndPlaceOnNodeStack(
 //                        ,   ardatatype_name( rawContentType )
 //                        ];
 //
-//                    if ( rawContentType == ardt_ciexyz )
-//                        rawContentType = ardt_ut_xyz;
+//                    if ( rawContentType == ardt_xyz )
+//                        rawContentType = ardt_xyz;
 //
-//                    if ( rawContentType == ardt_ciexyz_polarisable )
-//                        rawContentType = ardt_ut_xyz_polarisable;
+//                    if ( rawContentType == ardt_xyz_polarisable )
+//                        rawContentType = ardt_xyz_polarisable;
 //
 //                    [ ART_GLOBAL_REPORTER printf
 //                        :   "ISR will be set as: %s\n"

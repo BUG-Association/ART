@@ -239,7 +239,7 @@ int artist(
     }
 
     if ( [ gpvOpt hasBeenSpecified ] )
-        art_set_isr( art_gv, ardt_ut_xyz );
+        art_set_isr( art_gv, ardt_xyz );
     
     if ( [ monoOpt hasBeenSpecified ] )
         art_set_hero_samples_to_splat( art_gv, 1 );

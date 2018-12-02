@@ -34,7 +34,6 @@
 #define XYZA        ardt_content_xyz_alpha
 #define SPC         ardt_content_spectrum
 
-#define UT          ardt_untagged
 #define POL         ardt_polarisable
 #define NEG         ardt_negative
 #define PM          ardt_plusminus

@@ -1132,7 +1132,7 @@ int art_print_banner_and_process_standard_commandline_options(
         if ( [ CSP_ISR_OPT hasBeenSpecified ] )
         {
             ART_ISR_WAS_MANUALLY_SET_BY_USER = YES;
-            selectedDataType = ardt_ut_xyz;
+            selectedDataType = ardt_xyz;
             if ( ART_POLARISATION_WAS_MANUALLY_SET_BY_USER )
                 selectedDataType |= ardt_polarisable;
             numberOfRequestedISRs++;

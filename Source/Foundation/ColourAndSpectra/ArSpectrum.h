@@ -66,11 +66,11 @@ void  ardt_printf_current_isr(
 CANONICAL_INTERFACE_FOR_ISR(ArSpectrum, spc)
 
 #include "ArGrey.h"
-#include "ArRGBA.h"
-#include "ArUntaggedRGB.h"
-#include "ArUntaggedRGBA.h"
+#include "ArRGB.h"
 #include "ArRGBUInt.h"
-#include "ArCIEColourValues.h"
+#include "ArRGBA.h"
+#include "ArCIEXYZ.h"
+#include "ArCIEXYZA.h"
 #include "ArSpectrum8.h"
 #include "ArSpectrum11.h"
 #include "ArSpectrum18.h"
@@ -98,22 +98,18 @@ SPC_CONVERSION_INTERFACE(ArGreyAlpha,ga,)
 SPC_CONVERSION_INTERFACE(ArGrey8,g8,)
 SPC_CONVERSION_INTERFACE(ArGrey16,g16,)
 SPC_CONVERSION_INTERFACE(ArGreyAlpha16,ga16,)
-//SPC_CONVERSION_INTERFACE(ArGrey32,g32,)
+SPC_CONVERSION_INTERFACE(ArGrey32,g32,)
 SPC_CONVERSION_INTERFACE(ArGreyAlpha32,ga32,)
     
 SPC_CONVERSION_INTERFACE(ArRGB,rgb,)
-SPC_CONVERSION_INTERFACE(ArUT_RGB,ut_rgb,)
 SPC_CONVERSION_INTERFACE(ArRGBA,rgba,)
-SPC_CONVERSION_INTERFACE(ArUT_RGBA,ut_rgba,)
 SPC_CONVERSION_INTERFACE(ArRGB24,rgb24,)
 SPC_CONVERSION_INTERFACE(ArRGBA32,rgba32,)
 SPC_CONVERSION_INTERFACE(ArRGB48,rgb48,)
 SPC_CONVERSION_INTERFACE(ArRGBA64,rgba64,)
-//SPC_CONVERSION_INTERFACE(ArRGB96,rgb96,)
-//SPC_CONVERSION_INTERFACE(ArRGBA128,rgba128,)
 
 SPC_CONVERSION_INTERFACE(ArCIEXYZ,xyz,)
-//SPC_CONVERSION_INTERFACE(ArCIEXYZA,xyza,)
+SPC_CONVERSION_INTERFACE(ArCIEXYZA,xyza,)
 
 SPC_CONVERSION_INTERFACE(ArSpectrum8,s8,)
 SPC_CONVERSION_INTERFACE(ArSpectrum11,s11,)
@@ -123,12 +119,6 @@ SPC_CONVERSION_INTERFACE(ArSpectrum500,s500,)
 
 SPC_CONVERSION_INTERFACE(ArRSSpectrum,rss,_new)
 SPC_CONVERSION_INTERFACE(ArPSSpectrum,pss,_new)
-
-void utf_rgb_to_spc(
-        const ART_GV            * art_gv,
-        const ArUTF_RGB         * utf_rgb,
-              ArSpectrum        * spc
-        );
 
 #endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARSPECTRUM_H_ */
 /* ======================================================================== */

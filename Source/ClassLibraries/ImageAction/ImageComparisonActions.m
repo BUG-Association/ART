@@ -86,19 +86,10 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_Add_ARTRAW)
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-        //   The image colour type is always "native" (i.e. whatever model we
-        //   are using), except for RGB images: to avoid issues with different
-        //   RGB colour spaces, any RGB results get written to disk as CIE XYZ
-
-        if (   art_isr( art_gv ) == ardt_ut_xyz
-            || art_isr( art_gv ) == ardt_ut_xyz_polarisable )
-            destinationImageDataType = ardt_ciexyz;
-        else
-            destinationImageDataType = art_isr( art_gv );
-
         //   In the case of a renderer directly writing its output to file, the
         //   image and file colour data types are the same.
 
+        destinationImageDataType = art_isr( art_gv );
         destinationFileDataType = destinationImageDataType;
 
     /* ------------------------------------------------------------------
@@ -211,8 +202,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_Add_ARTCSP)
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-        destinationImageDataType = ardt_ciexyz;
-        destinationFileDataType = ardt_ciexyz;
+        destinationImageDataType = ardt_xyz;
+        destinationFileDataType = ardt_xyz;
 
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
@@ -252,39 +243,39 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_Add_ARTCSP)
                  +   XYZA_SOURCE_BUFFER_A_ALPHA(x)
                    * ( 1.0 - XYZA_SOURCE_BUFFER_B_ALPHA(x) );
 
-            ArUT_RGB  rgbA, rgbB;
+            ArRGB  rgbA, rgbB;
             
-            xyz_to_ut_rgb(
+            xyz_to_rgb(
                   art_gv,
                 & XYZA_SOURCE_BUFFER_A_XYZ(x),
                 & rgbA
                 );
             
-            xyz_to_ut_rgb(
+            xyz_to_rgb(
                   art_gv,
                 & XYZA_SOURCE_BUFFER_B_XYZ(x),
                 & rgbB
                 );
             
-            ut_rgb_d_mul_c(
+            rgb_d_mul_c(
                   art_gv,
                   XYZA_SOURCE_BUFFER_A_ALPHA(x) * ( 1.0 - XYZA_SOURCE_BUFFER_B_ALPHA(x) ),
                 & rgbA
                 );
             
-            ut_rgb_d_mul_c(
+            rgb_d_mul_c(
                   art_gv,
                   XYZA_SOURCE_BUFFER_B_ALPHA(x),
                 & rgbB
                 );
             
-            ut_rgb_c_add_c(
+            rgb_c_add_c(
                   art_gv,
                 & rgbA,
                 & rgbB
                 );
 
-            ut_rgb_to_xyz(
+            rgb_to_xyz(
                   art_gv,
                 & rgbB,
                 & XYZA_DESTINATION_BUFFER_XYZ(x)
@@ -360,8 +351,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_AddMul_ARTCSP)
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-        destinationImageDataType = ardt_ciexyz;
-        destinationFileDataType = ardt_ciexyz;
+        destinationImageDataType = ardt_xyz;
+        destinationFileDataType = ardt_xyz;
 
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
@@ -409,47 +400,47 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_AddMul_ARTCSP)
                  +   aA
                    * ( 1.0 - aB );
 
-            ArUT_RGB  rgbA, rgbB;
+            ArRGB  rgbA, rgbB;
             
-            xyz_to_ut_rgb(
+            xyz_to_rgb(
                   art_gv,
                 & XYZA_SOURCE_BUFFER_A_XYZ(x),
                 & rgbA
                 );
             
-            xyz_to_ut_rgb(
+            xyz_to_rgb(
                   art_gv,
                 & XYZA_SOURCE_BUFFER_B_XYZ(x),
                 & rgbB
                 );
             
-            ut_rgb_c_mul_c(
+            rgb_c_mul_c(
                   art_gv,
                 & rgbA,
                 & rgbB
                 );
 
-            ut_rgb_d_mul_c(
+            rgb_d_mul_c(
                   art_gv,
 //                  XYZA_DESTINATION_BUFFER_ALPHA(x),
                   XYZA_SOURCE_BUFFER_A_ALPHA(x) * ( 1.0 - XYZA_SOURCE_BUFFER_B_ALPHA(x) ),
                 & rgbA
                 );
             
-            ut_rgb_d_mul_c(
+            rgb_d_mul_c(
                   art_gv,
 //                  1.0,
                   XYZA_SOURCE_BUFFER_B_ALPHA(x),
                 & rgbB
                 );
             
-            ut_rgb_c_add_c(
+            rgb_c_add_c(
                   art_gv,
                 & rgbA,
                 & rgbB
                 );
 
-            ut_rgb_to_xyz(
+            rgb_to_xyz(
                   art_gv,
                 & rgbB,
                 & XYZA_DESTINATION_BUFFER_XYZ(x)
@@ -999,25 +990,25 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_SNR)
             sumRefSquared  += spc_s_l1_norm(art_gv, spectrumReferenceSqr);
             sumDiffSquared += spc_s_l1_norm(art_gv, spectrumDiffSqr);
 
-            ArUT_RGB  referenceRGB;
-            ArUT_RGB  compareRGB;
+            ArRGB  referenceRGB;
+            ArRGB  compareRGB;
             
-            spc_to_ut_rgb( art_gv, spectrumReference, & referenceRGB );
-            spc_to_ut_rgb( art_gv, spectrumCompare, & compareRGB );
+            spc_to_rgb( art_gv, spectrumReference, & referenceRGB );
+            spc_to_rgb( art_gv, spectrumCompare, & compareRGB );
             
-            referenceRGB = ARUT_RGB( 0, ARUT_RGB_G(referenceRGB) , 0 );
-            compareRGB = ARUT_RGB( 0, ARUT_RGB_G(compareRGB) , 0 );
+            referenceRGB = ARRGB( 0, ARRGB_G(referenceRGB) , 0 );
+            compareRGB = ARRGB( 0, ARRGB_G(compareRGB) , 0 );
 
-            ArUT_RGB  referenceRGBSqr;
-            ArUT_RGB  diffRGB;
-            ArUT_RGB  diffRGBSqr;
+            ArRGB  referenceRGBSqr;
+            ArRGB  diffRGB;
+            ArRGB  diffRGBSqr;
 
-            ut_rgb_ds_pow_s(art_gv, 2.0, & referenceRGB, & referenceRGBSqr);
-            ut_rgb_ss_sub_s(art_gv, & referenceRGB, & compareRGB, & diffRGB);
-            ut_rgb_ds_pow_s(art_gv, 2.0, & diffRGB, & diffRGBSqr);
+            rgb_ds_pow_s(art_gv, 2.0, & referenceRGB, & referenceRGBSqr);
+            rgb_ss_sub_s(art_gv, & referenceRGB, & compareRGB, & diffRGB);
+            rgb_ds_pow_s(art_gv, 2.0, & diffRGB, & diffRGBSqr);
             
-            sumRefSquaredRGB  += ut_rgb_s_l1_norm(art_gv, & referenceRGBSqr);
-            sumDiffSquaredRGB += ut_rgb_s_l1_norm(art_gv, & diffRGBSqr);
+            sumRefSquaredRGB  += rgb_s_l1_norm(art_gv, & referenceRGBSqr);
+            sumDiffSquaredRGB += rgb_s_l1_norm(art_gv, & diffRGBSqr);
         }
     }
 

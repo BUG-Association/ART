@@ -28,127 +28,164 @@
 
 #include "ArRGB.h"
 
-typedef struct ArRGB_GV
-{
-    pthread_mutex_t        mutex;
-    ArColourSpace const  * default_rgbspace_ref;
-    ArRGB                  default_white;
-    ArRGB                  default_black;
-}
-ArRGB_GV;
+#include "SpectralDatatype_ImplementationMacros.h"
 
+CANONICAL_GV_FOR_ISR_WITH_ADDITIONAL_FIELDS(ArRGB, pthread_mutex_t mutex; ArColourSpace const  * default_rgbspace_ref; )
 
-#define ARRGB_GV                    art_gv->arrgb_gv
-#define ARRGB_MUTEX                 ARRGB_GV->mutex
-#define ARRGB_DEFAULT_RGBSPACE_REF  ARRGB_GV->default_rgbspace_ref
-#define ARRGB_DEFAULT_WHITE         ARRGB_GV->default_white
-#define ARRGB_DEFAULT_BLACK         ARRGB_GV->default_black
-
+#define ARRGB_GV                     art_gv->arrgb_gv
+#define ARRGB_MUTEX                  ARRGB_GV->mutex
+#define ARRGB_DEFAULT_RGBSPACE_REF   ARRGB_GV->default_rgbspace_ref
+#define ARRGB_CHANNELS               ARRGB_GV->channels
+#define ARRGB_FIRST_VISIBLE_CHANNEL  ARRGB_GV->first_visible_channel
+#define ARRGB_SAMPLE_BOUND           ARRGB_GV->sample_bound
+#define ARRGB_SAMPLING_RANGE         ARRGB_GV->sampling_range
+#define ARRGB_SAMPLE_CENTER          ARRGB_GV->sample_center
+#define ARRGB_SAMPLE_WIDTH           ARRGB_GV->sample_width
+#define ARRGB_SAMPLE_WIDTH_DIV_2     ARRGB_GV->sample_width_div_2
+#define ARRGB_SAMPLE_WEIGHT          ARRGB_GV->sample_weight
+#define ARRGB_SAMPLE_BASIS           ARRGB_GV->sample_basis
+#define ARRGB_SHORTNAME_STRING       ARRGB_GV->shortname_string
+#define ARRGB_TYPENAME_STRING        ARRGB_GV->typename_string
+#define ARRGB_DESCRIPTION_STRING     ARRGB_GV->description_string
+#define ARRGB_ZERO                   ARRGB_GV->zero
+#define ARRGB_UNIT                   ARRGB_GV->unit
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
-    ARRGB_GV = ALLOC(ArRGB_GV);
+    ARRGB_GV = ALLOC( ArRGB_GV );
 
     pthread_mutex_init( & ARRGB_MUTEX, NULL );
 
     ARRGB_DEFAULT_RGBSPACE_REF = arcolourspace_sRGB( art_gv );
 
-    ArRGB_initialise_spectrum_subsystem( art_gv );
+    ARRGB_CHANNELS = 3;
+    ARRGB_FIRST_VISIBLE_CHANNEL = 0;
+    ARRGB_SAMPLE_BOUND = ALLOC_ARRAY( double, 4 );
+
+    for ( unsigned int i = 0; i < 4; i++ )
+        ARRGB_SAMPLE_BOUND[i] = 380.0 NM + i * 110.0 NM;
+
+    ARRGB_SAMPLING_RANGE =
+        ARRGB_SAMPLE_BOUND[ARRGB_CHANNELS] - ARRGB_SAMPLE_BOUND[0];
+
+    ARRGB_SAMPLE_CENTER      = ALLOC_ARRAY( double, 3 );
+    ARRGB_SAMPLE_WIDTH       = ALLOC_ARRAY( double, 3 );
+    ARRGB_SAMPLE_WIDTH_DIV_2 = ALLOC_ARRAY( double, 3 );
+    ARRGB_SAMPLE_WEIGHT      = ALLOC_ARRAY( double, 3 );
+    ARRGB_SAMPLE_BASIS       = ALLOC_ARRAY( ArPSSpectrum, 3 );
+
+    for ( unsigned int i = 0; i < ARRGB_CHANNELS; i++ )
+    {
+        ARRGB_SAMPLE_CENTER[i] =
+            ( ARRGB_SAMPLE_BOUND[ i + 1 ] + ARRGB_SAMPLE_BOUND[ i ] ) / 2.0;
+
+        ARRGB_SAMPLE_WIDTH[i] =
+            ARRGB_SAMPLE_BOUND[ i + 1 ] - ARRGB_SAMPLE_BOUND[ i ];
+
+        ARRGB_SAMPLE_WIDTH_DIV_2[i] = ARRGB_SAMPLE_WIDTH[i] / 2.0;
+
+        ARRGB_SAMPLE_WEIGHT[i] = ARRGB_SAMPLE_WIDTH[i] / ARRGB_SAMPLING_RANGE;
+
+        ARRGB_SAMPLE_BASIS[i].size  = 2;
+        ARRGB_SAMPLE_BASIS[i].scale =
+            1.0 / (  ARRGB_SAMPLE_BOUND[ i + 1 ]
+                   - ARRGB_SAMPLE_BOUND[ i     ] );
+
+        ARRGB_SAMPLE_BASIS[i].array = ALLOC_ARRAY( Pnt2D, 2 );
+        ARRGB_SAMPLE_BASIS[i].array[0] = PNT2D( ARRGB_SAMPLE_BOUND[ i    ], 1.0 );
+        ARRGB_SAMPLE_BASIS[i].array[1] = PNT2D( ARRGB_SAMPLE_BOUND[ i + 1], 1.0 );
+    }
+
+    ARRGB_SHORTNAME_STRING = "RGB";
+    ARRGB_TYPENAME_STRING = "RGB";
+    ARRGB_DESCRIPTION_STRING = "visible range, colour values";
+
+    ARRGB_ZERO = rgb_d_alloc_init( art_gv, 0.0 );
+    ARRGB_UNIT = rgb_d_alloc_init( art_gv, 1.0 );
 )
 
 ART_MODULE_SHUTDOWN_FUNCTION
 (
-    pthread_mutex_destroy( & art_gv->arrgb_gv->mutex );
+    FREE_ARRAY(ARRGB_SAMPLE_BOUND);
+    FREE_ARRAY(ARRGB_SAMPLE_CENTER);
+    FREE_ARRAY(ARRGB_SAMPLE_WIDTH);
+    FREE_ARRAY(ARRGB_SAMPLE_WIDTH_DIV_2);
+    FREE_ARRAY(ARRGB_SAMPLE_WEIGHT);
 
-    FREE( art_gv->arrgb_gv );
+    for ( unsigned int i = 0; i < ARRGB_CHANNELS; i++ )
+        pss_freearray_s( art_gv, & ARRGB_SAMPLE_BASIS[i] );
+
+    FREE_ARRAY(ARRGB_SAMPLE_BASIS);
+
+    rgb_free( art_gv, ARRGB_ZERO );
+    rgb_free( art_gv, ARRGB_UNIT );
+
+    pthread_mutex_destroy( & ARRGB_MUTEX );
+
+    FREE(ARRGB_GV);
 )
 
-ART_SPECTRUM_MODULE_INITIALISATION_FUNCTION
-(
-    ARRGB_DEFAULT_WHITE = ARRGB( 1.0, 1.0, 1.0 );
-    ARRGB_DEFAULT_BLACK = ARRGB( 0.0, 0.0, 0.0 );
-)
+#define _ISR_CHANNELS           3
+#define _ISR_C(_s0)             (_s0).c
+#define _ISR_CI(_s0,_i)         C3_CI(_ISR_C(_s0),(_i))
 
+CANONICAL_IMPLEMENTATION_FOR_ISR( ArRGB, arrgb, ARRGB, rgb, c3, s );
+
+#undef _ISR_CHANNELS
+#undef _ISR_C
+#undef _ISR_CI
 
 void set_default_rgbspace_ref(
         ART_GV               * art_gv,
         ArColourSpace const  * newRef
         )
 {
-    pthread_mutex_lock( & art_gv->arrgb_gv->mutex );
+    pthread_mutex_lock( & ARRGB_MUTEX );
 
-    art_gv->arrgb_gv->default_rgbspace_ref = newRef;
+    ARRGB_DEFAULT_RGBSPACE_REF = newRef;
 
     art_foundation_initialise_spectral_subsystem( art_gv );
 
-    pthread_mutex_unlock( & art_gv->arrgb_gv->mutex );
+    pthread_mutex_unlock( & ARRGB_MUTEX );
 }
 
 ArColourSpace const * default_rgbspace_ref(
         const ART_GV  * art_gv
         )
 {
-    return art_gv->arrgb_gv->default_rgbspace_ref;
+    return ARRGB_DEFAULT_RGBSPACE_REF;
 }
 
-ArRGB const * arrgb_unit(
-        const ART_GV  * art_gv
+
+
+/* ---------------------------------------------------------------------------
+
+    'rgb_cc_convolve_d' function
+
+    Raises an exception and terminates the calling application. This is the
+    correct thing to do, since this kind of operation does not make sense in
+    colour space. Sometimes the "ArSpectrum" data type polymorphism breaks down
+    after all...
+
+------------------------------------------------------------------------aw- */
+
+void rgb_ss_convolve_d(
+        const ART_GV    * art_gv,
+        const ArRGB  * r0,
+        const ArRGB  * r1,
+              double    * dr
         )
 {
-    return & art_gv->arrgb_gv->default_white;
-}
-
-ArRGB const * arrgb_zero(
-        const ART_GV  * art_gv
-        )
-{
-    return & art_gv->arrgb_gv->default_black;
-}
-
-void rgb_ssd_interpol_s(
-        const ART_GV  * art_gv,
-        const ArRGB   * c0,
-        const ArRGB   * c1,
-        const double    d0,
-              ArRGB   * cr
-        )
-{
-    c3_dcc_interpol_c(
-          d0,
-        & ARRGB_C( *c0 ),
-        & ARRGB_C( *c1 ),
-        & ARRGB_C( *cr ) );
-}
-
-void rgb_dd_clamp_s(
-        const ART_GV  * art_gv,
-        const double    d0,
-        const double    d1,
-              ArRGB   * cr
-        )
-{
-    c3_dd_clamp_c(
-          d0,
-          d1,
-        & ARRGB_C(*cr) );
-}
-
-void rgb_d_init_s(
-        const ART_GV  * art_gv,
-        const double    d0,
-              ArRGB   * cr
-        )
-{
-    for ( int i = 0; i < ARRGB_CHANNELS; i++ )
-        ARRGB_CI( *cr, i ) = d0;
-
-    ARRGB_S( *cr ) = DEFAULT_RGB_SPACE_REF;
+    ART_ERRORHANDLING_FATAL_ERROR(
+        "convolution operation not defined in colour space - "
+        "switch ART to a spectral ISR to avoid this error"
+        );
 }
 
 double rgb_sd_value_at_wavelength(
-        const ART_GV  * art_gv,
-        const ArRGB   * c0,
-        const double    d0
+        const ART_GV    * art_gv,
+        const ArRGB  * r_0,
+        const double      d_0
         )
 {
     ART_ERRORHANDLING_FATAL_ERROR(
@@ -160,17 +197,73 @@ double rgb_sd_value_at_wavelength(
     return 0.0;
 }
 
-void rgb_s_debugprintf(
-        const ART_GV  * art_gv,
-        const ArRGB   * c0
+void rgb_sdd_sample_at_wavelength_s(
+        const ART_GV    * art_gv,
+        const ArRGB  * r_0,
+        const double      d_0,
+        const double      d_1,
+              ArRGB  * r_r
         )
 {
-    printf(
-        "ArRGB( % 5.3f, % 5.3f, % 5.3f, %s )\n",
-        ARRGB_R(*c0),
-        ARRGB_G(*c0),
-        ARRGB_B(*c0),
-        ARCSR_NAME( ARRGB_S(*c0) ) );
+    ART_ERRORHANDLING_FATAL_ERROR(
+        "ArSpectrum sample queries for a specific wavelength not "
+        "defined in colour space - "
+        "switch ART to a spectral ISR to avoid this error"
+        );
+}
+
+double rgb_ss_convolve(
+        const ART_GV    * art_gv,
+        const ArRGB  * c0,
+        const ArRGB  * c1
+        )
+{
+    ART_ERRORHANDLING_FATAL_ERROR(
+        "ArSpectrum value convolution not defined in colour space - "
+        "switch ART to a spectral ISR to avoid this error"
+        );
+
+    return 0.0;
+}
+
+void rgb_s_debugprintf(
+        const ART_GV    * art_gv,
+        const ArRGB  * c_0
+        )
+{
+    printf( "ArRGB( % 5.3f, % 5.3f, % 5.3f, %s )\n",
+        ARRGB_R(*c_0),
+        ARRGB_G(*c_0),
+        ARRGB_B(*c_0),
+        ARCSR_NAME( DEFAULT_RGB_SPACE_REF ) );
+
+    fflush(stdout);
+}
+
+void rgb_s_mathematicaprintf(
+        const ART_GV    * art_gv,
+        const ArRGB  * c_0
+        )
+{
+    printf( "ArRGB{ % 5.3f, % 5.3f, % 5.3f, %s }\n",
+        ARRGB_R(*c_0),
+        ARRGB_G(*c_0),
+        ARRGB_B(*c_0),
+        ARCSR_NAME( DEFAULT_RGB_SPACE_REF ) );
+
+    fflush(stdout);
+}
+
+void frgb_c_debugprintf(
+        const ART_GV     * art_gv,
+        const ArFloatRGB  * c_0
+        )
+{
+    printf( "ArFloatRGB( % 5.3f, % 5.3f, % 5.3f )\n",
+        ARRGB_R(*c_0),
+        ARRGB_G(*c_0),
+        ARRGB_B(*c_0)
+        );
 
     fflush(stdout);
 }

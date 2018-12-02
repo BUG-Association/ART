@@ -177,8 +177,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTCSPLuminanceClipping)
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageDataType = ardt_ciexyz;
-    destinationFileDataType  = ardt_ciexyz;
+    destinationImageDataType = ardt_xyz;
+    destinationFileDataType  = ardt_xyz;
 
 
     /* ------------------------------------------------------------------
@@ -484,11 +484,15 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetColourSubsystemWhitepoint)
                 & wpxyY
                 );
             
+            ArCIExy  wpxy;
+            
+            ARCIExy_x(wpxy) = ARCIExyY_x(wpxyY);
+            ARCIExy_y(wpxy) = ARCIExyY_y(wpxyY);
+
             art_set_system_white_point(
                   art_gv,
                   wp_desc,
-                  ARCIExyY_x(wpxyY),
-                  ARCIExyY_y(wpxyY)
+                & wpxy
                 );
         }
         else
@@ -794,19 +798,11 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTRAW_Double_Mul_ARTRAW
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    //   The image colour type is always "native" (i.e. whatever model we
-    //   are using), except for RGB images: to avoid issues with different
-    //   RGB colour spaces, any RGB results get written to disk as CIE XYZ
-
-    if (   art_isr( art_gv ) == ardt_ut_xyz
-        || art_isr( art_gv ) == ardt_ut_xyz_polarisable )
-        destinationImageDataType = ardt_ciexyz;
-    else
-        destinationImageDataType = art_isr( art_gv );
 
     //   In the case of a renderer directly writing its output to file, the
     //   image and file colour data types are the same.
 
+    destinationImageDataType = art_isr( art_gv );
     destinationFileDataType = destinationImageDataType;
 
 
@@ -957,18 +953,11 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyARTRAWValues)
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    //   The image colour type is always "native" (i.e. whatever model we
-    //   are using), except for RGB images: to avoid issues with different
-    //   RGB colour spaces, any RGB results get written to disk as CIE XYZ
-
-    if (   art_isr( art_gv ) == ardt_ut_xyz
-        || art_isr( art_gv ) == ardt_ut_xyz_polarisable )
-        destinationImageDataType = ardt_ciexyz;
-    else
-        destinationImageDataType = art_isr( art_gv );
 
     //   In the case of a renderer directly writing its output to file, the
     //   image and file colour data types are the same.
+
+    destinationImageDataType = art_isr( art_gv );
 
     destinationFileDataType = destinationImageDataType;
 
@@ -1101,19 +1090,10 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleARTRAW)
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    //   The image colour type is always "native" (i.e. whatever model we
-    //   are using), except for RGB images: to avoid issues with different
-    //   RGB colour spaces, any RGB results get written to disk as CIE XYZ
-
-    if (   art_isr( art_gv ) == ardt_ut_xyz
-        || art_isr( art_gv ) == ardt_ut_xyz_polarisable )
-        destinationImageDataType = ardt_ciexyz;
-    else
-        destinationImageDataType = art_isr( art_gv );
-
     //   In the case of a renderer directly writing its output to file, the
     //   image and file colour data types are the same.
 
+    destinationImageDataType = art_isr( art_gv );
     destinationFileDataType = destinationImageDataType;
 
 
@@ -1317,19 +1297,10 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopARTRAWValue
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    //   The image colour type is always "native" (i.e. whatever model we
-    //   are using), except for RGB images: to avoid issues with different
-    //   RGB colour spaces, any RGB results get written to disk as CIE XYZ
-
-    if (   art_isr( art_gv ) == ardt_ut_xyz
-        || art_isr( art_gv ) == ardt_ut_xyz_polarisable )
-        destinationImageDataType = ardt_ciexyz;
-    else
-        destinationImageDataType = art_isr( art_gv );
-
     //   In the case of a renderer directly writing its output to file, the
     //   image and file colour data types are the same.
 
+    destinationImageDataType = art_isr( art_gv );
     destinationFileDataType = destinationImageDataType;
 
 

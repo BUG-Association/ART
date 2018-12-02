@@ -37,6 +37,8 @@ ART_MODULE_INTERFACE(ArColourSpace)
 
 #include "ART_Foundation_Math.h"
 #include "ART_Foundation_Geometry.h"
+#include "ArCIExy.h"
+#include "ArCIEXYZ.h"
 
 /* ---------------------------------------------------------------------------
 
@@ -144,10 +146,10 @@ typedef struct ArColourSpace
 {
     ArColourSpaceType  type;
     ArSymbol           name;
-    Pnt2D              r;
-    Pnt2D              g;
-    Pnt2D              b;
-    Pnt2D              w;
+    ArCIExy            r;
+    ArCIExy            g;
+    ArCIExy            b;
+    ArCIExy            w;
     Mat3               xyz_to_rgb;
     Mat3               rgb_to_xyz;
     double             gamma;
@@ -438,6 +440,14 @@ ArColourSpaceRef create_and_register_arcolourspace_from_icc(
 void arcolourspace_debugprintf(
         ART_GV            * art_gv,
         ArColourSpaceRef    csr
+        );
+
+Mat3  xyz2rgb_via_primaries(
+              ART_GV   * art_gv,
+        const ArCIExy  * r,
+        const ArCIExy  * g,
+        const ArCIExy  * b,
+        const ArCIExy  * w
         );
 
 #endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARCOLOURSPACE_H_ */

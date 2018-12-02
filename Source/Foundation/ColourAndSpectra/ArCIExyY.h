@@ -24,43 +24,40 @@
 
 =========================================================================== */
 
-#define ART_MODULE_NAME     ArRGBA
+#ifndef _ART_FOUNDATION_COLOURANDSPECTRA_ARCIEXYY_H_
+#define _ART_FOUNDATION_COLOURANDSPECTRA_ARCIEXYY_H_
 
-#include "ArRGBA.h"
+#include "ART_Foundation_System.h"
+#include "ART_Foundation_Math.h"
 
-ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
+ART_MODULE_INTERFACE(ArCIExyY)
 
-ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
-
-void rgba_s_debugprintf(
-        const ART_GV     * art_gv,
-        const ArRGBA  * c_0
-        )
+typedef struct ArCIExyY
 {
-    printf( "ArRGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
-        ARRGBA_R(*c_0),
-        ARRGBA_G(*c_0),
-        ARRGBA_B(*c_0),
-        ARRGBA_A(*c_0)
+    Crd3  c;
+}
+ArCIExyY;
+
+#define ARCIExyY_C(_c)          (_c).c
+#define ARCIExyY_CI(_c,_i)      C3_CI( ARCIExyY_C(_c), (_i) )
+
+#define ARCIExyY_x(_c)          ARCIExyY_CI((_c),0)
+#define ARCIExyY_y(_c)          ARCIExyY_CI((_c),1)
+#define ARCIExyY_Y(_c)          ARCIExyY_CI((_c),2)
+
+#define ARCIExyY(_x,_y,_Y)      ((ArCIExyY){CRD3( (_x), (_y), (_Y) ) })
+#define ARCIExyY_xy1(_xy)       ((ArCIExyY){CRD3( ARCIExy_x(_xy), ARCIExy_y(_xy), 1.0 ) })
+#define ARCIExyY_GREY           ARCIExyY( MATH_1_DIV_3, MATH_1_DIV_3, 1.0 )
+
+#define ARCIExyY_FORMAT(_form)  "ARCIExyY(" _form "," _form "," _form ")"
+#define ARCIExyY_PRINTF(_c)     ARCIExyY_x(_c),ARCIExyY_y(_c),ARCIExyY_Y(_c)
+#define ARCIExyY_SCANF(_c)      &ARCIExyY_x(_c),&ARCIExyY_y(_c),&ARCIExyY_Y(_c)
+
+
+void xyy_c_debugprintf(
+        const ART_GV    * art_gv,
+        const ArCIExyY  * c0
         );
 
-    fflush(stdout);
-}
-
-void frgba_s_debugprintf(
-        const ART_GV      * art_gv,
-        const ArFloatRGBA  * c_0
-        )
-{
-    printf( "ArUTF_RGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
-        ARRGBA_R(*c_0),
-        ARRGBA_G(*c_0),
-        ARRGBA_B(*c_0),
-        ARRGBA_A(*c_0)
-        );
-
-    fflush(stdout);
-}
-
-
+#endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARCIEXYY_H_ */
 /* ======================================================================== */

@@ -24,43 +24,40 @@
 
 =========================================================================== */
 
-#define ART_MODULE_NAME     ArUntaggedRGBA
+#define ART_MODULE_NAME     ArCIELuv
 
-#include "ArUntaggedRGBA.h"
+#include "ArCIELuv.h"
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-void ut_rgba_s_debugprintf(
-        const ART_GV     * art_gv,
-        const ArUT_RGBA  * c_0
+
+double luv_delta_E(
+        const ArCIELuv  * luv_0,
+        const ArCIELuv  * luv_1
         )
 {
-    printf( "ArUT_RGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f, < %s > )\n",
-        ARUT_RGBA_R(*c_0),
-        ARUT_RGBA_G(*c_0),
-        ARUT_RGBA_B(*c_0),
-        ARUT_RGBA_A(*c_0),
-        ARCSR_NAME( DEFAULT_RGB_SPACE_REF ) );
+    return
+        sqrt(
+              M_SQR( ARCIELuv_L( *luv_0 ) - ARCIELuv_L( *luv_1 ) )
+            + M_SQR( ARCIELuv_u( *luv_0 ) - ARCIELuv_u( *luv_1 ) )
+            + M_SQR( ARCIELuv_v( *luv_0 ) - ARCIELuv_v( *luv_1 ) )
+            );
+}
+
+void luv_c_debugprintf(
+        const ART_GV    * art_gv,
+        const ArCIELuv  * c_0
+        )
+{
+    printf( "CIE L* u* v* ( % 5.3f, % 5.3f, % 5.3f )\n",
+        ARCIELuv_L(*c_0),
+        ARCIELuv_u(*c_0),
+        ARCIELuv_v(*c_0)
+        );
 
     fflush(stdout);
 }
-
-void utf_rgba_s_debugprintf(
-        const ART_GV      * art_gv,
-        const ArUTF_RGBA  * c_0
-        )
-{
-    printf( "ArUTF_RGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f, < %s > )\n",
-        ARUTF_RGBA_R(*c_0),
-        ARUTF_RGBA_G(*c_0),
-        ARUTF_RGBA_B(*c_0),
-        ARUTF_RGBA_A(*c_0),
-        ARCSR_NAME( DEFAULT_RGB_SPACE_REF ) );
-
-    fflush(stdout);
-}
-
 
 /* ======================================================================== */

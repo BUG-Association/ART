@@ -1796,9 +1796,7 @@ SPC_CONVERSION_IMPLEMENTATION(ArGreyAlpha16,ga16,)
 SPC_CONVERSION_IMPLEMENTATION(ArGreyAlpha32,ga32,)
 
 SPC_CONVERSION_IMPLEMENTATION(ArRGB,rgb,)
-SPC_CONVERSION_IMPLEMENTATION(ArUT_RGB,ut_rgb,)
 SPC_CONVERSION_IMPLEMENTATION(ArRGBA,rgba,)
-SPC_CONVERSION_IMPLEMENTATION(ArUT_RGBA,ut_rgba,)
 SPC_CONVERSION_IMPLEMENTATION(ArRGB24,rgb24,)
 SPC_CONVERSION_IMPLEMENTATION(ArRGBA32,rgba32,)
 SPC_CONVERSION_IMPLEMENTATION(ArRGB48,rgb48,)
@@ -1807,7 +1805,7 @@ SPC_CONVERSION_IMPLEMENTATION(ArRGBA64,rgba64,)
 //SPC_CONVERSION_IMPLEMENTATION(ArRGBA128,rgba128,)
 
 SPC_CONVERSION_IMPLEMENTATION(ArCIEXYZ,xyz,)
-//SPC_CONVERSION_IMPLEMENTATION(ArCIEXYZA,xyza,)
+SPC_CONVERSION_IMPLEMENTATION(ArCIEXYZA,xyza,)
 
 SPC_CONVERSION_IMPLEMENTATION(ArSpectrum8,s8,)
 SPC_CONVERSION_IMPLEMENTATION(ArSpectrum11,s11,)
@@ -1818,26 +1816,5 @@ SPC_CONVERSION_IMPLEMENTATION(ArRSSpectrum,rss,_new)
 SPC_CONVERSION_IMPLEMENTATION(ArPSSpectrum,pss,_new)
 
 #include "ColourAndSpectralDataConversion.h"
-
-void utf_rgb_to_spc(
-        const ART_GV            * art_gv,
-        const ArUTF_RGB         * utf_rgb,
-              ArSpectrum        * spc
-        )
-{
-    ArRGB  rgb;
-    
-    utf_rgb_to_rgb(
-          art_gv,
-          utf_rgb,
-        & rgb
-        );
-    
-    rgb_to_spc(
-          art_gv,
-        & rgb,
-          spc
-        );
-}
 
 /* ======================================================================== */

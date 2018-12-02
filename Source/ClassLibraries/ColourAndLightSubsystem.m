@@ -109,7 +109,7 @@ void art_set_isr(
 
     switch (isr)
     {
-        case ardt_ut_xyz:
+        case ardt_xyz:
         case ardt_spectrum8:
         case ardt_spectrum11:
         case ardt_spectrum18:
@@ -117,7 +117,7 @@ void art_set_isr(
             arlightandattenuation_switch_to_plain( art_gv );
             break;
 
-        case ardt_ut_xyz_polarisable:
+        case ardt_xyz_polarisable:
         case ardt_spectrum8_polarisable:
         case ardt_spectrum11_polarisable:
         case ardt_spectrum18_polarisable:

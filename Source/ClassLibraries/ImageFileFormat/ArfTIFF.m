@@ -201,7 +201,7 @@ unsigned int arftifftype(
 #define RGBA32_FILE     ((ArRGBA32 *)fileLine)
 #define RGB48_FILE      ((ArRGB48 *)fileLine)
 #define RGBA64_FILE     ((ArRGBA64 *)fileLine)
-#define FCIE_FILE       ((ArUTF_CIEXYZ *)fileLine)
+#define CIEXYZ_FILE     ((ArCIEXYZ *)fileLine)
 
 #define G_DATA          ((ArGrey *)dataLine)
 #define GA_DATA         ((ArGreyAlpha *)dataLine)
@@ -223,7 +223,7 @@ unsigned int arftifftype(
 #define RGBA32_FILE_NC  fileLine
 #define RGB48_FILE_NC   fileLine
 #define RGBA64_FILE_NC  fileLine
-#define FCIE_FILE_NC    fileLine
+#define FCIEXYZ_FILE_NC fileLine
 
 #define G_DATA_NC       dataLine
 #define GA_DATA_NC      dataLine
@@ -891,7 +891,7 @@ unsigned int arftifftype(
                         {
                             ArRGBA rgba = RGBA_DATA[x];
 
-                            rgb_dd_clamp_c(art_gv,0.0,1.0, &ARRGBA_T(rgba));
+                            rgb_dd_clamp_c(art_gv,0.0,1.0, &ARRGBA_C(rgba));
                             rgba_to_rgba32(art_gv,&rgba,&RGBA32_FILE[x]);
                         }
                         TIFFWriteScanline(tiffFile, RGBA32_FILE, YC(start)+y, 0);
@@ -902,7 +902,7 @@ unsigned int arftifftype(
                         for (long x = 0; x < ARNIMG_XSIZE(image); x++)
                         {
                             ArRGBA rgba = RGBA_DATA[x];
-                            rgb_dd_clamp_c(art_gv,0.0,1.0, &ARRGBA_T(rgba));
+                            rgb_dd_clamp_c(art_gv,0.0,1.0, &ARRGBA_C(rgba));
                             rgba_to_rgba64(art_gv,&rgba,&RGBA64_FILE[x]);
                         }
                         TIFFWriteScanline(tiffFile, RGBA64_FILE, YC(start)+y, 0);
@@ -1208,25 +1208,6 @@ unsigned int arftifftype(
             }
             break;
         }
-#ifndef _ART_WITHOUT_TIFFLOGLUV_
-        case ardt_ciexyz:
-        {
-            for ( long y = 0; y < ARNIMG_YSIZE(image); y++ )
-            {
-                [ image getCIEXYZRegion
-                    :   IPNT2D( 0, y )
-                    :   IVEC2D( ARNIMG_XSIZE(image), 1 )
-                    :   CIE_DATA
-                    :   0 ];
-
-                for ( long x = 0; x < ARNIMG_XSIZE(image); x++ )
-                    xyz_to_utf_xyz( art_gv,& CIE_DATA[x], & FCIE_FILE[x] );
-
-                TIFFWriteScanline( tiffFile, FCIE_FILE, YC(start) + y, 0 );
-            }
-            break;
-        }
-#endif
     }
 }
 

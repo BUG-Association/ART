@@ -28,107 +28,56 @@
 #define _ART_FOUNDATION_COLOURANDSPECTRA_ARRGBA_H_
 
 #include "ART_Foundation_System.h"
+#include "ART_Foundation_Math.h"
+#include "ArRGB.h"
 
 ART_MODULE_INTERFACE(ArRGBA)
 
-#include "ArSpectrumSubsystemManagement.h"
 
-ART_SPECTRUM_MODULE_INTERFACE(ArRGBA)
+typedef struct ArRGBA
+{
+    ArRGB   rgb;
+    double  alpha;
+}
+ArRGBA;
 
-#include "ArTristimulusColourValue.h"
-#include "ArRGB.h"
+typedef struct ArFloatRGBA
+{
+    ArFloatRGB  rgb;
+    float       alpha;
+}
+ArFloatRGBA;
 
-/* ---------------------------------------------------------------------------
+#define ARRGBA_C(__c)       (__c).rgb
+#define ARRGBA_A(__c)       (__c).alpha
+#define ARRGBA_R(__c)       ARRGB_R(ARRGBA_C(__c))
+#define ARRGBA_G(__c)       ARRGB_G(ARRGBA_C(__c))
+#define ARRGBA_B(__c)       ARRGB_B(ARRGBA_C(__c))
 
-    'ArRGBA' and 'ArUntaggedFloatRGBA' structs
-
-    These are similar to ArRGB and ArUTF_RGB in all ways except that these
-    structures contain an additional alpha channel.
-
-    All explanations and caveats from ArRGB.h apply to these as well.
-
-------------------------------------------------------------------------aw- */
-
-typedef ArTristimulusColourValueAlpha  ArRGBA;
-
-
-//   Mappings of the accessor macros to the TCV macros
-
-#define ARRGBA_T        ARTCVA_T
-#define ARRGBA_C        ARRGBA_T
-#define ARRGBA_S        ARTCVA_S
-#define ARRGBA_A        ARTCVA_A
-
-
-//   Component acessor macros
-
-#define ARRGBA_R(_rgba)        ARRGB_R(ARRGBA_T(_rgba))
-#define ARRGBA_G(_rgba)        ARRGB_G(ARRGBA_T(_rgba))
-#define ARRGBA_B(_rgba)        ARRGB_B(ARRGBA_T(_rgba))
-
-#define ARRGBA_CI(_rgba,_i)    ARRGB_CI(ARRGBA_T(_rgba),(_i))
+#define ARFLOATRGBA_C(__c)  (__c).rgb
+#define ARFLOATRGBA_A(__c)  (__c).alpha
+#define ARFLOATRGBA_R(__c)  ARRGB_R(ARFLOATRGBA_C(__c))
+#define ARFLOATRGBA_G(__c)  ARRGB_G(ARFLOATRGBA_C(__c))
+#define ARFLOATRGBA_B(__c)  ARRGB_B(ARFLOATRGBA_C(__c))
 
 //   Initialisation macros
 
-#define ARRGBA_CS                   ARTCVA
-#define ARRGBA_GREY_CS(_d,_a,_s)    ARRGBA_CS( (_d),(_d),(_d), (_a), (_s) )
+#define ARRGBA(_r,_g,_b,_a)  ((ArRGBA){ ARRGB( (_r),(_g),(_b) ), (_a) })
+#define ARRGBA_GREY(_d,_a)   ARRGBA( (_d), (_d), (_d), (_a) )
 
-#define ARRGBA(_r,_g,_b,_a)     ARRGBA_CS( (_r),(_g),(_b),(_a), DEFAULT_RGB_SPACE_REF )
-#define ARRGBA_GREY(_d,_a)      ARRGBA_GREY_CS( (_d), (_a), DEFAULT_RGB_SPACE_REF )
-
-#define ARRGBA_WHITE    *arrgba_unit( art_gv )
-#define ARRGBA_BLACK    *arrgba_zero( art_gv )
-
-ArRGBA const * arrgba_unit(
-        const ART_GV  * art_gv
-        );
-
-ArRGBA const * arrgba_zero(
-        const ART_GV  * art_gv
-        );
-
-void rgba_d_init_c(
-        const ART_GV  * art_gv,
-        const double    d0,
-              ArRGBA  * cr
-        );
-
-void rgba_c_add_c(
-        const ART_GV  * art_gv,
-        const ArRGBA  * c0,
-              ArRGBA  * cr
-        );
-
-void rgba_d_mul_c(
-        const ART_GV  * art_gv,
-        const double    d0,
-              ArRGBA  * cr
-        );
-
-void rgba_dd_clamp_c(
-        const ART_GV  * art_gv,
-        const double    d0,
-        const double    d1,
-              ArRGBA  * cr
-        );
-
-void rgba_ccd_interpol_c(
-        const ART_GV  * art_gv,
-        const ArRGBA  * c0,
-        const ArRGBA  * c1,
-        const double    d0,
-              ArRGBA  * cr
-        );
+#define ARFLOATRGBA(_r,_g,_b,_a) ((ArFLOATRGBA){FCRD3( (_r),(_g),(_b) ), (_a) })
+#define ARFLOATRGBA_GREY(_d,_a)  ARFLOATRGBA( (_d), (_d), (_d), (_a) )
 
 void rgba_s_debugprintf(
         const ART_GV  * art_gv,
-        const ArRGBA  * c_0
+        const ArRGBA  * c0
         );
 
-int rgba_s_valid(
-        const ART_GV  * art_gv,
-        const ArRGBA  * c_0
+void utf_rgba_s_debugprintf(
+        const ART_GV       * art_gv,
+        const ArFloatRGBA  * c0
         );
+
 
 #endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARRGBA_H_ */
 /* ======================================================================== */

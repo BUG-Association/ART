@@ -39,7 +39,7 @@ void art_foundation_set_isr(
         );
 
 ArDataType  art_foundation_isr(
-        ART_GV  * art_gv
+        const ART_GV  * art_gv
         );
 
 void art_foundation_initialise_spectral_subsystem(

@@ -38,13 +38,13 @@ ART_MODULE_INTERFACE(ColourAndSpectralDataConversion)
 #include "ArColourTransform.h"
 
 #include "ArGrey.h"
+#include "ArCIEXYZ.h"
+#include "ArCIEXYZA.h"
+#include "ArCIELab.h"
+#include "ArCIELuv.h"
 #include "ArRGB.h"
-#include "ArRGBA.h"
-#include "ArUntaggedRGB.h"
-#include "ArUntaggedRGBA.h"
 #include "ArRGBUInt.h"
-#include "ArCIEColourValues.h"
-#include "ArCIEColourConversions.h"
+#include "ArRGBA.h"
 #include "ArSpectrum8.h"
 #include "ArSpectrum11.h"
 #include "ArSpectrum18.h"
@@ -52,8 +52,8 @@ ART_MODULE_INTERFACE(ColourAndSpectralDataConversion)
 #include "ArSpectrum500.h"
 #include "ArRSSpectrum.h"
 #include "ArPSSpectrum.h"
-
-#include "ColourConversionConstructorMacros.h"
+#include "ArCIEColourConversions.h"
+#include "ArCIEColourConversions.h"
 
 #define CONVERSION_FROM_TYPE_A_TO_TYPE_B(_TypeA,_typeA,_TypeB,_typeB) \
 void _typeA##_to_##_typeB( \
@@ -73,11 +73,7 @@ void _typeA##_to_##_typeB( \
     CONVERSION_FROM_TYPE_A_TO_TYPE_B(_Type,_type,CIEXYZ,xyz) \
     CONVERSION_FROM_TYPE_A_TO_TYPE_B(_Type,_type,CIEXYZA,xyza) \
     CONVERSION_FROM_TYPE_A_TO_TYPE_B(_Type,_type,RGB,rgb) \
-    CONVERSION_FROM_TYPE_A_TO_TYPE_B(_Type,_type,UT_RGB,ut_rgb) \
-    CONVERSION_FROM_TYPE_A_TO_TYPE_B(_Type,_type,UTF_RGB,utf_rgb) \
     CONVERSION_FROM_TYPE_A_TO_TYPE_B(_Type,_type,RGBA,rgba) \
-    CONVERSION_FROM_TYPE_A_TO_TYPE_B(_Type,_type,UT_RGBA,ut_rgba) \
-    CONVERSION_FROM_TYPE_A_TO_TYPE_B(_Type,_type,UTF_RGBA,utf_rgba) \
     CONVERSION_FROM_TYPE_A_TO_TYPE_B(_Type,_type,RGB24,rgb24) \
     CONVERSION_FROM_TYPE_A_TO_TYPE_B(_Type,_type,RGBA32,rgba32) \
     CONVERSION_FROM_TYPE_A_TO_TYPE_B(_Type,_type,RGB48,rgb48) \
@@ -102,11 +98,7 @@ COLOUR_CONVERSION_INTERFACE_FOR_TYPE(GreyAlpha32,ga32)
 COLOUR_CONVERSION_INTERFACE_FOR_TYPE(CIEXYZ,xyz)
 COLOUR_CONVERSION_INTERFACE_FOR_TYPE(CIEXYZA,xyza)
 COLOUR_CONVERSION_INTERFACE_FOR_TYPE(RGB,rgb)
-COLOUR_CONVERSION_INTERFACE_FOR_TYPE(UT_RGB,ut_rgb)
-COLOUR_CONVERSION_INTERFACE_FOR_TYPE(UTF_RGB,utf_rgb)
 COLOUR_CONVERSION_INTERFACE_FOR_TYPE(RGBA,rgba)
-COLOUR_CONVERSION_INTERFACE_FOR_TYPE(UT_RGBA,ut_rgba)
-COLOUR_CONVERSION_INTERFACE_FOR_TYPE(UTF_RGBA,utf_rgba)
 COLOUR_CONVERSION_INTERFACE_FOR_TYPE(RGB24,rgb24)
 COLOUR_CONVERSION_INTERFACE_FOR_TYPE(RGBA32,rgba32)
 COLOUR_CONVERSION_INTERFACE_FOR_TYPE(RGB48,rgb48)

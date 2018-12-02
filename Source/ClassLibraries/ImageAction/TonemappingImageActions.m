@@ -97,8 +97,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageDataType = ardt_ciexyz;
-    destinationFileDataType  = ardt_ciexyz;
+    destinationImageDataType = ardt_xyz;
+    destinationFileDataType  = ardt_xyz;
 
 
     /* ------------------------------------------------------------------
@@ -300,8 +300,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageDataType = ardt_ciexyz;
-    destinationFileDataType  = ardt_ciexyz;
+    destinationImageDataType = ardt_xyz;
+    destinationFileDataType  = ardt_xyz;
 
 
     /* ------------------------------------------------------------------
@@ -581,8 +581,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnMonochromeInteractiveCal
          fileDataType  = what we want it to write to disk for us
     ---------------------------------------------------------------aw- */
 
-    destinationImageDataType = ardt_ciexyz;
-    destinationFileDataType  = ardt_ciexyz;
+    destinationImageDataType = ardt_xyz;
+    destinationFileDataType  = ardt_xyz;
 
 
     /* ------------------------------------------------------------------

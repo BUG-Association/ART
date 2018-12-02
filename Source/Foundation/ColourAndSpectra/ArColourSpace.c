@@ -27,7 +27,9 @@
 #define ART_MODULE_NAME     ArColourSpace
 
 #include "ArColourSpace.h"
-#include "ArCIEColourValues.h"
+#include "ArRGB.h"
+#include "ArCIExyY.h"
+#include "ArCIEXYZ.h"
 
 //   uncomment the following line to get debug output for each ICC profile
 //   that is loaded
@@ -203,6 +205,26 @@ void calculateColourspaceMatrices(
         );
 }
 
+Mat3 bradford_ma()
+{
+    return
+        MAT3(
+             0.8951000,  0.2664000, -0.1614000,
+            -0.7502000,  1.7135000,  0.0367000,
+             0.0389000, -0.0685000,  1.0296000
+             );
+}
+
+Mat3 cat02_suesstrunk_ma()
+{
+    return
+        MAT3(
+             0.7328, 0.4296, -0.1624,
+            -0.7036, 1.6975,  0.0061,
+             0.0000, 0.0000,  1.0000
+             );
+}
+
 #define TYPE                        ARCS_TYPE(cs)
 #define NAME                        ARCS_NAME(cs)
 
@@ -276,8 +298,8 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     ARCS_TABLE = artable_alloc_init();
 
-    Pnt2D  d50_xy = PNT2D(0.3457,0.3585);
-    Pnt2D  d65_xy = PNT2D(0.3127,0.3290);
+    ArCIExy  d50_xy = ARCIExy(0.3457,0.3585);
+    ArCIExy  d65_xy = ARCIExy(0.3127,0.3290);
 
     ArColourSpace  cs;
  
@@ -286,9 +308,9 @@ ART_MODULE_INITIALISATION_FUNCTION
     TYPE = arcolourspacetype_ciexyz;
     NAME = arsymbol( art_gv, "CIE XYZ" );
  
-    RED   = PNT2D(1,0);
-    GREEN = PNT2D(0,1);
-    BLUE  = PNT2D(0,0);
+    RED   = ARCIExy(1,0);
+    GREEN = ARCIExy(0,1);
+    BLUE  = ARCIExy(0,0);
     WHITE = d50_xy;
     GAMMA = 1.0;
 
@@ -338,9 +360,9 @@ ART_MODULE_INITIALISATION_FUNCTION
     TYPE = arcolourspacetype_rgb;
     NAME = arsymbol( art_gv, "sRGB" );
 
-    RED   = PNT2D(.64,.33);
-    GREEN = PNT2D(.30,.60);
-    BLUE  = PNT2D(.15,.06);
+    RED   = ARCIExy(.64,.33);
+    GREEN = ARCIExy(.30,.60);
+    BLUE  = ARCIExy(.15,.06);
     WHITE = d65_xy;
     GAMMA = 2.2;
 
@@ -373,9 +395,9 @@ ART_MODULE_INITIALISATION_FUNCTION
     TYPE = arcolourspacetype_rgb;
     NAME = arsymbol( art_gv, "Adobe RGB (1998)" );
 
-    RED   = PNT2D(.64,.33);
-    GREEN = PNT2D(.21,.71);
-    BLUE  = PNT2D(.15,.06);
+    RED   = ARCIExy(.64,.33);
+    GREEN = ARCIExy(.21,.71);
+    BLUE  = ARCIExy(.15,.06);
     WHITE = d65_xy;
     GAMMA = 563. / 256.;
 
@@ -399,9 +421,9 @@ ART_MODULE_INITIALISATION_FUNCTION
     TYPE = arcolourspacetype_rgb;
     NAME = arsymbol( art_gv, "Adobe Wide Gamut RGB" );
 
-    RED   = PNT2D(0.7347,0.2653);
-    GREEN = PNT2D(0.1152,0.8264);
-    BLUE  = PNT2D(0.1566,0.0177);
+    RED   = ARCIExy(0.7347,0.2653);
+    GREEN = ARCIExy(0.1152,0.8264);
+    BLUE  = ARCIExy(0.1566,0.0177);
     WHITE = d50_xy;
     GAMMA = 563. / 256.;
 
@@ -425,10 +447,10 @@ ART_MODULE_INITIALISATION_FUNCTION
     TYPE = arcolourspacetype_rgb;
     NAME = arsymbol( art_gv, "ACES AP0 RGB" );
 
-    RED   = PNT2D( 0.73470,  0.26530 );
-    GREEN = PNT2D( 0.00000,  1.00000 );
-    BLUE  = PNT2D( 0.00010, -0.07700 );
-    WHITE = PNT2D( 0.32168,  0.33767 );
+    RED   = ARCIExy( 0.73470,  0.26530 );
+    GREEN = ARCIExy( 0.00000,  1.00000 );
+    BLUE  = ARCIExy( 0.00010, -0.07700 );
+    WHITE = ARCIExy( 0.32168,  0.33767 );
     GAMMA = 563. / 256.;
 
     GAMMAFUNCTION = arcolourspace_standard_gamma;
@@ -795,6 +817,66 @@ void arcolourspace_debugprintf(
         printf("\n"C3_M_FORMAT("%6.5f") "\n",C3_M_PRINTF(ARCS_RGB_TO_XYZ(cs)));fflush(stdout);
         printf(C3_M_FORMAT("%6.5f") "\n",C3_M_PRINTF(ARCS_XYZ_TO_RGB(cs)));fflush(stdout);
 */
+}
+
+Mat3  xyz2rgb_via_primaries(
+              ART_GV   * art_gv,
+        const ArCIExy  * r,
+        const ArCIExy  * g,
+        const ArCIExy  * b,
+        const ArCIExy  * w
+        )
+{
+    ArCIEXYZ r_xyz, g_xyz, b_xyz, w_xyz;
+    
+    ARCIEXYZ_X(r_xyz) = XC(*r)/YC(*r);
+    ARCIEXYZ_Y(r_xyz) = 1;
+    ARCIEXYZ_Z(r_xyz) = (1-XC(*r)-YC(*r))/YC(*r);
+    
+    ARCIEXYZ_X(g_xyz) = XC(*g)/YC(*g);
+    ARCIEXYZ_Y(g_xyz) = 1;
+    ARCIEXYZ_Z(g_xyz) = (1-XC(*g)-YC(*g))/YC(*g);
+    
+    ARCIEXYZ_X(b_xyz) = XC(*b)/YC(*b);
+    ARCIEXYZ_Y(b_xyz) = 1;
+    ARCIEXYZ_Z(b_xyz) = (1-XC(*b)-YC(*b))/YC(*b);
+    
+    ARCIEXYZ_X(w_xyz) = XC(*w)/YC(*w);
+    ARCIEXYZ_Y(w_xyz) = 1;
+    ARCIEXYZ_Z(w_xyz) = (1-XC(*w)-YC(*w))/YC(*w);
+    
+    Mat3  rgb2xyz =
+        MAT3( ARCIEXYZ_X(r_xyz), ARCIEXYZ_X(g_xyz), ARCIEXYZ_X(b_xyz),
+              ARCIEXYZ_Y(r_xyz), ARCIEXYZ_Y(g_xyz), ARCIEXYZ_Y(b_xyz),
+              ARCIEXYZ_Z(r_xyz), ARCIEXYZ_Z(g_xyz), ARCIEXYZ_Z(b_xyz));
+
+//    c3_transpose_m( & rgb2xyz );
+
+    double  det = c3_m_det( & rgb2xyz );
+
+    Mat3  xyz2srgb;
+    
+    c3_md_invert_m( & rgb2xyz, det, & xyz2srgb );
+    
+    ArCIEXYZ  w_rgb;
+    c3_transpose_m( & xyz2srgb );
+
+    c3_cm_mul_c(&w_xyz.c,&xyz2srgb,&w_rgb.c);
+    
+    Mat3  rgb2xyz_final =
+        MAT3( ARCIEXYZ_X(r_xyz)*XC(w_rgb), ARCIEXYZ_X(g_xyz)*YC(w_rgb), ARCIEXYZ_X(b_xyz)*ZC(w_rgb),
+              ARCIEXYZ_Y(r_xyz)*XC(w_rgb), ARCIEXYZ_Y(g_xyz)*YC(w_rgb), ARCIEXYZ_Y(b_xyz)*ZC(w_rgb),
+              ARCIEXYZ_Z(r_xyz)*XC(w_rgb), ARCIEXYZ_Z(g_xyz)*YC(w_rgb), ARCIEXYZ_Z(b_xyz)*ZC(w_rgb));
+    
+    det = c3_m_det( & rgb2xyz_final );
+
+    Mat3  xyz2srgb_final;
+    
+    c3_md_invert_m( & rgb2xyz_final, det, & xyz2srgb_final );
+    
+    c3_transpose_m( & xyz2srgb_final );
+
+    return  xyz2srgb_final;
 }
 
 /* ======================================================================== */

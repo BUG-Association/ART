@@ -1,3 +1,4 @@
+
 /* ===========================================================================
 
     Copyright (c) 1996-2018 The ART Development Team
@@ -24,10 +25,48 @@
 
 =========================================================================== */
 
-#include "ArCIEColourValuesUInt.h"
+#ifndef _ART_FOUNDATION_COLOURANDSPECTRA_SYSTEM_WHITEPOINT_H_
+#define _ART_FOUNDATION_COLOURANDSPECTRA_SYSTEM_WHITEPOINT_H_
 
-void arciecolourvaluesuint_initialise()
-{
-}
+#include "ART_Foundation_System.h"
 
+ART_MODULE_INTERFACE(SystemWhitepoint)
+
+#include "ART_Foundation_Math.h"
+#include "ArCIExy.h"
+#include "ArCIEXYZ.h"
+
+
+ArCIEXYZ const * art_system_white_point_xyz(
+        const ART_GV  * art_gv
+        );
+
+void art_set_system_white_point_by_desc(
+              ART_GV  * art_gv,
+        const char    * wp_desc
+        );
+
+void art_set_system_white_point(
+              ART_GV   * art_gv,
+        const char     * wp_desc,
+        const ArCIExy  * wp
+        );
+
+Mat3 art_chromatic_adaptation_matrix(
+              ART_GV   * art_gv,
+        const ArCIExy  * target
+        );
+
+ArSymbol art_system_white_point_symbol(
+        const ART_GV  * art_gv
+        );
+
+int art_system_white_point_has_been_manually_set(
+        const ART_GV  * art_gv
+        );
+
+#define ARCIEXYZ_SYSTEM_WHITE_POINT \
+    * art_system_white_point_xyz(art_gv)
+
+#endif /* _ART_FOUNDATION_COLOURANDSPECTRA_SYSTEM_WHITEPOINT_H_ */
 /* ======================================================================== */

@@ -83,9 +83,9 @@ ART_MODULE_INTERFACE(ARM_Action)
         ]
 
 #define SET_ISR_TO_PLAIN_XYZ \
-    SET_ISR_ACTION(ardt_ut_xyz)
+    SET_ISR_ACTION(ardt_xyz)
 #define SET_ISR_TO_POLARISABLE_XYZ \
-    SET_ISR_ACTION(ardt_ut_xyz_polarisable)
+    SET_ISR_ACTION(ardt_xyz_polarisable)
 #define SET_ISR_TO_XYZ                SET_ISR_TO_PLAIN_XYZ
 
 #define SET_ISR_TO_PLAIN_SPECTRUM_8 \

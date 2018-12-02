@@ -39,9 +39,7 @@ ART_MODULE_INITIALISATION_FUNCTION
     [ ArnGreyAlpha32Image registerWithRuntime ];
 
     [ ArnRGBImage         registerWithRuntime ];
-    [ ArnUT_RGBImage      registerWithRuntime ];
     [ ArnRGBAImage        registerWithRuntime ];
-    [ ArnUT_RGBAImage     registerWithRuntime ];
     [ ArnRGB24Image       registerWithRuntime ];
     [ ArnRGBA32Image      registerWithRuntime ];
     [ ArnRGB48Image       registerWithRuntime ];
@@ -284,9 +282,7 @@ _ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(_class,_Type)
     GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,GreyAlpha32,ga32) \
     \
     GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,RGB,rgb) \
-    GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,UT_RGB,ut_rgb) \
     GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,RGBA,rgba) \
-    GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,UT_RGBA,ut_rgba) \
     GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,RGB24,rgb24) \
     GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,RGBA32,rgba32) \
     GETSET_REGION_CONVERSION_IMPLEMENTATION(_itype,_it,RGB48,rgb48) \
@@ -354,13 +350,6 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnPlainImage)
                     :   s
                     ];
 
-        case ardt_ut_xyz:
-            return
-                [ ALLOC_OBJECT_AGV(new_art_gv,ArnUT_RGBImage)
-                    initWithSize
-                    :   s
-                    ];
-
         case ardt_rgba:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnRGBAImage)
@@ -389,14 +378,14 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnPlainImage)
                     :   s
                     ];
 
-        case ardt_ciexyz:
+        case ardt_xyz:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnCIEXYZImage)
                     initWithSize
                     :   s
                     ];
 
-        case ardt_ciexyza:
+        case ardt_xyza:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnCIEXYZAImage)
                     initWithSize
@@ -525,9 +514,7 @@ GETSET_REGION_DUMMY_IMPLEMENTATION(GreyAlpha16)
 GETSET_REGION_DUMMY_IMPLEMENTATION(GreyAlpha32)
 
 GETSET_REGION_DUMMY_IMPLEMENTATION(RGB)
-GETSET_REGION_DUMMY_IMPLEMENTATION(UT_RGB)
 GETSET_REGION_DUMMY_IMPLEMENTATION(RGBA)
-GETSET_REGION_DUMMY_IMPLEMENTATION(UT_RGBA)
 GETSET_REGION_DUMMY_IMPLEMENTATION(RGB24)
 GETSET_REGION_DUMMY_IMPLEMENTATION(RGBA32)
 GETSET_REGION_DUMMY_IMPLEMENTATION(RGB48)
@@ -647,20 +634,6 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(RGB,rgb)
 @end
 
 /* ===========================================================================
-    'ArnRGBImage'
-=========================================================================== */
-@implementation ArnUT_RGBImage
-
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnUT_RGBImage)
-ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnUT_RGBImage,UT_RGB)
-
-- (ArDataType) dataType { return ardt_rgb; }
-
-IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(UT_RGB,ut_rgb)
-
-@end
-    
-/* ===========================================================================
     'ArnRGBAImage'
 =========================================================================== */
 @implementation ArnRGBAImage
@@ -671,20 +644,6 @@ ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnRGBAImage,RGBA)
 - (ArDataType) dataType { return ardt_rgba; }
 
 IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(RGBA,rgba)
-
-@end
-
-/* ===========================================================================
-    'ArnUT_RGBAImage'
-=========================================================================== */
-@implementation ArnUT_RGBAImage
-
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnUT_RGBAImage)
-ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnUT_RGBAImage,UT_RGBA)
-
-- (ArDataType) dataType { return ardt_ut_xyza; }
-
-IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(UT_RGBA,ut_rgba)
 
 @end
 
@@ -767,7 +726,7 @@ IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(RGB96,rgb96)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCIEXYZImage)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnCIEXYZImage,CIEXYZ)
 
-- (ArDataType) dataType { return ardt_ciexyz; }
+- (ArDataType) dataType { return ardt_xyz; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(CIEXYZ,xyz)
 
@@ -781,7 +740,7 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(CIEXYZ,xyz)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCIEXYZAImage)
 ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnCIEXYZAImage,CIEXYZA)
 
-- (ArDataType) dataType { return ardt_ciexyza; }
+- (ArDataType) dataType { return ardt_xyza; }
 
 IMAGE_CONVERSION_DEFAULT_IMPLEMENTATION(CIEXYZA,xyza)
 

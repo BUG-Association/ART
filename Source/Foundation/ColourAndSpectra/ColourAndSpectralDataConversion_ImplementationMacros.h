@@ -279,7 +279,6 @@ void s##_n##_to_xyz( \
     ARCIEXYZ_Y(*xyz_r) = s##_n##_s_sum( art_gv, & temp ); \
     s##_n##_ss_mul_s( art_gv,s_0, primary[2], & temp ); \
     ARCIEXYZ_Z(*xyz_r) = s##_n##_s_sum( art_gv, & temp ); \
-    ARCIEXYZ_S(*xyz_r) = ARCSR_CIEXYZ; \
     CC_OPERAND_DEBUGPRINTF( xyz, xyz_r ) \
     CC_END_DEBUGPRINTF( s##_n##_to_xyz ) \
 }
@@ -295,11 +294,7 @@ COLOUR_CONVERSION_VIA_XYZ( Spectrum##_n ,s##_n,GreyAlpha32,ga32) \
 COLOUR_CONVERSION_S_TO_XYZ_IMPLEMENTATION(_n) \
 COLOUR_CONVERSION_VIA_XYZ( Spectrum##_n ,s##_n,CIEXYZA,xyza) \
 COLOUR_CONVERSION_VIA_XYZ( Spectrum##_n ,s##_n,RGB,rgb) \
-COLOUR_CONVERSION_VIA_XYZ( Spectrum##_n ,s##_n,UT_RGB,ut_rgb) \
-COLOUR_CONVERSION_VIA_XYZ( Spectrum##_n ,s##_n,UTF_RGB,utf_rgb) \
 COLOUR_CONVERSION_VIA_XYZ( Spectrum##_n ,s##_n,RGBA,rgba) \
-COLOUR_CONVERSION_VIA_XYZ( Spectrum##_n ,s##_n,UT_RGBA,ut_rgba) \
-COLOUR_CONVERSION_VIA_XYZ( Spectrum##_n ,s##_n,UTF_RGBA,utf_rgba) \
 COLOUR_CONVERSION_VIA_XYZ( Spectrum##_n ,s##_n,RGB24,rgb24) \
 COLOUR_CONVERSION_VIA_XYZ( Spectrum##_n ,s##_n,RGBA32,rgba32) \
 COLOUR_CONVERSION_VIA_XYZ( Spectrum##_n ,s##_n,RGB48,rgb48) \
@@ -375,10 +370,10 @@ void rgb##_a##_n##_to_rgb( \
         ) \
 { \
     CC_START_DEBUGPRINTF( rgb##_a##_n##_to_rgb##_a ) \
-    ArUT_RGB  ut_rgb; \
+    ArRGB  rgb; \
 \
-    rgb##_a##_n##_to_ut_rgb(art_gv,source,&ut_rgb); \
-    ut_rgb_to_rgb(art_gv,&ut_rgb,target); \
+    rgb##_a##_n##_to_rgb(art_gv,source,&rgb); \
+    rgb_to_rgb(art_gv,&rgb,target); \
     CC_END_DEBUGPRINTF( rgb##_a##_n##_to_rgb ) \
 }
 
@@ -390,10 +385,10 @@ void rgb##_a##_n##_to_rgba( \
         ) \
 { \
     CC_START_DEBUGPRINTF( rgb##_n##_to_rgba ) \
-    ArUT_RGBA  ut_rgba; \
+    ArRGBA  rgba; \
 \
-    rgb##_a##_n##_to_ut_rgba(art_gv,source,&ut_rgba); \
-    ut_rgba_to_rgba(art_gv,&ut_rgba,target); \
+    rgb##_a##_n##_to_rgba(art_gv,source,&rgba); \
+    rgba_to_rgba(art_gv,&rgba,target); \
     CC_END_DEBUGPRINTF( rgb##_n##_to_rgba ) \
 }
 

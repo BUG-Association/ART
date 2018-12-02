@@ -175,9 +175,6 @@ ART_MODULE_INTERFACE(ArpCoding)
 - (void) codeArRGB
         : (ArRGB *) codeArRGB
         ;
-- (void) codeArUTF_RGB
-        : (ArUTF_RGB *) codeArUTF_RGB
-        ;
 - (void) codeArSpectrum8
         : (ArSpectrum8 *) codeArSpectrum8
         ;

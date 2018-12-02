@@ -43,7 +43,6 @@ ART_MODULE_INITIALISATION_FUNCTION
     [ ArnDefaultRGBColourSpace registerWithRuntime ];
 
     set_default_rgbspace_ref( art_gv, ARCOLOURSPACEREF_sRGB );
-    set_rgb_computationspace_ref( art_gv, ARCOLOURSPACEREF_sRGB );
 
     ArnColourSpace_GV  * arncolourspace_gv;
 
