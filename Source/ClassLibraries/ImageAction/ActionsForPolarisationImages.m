@@ -154,19 +154,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTRAWLinearPolarisingFi
              fileDataType  = what we want it to write to disk for us
         ---------------------------------------------------------------aw- */
 
-        //   The image colour type is always "native" (i.e. whatever model we
-        //   are using), except for RGB images: to avoid issues with different
-        //   RGB colour spaces, any RGB results get written to disk as CIE XYZ
-
-        if (   art_isr( art_gv ) == ardt_xyz
-            || art_isr( art_gv ) == ardt_xyz_polarisable )
-            destinationImageDataType = ardt_xyz;
-        else
-            destinationImageDataType = art_isr( art_gv );
-
-        //   In the case of a renderer directly writing its output to file, the
-        //   image and file colour data types are the same.
-
+        destinationImageDataType = art_isr( art_gv );
         destinationFileDataType = destinationImageDataType;
 
 

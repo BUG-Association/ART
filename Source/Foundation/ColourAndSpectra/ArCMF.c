@@ -507,6 +507,7 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     ARCMF_RESULT_DATATYPE( *arcmf_gv->cie31_2deg_cmf  ) = ardt_xyz;
     ARCMF_CURVES( *arcmf_gv->cie31_2deg_cmf  ) = ALLOC_ARRAY( ArPSSpectrum, 3 );
+    ARCMF_CURVES_500( *arcmf_gv->cie31_2deg_cmf  ) = ALLOC_ARRAY( ArSpectrum500, 3 );
 
     rss_to_pss_new(
           art_gv,
@@ -540,6 +541,7 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     ARCMF_RESULT_DATATYPE( *arcmf_gv->cie06_2deg_cmf  ) = ardt_xyz;
     ARCMF_CURVES( *arcmf_gv->cie06_2deg_cmf  ) = ALLOC_ARRAY( ArPSSpectrum, 3 );
+    ARCMF_CURVES_500( *arcmf_gv->cie06_2deg_cmf  ) = ALLOC_ARRAY( ArSpectrum500, 3 );
 
     rss_to_pss_new(
           art_gv,
@@ -566,7 +568,22 @@ ART_MODULE_INITIALISATION_FUNCTION
     ARCMF_CURVE_SCALE( *arcmf_gv->cie06_2deg_cmf, 1 ) /= areaY;
     ARCMF_CURVE_SCALE( *arcmf_gv->cie06_2deg_cmf, 2 ) /= areaY;
 
-//  You can switch ART to using the old CIE 1931 primaries here
+    for ( int i = 0; i < 3; i++ )
+    {
+        pss_to_s500(
+              art_gv,
+            & ARCMF_CURVE(*arcmf_gv->cie31_2deg_cmf,i),
+            & ARCMF_CURVE_500(*arcmf_gv->cie31_2deg_cmf,i)
+            );
+            
+        pss_to_s500(
+              art_gv,
+            & ARCMF_CURVE(*arcmf_gv->cie06_2deg_cmf,i),
+            & ARCMF_CURVE_500(*arcmf_gv->cie06_2deg_cmf,i)
+            );
+    }
+
+//  You can switch ART to using the new tentative 2006 CIE primaries here
 
 //    arcmf_gv->default_cmf = arcmf_gv->cie06_2deg_cmf;
     arcmf_gv->default_cmf = arcmf_gv->cie31_2deg_cmf;

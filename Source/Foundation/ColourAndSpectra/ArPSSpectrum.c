@@ -321,7 +321,7 @@ double pss_sd_value_at_wavelength(
 
         double scale = ( 1.0 / ( XC(ARPSS_ARRAY_I( *s0, i )) - XC(ARPSS_ARRAY_I( *s0, i-1 )) ) ) *
                         ( XC(ARPSS_ARRAY_I( *s0, i )) - d0 );
-        return YC( ARPSS_ARRAY_I( *s0, i ) ) * scale + YC( ARPSS_ARRAY_I( *s0, i-1 ) ) * ( 1.0 - scale );
+        return YC( ARPSS_ARRAY_I( *s0, i ) ) * ( 1.0 - scale ) + YC( ARPSS_ARRAY_I( *s0, i-1 ) ) * scale;
 
     }
     else

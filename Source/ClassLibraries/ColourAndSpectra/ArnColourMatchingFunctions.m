@@ -76,18 +76,23 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourMatchingFunctions)
         int  currentNormalisation = 0;
         double  area = 0.0;
 
-        colourMatchingFunctions.cmfCurves =
+        ARCMF_CURVES(colourMatchingFunctions) =
             ALLOC_ARRAY(ArPSSpectrum,numChannels);
+
+        ARCMF_CURVES_500(colourMatchingFunctions) =
+            ALLOC_ARRAY(ArSpectrum500,numChannels);
 
         for ( i = 0; i < numChannels; i++ )
         {
             [ MATCHING_FUNCTION(i) getNewPSSpectrum
                 :   0
-                : & colourMatchingFunctions.cmfCurves[i] ];
+                : & ARCMF_CURVE(colourMatchingFunctions,i)
+                ];
 
             if (ARCMF_NORMALISATION_MASTER(normalisationType[i]))
             {
                 masterIndex = i;
+        
                 if(ARCMF_NORMALISATION_EXTERNAL( normalisationType[i]))
                 {
                     ArPSSpectrum  normSpectrum;
@@ -102,7 +107,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourMatchingFunctions)
                         pss_inner_product(
                               art_gv,
                             & normSpectrum,
-                            & colourMatchingFunctions.cmfCurves[i]
+                            & ARCMF_CURVE(colourMatchingFunctions,i)
                             );
 
                     FREE_ARRAY(normSpectrum.array);
@@ -112,7 +117,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourMatchingFunctions)
                         pss_inner_product(
                               art_gv,
                               VISIBLE_RANGE,
-                            & colourMatchingFunctions.cmfCurves[i]
+                            & ARCMF_CURVE(colourMatchingFunctions,i)
                             );
             }
 
@@ -134,7 +139,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourMatchingFunctions)
                         pss_inner_product(
                               art_gv,
                             & normSpectrum,
-                            & colourMatchingFunctions.cmfCurves[i]
+                            & ARCMF_CURVE(colourMatchingFunctions,i)
                             );
 
                     FREE_ARRAY(normSpectrum.array);
@@ -144,12 +149,18 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourMatchingFunctions)
                         pss_inner_product(
                               art_gv,
                               VISIBLE_RANGE,
-                            & colourMatchingFunctions.cmfCurves[i]
+                            & ARCMF_CURVE(colourMatchingFunctions,i)
                             );
 
                 if ( area_i != 0.0 )
-                    colourMatchingFunctions.cmfCurves[i].scale /= area_i;
+                    ARCMF_CURVE_SCALE(colourMatchingFunctions,i) /= area_i;
             }
+            
+            pss_to_s500(
+                  art_gv,
+                & ARCMF_CURVE(colourMatchingFunctions,i),
+                & ARCMF_CURVE_500(colourMatchingFunctions,i)
+                );
         }
 
         if ( masterIndex != -1 )
@@ -157,11 +168,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourMatchingFunctions)
             if ( area != 0.0 )
                 for ( i = 0; i < numChannels; i++ )
                     if (
-                      ARCMF_NORMALISATION_MASTER(
-                                                normalisationType[i])
-                   || ARCMF_NORMALISATION_SLAVE(
-                                               normalisationType[i]))
-                        colourMatchingFunctions.cmfCurves[i].scale /= area;
+                      ARCMF_NORMALISATION_MASTER( normalisationType[i] )
+                   || ARCMF_NORMALISATION_SLAVE( normalisationType[i]) )
+                        ARCMF_CURVE_SCALE(colourMatchingFunctions,i) /= area;
         }
 
         validCMF = YES;

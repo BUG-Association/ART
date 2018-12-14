@@ -68,8 +68,9 @@ ArCMFNormalisation;
 
 typedef struct ArCMF
 {
-    ArDataType      resultDataType;
-    ArPSSpectrum  * cmfCurves;
+    ArDataType       resultDataType;
+    ArPSSpectrum   * cmf_pss;
+    ArSpectrum500  * cmf_500;
 }
 ArCMF;
 
@@ -78,10 +79,12 @@ ArCMF;
 #define ARCMF_RESULT_DATATYPE(__cmf)      (__cmf).resultDataType
 #define ARCMF_RESULT_CHANNELS(__cmf)        \
         ARDATATYPE_NUMCHANNELS(ARCMF_RESULT_DATATYPE(__cmf))
-#define ARCMF_CURVES(__cmf)                 (__cmf).cmfCurves
-#define ARCMF_CURVE(__cmf,__i)              (__cmf).cmfCurves[(__i)]
+#define ARCMF_CURVES(__cmf)                 (__cmf).cmf_pss
+#define ARCMF_CURVE(__cmf,__i)              ARCMF_CURVES(__cmf)[(__i)]
+#define ARCMF_CURVES_500(__cmf)             (__cmf).cmf_500
+#define ARCMF_CURVE_500(__cmf,__i)          ARCMF_CURVES_500(__cmf)[(__i)]
 #define ARCMF_CURVE_SCALE(__cmf,__i)        \
-        ARPSSPECTRUM_SCALE((__cmf).cmfCurves[(__i)])
+        ARPSSPECTRUM_SCALE(ARCMF_CURVE(__cmf,__i) )
 
 #define DEFAULT_CMF                   arcmf_defaultCMF(art_gv)
 #define CIE_2_DEG_STANDARD_OBSERVER   arcmf_CIE_2_deg_SO()

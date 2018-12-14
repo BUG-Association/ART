@@ -81,7 +81,7 @@ ART_MODULE_INITIALISATION_FUNCTION
     XYZ_SAMPLE_BOUND = ALLOC_ARRAY( double, XYZ_CHANNELS + 1 );
 
     double  range_start = 380.0 NM;
-    double  channel_width = 40.0 NM;
+    double  channel_width = 120.0 NM;
 
     for ( unsigned int i = 0; i < (XYZ_CHANNELS + 1); i++ )
     {
@@ -97,9 +97,14 @@ ART_MODULE_INITIALISATION_FUNCTION
              && next_sample_bound > 380.0 NM )
             XYZ_FIRST_VISIBLE_CHANNEL = i;
     }
+ 
+    XYZ_FIRST_VISIBLE_CHANNEL = 0;
+    XYZ_SAMPLE_BOUND[0] = 380 NM;
+    XYZ_SAMPLE_BOUND[1] = 520 NM;
+    XYZ_SAMPLE_BOUND[2] = 680 NM;
+    XYZ_SAMPLE_BOUND[3] = 780 NM;
 
-    XYZ_SAMPLING_RANGE =
-        XYZ_SAMPLE_BOUND[XYZ_CHANNELS] - XYZ_SAMPLE_BOUND[0];
+    XYZ_SAMPLING_RANGE = 400 NM;
 
     double  uniform_channel_width = XYZ_SAMPLING_RANGE / XYZ_CHANNELS;
 
@@ -208,19 +213,46 @@ void xyz_ss_convolve_d(
         );
 }
 
+//   Be aware of what this does: here, NO spectral uplifting is performed
+//   Instead, we go to RGB, and pick the channel which is most appropriate
+//   for the selected wavelength.
+
+//   The two boundaries defined here are a rough estimate: but if one is
+//   picking spectral channels from an XYZ image, any excess accuracy is
+//   unwarranted anyway.
+
+#define  BOUNDARY_BG    490 NM
+#define  BOUNDARY_GR    590 NM
+
 double xyz_sd_value_at_wavelength(
         const ART_GV    * art_gv,
         const ArCIEXYZ  * c_0,
         const double      d_0
         )
 {
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "ArSpectrum value queries for a specific wavelength not "
-        "defined in colour space - "
-        "switch ART to a spectral ISR to avoid this error"
+    ArRGB  rgb;
+    
+    xyz_conversion_to_linear_rgb(
+          art_gv,
+          c_0,
+        & rgb
         );
+    
+    double  result = ARRGB_B(*c_0);
+    
+    if ( d_0 > BOUNDARY_BG )
+    {
+        if ( d_0 > BOUNDARY_GR )
+        {
+            result = ARRGB_R(*c_0);
+        }
+        else
+        {
+            result = ARRGB_G(*c_0);
+        }
+    }
 
-    return 0.0;
+    return result;
 }
 
 void xyz_sdd_sample_at_wavelength_s(
@@ -257,11 +289,11 @@ void xyz_s_debugprintf(
         const ArCIEXYZ  * c_0
         )
 {
-    printf( "ArCIEXYZ( % 5.3f, % 5.3f, % 5.3f, %s )\n",
+    printf( "ArCIEXYZ( % 5.3f, % 5.3f, % 5.3f )\n",
         ARRGB_R(*c_0),
         ARRGB_G(*c_0),
-        ARRGB_B(*c_0),
-        ARCSR_NAME( DEFAULT_RGB_SPACE_REF ) );
+        ARRGB_B(*c_0)
+        );
 
     fflush(stdout);
 }
@@ -271,11 +303,11 @@ void xyz_s_mathematicaprintf(
         const ArCIEXYZ  * c_0
         )
 {
-    printf( "ArCIEXYZ{ % 5.3f, % 5.3f, % 5.3f, %s }\n",
+    printf( "ArCIEXYZ{ % 5.3f, % 5.3f, % 5.3f }\n",
         ARRGB_R(*c_0),
         ARRGB_G(*c_0),
-        ARRGB_B(*c_0),
-        ARCSR_NAME( DEFAULT_RGB_SPACE_REF ) );
+        ARRGB_B(*c_0)
+        );
 
     fflush(stdout);
 }

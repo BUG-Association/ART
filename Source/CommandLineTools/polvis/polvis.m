@@ -116,11 +116,11 @@ int polvis(
     ART_APPLICATION_MAIN_OPTIONS_FOLLOW
 
     id  wavelengthOpt =
-        [ FLOAT_OPTION
+        [ STRING_OPTION
             :   "wavelength"
             :   "wl"
-            :   "<float>"
-            :   "wavelength to visualise (in NM)"
+            :   "<string>"
+            :   "wavelength to visualise (in NM, or as r|g|b)"
             ];
 
     id  filterTinyOpt =
@@ -249,7 +249,40 @@ int polvis(
     double  wavelength = POLVIS_DEFAULT_WAVELENGTH;
     
     if ( [ wavelengthOpt hasBeenSpecified ] )
-        wavelength = UNIT_FROM_NANO([ wavelengthOpt doubleValue ]);
+    {
+        double  wl = NANO_FROM_UNIT(POLVIS_DEFAULT_WAVELENGTH);
+        BOOL    rgb = NO;
+        
+        if (   !strncmp([ wavelengthOpt cStringValue ], "r",1)
+            || !strncmp([ wavelengthOpt cStringValue ], "R",1))
+        {
+            wl = 620;
+            rgb = YES;
+        }
+        
+        if (   !strncmp([ wavelengthOpt cStringValue ], "g",1)
+            || !strncmp([ wavelengthOpt cStringValue ], "G",1))
+        {
+            wl = 550;
+            rgb = YES;
+        }
+        
+        if (   !strncmp([ wavelengthOpt cStringValue ], "b",1)
+            || !strncmp([ wavelengthOpt cStringValue ], "B",1))
+        {
+            wl = 420;
+            rgb = YES;
+        }
+        
+        if ( ! rgb )
+        {
+            char  * endptr;
+    
+            wl = strtod([ wavelengthOpt cStringValue ],&endptr);
+        }
+        
+        wavelength = UNIT_FROM_NANO(wl);
+    }
     else
         wavelength = UNIT_FROM_NANO(wavelength);
 

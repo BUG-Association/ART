@@ -173,6 +173,10 @@ void arplainlight_dld_mul_sloppy_add_l(
         );
 }
 
+const ArSpectrum500  ** s500_ciexyz_primary(
+        const ART_GV  * art_gv
+        );
+
 void arplainlight_ws_add_l(
         const ART_GV                         * art_gv,
         const ArPlainLightSample             * s0,
@@ -184,29 +188,46 @@ void arplainlight_ws_add_l(
     ASSERT_VALID_WAVELENGTH( w0 )
     ASSERT_VALID_SPECTRUMTYPE( sps, ArSpectralSample, s0, s )
     ASSERT_VALID_SPECTRUM( lr )
-
-    if ( art_foundation_isr(art_gv) == ardt_xyz )
-    {
     
-    }
-    else
+    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
     {
-        for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+        ASSERT_DOUBLE_LARGER_THAN(
+            NANO_FROM_UNIT(ARWL_WI(*w0,i)),
+            sd->s500_range_start
+            )
+        
+        ASSERT_DOUBLE_LESS_THAN(
+            NANO_FROM_UNIT(ARWL_WI(*w0,i)),
+            sd->s500_range_end
+            )
+        
+        unsigned int  s500_index =
+            (unsigned int)(   NANO_FROM_UNIT(ARWL_WI(*w0,i))
+                            - sd->s500_range_start );
+        
+        if ( art_foundation_isr(art_gv) == ardt_xyz )
         {
-            ASSERT_DOUBLE_LARGER_THAN(
-                NANO_FROM_UNIT(ARWL_WI(*w0,i)),
-                sd->s500_range_start
-                )
-            
-            ASSERT_DOUBLE_LESS_THAN(
-                NANO_FROM_UNIT(ARWL_WI(*w0,i)),
-                sd->s500_range_end
-                )
-            
-            unsigned int  s500_index =
-                (unsigned int)(   NANO_FROM_UNIT(ARWL_WI(*w0,i))
-                                - sd->s500_range_start );
-
+            for ( int j = 0; j < 3; j++ )
+            {
+                double  val  = arplainlight_li( art_gv, lr, j );
+                
+                double  cmf =
+                    s500_si(
+                          art_gv,
+                        & ARCMF_CURVE_500( *DEFAULT_CMF, j ),
+                          s500_index
+                        );
+                
+                arplainlight_set_lid(
+                      art_gv,
+                      lr,
+                      j,
+                      val + SPS_CI(*s0, i) * cmf
+                    );
+            }
+        }
+        else
+        {
             if ( sd->splatChannel0[s500_index] != INVALID_SPLAT_CHANNEL)
             {
                 double  temp =

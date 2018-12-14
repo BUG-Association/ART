@@ -503,8 +503,8 @@ void art_define_standard_commandline_options(
     {
         CSP_ISR_OPT =
             [ FLAG_OPTION
-                :   "colourspace"
-                :   "csp"
+                :   "CIEXYZ"
+                :   "xyz"
                 :   "CIE XYZ colour ARTRAWs"
                 ];
 

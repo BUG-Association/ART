@@ -95,7 +95,7 @@ void arpcoder_arcolour(
     else
     {
         if ( art_foundation_isr(art_gv) == ardt_xyz )
-            [ coder codeArRGB: ((ArRGB*)spc->value) ];
+            [ coder codeArCIEXYZ: ((ArCIEXYZ*)spc->value) ];
 
         if ( art_foundation_isr(art_gv) == ardt_spectrum8 )
             [ coder codeArSpectrum8: ((ArSpectrum8*)spc->value) ];

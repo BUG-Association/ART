@@ -128,7 +128,7 @@ id sphereFlake(
     return SPHERE;
 }
 
-ARM_MAIN_FUNCTION(ObjectsBeforeWall)
+ARM_MAIN_FUNCTION(ObjectsBeforeGlassWall)
 {
     //   spectral data: the orange patch E3 on the colour checker SG
     
@@ -140,7 +140,7 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
     
 #ifdef WITH_LAMBERT_SURFACES
     id orange_lambert_surface =
-        LAMBERT_REFLECTOR_CONST(
+        LAMBERT_REFLECTOR(
             CONST_COLOUR_RSSPECTRUM( 
                 380.0 NANOMETER, 5.0 NANOMETER, 100.0,	
                 6.143748,  5.192119,  4.867970,  5.092529,  4.717562,  4.663087,  4.455331,  
@@ -161,7 +161,7 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
 
 /*
     id grey_lambert_surface =
-        LAMBERT_REFLECTOR_CONST(
+        LAMBERT_REFLECTOR(
             CONST_COLOUR_RSSPECTRUM( 
                 380.0 NANOMETER, 5.0 NANOMETER, 100.0,	
                 7.083606,  7.548733,  8.004693,  8.206776,  8.360070,  8.395691,  8.411283,  
@@ -181,15 +181,15 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
             );
 */
     id grey_lambert_surface =
-        LAMBERT_REFLECTOR_CONST(
+        LAMBERT_REFLECTOR(
             CONST_COLOUR_GREY(0.2) 
             );
 #endif
 
-    id white_lambert_surface = LAMBERT_REFLECTOR_CONST( MACBETH_NEUTRAL8 );
+    id white_lambert_surface = LAMBERT_REFLECTOR( MACBETH_NEUTRAL8 );
 /*
     id white_lambert_surface =
-        LAMBERT_REFLECTOR_CONST(
+        LAMBERT_REFLECTOR(
             CONST_COLOUR_RSSPECTRUM( 
                 380.0 NANOMETER, 5.0 NANOMETER, 100.0,	
                 22.696239, 29.054020, 37.571621, 46.166943, 53.429451, 57.110985, 58.401501, 
@@ -251,7 +251,7 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
             1.0
             );
 */
-    flakeSurface[1] = LAMBERT_REFLECTOR_CONST(
+    flakeSurface[1] = LAMBERT_REFLECTOR(
         CONST_COLOUR_RSSPECTRUM( 
             380.0 NANOMETER, 5.0 NANOMETER, 100.0,	
             17.943291, 22.671278, 27.405220, 31.227926, 33.491619, 34.459782, 34.664639, 
@@ -269,7 +269,7 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
             RSS_END
             ) );
 
-    flakeSurface[2] = LAMBERT_REFLECTOR_CONST(
+    flakeSurface[2] = LAMBERT_REFLECTOR(
         CONST_COLOUR_RSSPECTRUM( 
             380.0 NANOMETER, 5.0 NANOMETER, 100.0,	
             2.546426,  2.610934,  2.542109,  2.640033,  2.668386,  2.670110,  2.679658,  
@@ -287,7 +287,7 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
             RSS_END
             ) );
 
-    flakeSurface[3] = LAMBERT_REFLECTOR_CONST(
+    flakeSurface[3] = LAMBERT_REFLECTOR(
         CONST_COLOUR_RSSPECTRUM( 
             380.0 NANOMETER, 5.0 NANOMETER, 100.0,	
             21.504471, 26.985552, 34.021549, 39.510910, 43.429729, 44.911545, 45.581810, 
@@ -305,7 +305,7 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
             RSS_END
             ) );
 
-    flakeSurface[4] = LAMBERT_REFLECTOR_CONST(
+    flakeSurface[4] = LAMBERT_REFLECTOR(
         CONST_COLOUR_RSSPECTRUM( 
             380.0 NANOMETER, 5.0 NANOMETER, 100.0,	
             6.128503,  5.963221,  5.502130,  5.262633,  5.069424,  5.262915,  5.094549,  
@@ -323,7 +323,7 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
             RSS_END
             ) );
 
-    flakeSurface[5] = LAMBERT_REFLECTOR_CONST(
+    flakeSurface[5] = LAMBERT_REFLECTOR(
         CONST_COLOUR_RSSPECTRUM( 
             380.0 NANOMETER, 5.0 NANOMETER, 100.0,	
             18.686119, 23.105488, 27.136400, 30.388052, 32.360771, 33.244198, 33.674278, 
@@ -341,7 +341,7 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
             RSS_END
             ) );
 
-    flakeSurface[6] = LAMBERT_REFLECTOR_CONST(
+    flakeSurface[6] = LAMBERT_REFLECTOR(
         CONST_COLOUR_RSSPECTRUM( 
             380.0 NANOMETER, 5.0 NANOMETER, 100.0,	
             15.799930, 19.774714, 24.081640, 27.756655, 30.455971, 32.119804, 32.956371, 
@@ -359,7 +359,7 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
             RSS_END
             ) );
 
-    flakeSurface[7] = LAMBERT_REFLECTOR_CONST(
+    flakeSurface[7] = LAMBERT_REFLECTOR(
         CONST_COLOUR_RSSPECTRUM( 
             380.0 NANOMETER, 5.0 NANOMETER, 100.0,	
             12.669950, 14.544419, 15.348420, 15.663042, 15.440190, 14.938562, 14.476950, 
@@ -377,7 +377,7 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
             RSS_END
             ) );
 
-    flakeSurface[8] = LAMBERT_REFLECTOR_CONST(
+    flakeSurface[8] = LAMBERT_REFLECTOR(
         CONST_COLOUR_RSSPECTRUM( 
             380.0 NANOMETER, 5.0 NANOMETER, 100.0,	
             11.859360, 14.397915, 16.806971, 18.538034, 19.507759, 19.613047, 19.221670, 
@@ -395,7 +395,7 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
             RSS_END
             ) );
 
-    flakeSurface[9] = LAMBERT_REFLECTOR_CONST(
+    flakeSurface[9] = LAMBERT_REFLECTOR(
         CONST_COLOUR_RSSPECTRUM( 
             380.0 NANOMETER, 5.0 NANOMETER, 100.0,
             5.699953,  5.295924,  5.190561,  5.193296,  5.253389,  5.187729,  5.058478,  
@@ -412,7 +412,7 @@ ARM_MAIN_FUNCTION(ObjectsBeforeWall)
             36.803909, 36.803909, 36.803909,
             RSS_END
             ) );
-//    id white = LAMBERT_REFLECTOR_CONST( ARNGREY_050 );
+//    id white = LAMBERT_REFLECTOR( ARNGREY_050 );
     
     id sphere0  =
         [ knubbelKugel( art_gv, 22 DEGREES, 0.1 ) apply

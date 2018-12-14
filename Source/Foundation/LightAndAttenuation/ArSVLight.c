@@ -1155,84 +1155,136 @@ void arsvlight_ws_add_l(
             (unsigned int)(   NANO_FROM_UNIT(ARWL_WI(*w0,i))
                             - sd->s500_range_start );
 
-        if ( sd->splatChannel0[s500_index] != INVALID_SPLAT_CHANNEL)
+        if ( art_foundation_isr(art_gv) == ardt_xyz )
         {
-            ArStokesVectorSample  temp0;
+            for ( int j = 0; j < 3; j++ )
+            {
+                ArStokesVectorSample  prior_value;
+                
+                arsvlight_li_sv(
+                      art_gv,
+                      lr,
+                      j,
+                    & prior_value
+                    );
 
-            arsvlightsample_li_sv(
-                  art_gv,
-                & t0,
-                  i,
-                & temp0
-                );
+                double  cmf_value =
+                    s500_si(
+                          art_gv,
+                        & ARCMF_CURVE_500( *DEFAULT_CMF, j ),
+                          s500_index
+                        );
+                
+                ArStokesVectorSample  sample;
 
-            arstokesvectorsample_d_mul_sv(
-                  art_gv,
-                  sd->splatFactor0[s500_index],
-                & temp0
-                );
+                arsvlightsample_li_sv(
+                      art_gv,
+                    & t0,
+                      i,
+                    & sample
+                    );
 
-            ArStokesVectorSample  temp1;
-            
-            arsvlight_li_sv(
-                  art_gv,
-                  lr,
-                  sd->splatChannel0[s500_index],
-                & temp1
-                );
+                arstokesvectorsample_d_mul_sv(
+                      art_gv,
+                      cmf_value,
+                    & sample
+                    );
 
-            arstokesvectorsample_sv_add_sv(
-                  art_gv,
-                & temp0,
-                & temp1
-                );
-            
-            arsvlight_set_li_sv(
-                  art_gv,
-                  lr,
-                  sd->splatChannel0[s500_index],
-                & temp1
-                );
+                arstokesvectorsample_sv_add_sv(
+                      art_gv,
+                    & sample,
+                    & prior_value
+                    );
+                
+                arsvlight_set_li_sv(
+                      art_gv,
+                      lr,
+                      j,
+                    & prior_value
+                    );
+            }
         }
-
-        if ( sd->splatChannel1[s500_index] != INVALID_SPLAT_CHANNEL)
+        else
         {
-            ArStokesVectorSample  temp0;
+            if ( sd->splatChannel0[s500_index] != INVALID_SPLAT_CHANNEL)
+            {
+                ArStokesVectorSample  temp0;
 
-            arsvlightsample_li_sv(
-                  art_gv,
-                & t0,
-                  i,
-                & temp0
-                );
+                arsvlightsample_li_sv(
+                      art_gv,
+                    & t0,
+                      i,
+                    & temp0
+                    );
 
-            arstokesvectorsample_d_mul_sv(
-                  art_gv,
-                  sd->splatFactor1[s500_index],
-                & temp0
-                );
+                arstokesvectorsample_d_mul_sv(
+                      art_gv,
+                      sd->splatFactor0[s500_index],
+                    & temp0
+                    );
 
-            ArStokesVectorSample  temp1;
-            
-            arsvlight_li_sv(
-                  art_gv,
-                  lr,
-                  sd->splatChannel1[s500_index],
-                & temp1
-                );
+                ArStokesVectorSample  temp1;
+                
+                arsvlight_li_sv(
+                      art_gv,
+                      lr,
+                      sd->splatChannel0[s500_index],
+                    & temp1
+                    );
 
-            arstokesvectorsample_sv_add_sv(
-                  art_gv,
-                & temp0,
-                & temp1
-                );
-            
-            arsvlight_set_li_sv(
-                  art_gv,
-                  lr,
-                  sd->splatChannel1[s500_index],
-                & temp1
-                );
+                arstokesvectorsample_sv_add_sv(
+                      art_gv,
+                    & temp0,
+                    & temp1
+                    );
+                
+                arsvlight_set_li_sv(
+                      art_gv,
+                      lr,
+                      sd->splatChannel0[s500_index],
+                    & temp1
+                    );
+            }
+
+            if ( sd->splatChannel1[s500_index] != INVALID_SPLAT_CHANNEL)
+            {
+                ArStokesVectorSample  temp0;
+
+                arsvlightsample_li_sv(
+                      art_gv,
+                    & t0,
+                      i,
+                    & temp0
+                    );
+
+                arstokesvectorsample_d_mul_sv(
+                      art_gv,
+                      sd->splatFactor1[s500_index],
+                    & temp0
+                    );
+
+                ArStokesVectorSample  temp1;
+                
+                arsvlight_li_sv(
+                      art_gv,
+                      lr,
+                      sd->splatChannel1[s500_index],
+                    & temp1
+                    );
+
+                arstokesvectorsample_sv_add_sv(
+                      art_gv,
+                    & temp0,
+                    & temp1
+                    );
+                
+                arsvlight_set_li_sv(
+                      art_gv,
+                      lr,
+                      sd->splatChannel1[s500_index],
+                    & temp1
+                    );
+            }
         }
     }
 }

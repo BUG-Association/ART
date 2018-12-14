@@ -128,7 +128,7 @@ const char * ardatatype_long_name_string(
     {
         case ardt_xyz:
         case ardt_xyz_polarisable:
-            return rgb_typename_string(art_gv);
+            return xyz_typename_string(art_gv);
             break;
 
         case ardt_spectrum8:

@@ -20,7 +20,7 @@
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with ART.  If not, see <http://www.gnu.org/licenses/>.
+    aint with ART.  If not, see <http://www.gnu.org/licenses/>.
 
 =========================================================================== */
 
@@ -74,7 +74,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
          actions. This takes the source image from the stack, and creates
-         the destination image along with all needed scanline buffers.
+         the destination image aint with all needed scanline buffers.
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
@@ -104,17 +104,17 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
-        for ( long y = 0; y < YC(destinationImageSize); y++ )
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
             [ self loadSourceScanlineBuffer: i : y ];
 
-            for ( long x = 0; x < XC(destinationImageSize); x++ )
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
                 #ifdef IMAGECONVERSION_DEBUGPRINTF
                 debugprintf("Source (%u|%u)\n",x,y);
                 arlight_l_debugprintf(
                       art_gv,
-                    & LIGHTALPHA_SOURCE_BUFFER_LIGHT(x)
+                      LIGHTALPHA_SOURCE_BUFFER_LIGHT(x)
                     );
                 #endif
 
@@ -132,7 +132,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
                 #ifdef IMAGECONVERSION_DEBUGPRINTF
                 debugprintf("Result (%u|%u)\n",x,y);
-                xyz_c_debugprintf(
+                xyz_s_debugprintf(
                       art_gv,
                     & XYZA_DESTINATION_BUFFER_XYZ(x)
                     );
@@ -217,7 +217,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
          actions. This takes the source image from the stack, and creates
-         the destination image along with all needed scanline buffers.
+         the destination image aint with all needed scanline buffers.
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
@@ -254,17 +254,17 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
-        for ( long y = 0; y < YC(destinationImageSize); y++ )
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
             [ self loadSourceScanlineBuffer: i : y ];
 
-            for ( long x = 0; x < XC(destinationImageSize); x++ )
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
                 #ifdef IMAGECONVERSION_DEBUGPRINTF
                 debugprintf("Source (%u|%u)\n",x,y);
                 arlight_l_debugprintf(
                       art_gv,
-                    & LIGHTALPHA_SOURCE_BUFFER_LIGHT(x)
+                      LIGHTALPHA_SOURCE_BUFFER_LIGHT(x)
                     );
                 #endif
 
@@ -302,7 +302,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
                 
                 #ifdef IMAGECONVERSION_DEBUGPRINTF
                 debugprintf("Result (%u|%u)\n",x,y);
-                xyz_c_debugprintf(
+                xyz_s_debugprintf(
                       art_gv,
                     & XYZA_DESTINATION_BUFFER_XYZ(x)
                     );
@@ -403,7 +403,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
          actions. This takes the source image from the stack, and creates
-         the destination image along with all needed scanline buffers.
+         the destination image aint with all needed scanline buffers.
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
@@ -438,13 +438,13 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
         ArDataType  sourceDataType =
             [ sourceImage[i]->imageInfo fileDataType ];
 
-        for ( long y = 0; y < YC(destinationImageSize); y++ )
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
             //   Load the source scanline into the buffer
 
             [ self loadSourceScanlineBuffer: i : y ];
 
-            for ( long x = 0; x < XC(destinationImageSize); x++ )
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
                 if ( sourceDataType == ardt_rgba32 )
                 {
@@ -624,7 +624,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
          actions. This takes the source image from the stack, and creates
-         the destination image along with all needed scanline buffers.
+         the destination image aint with all needed scanline buffers.
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
@@ -684,16 +684,16 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
 
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
-        for ( long y = 0; y < YC(destinationImageSize); y++ )
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
             //   Load the source scanline into the buffer
 
             [ self loadSourceScanlineBuffer: i : y ];
 
-            for ( long x = 0; x < XC(destinationImageSize); x++ )
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
     #ifdef IMAGECONVERSION_DEBUGPRINTF
-                xyz_c_debugprintf( art_gv,& XYZA_SOURCE_BUFFER_XYZ(x) );
+                xyz_s_debugprintf( art_gv,& XYZA_SOURCE_BUFFER_XYZ(x) );
     #endif
                 ArCIEXYZ  xyz_wb;
                 
@@ -710,7 +710,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
                     );
 
     #ifdef IMAGECONVERSION_DEBUGPRINTF
-                rgb_c_debugprintf( art_gv,& RGBA_DESTINATION_BUFFER_RGB(x) );
+                rgb_s_debugprintf( art_gv,& RGBA_DESTINATION_BUFFER_RGB(x) );
     #endif
 
                 //   Copy the alpha channel from the source image
@@ -845,7 +845,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
          actions. This takes the source image from the stack, and creates
-         the destination image along with all needed scanline buffers.
+         the destination image aint with all needed scanline buffers.
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
@@ -882,16 +882,16 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
 
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
-        for ( long y = 0; y < YC(destinationImageSize); y++ )
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
             //   Load the source scanline into the buffer
 
             [ self loadSourceScanlineBuffer: i : y ];
 
-            for ( long x = 0; x < XC(destinationImageSize); x++ )
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
     #ifdef IMAGECONVERSION_DEBUGPRINTF
-                xyz_c_debugprintf( art_gv,& XYZA_SOURCE_BUFFER_XYZ(x) );
+                xyz_s_debugprintf( art_gv,& XYZA_SOURCE_BUFFER_XYZ(x) );
     #endif
                 ArCIEXYZ  xyz_wb;
                 
@@ -908,7 +908,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
                     );
 
     #ifdef IMAGECONVERSION_DEBUGPRINTF
-                rgb_c_debugprintf( art_gv,& RGBA_DESTINATION_BUFFER_RGB(x) );
+                rgb_s_debugprintf( art_gv,& RGBA_DESTINATION_BUFFER_RGB(x) );
     #endif
 
                 //   Copy the alpha channel from the source image
@@ -1011,7 +1011,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
          actions. This takes the source image from the stack, and creates
-         the destination image along with all needed scanline buffers.
+         the destination image aint with all needed scanline buffers.
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
@@ -1039,16 +1039,16 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
 
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
-        for ( long y = 0; y < YC(destinationImageSize); y++ )
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
             //   Load the source scanline into the buffer
 
             [ self loadSourceScanlineBuffer: i : y ];
 
-            for ( long x = 0; x < XC(destinationImageSize); x++ )
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
     #ifdef IMAGECONVERSION_DEBUGPRINTF
-                rgb_c_debugprintf( art_gv,& RGBA_SOURCE_BUFFER_RGB(x) );
+                rgb_s_debugprintf( art_gv,& RGBA_SOURCE_BUFFER_RGB(x) );
     #endif
                 rgb_to_xyz(
                       art_gv,
@@ -1057,7 +1057,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
                     );
 
     #ifdef IMAGECONVERSION_DEBUGPRINTF
-                xyz_c_debugprintf( art_gv,& XYZA_DESTINATION_BUFFER_XYZ(x) );
+                xyz_s_debugprintf( art_gv,& XYZA_DESTINATION_BUFFER_XYZ(x) );
     #endif
 
                 //   Copy the alpha channel from the source image
@@ -1153,7 +1153,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
          actions. This takes the source image from the stack, and creates
-         the destination image along with all needed scanline buffers.
+         the destination image aint with all needed scanline buffers.
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
@@ -1200,13 +1200,13 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
         
-        for ( long y = 0; y < YC(destinationImageSize); y++ )
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
             //   Load the source scanline into the buffer
 
             [ self loadSourceScanlineBuffer: i : y ];
 
-            for ( long x = 0; x < XC(destinationImageSize); x++ )
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
                 double  channelValue = GREYALPHA_SOURCE_BUFFER_G(x);
 
@@ -1456,7 +1456,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
          actions. This takes the source image from the stack, and creates
-         the destination image along with all needed scanline buffers.
+         the destination image aint with all needed scanline buffers.
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
@@ -1510,17 +1510,17 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
-        for ( long y = 0; y < YC(destinationImageSize); y++ )
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
             if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
             {
                 [ self loadSourceScanlineBuffer: i : y ];
 
-                for ( long j = 0; j < numberOfISRChannels; j++ )
+                for ( int j = 0; j < numberOfISRChannels; j++ )
                 {
-                    for ( long k = 0; k < componentsPerInputImage; k++ )
+                    for ( int k = 0; k < componentsPerInputImage; k++ )
                     {
-                        for ( long x = 0; x < XC(destinationImageSize); x++ )
+                        for ( int x = 0; x < XC(destinationImageSize); x++ )
                         {
                             #ifdef IMAGECONVERSION_DEBUGPRINTF
                             debugprintf("Source (%u|%u)\n",x,y);
@@ -1579,9 +1579,9 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
             {
                 [ self loadSourceScanlineBuffer: i : y ];
 
-                for ( long j = 0; j < numberOfISRChannels; j++ )
+                for ( int j = 0; j < numberOfISRChannels; j++ )
                 {
-                    for ( long x = 0; x < XC(destinationImageSize); x++ )
+                    for ( int x = 0; x < XC(destinationImageSize); x++ )
                     {
                         #ifdef IMAGECONVERSION_DEBUGPRINTF
                         debugprintf("Source (%u|%u)\n",x,y);
@@ -1609,7 +1609,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
                         #ifdef IMAGECONVERSION_DEBUGPRINTF
                         debugprintf("Result (%u|%u)\n",x,y);
-                        xyz_c_debugprintf(
+                        xyz_s_debugprintf(
                               art_gv,
                             & XYZA_DESTINATION_BUFFER_XYZ(x)
                             );
@@ -1784,7 +1784,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
          actions. This takes the source image from the stack, and creates
-         the destination image along with all needed scanline buffers.
+         the destination image aint with all needed scanline buffers.
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
@@ -2043,15 +2043,15 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
-        for ( long y = 0; y < YC(destinationImageSize); y++ )
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
             [ self loadSourceScanlineBuffer: i : y ];
             
             if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
             {
-                for ( long k = 0; k < 4; k++ )
+                for ( int k = 0; k < 4; k++ )
                 {
-                    for ( long x = 0; x < XC(destinationImageSize); x++ )
+                    for ( int x = 0; x < XC(destinationImageSize); x++ )
                     {
                         #ifdef IMAGECONVERSION_DEBUGPRINTF
                         debugprintf("Source (%u|%u)\n",x,y);
@@ -2111,7 +2111,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
             }
             else
             {
-                for ( long x = 0; x < XC(destinationImageSize); x++ )
+                for ( int x = 0; x < XC(destinationImageSize); x++ )
                 {
                     #ifdef IMAGECONVERSION_DEBUGPRINTF
                     debugprintf("Source (%u|%u)\n",x,y);
@@ -2284,7 +2284,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
          actions. This takes the source image from the stack, and creates
-         the destination image along with all needed scanline buffers.
+         the destination image aint with all needed scanline buffers.
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
@@ -2340,11 +2340,11 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
                 storedMaxValue[i] = NO;
                 imageMaxValue[i] = 0.0;
 
-                for ( long y = 0; y < YC(sourceImageSize); y++ )
+                for ( int y = 0; y < YC(sourceImageSize); y++ )
                 {
                     [ self loadSourceScanlineBuffer: i : y ];
 
-                    for ( long x = 0; x < XC(sourceImageSize); x++ )
+                    for ( int x = 0; x < XC(sourceImageSize); x++ )
                     {
                         if ( M_ABS(GREYALPHA_SOURCE_BUFFER_G(x)) > imageMaxValue[i] )
                             imageMaxValue[i] = GREYALPHA_SOURCE_BUFFER_G(x);
@@ -2490,10 +2490,10 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
             //   the other, while dividing them by the max value, and
             //   clamping them to the unit interval.
 
-            for ( unsigned long x = 0; x < XC(sourceImageSize); x++ )
+            for ( unsigned int x = 0; x < XC(sourceImageSize); x++ )
             {
     #ifdef IMAGECONVERSION_DEBUGPRINTF
-                g_c_debugprintf( art_gv,& GREY_SOURCE_BUFFER(x) );
+                g_s_debugprintf( art_gv,& GREY_SOURCE_BUFFER(x) );
     #endif
                 GREYALPHA_SOURCE_BUFFER_G(x) /= imageMaxValue[i];
 
@@ -2517,7 +2517,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
                   (double) scaleY
                 / ( YC(sourceImageSize) - 1 );
 
-            for ( unsigned long x = XC(sourceImageSize); x < XC(destinationImageSize); x++ )
+            for ( unsigned int x = XC(sourceImageSize); x < XC(destinationImageSize); x++ )
             {
                 GREYALPHA_DESTINATION_BUFFER_A(x) = 1.0;
                 
@@ -2696,7 +2696,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
          actions. This takes the source image from the stack, and creates
-         the destination image along with all needed scanline buffers.
+         the destination image aint with all needed scanline buffers.
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
@@ -2725,13 +2725,13 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
         
-        for ( long y = 0; y < YC(destinationImageSize); y++ )
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
             //   Load the source scanline into the buffer
 
             [ self loadSourceScanlineBuffer: i : y ];
 
-            for ( long x = 0; x < XC(destinationImageSize); x++ )
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
                 GREYALPHA_DESTINATION_BUFFER_G(x) =
                     GREYALPHA_SOURCE_BUFFER_G(x);

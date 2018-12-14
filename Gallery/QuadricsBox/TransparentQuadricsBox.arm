@@ -632,7 +632,7 @@ ArObj create_TransparentQuadrics(
 #define SAMPLES 32
 #endif
 
-ARM_MAIN_FUNCTION(FourQuadricsColouredGlass)
+ARM_MAIN_FUNCTION(TransparentQuadricsBox)
 {
     id scene_geometry =
         create_TransparentQuadrics(art_gv);
