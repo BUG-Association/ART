@@ -363,10 +363,11 @@ void xyz_to_rgb(
     CC_START_DEBUGPRINTF( xyz_to_rgb )
     CC_OPERAND_DEBUGPRINTF( xyz, xyz )
 
-    c3_cm_mul_c(
-        & ARCIEXYZ_C(*xyz),
+    xyz_mat_to_rgb(
+          art_gv,
+          xyz,
         & ARCSR_XYZ_TO_RGB( DEFAULT_RGB_SPACE_REF ),
-        & ARRGB_C(*rgb)
+          rgb
         );
 
 //   we probably should do a _moveToGamut here
@@ -572,11 +573,13 @@ void rgb_to_xyz(
 {
     CC_START_DEBUGPRINTF( rgb_to_xyz )
 
-    c3_cm_mul_c(
-        & ARRGB_C(*rgb),
+    rgb_mat_to_xyz(
+          art_gv,
+          rgb,
         & ARCSR_RGB_TO_XYZ( DEFAULT_RGB_SPACE_REF ),
-        & ARCIEXYZ_C(*xyz)
+          xyz
         );
+
 
     CC_END_DEBUGPRINTF( rgb_to_xyz )
 }

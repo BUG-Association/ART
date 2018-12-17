@@ -205,26 +205,6 @@ void calculateColourspaceMatrices(
         );
 }
 
-Mat3 bradford_ma()
-{
-    return
-        MAT3(
-             0.8951000,  0.2664000, -0.1614000,
-            -0.7502000,  1.7135000,  0.0367000,
-             0.0389000, -0.0685000,  1.0296000
-             );
-}
-
-Mat3 cat02_suesstrunk_ma()
-{
-    return
-        MAT3(
-             0.7328, 0.4296, -0.1624,
-            -0.7036, 1.6975,  0.0061,
-             0.0000, 0.0000,  1.0000
-             );
-}
-
 #define TYPE                        ARCS_TYPE(cs)
 #define NAME                        ARCS_NAME(cs)
 
@@ -819,6 +799,8 @@ void arcolourspace_debugprintf(
 */
 }
 
+#include "ArCIEColourConversions.h"
+
 Mat3  xyz2rgb_via_primaries(
               ART_GV   * art_gv,
         const ArCIExy  * r,
@@ -854,15 +836,21 @@ Mat3  xyz2rgb_via_primaries(
 
     double  det = c3_m_det( & rgb2xyz );
 
-    Mat3  xyz2srgb;
+    Mat3  xyz2rgb_temp;
     
-    c3_md_invert_m( & rgb2xyz, det, & xyz2srgb );
+    c3_md_invert_m( & rgb2xyz, det, & xyz2rgb_temp );
     
-    ArCIEXYZ  w_rgb;
-    c3_transpose_m( & xyz2srgb );
+    ArRGB  w_rgb;
+    
+    c3_transpose_m( & xyz2rgb_temp );
 
-    c3_cm_mul_c(&w_xyz.c,&xyz2srgb,&w_rgb.c);
-    
+    xyz_mat_to_rgb(
+          art_gv,
+        & w_xyz,
+        & xyz2rgb_temp,
+        & w_rgb
+        );
+
     Mat3  rgb2xyz_final =
         MAT3( ARCIEXYZ_X(r_xyz)*XC(w_rgb), ARCIEXYZ_X(g_xyz)*YC(w_rgb), ARCIEXYZ_X(b_xyz)*ZC(w_rgb),
               ARCIEXYZ_Y(r_xyz)*XC(w_rgb), ARCIEXYZ_Y(g_xyz)*YC(w_rgb), ARCIEXYZ_Y(b_xyz)*ZC(w_rgb),
@@ -870,13 +858,13 @@ Mat3  xyz2rgb_via_primaries(
     
     det = c3_m_det( & rgb2xyz_final );
 
-    Mat3  xyz2srgb_final;
+    Mat3  xyz2rgb_final;
     
-    c3_md_invert_m( & rgb2xyz_final, det, & xyz2srgb_final );
+    c3_md_invert_m( & rgb2xyz_final, det, & xyz2rgb_final );
     
-    c3_transpose_m( & xyz2srgb_final );
+    c3_transpose_m( & xyz2rgb_final );
 
-    return  xyz2srgb_final;
+    return  xyz2rgb_final;
 }
 
 /* ======================================================================== */

@@ -154,13 +154,13 @@ ART_MODULE_INITIALISATION_FUNCTION
     XYZ_ZERO = xyz_d_alloc_init( art_gv, 0.0 );
     XYZ_UNIT = xyz_d_alloc_init( art_gv, 1.0 );
 
-    ArCIExyY  xyY_E   = ARCIExyY_xy1( * ARCIEXY_E );
-    ArCIExyY  xyY_A   = ARCIExyY_xy1( * ARCIEXY_A );
-    ArCIExyY  xyY_D50 = ARCIExyY_xy1( * ARCIEXY_D50 );
-    ArCIExyY  xyY_D55 = ARCIExyY_xy1( * ARCIEXY_D55 );
-    ArCIExyY  xyY_D60 = ARCIExyY_xy1( * ARCIEXY_D60 );
-    ArCIExyY  xyY_D65 = ARCIExyY_xy1( * ARCIEXY_D65 );
-    ArCIExyY  xyY_D75 = ARCIExyY_xy1( * ARCIEXY_D75 );
+    ArCIExyY  xyY_E   = ARCIExyY_xy1( ARCIEXY_E );
+    ArCIExyY  xyY_A   = ARCIExyY_xy1( ARCIEXY_A );
+    ArCIExyY  xyY_D50 = ARCIExyY_xy1( ARCIEXY_D50 );
+    ArCIExyY  xyY_D55 = ARCIExyY_xy1( ARCIEXY_D55 );
+    ArCIExyY  xyY_D60 = ARCIExyY_xy1( ARCIEXY_D60 );
+    ArCIExyY  xyY_D65 = ARCIExyY_xy1( ARCIEXY_D65 );
+    ArCIExyY  xyY_D75 = ARCIExyY_xy1( ARCIEXY_D75 );
 
     xyy_to_xyz( art_gv, & xyY_E  , & XYZ_E   );
     xyy_to_xyz( art_gv, & xyY_A  , & XYZ_A );
@@ -263,10 +263,40 @@ void xyz_sdd_sample_at_wavelength_s(
               ArCIEXYZ  * c_r
         )
 {
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "ArSpectrum sample queries for a specific wavelength not "
-        "defined in colour space - "
-        "switch ART to a spectral ISR to avoid this error"
+    //   Note: this is probably not what should be done: a gradual shift
+    //         between channels would likely be much better.
+    
+    ArRGB  rgb;
+    
+    xyz_conversion_to_linear_rgb(
+          art_gv,
+          c_0,
+        & rgb
+        );
+    
+    ArRGB  result = ARRGB(0,0,0);
+    
+    if ( d_0 > BOUNDARY_BG )
+    {
+        BC(result) = ARRGB_B(*c_0);
+    }
+    
+    if ( d_0 > BOUNDARY_BG )
+    {
+        if ( d_0 > BOUNDARY_GR )
+        {
+            RC(result) = ARRGB_R(*c_0);
+        }
+        else
+        {
+            GC(result) = ARRGB_G(*c_0);
+        }
+    }
+    
+    rgb_to_xyz(
+          art_gv,
+        & result,
+          c_r
         );
 }
 

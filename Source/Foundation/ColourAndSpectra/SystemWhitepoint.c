@@ -37,6 +37,7 @@ typedef struct SystemWhitepoint_GV
 {
     pthread_mutex_t  mutex;
 
+    ArCIExy          syswhite_xy;
     ArCIEXYZ         syswhite_xyz;
     ArSymbol         syswhite_symbol;
     int              manual_syswhite;
@@ -48,7 +49,8 @@ SystemWhitepoint_GV;
 
 #define ARSWP_GV                art_gv->systemwhitepoint_gv
 #define ARSWP_MUTEX             ARSWP_GV->mutex
-#define ARSWP_XYZ_SYSWHITE      ARSWP_GV->syswhite_xyz
+#define ARSWP_SYSWHITE_XY       ARSWP_GV->syswhite_xy
+#define ARSWP_SYSWHITE_XYZ      ARSWP_GV->syswhite_xyz
 #define ARSWP_SYSWHITE_SYMBOL   ARSWP_GV->syswhite_symbol
 #define ARSWP_MANUAL_SYSWHITE   ARSWP_GV->manual_syswhite
 #define ARSWP_MA                ARSWP_GV->ma
@@ -83,31 +85,81 @@ ART_MODULE_SHUTDOWN_FUNCTION
     FREE( ARSWP_GV );
 )
 
+Mat3 art_xyz_scaling_ma()
+{
+    return  MAT3_UNIT;
+}
+
+Mat3 art_von_kries_ma()
+{
+    return
+        MAT3(
+             0.4002400,  0.7076000, -0.0808100,
+            -0.2263000,  1.1653200,  0.0457000,
+             0.0000000,  0.0000000,  0.9182200
+             );
+}
+
+Mat3 art_bradford_ma()
+{
+    return
+        MAT3(
+             0.8951000,  0.2664000, -0.1614000,
+            -0.7502000,  1.7135000,  0.0367000,
+             0.0389000, -0.0685000,  1.0296000
+             );
+}
+
+Mat3 art_cat02_suesstrunk_ma()
+{
+    return
+        MAT3(
+             0.7328, 0.4296, -0.1624,
+            -0.7036, 1.6975,  0.0061,
+             0.0000, 0.0000,  1.0000
+             );
+}
+
 Mat3 art_chromatic_adaptation_matrix(
-              ART_GV   * art_gv,
-        const ArCIExy  * target_xy
+              ART_GV                      * art_gv,
+        const ArChromaticAdaptationSpace    cas,
+        const ArCIExy                     * source_white,
+        const ArCIExy                     * target_white
         )
 {
+    ArCIExyY  source_xyy = ARCIExyY_xy1(*source_white);
+    ArCIExyY  target_xyy = ARCIExyY_xy1(*target_white);
+
     ArCIEXYZ  source_xyz, target_xyz;
-    
-    source_xyz = ARSWP_XYZ_SYSWHITE;
-    
-    ArCIExyY  target_xyy = ARCIExyY_xy1(*target_xy);
-    
+
     xyy_to_xyz( art_gv, & target_xyy, & target_xyz );
-    
-//    ARCIEXYZ_X(source) = 0.96422;
-//    ARCIEXYZ_Y(source) = 1;
-//    ARCIEXYZ_Z(source) = 0.82521;
-//
-//    ARCIEXYZ_X(target) = 0.95047;
-//    ARCIEXYZ_Y(target) = 1;
-//    ARCIEXYZ_Z(target) = 1.08883;
-//
+    xyy_to_xyz( art_gv, & source_xyy, & source_xyz );
+
     ArCIEXYZ source_crs, target_crs;
     
-    c3_cm_mul_c(&ARCIEXYZ_C(source_xyz), &ARSWP_MA, &ARCIEXYZ_C(source_crs));
-    c3_cm_mul_c(&ARCIEXYZ_C(target_xyz), &ARSWP_MA, &ARCIEXYZ_C(target_crs));
+    Mat3  ma;
+    
+    switch (cas)
+    {
+        case arcas_von_kries:
+            ma = art_von_kries_ma();
+            break;
+
+        case arcas_bradford:
+            ma = art_bradford_ma();
+            break;
+
+        case arcas_cat_02:
+            ma = art_cat02_suesstrunk_ma();
+            break;
+
+        default:
+            ma = art_xyz_scaling_ma();
+            break;
+    }
+    
+    xyz_mat_to_xyz( art_gv, & source_xyz, & ma, & source_crs );
+    xyz_mat_to_xyz( art_gv, & target_xyz, & ma, & target_crs );
 
     double  xf = 1.; double  yf = 1.; double  zf = 1.;
     
@@ -125,18 +177,24 @@ Mat3 art_chromatic_adaptation_matrix(
              0., 0., zf
              );
     
+    c3_transpose_m( & ma );
+
+    double  det = c3_m_det( & ma );
+
+    Mat3  ma_inv;
+
+    c3_md_invert_m( & ma, det, & ma_inv );
+
     Mat3  tmp;
     
-    c3_mm_mul_m(&scale, &ARSWP_MA_INV, &tmp);
+    c3_mm_mul_m( & scale, & ma_inv, & tmp );
     
     Mat3  cam;
 
-    c3_mm_mul_m(&ARSWP_MA, &tmp,&cam);
-    c3_transpose_m(&cam);
+    c3_mm_mul_m( & ma, & tmp, & cam );
     
-//    debugprintf("\n"C3_M_FORMAT("%f")"\n",C3_M_PRINTF(cam))
-//
-//    cam = MAT3_UNIT;
+    c3_transpose_m( & cam );
+    
     return cam;
 }
 
@@ -167,7 +225,8 @@ void art_set_system_white_point_by_desc(
         //   Option 1: Illuminant E. Not that this makes much sense from
         //             a practical viewpoint, but let's include it anyway.
     
-        ARSWP_XYZ_SYSWHITE = ARCIEXYZ_E;
+        ARSWP_SYSWHITE_XY  = ARCIEXY_E;
+        ARSWP_SYSWHITE_XYZ = ARCIEXYZ_E;
         my_wp_desc = "E";
         valid_wp_desc = 1;
     }
@@ -178,7 +237,8 @@ void art_set_system_white_point_by_desc(
         //   Option 2: Illuminant A. Extremely red, probably not very
         //             useful, either.
     
-        ARSWP_XYZ_SYSWHITE = ARCIEXYZ_A;
+        ARSWP_SYSWHITE_XY  = ARCIEXY_A;
+        ARSWP_SYSWHITE_XYZ = ARCIEXYZ_A;
         my_wp_desc = "A";
         valid_wp_desc = 1;
     }
@@ -192,28 +252,32 @@ void art_set_system_white_point_by_desc(
     
         if ( wp_desc[1] == '5' && wp_desc[2] == '0' )
         {
-            ARSWP_XYZ_SYSWHITE = ARCIEXYZ_D50;
+            ARSWP_SYSWHITE_XY  = ARCIEXY_D50;
+            ARSWP_SYSWHITE_XYZ = ARCIEXYZ_D50;
             my_wp_desc = "D50";
             valid_wp_desc = 1;
         }
 
         if ( wp_desc[1] == '5' && wp_desc[2] == '5' )
         {
-            ARSWP_XYZ_SYSWHITE = ARCIEXYZ_D55;
+            ARSWP_SYSWHITE_XY  = ARCIEXY_D55;
+            ARSWP_SYSWHITE_XYZ = ARCIEXYZ_D55;
             my_wp_desc = "D55";
             valid_wp_desc = 1;
         }
 
         if ( wp_desc[1] == '6' && wp_desc[2] == '5' )
         {
-            ARSWP_XYZ_SYSWHITE = ARCIEXYZ_D65;
+            ARSWP_SYSWHITE_XY  = ARCIEXY_D65;
+            ARSWP_SYSWHITE_XYZ = ARCIEXYZ_D65;
             my_wp_desc = "D65";
             valid_wp_desc = 1;
         }
 
         if ( wp_desc[1] == '7' && wp_desc[2] == '5' )
         {
-            ARSWP_XYZ_SYSWHITE = ARCIEXYZ_D75;
+            ARSWP_SYSWHITE_XY  = ARCIEXY_D75;
+            ARSWP_SYSWHITE_XYZ = ARCIEXYZ_D75;
             my_wp_desc = "D75";
             valid_wp_desc = 1;
         }
@@ -246,10 +310,12 @@ void art_set_system_white_point_by_desc(
             ArCIExyY  bbxyy;
 
             xyz_to_xyy( art_gv, & bbxyz, & bbxyy );
+            
+            ARSWP_SYSWHITE_XY = ARCIExy(ARCIExyY_x(bbxyy),ARCIExyY_y(bbxyy));
 
             ARCIExyY_Y(bbxyy) = 1.0;
 
-            xyy_to_xyz( art_gv, & bbxyy, & ARSWP_XYZ_SYSWHITE );
+            xyy_to_xyz( art_gv, & bbxyy, & ARSWP_SYSWHITE_XYZ );
 
             asprintf(
                 & my_wp_desc,
@@ -288,13 +354,15 @@ void art_set_system_white_point(
     ARSWP_MANUAL_SYSWHITE += 1;
     ARSWP_SYSWHITE_SYMBOL = arsymbol(art_gv, wp_desc);
     
+    ARSWP_SYSWHITE_XY = *wp;
+    
     ArCIExyY  new_syswhite;
     
     ARCIExyY_x(new_syswhite) = XC(*wp);
     ARCIExyY_y(new_syswhite) = YC(*wp);
     ARCIExyY_Y(new_syswhite) = 1.0;
 
-    xyy_to_xyz( art_gv, & new_syswhite, & ARSWP_XYZ_SYSWHITE );
+    xyy_to_xyz( art_gv, & new_syswhite, & ARSWP_SYSWHITE_XYZ );
 
     pthread_mutex_unlock( & ARSWP_MUTEX );
 }
@@ -317,7 +385,14 @@ ArCIEXYZ const * art_system_white_point_xyz(
         const ART_GV  * art_gv
         )
 {
-    return & ARSWP_XYZ_SYSWHITE;
+    return & ARSWP_SYSWHITE_XYZ;
+}
+
+ArCIExy const * art_system_white_point_xy(
+        const ART_GV  * art_gv
+        )
+{
+    return & ARSWP_SYSWHITE_XY;
 }
 
 /* ======================================================================== */

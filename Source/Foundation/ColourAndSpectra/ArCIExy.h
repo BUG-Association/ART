@@ -52,13 +52,13 @@ ArCIExy;
 #define ARCIExy_PRINTF(_c)      ARCIExy_x(_c),ARCIExy_y(_c)
 #define ARCIExy_SCANF(_c)       &ARCIExy_x(_c),&ARCIExy_y(_c)
 
-#define ARCIEXY_E               xy_illuminant_E(art_gv)
-#define ARCIEXY_A               xy_illuminant_A(art_gv)
-#define ARCIEXY_D50             xy_illuminant_D50(art_gv)
-#define ARCIEXY_D55             xy_illuminant_D55(art_gv)
-#define ARCIEXY_D60             xy_illuminant_D60(art_gv)
-#define ARCIEXY_D65             xy_illuminant_D65(art_gv)
-#define ARCIEXY_D75             xy_illuminant_D75(art_gv)
+#define ARCIEXY_E               (*xy_illuminant_E(art_gv))
+#define ARCIEXY_A               (*xy_illuminant_A(art_gv))
+#define ARCIEXY_D50             (*xy_illuminant_D50(art_gv))
+#define ARCIEXY_D55             (*xy_illuminant_D55(art_gv))
+#define ARCIEXY_D60             (*xy_illuminant_D60(art_gv))
+#define ARCIEXY_D65             (*xy_illuminant_D65(art_gv))
+#define ARCIEXY_D75             (*xy_illuminant_D75(art_gv))
 
 ArCIExy const * xy_illuminant_E(
         const ART_GV  * art_gv

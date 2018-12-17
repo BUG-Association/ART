@@ -110,73 +110,140 @@ ArRGBGamutMapping currentRGBGamutMappingMethod(
 
 #include "ColourAndSpectralDataConversion_ImplementationMacros.h"
 
+void xyz_mat_to_xyz(
+        const ART_GV    * art_gv,
+        const ArCIEXYZ  * xyz_0,
+        const Mat3      * mat_0,
+              ArCIEXYZ  * xyz_r
+        )
+{
+    c3_cm_mul_c(
+        & ARCIEXYZ_C(*xyz_0),
+          mat_0,
+        & ARCIEXYZ_C(*xyz_r)
+        );
+}
+
+void xyz_mat_to_rgb(
+        const ART_GV    * art_gv,
+        const ArCIEXYZ  * xyz_0,
+        const Mat3      * mat_0,
+              ArRGB     * rgb_r
+        )
+{
+    c3_cm_mul_c(
+        & ARCIEXYZ_C(*xyz_0),
+          mat_0,
+        & ARRGB_C(*rgb_r)
+        );
+}
+
+void rgb_mat_to_xyz(
+        const ART_GV    * art_gv,
+        const ArRGB     * rgb_0,
+        const Mat3      * mat_0,
+              ArCIEXYZ  * xyz_r
+        )
+{
+    c3_cm_mul_c(
+        & ARRGB_C(*rgb_0),
+          mat_0,
+        & ARCIEXYZ_C(*xyz_r)
+        );
+}
+
+
 void xyz_move2unit_gamut(
         const ART_GV    * art_gv,
-        const ArCIEXYZ  * outside,
-        const ArCIEXYZ  * inside,
+        const ArCIEXYZ  * outsideXYZ,
+        const ArCIEXYZ  * insideXYZ,
         const Mat3      * xyz2rgb,
         const int         depth,
               ArRGB     * finalRGB
         )
 {
-    ArCIEXYZ  midpoint;
+    ArCIEXYZ  midpointXYZ;
     ArRGB     midpointRGB;
     
-    XC(midpoint) = ( XC(*outside) + XC(*inside) ) / 2.0;
-    YC(midpoint) = ( YC(*outside) + YC(*inside) ) / 2.0;
-    ZC(midpoint) = ( ZC(*outside) + ZC(*inside) ) / 2.0;
+    XC(midpointXYZ) = ( XC(*outsideXYZ) + XC(*insideXYZ) ) / 2.0;
+    YC(midpointXYZ) = ( YC(*outsideXYZ) + YC(*insideXYZ) ) / 2.0;
+    ZC(midpointXYZ) = ( ZC(*outsideXYZ) + ZC(*insideXYZ) ) / 2.0;
     
-    c3_cm_mul_c( & midpoint.c, xyz2rgb, & midpointRGB.c );
+    xyz_mat_to_rgb(
+          art_gv,
+        & midpointXYZ,
+          xyz2rgb,
+        & midpointRGB
+        );
 
     if ( depth > 0 )
     {
     if (   XC(midpointRGB)<0.0 || YC(midpointRGB)<0.0 || ZC(midpointRGB)<0.0
         || XC(midpointRGB)>1.0 || YC(midpointRGB)>1.0 || ZC(midpointRGB)>1.0)
-        xyz_move2unit_gamut(art_gv,&midpoint, inside, xyz2rgb, depth-1, finalRGB);
+        xyz_move2unit_gamut(art_gv,&midpointXYZ, insideXYZ, xyz2rgb, depth-1, finalRGB);
     else
-        xyz_move2unit_gamut(art_gv,outside, &midpoint, xyz2rgb, depth-1, finalRGB);
+        xyz_move2unit_gamut(art_gv,outsideXYZ, &midpointXYZ, xyz2rgb, depth-1, finalRGB);
     }
     else
     {
-    if (   XC(midpointRGB)<0.0 || YC(midpointRGB)<0.0 || ZC(midpointRGB)<0.0
-        || XC(midpointRGB)>1.0 || YC(midpointRGB)>1.0 || ZC(midpointRGB)>1.0)
-        c3_cm_mul_c( &inside->c, xyz2rgb, &finalRGB->c );
-    else
-        *finalRGB = midpointRGB;
+        if (   XC(midpointRGB)<0.0 || YC(midpointRGB)<0.0 || ZC(midpointRGB)<0.0
+            || XC(midpointRGB)>1.0 || YC(midpointRGB)>1.0 || ZC(midpointRGB)>1.0)
+        {
+            xyz_mat_to_rgb(
+                  art_gv,
+                  insideXYZ,
+                  xyz2rgb,
+                  finalRGB
+                );
+        }
+        else
+            *finalRGB = midpointRGB;
     }
 }
 
 void xyz_move2gamut(
         const ART_GV    * art_gv,
-        const ArCIEXYZ  * outside,
-        const ArCIEXYZ  * inside,
+        const ArCIEXYZ  * outsideXYZ,
+        const ArCIEXYZ  * insideXYZ,
         const Mat3      * xyz2rgb,
         const int         depth,
               ArRGB     * finalRGB
         )
 {
-    ArCIEXYZ  midpoint;
+    ArCIEXYZ  midpointXYZ;
     ArRGB     midpointRGB;
     
-    XC(midpoint) = ( XC(*outside) + XC(*inside) ) / 2.0;
-    YC(midpoint) = ( YC(*outside) + YC(*inside) ) / 2.0;
-    ZC(midpoint) = ( ZC(*outside) + ZC(*inside) ) / 2.0;
+    XC(midpointXYZ) = ( XC(*outsideXYZ) + XC(*insideXYZ) ) / 2.0;
+    YC(midpointXYZ) = ( YC(*outsideXYZ) + YC(*insideXYZ) ) / 2.0;
+    ZC(midpointXYZ) = ( ZC(*outsideXYZ) + ZC(*insideXYZ) ) / 2.0;
     
-    c3_cm_mul_c( & midpoint.c, xyz2rgb, & midpointRGB.c );
+    xyz_mat_to_rgb(
+          art_gv,
+        & midpointXYZ,
+          xyz2rgb,
+        & midpointRGB
+        );
 
     if ( depth > 0 )
     {
     if ( XC(midpointRGB)<0.0 || YC(midpointRGB)<0.0 || ZC(midpointRGB)<0.0 )
-        xyz_move2gamut(art_gv,&midpoint, inside, xyz2rgb, depth-1, finalRGB);
+        xyz_move2gamut(art_gv,&midpointXYZ, insideXYZ, xyz2rgb, depth-1, finalRGB);
     else
-        xyz_move2gamut(art_gv,outside, &midpoint, xyz2rgb, depth-1, finalRGB);
+        xyz_move2gamut(art_gv,outsideXYZ, &midpointXYZ, xyz2rgb, depth-1, finalRGB);
     }
     else
     {
-    if ( XC(midpointRGB)<0.0 || YC(midpointRGB)<0.0 || ZC(midpointRGB)<0.0)
-        c3_cm_mul_c( &inside->c, xyz2rgb, &finalRGB->c );
-    else
-        *finalRGB = midpointRGB;
+        if ( XC(midpointRGB)<0.0 || YC(midpointRGB)<0.0 || ZC(midpointRGB)<0.0)
+        {
+            xyz_mat_to_rgb(
+                  art_gv,
+                  insideXYZ,
+                  xyz2rgb,
+                  finalRGB
+                );
+        }
+        else
+            *finalRGB = midpointRGB;
     }
 }
 
@@ -201,10 +268,11 @@ void xyz_conversion_to_unit_rgb_with_gamma(
         else
         {
 #endif
-            c3_cm_mul_c(
-                & ARCIEXYZ_C(*xyz_0),
+            xyz_mat_to_rgb(
+                  art_gv,
+                  xyz_0,
                 & ARCSR_XYZ_TO_RGB(DEFAULT_RGB_SPACE_REF),
-                & ARRGB_C(*rgb_r)
+                  rgb_r
                 );
 
         //   Nothing to do if we are already in gamut
@@ -305,10 +373,11 @@ void xyz_conversion_to_linear_rgb(
               ArRGB     * rgb_r
         )
 {
-    c3_cm_mul_c(
-        & ARCIEXYZ_C(*xyz_0),
+    xyz_mat_to_rgb(
+          art_gv,
+          xyz_0,
         & ARCSR_XYZ_TO_RGB(DEFAULT_RGB_SPACE_REF),
-        & ARRGB_C(*rgb_r)
+          rgb_r
         );
 
     if ( ( ARCIECV_GM_METHOD & arrgb_gm_technique_mask ) == arrgb_gm_clipping )

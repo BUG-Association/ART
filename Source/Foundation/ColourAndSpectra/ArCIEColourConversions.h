@@ -79,6 +79,27 @@ void setRGBGamutMappingMethod(
         const double               focus_luminance
         );
 
+void xyz_mat_to_xyz(
+        const ART_GV    * art_gv,
+        const ArCIEXYZ  * xyz_0,
+        const Mat3      * mat_0,
+              ArCIEXYZ  * xyz_r
+        );
+
+void xyz_mat_to_rgb(
+        const ART_GV    * art_gv,
+        const ArCIEXYZ  * xyz_0,
+        const Mat3      * mat_0,
+              ArRGB     * rgb_r
+        );
+
+void rgb_mat_to_xyz(
+        const ART_GV    * art_gv,
+        const ArRGB     * rgb_0,
+        const Mat3      * mat_0,
+              ArCIEXYZ  * xyz_r
+        );
+
 void xyz_conversion_to_linear_rgb(
         const ART_GV    * art_gv,
         const ArCIEXYZ  * xyz_0,

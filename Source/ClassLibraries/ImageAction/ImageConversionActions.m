@@ -663,6 +663,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
         xyz_whitebalance_xyz =
             art_chromatic_adaptation_matrix(
               art_gv,
+              arcas_xyz_scaling,
+            & ARCIEXY_SYSTEM_WHITE_POINT,
             & ARCSR_W(ARCSR_CIEXYZ)
             );
     }
@@ -674,6 +676,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
         xyz_whitebalance_xyz =
             art_chromatic_adaptation_matrix(
               art_gv,
+              arcas_xyz_scaling,
+            & ARCIEXY_SYSTEM_WHITE_POINT,
             & ARCSR_W(DEFAULT_RGB_SPACE_REF)
             );
     }
@@ -697,10 +701,11 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
     #endif
                 ArCIEXYZ  xyz_wb;
                 
-                c3_cm_mul_c(
-                    & ARCIEXYZ_C(XYZA_SOURCE_BUFFER_XYZ(x)),
+                xyz_mat_to_xyz(
+                      art_gv,
+                    & XYZA_SOURCE_BUFFER_XYZ(x),
                     & xyz_whitebalance_xyz,
-                    & ARCIEXYZ_C(xyz_wb)
+                    & xyz_wb
                     );
 
                 xyz_conversion_to_unit_rgb_with_gamma(
@@ -873,6 +878,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
     xyz_whitebalance_xyz =
         art_chromatic_adaptation_matrix(
           art_gv,
+          arcas_xyz_scaling,
+        & ARCIEXY_SYSTEM_WHITE_POINT,
         & ARCSR_W(DEFAULT_RGB_SPACE_REF)
         );
 
@@ -895,12 +902,13 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
     #endif
                 ArCIEXYZ  xyz_wb;
                 
-                c3_cm_mul_c(
-                    & ARCIEXYZ_C(XYZA_SOURCE_BUFFER_XYZ(x)),
+                xyz_mat_to_xyz(
+                      art_gv,
+                    & XYZA_SOURCE_BUFFER_XYZ(x),
                     & xyz_whitebalance_xyz,
-                    & ARCIEXYZ_C(xyz_wb)
+                    & xyz_wb
                     );
-                
+
                 xyz_conversion_to_linear_rgb(
                       art_gv,
                     & xyz_wb,

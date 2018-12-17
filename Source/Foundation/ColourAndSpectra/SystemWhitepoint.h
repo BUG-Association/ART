@@ -36,6 +36,19 @@ ART_MODULE_INTERFACE(SystemWhitepoint)
 #include "ArCIExy.h"
 #include "ArCIEXYZ.h"
 
+typedef enum ArChromaticAdaptationSpace
+{
+    arcas_xyz_scaling  = 0x01,
+    arcas_von_kries    = 0x02,
+    arcas_bradford     = 0x03,
+    arcas_cat_02       = 0x04,
+}
+ArChromaticAdaptationSpace;
+
+
+ArCIExy const * art_system_white_point_xy(
+        const ART_GV  * art_gv
+        );
 
 ArCIEXYZ const * art_system_white_point_xyz(
         const ART_GV  * art_gv
@@ -53,8 +66,10 @@ void art_set_system_white_point(
         );
 
 Mat3 art_chromatic_adaptation_matrix(
-              ART_GV   * art_gv,
-        const ArCIExy  * target
+              ART_GV                      * art_gv,
+        const ArChromaticAdaptationSpace    cas,
+        const ArCIExy                     * source_white,
+        const ArCIExy                     * target_white
         );
 
 ArSymbol art_system_white_point_symbol(
@@ -64,6 +79,9 @@ ArSymbol art_system_white_point_symbol(
 int art_system_white_point_has_been_manually_set(
         const ART_GV  * art_gv
         );
+
+#define ARCIEXY_SYSTEM_WHITE_POINT \
+    * art_system_white_point_xy(art_gv)
 
 #define ARCIEXYZ_SYSTEM_WHITE_POINT \
     * art_system_white_point_xyz(art_gv)
