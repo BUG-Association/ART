@@ -251,6 +251,18 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
     ArSpectrum      * temp_col = spc_alloc( art_gv );
     ArStokesVector  * temp_sc  = arstokesvector_alloc( art_gv );
+    
+    //   In order to get an XYZ value which corresponds to neutral RGB,
+    //   we have to do the inverse white balance shift that is applied to
+    //   XYZ images when they are being transformed back to RGB.
+    
+    Mat3  xyz_whitebalance_xyz =
+        art_chromatic_adaptation_matrix(
+              art_gv,
+              arcas_xyz_scaling,
+            & ARCSR_W(DEFAULT_RGB_SPACE_REF),
+            & ARCIEXY_SYSTEM_WHITE_POINT
+            );
 
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
@@ -294,12 +306,23 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
                 ARRGB_G(rgb) = intensity;
                 ARRGB_B(rgb) = intensity;
 
+                ArCIEXYZ  xyz_wb;
+                
                 rgb_to_xyz(
                       art_gv,
                     & rgb,
-                    & XYZA_DESTINATION_BUFFER_XYZ(x)
+                    & xyz_wb
                     );
                 
+                //   reverse white balance shift - see above
+                
+                xyz_mat_to_xyz(
+                      art_gv,
+                    & xyz_wb,
+                    & xyz_whitebalance_xyz,
+                    & XYZA_DESTINATION_BUFFER_XYZ(x)
+                    );
+
                 #ifdef IMAGECONVERSION_DEBUGPRINTF
                 debugprintf("Result (%u|%u)\n",x,y);
                 xyz_s_debugprintf(
