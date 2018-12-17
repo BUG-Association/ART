@@ -254,21 +254,27 @@ int polvis(
         BOOL    rgb = NO;
         
         if (   !strncmp([ wavelengthOpt cStringValue ], "r",1)
-            || !strncmp([ wavelengthOpt cStringValue ], "R",1))
+            || !strncmp([ wavelengthOpt cStringValue ], "R",1)
+            || !strncmp([ wavelengthOpt cStringValue ], "l",1)
+            || !strncmp([ wavelengthOpt cStringValue ], "L",1))
         {
             wl = 620;
             rgb = YES;
         }
         
         if (   !strncmp([ wavelengthOpt cStringValue ], "g",1)
-            || !strncmp([ wavelengthOpt cStringValue ], "G",1))
+            || !strncmp([ wavelengthOpt cStringValue ], "G",1)
+            || !strncmp([ wavelengthOpt cStringValue ], "m",1)
+            || !strncmp([ wavelengthOpt cStringValue ], "M",1))
         {
             wl = 550;
             rgb = YES;
         }
         
         if (   !strncmp([ wavelengthOpt cStringValue ], "b",1)
-            || !strncmp([ wavelengthOpt cStringValue ], "B",1))
+            || !strncmp([ wavelengthOpt cStringValue ], "B",1)
+            || !strncmp([ wavelengthOpt cStringValue ], "s",1)
+            || !strncmp([ wavelengthOpt cStringValue ], "S",1))
         {
             wl = 420;
             rgb = YES;
