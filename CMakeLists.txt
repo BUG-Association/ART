@@ -50,6 +50,7 @@ find_package( LCMS2 REQUIRED )
 #find_package( JPEG REQUIRED )
 find_package( GSL )
 find_package( OPENEXR )
+find_package( Sanitizers )
 
 if ( APPLE )
 
