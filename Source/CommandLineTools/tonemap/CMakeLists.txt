@@ -3,6 +3,10 @@ add_executable(
 	tonemap.m
 	)
 
+add_sanitizers(
+	tonemap
+	)
+
 target_link_libraries(
 	tonemap
 	${art_generic_link_libraries}

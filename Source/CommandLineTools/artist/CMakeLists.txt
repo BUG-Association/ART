@@ -3,6 +3,10 @@ add_executable(
 	artist.m
 	)
 
+add_sanitizers(
+	artist
+	)
+
 target_link_libraries(
 	artist
 	${art_generic_link_libraries}

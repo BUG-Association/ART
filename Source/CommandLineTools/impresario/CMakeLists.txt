@@ -1,12 +1,16 @@
 add_executable(
-impresario
-impresario.m
-)
+	impresario
+	impresario.m
+	)
+
+add_sanitizers(
+	impresario
+	)
 
 target_link_libraries(
-impresario
+	impresario
 	${art_generic_link_libraries}
-)
+	)
 
 install (
 	TARGETS

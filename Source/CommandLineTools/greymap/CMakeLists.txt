@@ -3,6 +3,10 @@ add_executable(
 	greymap.m
 	)
 
+add_sanitizers(
+	greymap
+	)
+
 target_link_libraries(
 	greymap
 	${art_generic_link_libraries}

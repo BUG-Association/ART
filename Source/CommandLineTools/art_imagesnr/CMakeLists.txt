@@ -1,12 +1,16 @@
 add_executable(
-art_imagesnr
-art_imagesnr.m
-)
+	art_imagesnr
+	art_imagesnr.m
+	)
+
+add_sanitizers(
+	art_imagesnr
+	)
 
 target_link_libraries(
-art_imagesnr
+	art_imagesnr
 	${art_generic_link_libraries}
-)
+	)
 
 install (
 	TARGETS

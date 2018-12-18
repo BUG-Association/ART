@@ -3,6 +3,10 @@ add_executable(
 	bugblatter.m
 	)
 
+add_sanitizers(
+	bugblatter
+	)
+
 target_link_libraries(
 	bugblatter
 	${art_generic_link_libraries}

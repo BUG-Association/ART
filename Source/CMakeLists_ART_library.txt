@@ -5,6 +5,10 @@ add_library (
 	${art_sources}
 	)
 
+add_sanitizers(
+	AdvancedRenderingToolkit
+	)
+
 @source_group_commands@
 
 if ( APPLE )

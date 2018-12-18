@@ -1,12 +1,16 @@
 add_executable(
-arm2art
-arm2art.m
-)
+	arm2art
+	arm2art.m
+	)
+
+add_sanitizers(
+	arm2art
+	)
 
 target_link_libraries(
-arm2art
+	arm2art
 	${art_generic_link_libraries}
-)
+	)
 
 install (
 	TARGETS
