@@ -162,6 +162,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnValConstSpectrum)
             spectrum
             );
 
+    if ( internalHiresSpectrum )
+        s500_free(
+            art_gv,
+            internalHiresSpectrum
+            );
+
     [ super dealloc ];
 }
 
