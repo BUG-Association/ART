@@ -366,14 +366,14 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNamedNodeSet)
 
         while ( entriesToProcess-- )
         {
-            ArNamedNode  * entry = ALLOC(ArNamedNode);
+            ArNamedNode entry;
 
-            [ coder codeSymbol : & entry->name ];
-            [ coder codeSubnode: & entry->node ];
+            [ coder codeSymbol : & entry.name ];
+            [ coder codeSubnode: & entry.node ];
 
             artable_add_nn(
                 & namedNodeTable,
-                 *entry );
+                  entry );
         }
     }
     else
