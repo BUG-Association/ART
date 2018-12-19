@@ -163,7 +163,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
 
 - (void) _loadExternal
 {
-    ArString  complete_path_to_external;
+    ArString  complete_path_to_external = NULL;
 
     full_path_for_filename(
         & complete_path_to_external,
@@ -178,6 +178,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
 
     ArNode <ArpFiletype, ArpParser> * nativeFile =
         [ self _getFileNamed: complete_path_to_external ];
+
+    FREE( complete_path_to_external );
 
     ArNode  * externalContent;
 
