@@ -242,10 +242,13 @@ Ar##_ShortType##DynArray ar##_type##dynarray_copy( \
     _ARDYNARRAY_UNUSED_SLOT_VALUE(clone) = \
         _ARDYNARRAY_UNUSED_SLOT_VALUE(*original); \
     _ARDYNARRAY_STP(clone) = _ARDYNARRAY_STP(*original); \
-    memcpy( \
-        _ARDYNARRAY_DYNARRAY(clone), \
-        _ARDYNARRAY_DYNARRAY(*original), \
-        _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(clone) * sizeof(_Type) ); \
+    if ( _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(clone) ) \
+    { \
+        memcpy( \
+            _ARDYNARRAY_DYNARRAY(clone), \
+            _ARDYNARRAY_DYNARRAY(*original), \
+            _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(clone) * sizeof(_Type) ); \
+    } \
     \
     return clone; \
 } \
@@ -379,10 +382,13 @@ Ar##_ShortType##DynArray ar##_type##dynarray_copy( \
         _ARDYNARRAY_UNUSED_SLOT_VALUE(*original); \
     _ARDYNARRAY_STP(clone) = _ARDYNARRAY_STP(*original); \
 \
-    memcpy( \
-        _ARDYNARRAY_DYNARRAY(clone), \
-        _ARDYNARRAY_DYNARRAY(*original), \
-        _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(clone) * sizeof(_Type) ); \
+    if ( _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(clone) ) \
+    { \
+        memcpy( \
+            _ARDYNARRAY_DYNARRAY(clone), \
+            _ARDYNARRAY_DYNARRAY(*original), \
+            _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(clone) * sizeof(_Type) ); \
+    } \
 \
     for ( unsigned int i = 0; i < _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(clone); i++ ) \
     { \
