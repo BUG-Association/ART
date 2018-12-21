@@ -125,10 +125,10 @@ static const char * arfartcsp_extension[] = { ARFARTCSP_EXTENSION, 0 };
 static inline void ieee32buffer_to_double(unsigned char * buffer, double * value)
 {
     union { float f; unsigned int i; }  float_int;
-    float_int.i =   buffer[3]
-                    | (buffer[2] << 8)
-                    | (buffer[1] << 16)
-                    | (buffer[0] << 24);
+    float_int.i =   (unsigned int)buffer[3]
+                    | ((unsigned int)buffer[2] << 8U)
+                    | ((unsigned int)buffer[1] << 16U)
+                    | ((unsigned int)buffer[0] << 24U);
     (*value) = (double)float_int.f;
 }
 
@@ -138,9 +138,9 @@ static inline void double_to_ieee32buffer(double * value, unsigned char * buffer
     float_int.f = (float)(*value);
     unsigned int i = float_int.i;
     buffer[3] = (unsigned char) i;
-    buffer[2] = (unsigned char) (i >> 8);
-    buffer[1] = (unsigned char) (i >> 16);
-    buffer[0] = (unsigned char) (i >> 24);
+    buffer[2] = (unsigned char) (i >> 8U);
+    buffer[1] = (unsigned char) (i >> 16U);
+    buffer[0] = (unsigned char) (i >> 24U);
 }
 
 
