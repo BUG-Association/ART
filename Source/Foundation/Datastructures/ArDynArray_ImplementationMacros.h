@@ -242,7 +242,7 @@ Ar##_ShortType##DynArray ar##_type##dynarray_copy( \
     _ARDYNARRAY_UNUSED_SLOT_VALUE(clone) = \
         _ARDYNARRAY_UNUSED_SLOT_VALUE(*original); \
     _ARDYNARRAY_STP(clone) = _ARDYNARRAY_STP(*original); \
-    if ( _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(clone) ) \
+    if ( _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(clone) > 0 ) \
     { \
         memcpy( \
             _ARDYNARRAY_DYNARRAY(clone), \
@@ -382,7 +382,7 @@ Ar##_ShortType##DynArray ar##_type##dynarray_copy( \
         _ARDYNARRAY_UNUSED_SLOT_VALUE(*original); \
     _ARDYNARRAY_STP(clone) = _ARDYNARRAY_STP(*original); \
 \
-    if ( _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(clone) ) \
+    if ( _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(clone) > 0 ) \
     { \
         memcpy( \
             _ARDYNARRAY_DYNARRAY(clone), \
