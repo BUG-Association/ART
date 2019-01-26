@@ -379,6 +379,8 @@ ARDYNARRAY_IMPLEMENTATION_FOR_ARTYPE(CMDLineInput, cmdli, c, ARCMDLI_EMPTY);
         }
     }
 
+    arcmdlidynarray_free_contents( & inputDynArray );
+
     return remainingInputFiles + 1;
 }
 

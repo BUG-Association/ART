@@ -467,8 +467,6 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
            && ! endOfSeries
            && series < ARFMA_MAX_SAMPLES - 1 )
     {
-        tempArray[ series ] = ALLOC_ARRAY( double, ARFMA_MAX_SAMPLES );
-
         [ self _parseSampleArray
             :   stream
             : & seriesLength
