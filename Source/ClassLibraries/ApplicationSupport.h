@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2018 The ART Development Team
+    Copyright (c) 1996-2019 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -370,7 +370,11 @@ int art_print_banner_and_process_standard_commandline_options(
         return 0; \
 }
 
-#define ART_EXTERNAL_APP_NO_INPUT_FILES_APPLICATION_STARTUP(__name,__desc,__usage) \
+#define ART_EXTERNAL_APP_NO_INPUT_FILES_APPLICATION_STARTUP( \
+    __name, \
+    __desc, \
+    __usage \
+    ) \
 { \
     if ( ! art_print_banner_and_process_standard_commandline_options( \
                argc, \
@@ -379,6 +383,28 @@ int art_print_banner_and_process_standard_commandline_options(
                __name, \
                __desc, \
                "", \
+               __usage, \
+               NO, \
+               1, \
+               1 \
+               ) ) \
+        return 0; \
+}
+
+#define ART_EXTERNAL_APP_NO_INPUT_FILES_APPLICATION_STARTUP_WITH_SYNOPSIS( \
+    __name, \
+    __desc, \
+    __ldesc, \
+    __usage \
+    ) \
+{ \
+    if ( ! art_print_banner_and_process_standard_commandline_options( \
+               argc, \
+               argv, \
+               art_gv, \
+               __name, \
+               __desc, \
+               __ldesc, \
                __usage, \
                NO, \
                1, \
