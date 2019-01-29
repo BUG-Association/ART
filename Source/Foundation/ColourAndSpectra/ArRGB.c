@@ -212,6 +212,15 @@ void rgb_sdd_sample_at_wavelength_s(
         );
 }
 
+double rgb_cc_dist(
+        const ART_GV  * art_gv,
+        const ArRGB   * c0,
+        const ArRGB   * c1
+        )
+{
+    return c3_cc_dist( & c0->c, & c1->c );
+}
+
 double rgb_ss_convolve(
         const ART_GV    * art_gv,
         const ArRGB  * c0,

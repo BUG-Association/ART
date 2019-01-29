@@ -108,11 +108,11 @@ void frgb_s_debugprintf(
         const ArFloatRGB  * c_0
         );
 
-//double rgb_cc_convolve(
-//        const ART_GV  * art_gv,
-//        const ArRGB   * c0,
-//        const ArRGB   * c1
-//        );
+double rgb_cc_dist(
+        const ART_GV  * art_gv,
+        const ArRGB   * c0,
+        const ArRGB   * c1
+        );
 
 #endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARRGB_H_ */
 /* ======================================================================== */
