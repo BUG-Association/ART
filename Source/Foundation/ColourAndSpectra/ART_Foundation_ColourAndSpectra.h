@@ -37,6 +37,7 @@ ART_LIBRARY_INTERFACE(ART_Foundation_ColourAndSpectra)
 #include "ArCIELabUInt.h"
 #include "ArCIELuv.h"
 #include "ArRGB.h"
+#include "ArHSV.h"
 #include "ArRGBUInt.h"
 #include "ArSpectrum8.h"
 #include "ArSpectrum11.h"
