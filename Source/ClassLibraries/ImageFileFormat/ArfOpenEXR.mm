@@ -94,6 +94,25 @@ ARPFILE_DEFAULT_IMPLEMENTATION(
 
 ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
 
+- (void) parseFile
+        : (ArNode **) objectPtr
+{
+    [ self parseFileGetExternals
+        :   objectPtr
+        :   0
+        ];
+}
+
+- (void) parseFileGetExternals
+        : (ArNode **) objectPtr
+        : (ArList *) externals
+{
+    *objectPtr =
+        [ ALLOC_INIT_OBJECT(ArnFileImage)
+            :   [ file name ]
+            ];
+}
+
 - (ArnImageInfo *) open     // open for reading
 {
     if ( ! member_vars )

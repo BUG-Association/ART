@@ -310,7 +310,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
 
     cc3 = NULL;
 //debugprintf("reading cc\n")
-    cc3_read( art_gv, "cc3_srgb.c3", & cc3 );
+    cc3_read( art_gv, "cc3_ww.c3", & cc3 );
 //debugprintf("done\n")
 
     Class  sourceImageBufferClass =
@@ -361,8 +361,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
     int  sourceImageDataSize =
         XC(sourceImageSize) * YC(sourceImageSize);
 
-    imageData = ALLOC_ARRAY( ArRGB, sourceImageDataSize );
-//    imageDataC3 = ALLOC_ARRAY( Crd3, sourceImageDataSize );
+//    imageData = ALLOC_ARRAY( ArRGB, sourceImageDataSize );
+    imageDataC3 = ALLOC_ARRAY( Crd3, sourceImageDataSize );
 
     for ( int i = 0; i < sourceImageDataSize; i++)
     {
@@ -389,14 +389,14 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
             }
         }
         
-        imageData[i] = pixelRGB;
+//        imageData[i] = pixelRGB;
         
-//        cc3_coeff_for_rgb(
-//              art_gv,
-//            & pixelRGB,
-//              cc3,
-//            & imageDataC3[i]
-//            );
+        cc3_coeff_for_rgb(
+              art_gv,
+            & pixelRGB,
+              cc3,
+            & imageDataC3[i]
+            );
     }
 
 //    FREE_ARRAY(cc3);
@@ -464,21 +464,21 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
     //   There is no point in filling in hero components 2-4 if
     //   we are in monochrome mode
 
-    cc3_spectral_sample_for_rgb(
-          art_gv,
-        & IMAGE_DATA_RGB(*p2d),
-          cc3,
-          wavelength,
-          outSpectralSample
-        );
-//    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
-//    {
-//        SPS_CI(*outSpectralSample,i) =
-//            spectralSigmoidC3(
-//                  NANO_FROM_UNIT(ARWL_WI(*wavelength,i)),
-//                    & IMAGE_DATA_C3(*p2d)
-//                );
-//    }
+//    cc3_spectral_sample_for_rgb(
+//          art_gv,
+//        & IMAGE_DATA_RGB(*p2d),
+//          cc3,
+//          wavelength,
+//          outSpectralSample
+//        );
+    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+    {
+        SPS_CI(*outSpectralSample,i) =
+            spectralSigmoidC3(
+                  NANO_FROM_UNIT(ARWL_WI(*wavelength,i)),
+                    & IMAGE_DATA_C3(*p2d)
+                );
+    }
 }
 
 - (void) getAttenuation

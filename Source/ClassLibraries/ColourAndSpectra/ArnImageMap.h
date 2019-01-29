@@ -41,7 +41,7 @@ ART_MODULE_INTERFACE(ArnImageMap)
     double    scaleFactor;
     IVec2D    sourceImageSize;
     ArRGB    * imageData;
-//    Crd3    * imageDataC3;
+    Crd3     * imageDataC3;
     struct ArCoeffCube3Entry  * cc3;
 }
 
