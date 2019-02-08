@@ -99,6 +99,39 @@ void arsingleton_register(
     pthread_mutex_unlock( & ARSINGLETON_MUTEX );
 }
 
+void arsingleton_deregister(
+        ART_GV   * art_gv,
+        ArSymbol   name
+        )
+{
+    ArSingleton * singleton =
+        SINGLETON_FROM_NAMEENTRY(
+            arhashtable_find_hash(
+                & ARSINGLETON_OBJECT_MAP,
+                  (unsigned long)name,
+                  0
+                )
+            );
+
+    if (singleton)
+    {
+        arhashtable_del_entry(
+            & ARSINGLETON_NAME_MAP,
+            & singleton->name_entry
+            );
+
+        if (singleton->object_entry.hash)
+        {
+            arhashtable_del_entry(
+                & ARSINGLETON_OBJECT_MAP,
+                & singleton->object_entry
+                );
+        }
+
+        FREE(singleton);
+    }
+}
+
 void arsingleton_register_creator(
         ART_GV           * art_gv,
         ArSymbol           name,

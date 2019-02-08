@@ -81,6 +81,15 @@ void arsingleton_register(
         );
 
 /* ---------------------------------------------------------------------------
+    'arsingleton_deregister'
+        Deregisters a singleton object.
+--------------------------------------------------------------------------- */
+void arsingleton_deregister(
+        ART_GV   * art_gv,
+        ArSymbol   name
+        );
+
+/* ---------------------------------------------------------------------------
     'arsingleton_register_creator'
         Registers a function to lazily create a singleton object.
 --------------------------------------------------------------------------- */
