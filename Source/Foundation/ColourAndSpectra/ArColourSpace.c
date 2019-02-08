@@ -155,6 +155,8 @@ void createLCMSProfileFromARTColours(
             );
     
     setICCProfileDescription( *profile, description );
+
+    cmsFreeToneCurve(gammacurve);
 }
 
 void createCompleteLCMSProfileFromARTColours(
