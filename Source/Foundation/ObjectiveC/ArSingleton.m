@@ -31,6 +31,9 @@
 #import "ART_Foundation_Datastructures.h"
 
 
+// #define ARSINGLETON_DEBUG_PRINTF
+
+
 typedef struct ArSingleton
 {
     ArHashEntry      name_entry;
@@ -39,6 +42,10 @@ typedef struct ArSingleton
 }
 ArSingleton;
 
+#define SINGLETON_FROM_NAMEENTRY(_ne)   \
+    STRUCT_POINTER(ArSingleton,(_ne),name_entry)
+#define SINGLETON_FROM_OBJECTENTRY(_oe) \
+    STRUCT_POINTER(ArSingleton,(_oe),object_entry)
 
 typedef struct ArSingleton_GV
 {
@@ -72,11 +79,6 @@ ART_MODULE_SHUTDOWN_FUNCTION
 
     FREE( ARSINGLETON_GV );
 )
-
-#define SINGLETON_FROM_NAMEENTRY(_ne)   \
-    STRUCT_POINTER(ArSingleton,(_ne),name_entry)
-#define SINGLETON_FROM_OBJECTENTRY(_oe) \
-    STRUCT_POINTER(ArSingleton,(_oe),object_entry)
 
 void arsingleton_register(
         ART_GV    * art_gv,
@@ -212,8 +214,6 @@ ArObjectCreator arsingleton_has_a_creator_function(
         return 0;
 }
 
-//#define SINGLETON_DEBUG_PRINTF
-
 /* ---------------------------------------------------------------------------
     'arsingleton_of_name'
         Returns the singleton object of a given name or 0 if there is no singleton
@@ -227,21 +227,27 @@ id arsingleton_of_name(
     ArSingleton * singleton =
         SINGLETON_FROM_NAMEENTRY(arhashtable_find_hash(&ARSINGLETON_NAME_MAP,
                                                   (unsigned long)name, 0));
-#ifdef SINGLETON_DEBUG_PRINTF
-    printf("\n singleton= %s \n",name);fflush(stdout);
+
+#ifdef ARSINGLETON_DEBUG_PRINTF
+    printf("\n%s %s\n",__FUNCTION__,name);fflush(stdout);
 #endif
+
     if (singleton)
     {
         ArcObject  * object = (ArcObject *)singleton->object_entry.hash;
-#ifdef SINGLETON_DEBUG_PRINTF
-        printf("\n S object= %s \n",[ object cStringClassName ]);fflush(stdout);
+
+#ifdef ARSINGLETON_DEBUG_PRINTF
+        printf("found object = %s %p\n",[ object cStringClassName ],object);fflush(stdout);
 #endif
+
         if (! object)
         {
             object = singleton->object_creator(art_gv);
-#ifdef SINGLETON_DEBUG_PRINTF
-            printf("\n C object= %s 0x%x\n",[ object cStringClassName ],object);fflush(stdout);
+
+#ifdef ARSINGLETON_DEBUG_PRINTF
+            printf("created object = %s %p\n",[ object cStringClassName ],object);fflush(stdout);
 #endif
+
             singleton->object_entry.hash = (unsigned long)object;
 
             arhashtable_add_entry(&ARSINGLETON_OBJECT_MAP,
