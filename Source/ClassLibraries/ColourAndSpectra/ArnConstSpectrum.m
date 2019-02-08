@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2018 The ART Development Team
+    Copyright (c) 1996-2019 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -160,6 +160,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnValConstSpectrum)
         spc_free(
             art_gv,
             spectrum
+            );
+
+    if ( internalHiresSpectrum )
+        s500_free(
+            art_gv,
+            internalHiresSpectrum
             );
 
     [ super dealloc ];

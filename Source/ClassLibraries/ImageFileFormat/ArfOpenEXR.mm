@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2018 The ART Development Team
+    Copyright (c) 1996-2019 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -93,6 +93,25 @@ ARPFILE_DEFAULT_IMPLEMENTATION(
     )
 
 ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
+
+- (void) parseFile
+        : (ArNode **) objectPtr
+{
+    [ self parseFileGetExternals
+        :   objectPtr
+        :   0
+        ];
+}
+
+- (void) parseFileGetExternals
+        : (ArNode **) objectPtr
+        : (ArList *) externals
+{
+    *objectPtr =
+        [ ALLOC_INIT_OBJECT(ArnFileImage)
+            :   [ file name ]
+            ];
+}
 
 - (ArnImageInfo *) open     // open for reading
 {

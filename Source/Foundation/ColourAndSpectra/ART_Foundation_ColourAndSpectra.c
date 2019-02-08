@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2018 The ART Development Team
+    Copyright (c) 1996-2019 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -55,6 +55,7 @@ ART_LIBRARY_INITIALISATION_FUNCTION
     ART_PERFORM_MODULE_INITIALISATION( ArCIELuv )
     ART_PERFORM_MODULE_INITIALISATION( ArGrey )
     ART_PERFORM_MODULE_INITIALISATION( ArRGB )
+    ART_PERFORM_MODULE_INITIALISATION( ArHSV )
     ART_PERFORM_MODULE_INITIALISATION( ArRGBA )
     ART_PERFORM_MODULE_INITIALISATION( ArRGBUInt )
     ART_PERFORM_MODULE_INITIALISATION( ArSpectrum8 )

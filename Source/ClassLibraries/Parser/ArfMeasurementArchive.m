@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2018 The ART Development Team
+    Copyright (c) 1996-2019 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -467,8 +467,6 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
            && ! endOfSeries
            && series < ARFMA_MAX_SAMPLES - 1 )
     {
-        tempArray[ series ] = ALLOC_ARRAY( double, ARFMA_MAX_SAMPLES );
-
         [ self _parseSampleArray
             :   stream
             : & seriesLength

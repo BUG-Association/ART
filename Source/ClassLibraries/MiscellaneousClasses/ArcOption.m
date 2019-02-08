@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2018 The ART Development Team
+    Copyright (c) 1996-2019 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -378,6 +378,8 @@ ARDYNARRAY_IMPLEMENTATION_FOR_ARTYPE(CMDLineInput, cmdli, c, ARCMDLI_EMPTY);
             }
         }
     }
+
+    arcmdlidynarray_free_contents( & inputDynArray );
 
     return remainingInputFiles + 1;
 }

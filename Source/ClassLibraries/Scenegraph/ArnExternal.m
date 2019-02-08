@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2018 The ART Development Team
+    Copyright (c) 1996-2019 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -163,7 +163,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
 
 - (void) _loadExternal
 {
-    ArString  complete_path_to_external;
+    ArString  complete_path_to_external = NULL;
 
     full_path_for_filename(
         & complete_path_to_external,
@@ -178,6 +178,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
 
     ArNode <ArpFiletype, ArpParser> * nativeFile =
         [ self _getFileNamed: complete_path_to_external ];
+
+    FREE( complete_path_to_external );
 
     ArNode  * externalContent;
 

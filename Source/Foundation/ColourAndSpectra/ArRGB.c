@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2018 The ART Development Team
+    Copyright (c) 1996-2019 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -210,6 +210,15 @@ void rgb_sdd_sample_at_wavelength_s(
         "defined in colour space - "
         "switch ART to a spectral ISR to avoid this error"
         );
+}
+
+double rgb_cc_dist(
+        const ART_GV  * art_gv,
+        const ArRGB   * c0,
+        const ArRGB   * c1
+        )
+{
+    return c3_cc_dist( & c0->c, & c1->c );
 }
 
 double rgb_ss_convolve(

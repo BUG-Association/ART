@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2018 The ART Development Team
+    Copyright (c) 1996-2019 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -37,6 +37,7 @@ ART_LIBRARY_INTERFACE(ART_Foundation_ColourAndSpectra)
 #include "ArCIELabUInt.h"
 #include "ArCIELuv.h"
 #include "ArRGB.h"
+#include "ArHSV.h"
 #include "ArRGBUInt.h"
 #include "ArSpectrum8.h"
 #include "ArSpectrum11.h"

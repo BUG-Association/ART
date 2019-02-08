@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2018 The ART Development Team
+    Copyright (c) 1996-2019 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -38,10 +38,11 @@ ART_MODULE_INTERFACE(ArnImageMap)
             ArpSpectrum
             >
 {
-    double          scaleFactor;
-    IVec2D          sourceImageSize;
-    ArSpectrum8  ** imageData;
-    ArSpectrum8   * temp;
+    double    scaleFactor;
+    IVec2D    sourceImageSize;
+    ArRGB    * imageData;
+    Crd3     * imageDataC3;
+    struct ArCoeffCube3Entry  * cc3;
 }
 
 - init
