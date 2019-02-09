@@ -72,6 +72,34 @@ ART_MODULE_INITIALISATION_FUNCTION
 
 ART_MODULE_SHUTDOWN_FUNCTION
 (
+
+#ifdef ARSINGLETON_DEBUG_PRINTF
+    unsigned long n = arhashtable_entries( & ARSINGLETON_NAME_MAP );
+    printf("\n# Dangling Singletons: %lu\n", n); fflush(stdout);
+#endif
+
+    // TG: we have to clear the hashtable ourselves, as our hash entries
+    // are embedded inside a struct
+
+    ArHashEntry * entry =
+        arhashtable_next_entry( & ARSINGLETON_NAME_MAP, NULL );
+
+    while (entry)
+    {
+        ArHashEntry * next =
+            arhashtable_next_entry( & ARSINGLETON_NAME_MAP, entry );
+
+        ArSingleton * singleton = SINGLETON_FROM_NAMEENTRY(entry);
+
+#ifdef ARSINGLETON_DEBUG_PRINTF
+        printf("Singleton: %s\n", (ArSymbol)singleton->name_entry.hash); fflush(stdout);
+#endif
+
+        FREE(singleton);
+
+        entry = next;
+    }
+
     arhashtable_free( & ARSINGLETON_NAME_MAP );
     arhashtable_free( & ARSINGLETON_OBJECT_MAP );
 
