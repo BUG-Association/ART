@@ -46,7 +46,9 @@ ART_MODULE_INTERFACE(ArHSV)
     Both conversions are taken from a Shadertoy example referenced in the
     source.
  
-    The gamma value which is
+    The gamma value which is passed to both conversion functions is an
+    arbitrary parameter which can be used to tune appearance of the
+    resulting colours.
 
 ------------------------------------------------------------------------aw- */
 
@@ -82,12 +84,14 @@ ArHSV;
 void hsv_to_rgb(
               ART_GV  * art_gv,
         const ArHSV   * hsv,
+        const double    gamma,
               ArRGB   * rgb
         );
 
 void hsv_to_boosted_rgb(
               ART_GV  * art_gv,
         const ArHSV   * hsv,
+        const double    gamma,
               ArRGB   * rgb
         );
 

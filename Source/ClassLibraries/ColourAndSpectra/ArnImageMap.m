@@ -55,250 +55,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 #define IMAGE_DATA_RGB(_p2d) \
     (imageData[((int)(XC(sourceImageSize)*XC(_p2d)))+((int)(YC(sourceImageSize)*YC(_p2d)))*XC(sourceImageSize)])
 
-#define  RGB_CUBE_DIM       32
-#define  RGB_CUBE_ROW       RGB_CUBE_DIM
-#define  RGB_CUBE_LEVEL     (RGB_CUBE_DIM * RGB_CUBE_DIM)
-#define  RGB_CUBE_SIZE      (RGB_CUBE_DIM * RGB_CUBE_DIM * RGB_CUBE_DIM)
-
-#define  RGB_CUBE_XYZ_TO_I(x,y,z)  \
-    ((x) + RGB_CUBE_ROW * (y) + RGB_CUBE_LEVEL * (z))
-
-#define  RGB_CUBE_I_TO_X(i)     ((int)(((i) % RGB_CUBE_LEVEL) % RGB_CUBE_ROW))
-#define  RGB_CUBE_I_TO_Y(i)     ((int)(((i) % RGB_CUBE_LEVEL) / RGB_CUBE_ROW))
-#define  RGB_CUBE_I_TO_Z(i)     ((int) ((i) / RGB_CUBE_LEVEL))
-
-#define  RGB_CUBE_F_TO_I(f)     (floor(f*((double)(RGB_CUBE_DIM-1))))
-
-double  basicSigmoid(
-        const double  x
-        )
-{
-    return 0.5 + ( x / (2.0*sqrt(1.+M_SQR(x))));
-}
-
-double  spectralSigmoidC3(
-        const double    wl,
-        const Crd3    * c
-        )
-{
-    double  iwl = wl - 380. - 180.;
-    return  basicSigmoid(C3_0(*c)*M_SQR(iwl) + C3_1(*c)*iwl + C3_2(*c));
-}
-
-typedef struct ArCoeffCube3Entry
-{
-    Crd3   c;
-    ArRGB  lattice_rgb;
-}
-ArCoeffCube3Entry;
-
-void binaryReadDouble(
-              FILE    * f,
-              double  * d
-        )
-{
-    char  charBuffer[8];
-
-    fread( charBuffer, 1, 8, f );
-
-    uint64_t l;
-    union { double d; uint64_t i; }  value;
-
-    l  = charBuffer[7] & 0xff; l <<= 8;
-    l |= charBuffer[6] & 0xff; l <<= 8;
-    l |= charBuffer[5] & 0xff; l <<= 8;
-    l |= charBuffer[4] & 0xff; l <<= 8;
-    l |= charBuffer[3] & 0xff; l <<= 8;
-    l |= charBuffer[2] & 0xff; l <<= 8;
-    l |= charBuffer[1] & 0xff; l <<= 8;
-    l |= charBuffer[0] & 0xff;
-
-    value.i = l; *d = value.d;
-}
-
-void binaryReadInt(
-              FILE  * f,
-              int   * d
-        )
-{
-    char  charBuffer[4];
-
-    fread( charBuffer, 1, 4, f );
-
-    int32_t  l;
-
-    l  = charBuffer[3] & 0xff; l <<= 8;
-    l |= charBuffer[2] & 0xff; l <<= 8;
-    l |= charBuffer[1] & 0xff; l <<= 8;
-    l |= charBuffer[0] & 0xff;
-
-    *d = l;
-}
-
-void cc3_read(
-              ART_GV              * art_gv,
-        const char                * fileName,
-              ArCoeffCube3Entry  ** coefficientCube
-        )
-{
-    FILE  * inputFile = fopen(fileName, "r");
-    
-    *coefficientCube = ALLOC_ARRAY(ArCoeffCube3Entry, RGB_CUBE_SIZE);
-    
-    //   Just for shorter code
-    ArCoeffCube3Entry  * cc = *coefficientCube;
-
-    //   The stepsize is unit div one less than the number of lattice points
-
-    double  stepsize = 1. / ( RGB_CUBE_DIM - 1.);
-
-    for ( int i = 0; i < RGB_CUBE_SIZE; i++ )
-    {
-        XC(cc[i].lattice_rgb) = RGB_CUBE_I_TO_X(i) * stepsize;
-        YC(cc[i].lattice_rgb) = RGB_CUBE_I_TO_Y(i) * stepsize;
-        ZC(cc[i].lattice_rgb) = RGB_CUBE_I_TO_Z(i) * stepsize;
-        
-        for ( int j = 0; j < 3; j++ )
-        {
-            binaryReadDouble( inputFile, & C3_CI( cc[i].c, j ) );
-        }
-        
-        //   We read & ignore the target RGB and treated contents of the cube
-        
-        for ( int j = 0; j < 3; j++ )
-        {
-            double  traget_rgb_c;
-            
-            binaryReadDouble( inputFile, & traget_rgb_c );
-        }
-        
-        int  treated;
-        
-        binaryReadInt( inputFile, & treated );
-    }
-
-    fclose(inputFile);
-}
-
-void cc3_coeff_for_rgb(
-              ART_GV             * art_gv,
-        const ArRGB              * c,
-        const ArCoeffCube3Entry  * cc,
-              Crd3               * coeff
-        )
-{
-    IPnt3D  bc;
-    
-    XC(bc) = RGB_CUBE_F_TO_I(XC(*c));
-    YC(bc) = RGB_CUBE_F_TO_I(YC(*c));
-    ZC(bc) = RGB_CUBE_F_TO_I(ZC(*c));
-
-    int  ci[8];
-
-    ci[0] = RGB_CUBE_XYZ_TO_I( XC(bc)    , YC(bc)    , ZC(bc)     ); //000
-    ci[1] = RGB_CUBE_XYZ_TO_I( XC(bc)    , YC(bc)    , ZC(bc) + 1 ); //001
-    ci[2] = RGB_CUBE_XYZ_TO_I( XC(bc)    , YC(bc) + 1, ZC(bc)     ); //010
-    ci[3] = RGB_CUBE_XYZ_TO_I( XC(bc)    , YC(bc) + 1, ZC(bc) + 1 ); //011
-    ci[4] = RGB_CUBE_XYZ_TO_I( XC(bc) + 1, YC(bc)    , ZC(bc)     ); //100
-    ci[5] = RGB_CUBE_XYZ_TO_I( XC(bc) + 1, YC(bc)    , ZC(bc) + 1 ); //101
-    ci[6] = RGB_CUBE_XYZ_TO_I( XC(bc) + 1, YC(bc) + 1, ZC(bc)     ); //110
-    ci[7] = RGB_CUBE_XYZ_TO_I( XC(bc) + 1, YC(bc) + 1, ZC(bc) + 1 ); //111
-
-    Vec3D  d;
-    
-    XC(d) = (XC(*c) - XC(cc[ci[0]].lattice_rgb))/(XC(cc[ci[7]].lattice_rgb)-XC(cc[ci[0]].lattice_rgb));
-    YC(d) = (YC(*c) - YC(cc[ci[0]].lattice_rgb))/(YC(cc[ci[7]].lattice_rgb)-YC(cc[ci[0]].lattice_rgb));
-    ZC(d) = (ZC(*c) - ZC(cc[ci[0]].lattice_rgb))/(ZC(cc[ci[7]].lattice_rgb)-ZC(cc[ci[0]].lattice_rgb));
-
-    ArPSSpectrum  resultPSS;
-
-    ARPSS_SIZE(resultPSS) = 360;
-    ARPSS_SCALE(resultPSS) = 1.0;
-    ARPSS_ARRAY(resultPSS) = ALLOC_ARRAY(Pnt2D,ARPSS_SIZE(resultPSS));
-
-    double  interpolatedC[3];
-
-    for ( int j = 0; j < 3; j++ )
-    {
-        double  c00, c01, c10, c11;
-
-        c00 = C3_CI(cc[ci[0]].c, j) * (1.-XC(d)) + C3_CI(cc[ci[4]].c, j) * XC(d);
-        c01 = C3_CI(cc[ci[1]].c, j) * (1.-XC(d)) + C3_CI(cc[ci[5]].c, j) * XC(d);
-        c10 = C3_CI(cc[ci[2]].c, j) * (1.-XC(d)) + C3_CI(cc[ci[6]].c, j) * XC(d);
-        c11 = C3_CI(cc[ci[3]].c, j) * (1.-XC(d)) + C3_CI(cc[ci[7]].c, j) * XC(d);
-        
-        double  c0, c1;
-        
-        c0 = c00 * (1.-YC(d)) + c10 * YC(d);
-        c1 = c01 * (1.-YC(d)) + c11 * YC(d);
-        
-        interpolatedC[j] = c0 * (1.-ZC(d)) + c1 * ZC(d);
-        C3_CI(*coeff,j) = interpolatedC[j];
-    }
-}
-
-void cc3_spectral_sample_for_rgb(
-              ART_GV             * art_gv,
-        const ArRGB              * c,
-        const ArCoeffCube3Entry  * cc,
-        const ArWavelength       * wl,
-              ArSpectralSample   * s
-        )
-{
-    IPnt3D  bc;
-    
-    XC(bc) = RGB_CUBE_F_TO_I(XC(*c));
-    YC(bc) = RGB_CUBE_F_TO_I(YC(*c));
-    ZC(bc) = RGB_CUBE_F_TO_I(ZC(*c));
-
-    int  ci[8];
-
-    ci[0] = RGB_CUBE_XYZ_TO_I( XC(bc)    , YC(bc)    , ZC(bc)     ); //000
-    ci[1] = RGB_CUBE_XYZ_TO_I( XC(bc)    , YC(bc)    , ZC(bc) + 1 ); //001
-    ci[2] = RGB_CUBE_XYZ_TO_I( XC(bc)    , YC(bc) + 1, ZC(bc)     ); //010
-    ci[3] = RGB_CUBE_XYZ_TO_I( XC(bc)    , YC(bc) + 1, ZC(bc) + 1 ); //011
-    ci[4] = RGB_CUBE_XYZ_TO_I( XC(bc) + 1, YC(bc)    , ZC(bc)     ); //100
-    ci[5] = RGB_CUBE_XYZ_TO_I( XC(bc) + 1, YC(bc)    , ZC(bc) + 1 ); //101
-    ci[6] = RGB_CUBE_XYZ_TO_I( XC(bc) + 1, YC(bc) + 1, ZC(bc)     ); //110
-    ci[7] = RGB_CUBE_XYZ_TO_I( XC(bc) + 1, YC(bc) + 1, ZC(bc) + 1 ); //111
-
-    Vec3D  d;
-    
-    XC(d) = (XC(*c) - XC(cc[ci[0]].lattice_rgb))/(XC(cc[ci[7]].lattice_rgb)-XC(cc[ci[0]].lattice_rgb));
-    YC(d) = (YC(*c) - YC(cc[ci[0]].lattice_rgb))/(YC(cc[ci[7]].lattice_rgb)-YC(cc[ci[0]].lattice_rgb));
-    ZC(d) = (ZC(*c) - ZC(cc[ci[0]].lattice_rgb))/(ZC(cc[ci[7]].lattice_rgb)-ZC(cc[ci[0]].lattice_rgb));
-
-    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
-    {
-        double  sv[8];
-        
-        double  j = NANO_FROM_UNIT(ARWL_WI(*wl,i));
-        
-        sv[0] = spectralSigmoidC3(j, & cc[ci[0]].c);
-        sv[1] = spectralSigmoidC3(j, & cc[ci[1]].c);
-        sv[2] = spectralSigmoidC3(j, & cc[ci[2]].c);
-        sv[3] = spectralSigmoidC3(j, & cc[ci[3]].c);
-        sv[4] = spectralSigmoidC3(j, & cc[ci[4]].c);
-        sv[5] = spectralSigmoidC3(j, & cc[ci[5]].c);
-        sv[6] = spectralSigmoidC3(j, & cc[ci[6]].c);
-        sv[7] = spectralSigmoidC3(j, & cc[ci[7]].c);
-        
-        double  c00, c01, c10, c11;
-
-        c00 = sv[0] * (1.-XC(d)) + sv[4] * XC(d);
-        c01 = sv[1] * (1.-XC(d)) + sv[5] * XC(d);
-        c10 = sv[2] * (1.-XC(d)) + sv[6] * XC(d);
-        c11 = sv[3] * (1.-XC(d)) + sv[7] * XC(d);
-        
-        double  c0, c1;
-        
-        c0 = c00 * (1.-YC(d)) + c10 * YC(d);
-        c1 = c01 * (1.-YC(d)) + c11 * YC(d);
-        
-        SPS_CI(*s, i) = c0 * (1.-ZC(d)) + c1 * ZC(d);
-    }
-}
-
 
 @implementation ArnImageMap
 
@@ -308,10 +64,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
 {
     sourceImageSize = [ IMAGE_FILE size ];
 
-    cc3 = NULL;
-//debugprintf("reading cc\n")
-    cc3_read( art_gv, "cc3_ww.c3", & cc3 );
-//debugprintf("done\n")
+    ucc = NULL;
+    
+    ucc_alloc_and_read_from_file( & ucc, "srgb");
 
     Class  sourceImageBufferClass =
         [ IMAGE_FILE nativeContentClass ];
@@ -362,7 +117,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
         XC(sourceImageSize) * YC(sourceImageSize);
 
     imageData = ALLOC_ARRAY( ArRGB, sourceImageDataSize );
-//    imageDataC3 = ALLOC_ARRAY( Crd3, sourceImageDataSize );
 
     for ( int i = 0; i < sourceImageDataSize; i++)
     {
@@ -390,16 +144,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
         }
         
         imageData[i] = pixelRGB;
-        
-//        cc3_coeff_for_rgb(
-//              art_gv,
-//            & pixelRGB,
-//              cc3,
-//            & imageDataC3[i]
-//            );
     }
 
-//    FREE_ARRAY(cc3);
     RELEASE_OBJECT(sourceImageBuffer);
 }
 
@@ -461,24 +207,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
     const Pnt2D  * p2d =
         [ (const ArcSurfacePoint *) locationInfo getTextureCoords ];
     
-    //   There is no point in filling in hero components 2-4 if
-    //   we are in monochrome mode
-
-    cc3_spectral_sample_for_rgb(
+    ucc_rgb_to_sps(
           art_gv,
+          ucc,
         & IMAGE_DATA_RGB(*p2d),
-          cc3,
           wavelength,
           outSpectralSample
         );
-//    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
-//    {
-//        SPS_CI(*outSpectralSample,i) =
-//            spectralSigmoidC3(
-//                  NANO_FROM_UNIT(ARWL_WI(*wavelength,i)),
-//                    & IMAGE_DATA_C3(*p2d)
-//                );
-//    }
 }
 
 - (void) getAttenuation

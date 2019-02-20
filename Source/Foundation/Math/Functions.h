@@ -349,6 +349,10 @@ double m_d_gamma_ln(
         const double xx
         );
 
+double  m_sigmoid(
+        const double  x
+        );
+
 int m_d_isNaN(
         const double  d0
         );
@@ -368,10 +372,20 @@ void m_i_xadd_i(
         int  * memory_location_to_increment
         );
 
-int m_ii_atomic_add(
-        int    i0,
-        int  * ir
-        );
+static inline int m_ii_atomic_add(
+        int    value,
+        int  * variable
+        )
+{
+    __asm__ volatile("lock; xaddl %0, %1"
+    : "+r" (value), "+m" (*variable) // input+output
+    : // No input-only
+    : "memory"
+    );
+    
+    return value;
+}
+
 
 float m_ff_atomic_add(
                  float    f0,

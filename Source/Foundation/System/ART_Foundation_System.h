@@ -39,6 +39,7 @@ ART_LIBRARY_INTERFACE(ART_Foundation_System)
 #include "ART_CRC32.h"
 #include "ART_File.h"
 #include "ART_SystemFunctions.h"
+#include "ART_BinaryFileIO.h"
 
 #include "ArString.h"
 #include "ArStringArray.h"

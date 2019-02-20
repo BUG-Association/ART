@@ -48,6 +48,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 void hsv_to_rgb(
               ART_GV  * art_gv,
         const ArHSV   * hsv,
+        const double    gamma,
               ArRGB   * rgb
         )
 {
@@ -71,12 +72,13 @@ void hsv_to_rgb(
     
     rgb_ds_mul_s( art_gv, VC(*hsv), rgb, & temp0 );
     
-    rgb_ds_pow_s( art_gv, 1.5, & temp0, rgb );
+    rgb_ds_pow_s( art_gv, gamma, & temp0, rgb );
 }
 
 void hsv_to_boosted_rgb(
               ART_GV  * art_gv,
         const ArHSV   * hsv,
+        const double    gamma,
               ArRGB   * rgb
         )
 {
@@ -106,7 +108,7 @@ void hsv_to_boosted_rgb(
     
     rgb_ds_mul_s( art_gv, VC(*hsv), rgb, & temp0 );
     
-    rgb_ds_pow_s( art_gv, 1.5, & temp0, rgb );
+    rgb_ds_pow_s( art_gv, gamma, & temp0, rgb );
 }
 
 /* ======================================================================== */

@@ -753,6 +753,13 @@ double m_dd_beta(
     return exp(m_d_gamma_ln(z) + m_d_gamma_ln(w) - m_d_gamma_ln(z+w));
 }
 
+double  m_sigmoid(
+        const double  x
+        )
+{
+    return 0.5 + ( x / (2.0*sqrt(1.+M_SQR(x))));
+}
+
 int m_d_isNaN(
         const double  number
         )
@@ -859,22 +866,6 @@ void m_i_xadd_i(
           "m"  (*memory_location_to_increment)
         : "memory", "cc"
         );
-}
-
-//  This is not very efficient code, but the semantics are consistent
-//  with the floating point version of the atomic add functions this way.
-
-int m_ii_atomic_add(
-        int    i0,
-        int  * ir
-        )
-{
-    m_i_xadd_i(
-        & i0,
-          ir
-        );
-
-    return *ir;
 }
 
 float m_ff_atomic_add(

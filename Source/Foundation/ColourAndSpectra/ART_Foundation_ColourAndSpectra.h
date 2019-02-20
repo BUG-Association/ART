@@ -56,6 +56,7 @@ ART_LIBRARY_INTERFACE(ART_Foundation_ColourAndSpectra)
 #include "ColourAndSpectralDataConversion.h"
 #include "ArSpectrumSubsystemManagement.h"
 #include "SystemWhitepoint.h"
+#include "UpliftCoefficientCube.h"
 
 #endif /* _ART_FOUNDATION_COLOUR_AND_LIGHT_H_ */
 /* ======================================================================== */
