@@ -914,7 +914,7 @@ int art_print_banner_and_process_standard_commandline_options(
         {
             asprintf(
                 & linked_against,
-                  "linked against the "
+                  "linked against "
                 );
         }
         
@@ -926,7 +926,7 @@ int art_print_banner_and_process_standard_commandline_options(
                     & second_line,
                       "%s%s version %s%s%s, %d cores detected",
                       linked_against,
-                      art_long_name_string,
+                      art_short_name_string,
                       art_version_string,
                       is_debug_build_string,
                       assertions_on_string,
