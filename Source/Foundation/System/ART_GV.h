@@ -128,10 +128,11 @@
 typedef struct ART_GV
 {
     unsigned int                          moduleManagementVerbosity;
+    
+    //   0..9
     struct ART_EnvironmentVariables_GV  * art_environmentvariables_gv;
     struct ArRandom_GV                  * arrandom_gv;
     struct ArSymbol_GV                  * arsymbol_gv;
-    
     struct ArSpectrum_GV                * arspectrum_gv;
     struct ArSpectralSample_GV          * arspectralsample_gv;
     struct ArCIExy_GV                   * arciexy_gv;
@@ -139,6 +140,8 @@ typedef struct ART_GV
     struct ArCIEXYZ_GV                  * arciexyz_gv;
     struct ArCIELab_GV                  * arcielab_gv;
     struct ArCIELuv_GV                  * arcieluv_gv;
+
+    //   10..19
     struct ArCIEColourConversions_GV    * arciecolourconversions_gv;
     struct ArColourSpace_GV             * arcolourspace_gv;
     struct SystemWhitepoint_GV          * systemwhitepoint_gv;
@@ -149,9 +152,10 @@ typedef struct ART_GV
     struct ArSpectrum8_GV               * arspectrum8_gv;
     struct ArSpectrum11_GV              * arspectrum11_gv;
     struct ArSpectrum18_GV              * arspectrum18_gv;
+    
+    //   20..29
     struct ArSpectrum46_GV              * arspectrum46_gv;
     struct ArSpectrum500_GV             * arspectrum500_gv;
-    
     struct ArCrosstalk_GV               * arcrosstalk_gv;
     struct ArLight_GV                   * arlight_gv;
     struct ArLightAlpha_GV              * arlightalpha_gv;
@@ -159,18 +163,21 @@ typedef struct ART_GV
     struct ArDirectAttenuation_GV       * ardirectattenuation_gv;
     struct ArMMDirectAttenuation_GV     * armmdirectattenuation_gv;
     struct ArAttenuation_GV             * arattenuation_gv;
+    struct ArLightSample_GV             * arlightsample_gv;
     
-    struct ArLightSample_GV               * arlightsample_gv;
+    //   30..39
     struct ArLightAlphaSample_GV          * arlightalphasample_gv;
     struct ArAttenuationSample_GV         * arattenuationsample_gv;
     struct ArSVLightSample_GV             * arsvlightsample_gv;
     struct ArDirectAttenuationSample_GV   * ardirectattenuationsample_gv;
     struct ArMMDirectAttenuationSample_GV * armmdirectattenuationsample_gv;
     struct ArCLS_GV                       * arcls_gv;
+    struct UpliftCoefficientCube_GV       * upliftcoefficientcube_gv;
+    struct ArSingleton_GV                 * arsingleton_gv;
+    struct ArcFileProbe_GV                * arcfileprobe_gv;
+    struct ArNodeOperation_GV             * arnodeoperation_gv;
 
-    struct ArSingleton_GV               * arsingleton_gv;
-    struct ArcFileProbe_GV              * arcfileprobe_gv;
-    struct ArNodeOperation_GV           * arnodeoperation_gv;
+    //   40..49
     struct ExecutionEnvironment_GV      * executionenvironment_gv;
     struct ArcOption_GV                 * arcoption_gv;
     struct ArnColour_GV                 * arncolour_gv;
@@ -181,6 +188,8 @@ typedef struct ART_GV
     struct ArnCube_GV                   * arncube_gv;
     struct ArnCylinder_GV               * arncylinder_gv;
     struct ArnHyperboloid_GV            * arnhyperboloid_gv;
+
+    //   50..59
     struct ArnInfSphere_GV              * arninfsphere_gv;
     struct ArnParaboloid_GV             * arnparaboloid_gv;
     struct ArnSphere_GV                 * arnsphere_gv;
@@ -189,16 +198,16 @@ typedef struct ART_GV
     struct ArnHosekSkyModel_GV          * arnhosekskylight_gv;
     struct ArnPreethamSkyModel_GV       * arnpreethamskymodel_gv;
     struct ArnHNSVolumeMaterial_GV      * arnhnsvolumematerial_gv;
-    
     struct ART_DefaultSurfaceMaterial_GV
            * art_defaultsurfacematerial_gv;
     struct ART_DefaultEmissiveSurfaceMaterial_GV
            * art_defaultemissivesurfacematerial_gv;
+
+    //   60..66
     struct ART_DefaultEnvironmentMaterial_GV
            * art_defaultenvironmentmaterial_gv;
     struct ART_DefaultVolumeMaterial_GV
            * art_defaultvolumematerial_gv;
-    
     struct ARM_Actions_GV               * ar2m_actions_gv;
     struct ARM_ImageSamplers_GV         * ar2m_imagesamplers_gv;
     struct ARM_RayCasting_GV            * ar2m_raycasting_gv;

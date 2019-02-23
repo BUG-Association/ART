@@ -72,6 +72,16 @@ void ucc_rgb_to_sps(
         );
 
 /*
+    Returns the system-wide default sRGB UCC. Do NOT call this in the inner
+    loop of anything: instead, grab this pointer when you load a texture,
+    and use that pointer from then on!
+*/
+
+const UCC * ucc_srgb(
+              ART_GV  * art_gv
+        );
+
+/*
     Destroy an UCC in an orderly fashion.
 */
 

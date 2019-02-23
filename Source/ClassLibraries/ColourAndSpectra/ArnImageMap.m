@@ -64,9 +64,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
 {
     sourceImageSize = [ IMAGE_FILE size ];
 
-    ucc = NULL;
-    
-    ucc_alloc_and_read_from_file( & ucc, "srgb");
+    ucc = ucc_srgb( art_gv );
 
     Class  sourceImageBufferClass =
         [ IMAGE_FILE nativeContentClass ];

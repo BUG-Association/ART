@@ -28,9 +28,33 @@
 
 #import "UpliftCoefficientCube.h"
 
-ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
+typedef struct UpliftCoefficientCube_GV
+{
+    pthread_mutex_t    mutex;
+    UCC              * ucc_srgb;
+}
+UpliftCoefficientCube_GV;
 
-ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
+#define UCC_GV          art_gv->upliftcoefficientcube_gv
+#define UCC_MUTEX       UCC_GV->mutex
+#define UCC_SRGB        UCC_GV->ucc_srgb
+
+ART_MODULE_INITIALISATION_FUNCTION
+(
+    UCC_GV = ALLOC(UpliftCoefficientCube_GV);
+
+    pthread_mutex_init( & UCC_MUTEX, NULL );
+ 
+    UCC_SRGB = NULL;
+)
+
+ART_MODULE_SHUTDOWN_FUNCTION
+(
+    pthread_mutex_destroy( & UCC_MUTEX );
+ 
+    if ( UCC_SRGB )
+        ucc_free( UCC_SRGB );
+)
 
 
 /*
@@ -56,6 +80,12 @@ typedef struct UCCEntry
     ArRGB  rgb;
 }
 UCCEntry;
+
+//    Versions of the coefficient cube data. We only read 1 and 2, and
+//    ignore all the extra debug data in version 2
+
+#define  UCC_VERSION_LEAN               1
+#define  UCC_VERSION_DEBUG              2
 
 #define  UCC_DIMENSION(cc)              (cc)->dimension
 #define  UCC_ROW_SIZE(cc)               UCC_DIMENSION(cc)
@@ -98,15 +128,7 @@ void ucc_alloc_and_read_from_file(
         const char   * filename
         )
 {
-    ArString    full_filename;
-    
-    arstring_pe_copy_add_extension_p(
-          filename,
-          UCC_FILE_EXTENSION,
-        & full_filename
-        );
-
-    FILE  * inputFile = fopen(full_filename, "r");
+    FILE  * inputFile = fopen(filename, "r");
     
     *ucc = ALLOC(UCC);
     
@@ -115,6 +137,21 @@ void ucc_alloc_and_read_from_file(
     
     UCC  *cc = *ucc;
 
+    //   Read the cube version
+    
+    int  cube_version;
+    
+    art_binary_read_int( inputFile, & cube_version );
+    
+    if (!(   cube_version == UCC_VERSION_LEAN
+          || cube_version == UCC_VERSION_DEBUG ))
+    {
+        ART_ERRORHANDLING_FATAL_ERROR(
+            "unsupported UCC version %d",
+            cube_version
+            );
+    }
+    
     //   Read the lattice size
     
     art_binary_read_int( inputFile, & UCC_DIMENSION(cc) );
@@ -127,10 +164,22 @@ void ucc_alloc_and_read_from_file(
 
     float  f;
 
+    //   NOTE: the UCC header information is currently ignored, but this is
+    //         not the final state. Future ART versions will process this
+    //         information to handle different colour spaces.
+    
     //   Read & ignore the fitting illuminant
     
     for ( int j = 0; j < 360; j++ )
     {
+        art_binary_read_float( inputFile, & f );
+    }
+
+    //   Read & ignore the  CIE x, y coordinates of the four primaries (RGBW)
+    
+    for ( int i = 0; i < 4; i++ )
+    {
+        art_binary_read_float( inputFile, & f );
         art_binary_read_float( inputFile, & f );
     }
 
@@ -163,30 +212,35 @@ void ucc_alloc_and_read_from_file(
             C3_CI( UCC_ENTRY_C(cc,i), j ) = f;
         }
         
-        //   Read & ignore the fitting target
+        //   Extra data is only present in debug versions of the cubes.
         
-        for ( int j = 0; j < 3; j++ )
+        if ( cube_version == UCC_VERSION_DEBUG )
         {
-            float  f;
-            art_binary_read_float( inputFile, & f );
-        }
+            //   Read & ignore the fitting target
+            
+            for ( int j = 0; j < 3; j++ )
+            {
+                float  f;
+                art_binary_read_float( inputFile, & f );
+            }
 
-        int  treated;
-        
-        //   Read the entry status. We don't store this value, but
-        //   throw an error if there are unprocessed entries.
-        //   Half-done cubes are only interesting for research purposes,
-        //   but aren't useful for rendering.
-        
-        art_binary_read_int( inputFile, & treated );
-        
-        if ( treated == -1 )
-        {
-            ART_ERRORHANDLING_FATAL_ERROR(
-                "spectral uplifting coefficient cube %s has unprocessed "
-                "entries, and cannot be used for rendering",
-                full_filename
-                );
+            int  treated;
+            
+            //   Read the entry status. We don't store this value, but
+            //   throw an error if there are unprocessed entries.
+            //   Half-done cubes are only interesting for research purposes,
+            //   but aren't useful for rendering.
+            
+            art_binary_read_int( inputFile, & treated );
+            
+            if ( treated == -1 )
+            {
+                ART_ERRORHANDLING_FATAL_ERROR(
+                    "spectral uplifting coefficient cube %s has unprocessed "
+                    "entries, and cannot be used for rendering",
+                    filename
+                    );
+            }
         }
     }
 
@@ -251,6 +305,37 @@ void ucc_rgb_to_sps(
     sps_dss_interpol_s( art_gv, YC(d), & c01, & c11, & c1 );
 
     sps_dss_interpol_s( art_gv, ZC(d), & c0, & c1, sps );
+}
+
+void art_find_file_on_paths(
+        const char  ** paths,
+        const char   * file_to_find,
+              char  ** complete_path_to_file
+        );
+
+const UCC * ucc_srgb(
+              ART_GV  * art_gv
+        )
+{
+    pthread_mutex_lock( & UCC_MUTEX );
+    
+    if ( ! UCC_SRGB )
+    {
+        char  * uccFilename = NULL;
+        const char ** libraryPath = art_ev_resource_paths( art_gv );
+
+        art_find_file_on_paths(
+              libraryPath,
+              "srgb.ucc",
+            & uccFilename
+            );
+
+        ucc_alloc_and_read_from_file( & UCC_SRGB, uccFilename);
+    }
+    
+    pthread_mutex_unlock( & UCC_MUTEX );
+    
+    return  UCC_SRGB;
 }
 
 void ucc_free(

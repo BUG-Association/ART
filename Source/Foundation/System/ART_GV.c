@@ -31,7 +31,7 @@ void art_gv_initialise(
         ART_GV  * art_gv
         )
 {
-    //   currently, there are 58 struct pointers
+    //   currently, there are 67 struct pointers
     //   10 NULL per line, plus one zero in the beginning
     //   ( for the verbosity int )
 
@@ -43,7 +43,8 @@ void art_gv_initialise(
           NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
           NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
           NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-          NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+          NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+          NULL, NULL, NULL, NULL, NULL, NULL, NULL
         });
 }
 

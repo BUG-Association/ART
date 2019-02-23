@@ -163,7 +163,7 @@ ART_MODULE_SHUTDOWN_FUNCTION
             ];
 }
 
-void _find_file_on_paths(
+void art_find_file_on_paths(
         const char  ** paths,
         const char   * file_to_find,
               char  ** complete_path_to_file
@@ -172,7 +172,7 @@ void _find_file_on_paths(
     if ( arstringarray_len( (ArStringArray) paths ) == 0 ) return;
 
     FTS  * fts_struct;
-//    printf("FFOP\n");
+
     fts_struct =
         fts_open(
             (char **)paths,
@@ -182,37 +182,12 @@ void _find_file_on_paths(
 
     if ( ! fts_struct ) return;
 
-/*
-       printf(
-                "Library path %u'\n"
-                ,   paths
-                );
-        int j = 0;
-
-        while ( paths[j] != 0 )
-        {
-            printf(
-                "Library path %d is '%s'\n"
-                ,   j
-                ,   paths[j]
-                );
-
-            j++;
-        }
-*/
     FTSENT  * fts_entry;
 
     while ( (fts_entry = fts_read( fts_struct )) )
     {
-//        printf("Considering %s vs. %s", fts_entry->fts_path,file_to_find);
-
         if ( ! strcmp( fts_entry->fts_name, file_to_find) )
         {
-/*
-            printf(" - found!\n");
-            printf("%s\n", fts_entry->fts_accpath);
-            printf("%s\n", fts_entry->fts_path);
-*/
             arstring_s_copy_s(
                 fts_entry->fts_path,
                 complete_path_to_file
@@ -222,11 +197,7 @@ void _find_file_on_paths(
 
             return;
         }
-//        else
-//            printf("\n");
     }
-
-//    printf("Done with FTS\n");
 
     fts_close( fts_struct );
 }
@@ -315,7 +286,7 @@ void _find_file_on_paths(
     }
     else
     {
-        _find_file_on_paths(
+        art_find_file_on_paths(
               libraryPath,
               filename,
             & completeFilename

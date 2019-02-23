@@ -38,10 +38,10 @@ ART_MODULE_INTERFACE(ArnImageMap)
             ArpSpectrum
             >
 {
-    double    scaleFactor;
-    IVec2D    sourceImageSize;
-    ArRGB   * imageData;
-    UCC     * ucc;
+    double       scaleFactor;
+    IVec2D       sourceImageSize;
+    ArRGB      * imageData;
+    const UCC  * ucc;
 }
 
 - init

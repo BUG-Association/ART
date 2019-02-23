@@ -29,7 +29,9 @@
 #include "ArHSV.h"
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
+
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
+
 
 //   The underlying formula for this floating point HSV -> RGB conversion
 //   is from a shader by user 'iq' on Shadertoy:
