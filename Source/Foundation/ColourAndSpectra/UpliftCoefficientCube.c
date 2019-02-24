@@ -26,7 +26,7 @@
 
 #define ART_MODULE_NAME     UpliftCoefficientCube
 
-#import "UpliftCoefficientCube.h"
+#include "UpliftCoefficientCube.h"
 
 typedef struct UpliftCoefficientCube_GV
 {
