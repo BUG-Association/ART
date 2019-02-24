@@ -165,11 +165,20 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
 {
     ArString  complete_path_to_external = NULL;
 
-    full_path_for_filename(
-        & complete_path_to_external,
-          [ self externalFileName ],
-          ART_INCLUDE_PATHS
-        );
+    BOOL  external_found =
+        full_path_for_filename(
+            & complete_path_to_external,
+              [ self externalFileName ],
+              ART_INCLUDE_PATHS
+            );
+
+    if ( ! external_found )
+    {
+        ART_ERRORHANDLING_FATAL_ERROR(
+            "could not locate external file %s",
+            [ self externalFileName ]
+            );
+    }
 
     ArSymbol   externalFileName =
         arsymbol( art_gv, complete_path_to_external );

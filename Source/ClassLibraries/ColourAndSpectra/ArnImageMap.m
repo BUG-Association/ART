@@ -91,20 +91,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
 
     if ( [ sourceImageBuffer isMemberOfClass: [ ArnRGBImage class ] ] )
     {
-//        debugprintf("RGB\n")
         sourceRGB = TRUE;
     }
 
     if ( [ sourceImageBuffer isMemberOfClass: [ ArnRGBAImage class ] ] )
     {
-//        debugprintf("RGBA\n")
         sourceRGBA = TRUE;
     }
-
-//    if ( ! sourceRGB && ! sourceRGBA )
-//    {
-//        debugprintf("RGBA32\n")
-//    }
 
     [ IMAGE_FILE getPlainImage
         :   IPNT2D( 0, 0 )
@@ -356,22 +349,11 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 - (void) prepareForISRChange
 {
     [ super prepareForISRChange ];
-
-//    if ( spectrum )
-//    {
-//        spc_free(
-//            art_gv,
-//            spectrum
-//            );
-//
-//        spectrum = 0;
-//    }
 }
 
 - (void) reinitialiseAfterISRChange
 {
     [ super reinitialiseAfterISRChange ];
-//    [ self _setup ];
 }
 
 
@@ -390,16 +372,10 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 {
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return 0.;
-//          scaleFactor
-//        * gaussiancolour_dd_value(
-//              center,
-//              sigma,
-//              wavelength );
 }
 
 - (BOOL) isFluorescent
 {
-//    ART__CODE_IS_NOT_TESTED__EXIT_WITH_ERROR
     return NO;
 }
 

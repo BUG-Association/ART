@@ -129,7 +129,15 @@ void ucc_alloc_and_read_from_file(
         )
 {
     FILE  * inputFile = fopen(filename, "r");
-    
+
+    if ( ! inputFile )
+    {
+        ART_ERRORHANDLING_FATAL_ERROR(
+            "could not open UCC file %s",
+            filename
+            );
+    }
+
     *ucc = ALLOC(UCC);
     
     //   This is just to avoid the silly double indirections needed when
@@ -321,16 +329,24 @@ const UCC * ucc_srgb(
     
     if ( ! UCC_SRGB )
     {
-        char  * uccFilename = NULL;
-        const char ** libraryPath = art_ev_resource_paths( art_gv );
+        char  * ucc_filename = NULL;
+        const char ** library_path = art_ev_resource_paths( art_gv );
 
         art_find_file_on_paths(
-              libraryPath,
+              library_path,
               "srgb.ucc",
-            & uccFilename
+            & ucc_filename
             );
+        
+        if ( ! ucc_filename )
+        {
+            ART_ERRORHANDLING_FATAL_ERROR(
+                "could not find sRGB spectral uplifting data in "
+                "ART_Resources"
+                );
+        }
 
-        ucc_alloc_and_read_from_file( & UCC_SRGB, uccFilename);
+        ucc_alloc_and_read_from_file( & UCC_SRGB, ucc_filename);
     }
     
     pthread_mutex_unlock( & UCC_MUTEX );
