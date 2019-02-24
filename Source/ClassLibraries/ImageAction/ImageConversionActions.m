@@ -453,8 +453,18 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
     ---------------------------------------------------------------aw- */
 
     ART_ERRORHANDLING_WARNING(
-        "the colour space of the TIFF file is not being considered!"
+        "TIFF to ARTCSP conversion currently ignores the colour profile "
+        "of the TIFF file, and assumes sRGB. Expect this to be fixed in "
+        "upcoming ART releases."
         );
+
+    Mat3  xyz_whitebalance_xyz =
+        art_chromatic_adaptation_matrix(
+              art_gv,
+              arcas_xyz_scaling,
+            & ARCSR_W(DEFAULT_RGB_SPACE_REF),
+            & ARCIEXY_SYSTEM_WHITE_POINT
+            );
 
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
@@ -469,6 +479,40 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
 
             for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
+                if ( sourceDataType == ardt_rgb24 )
+                {
+                    ArRGB  rgb;
+                    
+                    rgba32_to_rgb(
+                          art_gv,
+                        & RGBA32_SOURCE_BUFFER(x),
+                        & rgb
+                        );
+
+                    RC(rgb) = ARCSR_INV_GAMMAFUNCTION(DEFAULT_RGB_SPACE_REF,RC(rgb));
+                    GC(rgb) = ARCSR_INV_GAMMAFUNCTION(DEFAULT_RGB_SPACE_REF,GC(rgb));
+                    BC(rgb) = ARCSR_INV_GAMMAFUNCTION(DEFAULT_RGB_SPACE_REF,BC(rgb));
+                    
+                    ArCIEXYZ  xyz_raw;
+                    
+                    rgb_to_xyz(
+                          art_gv,
+                        & rgb,
+                        & xyz_raw
+                        );
+
+                    //   reverse white balance shift - see above
+                    
+                    xyz_mat_to_xyz(
+                          art_gv,
+                        & xyz_raw,
+                        & xyz_whitebalance_xyz,
+                        & XYZA_DESTINATION_BUFFER_XYZ(x)
+                        );
+
+                    XYZA_DESTINATION_BUFFER_ALPHA(x) = 1.0;
+                }
+
                 if ( sourceDataType == ardt_rgba32 )
                 {
                     rgba32_to_xyz(

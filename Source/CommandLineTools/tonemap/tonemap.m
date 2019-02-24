@@ -544,9 +544,11 @@ int tonemap(
         {
             #ifdef ART_WITH_OPENEXR
             if (   [ inputImage imageFileIsMemberOf: [ ArfARTCSP class ] ]
+                || [ inputImage imageFileIsMemberOf: [ ArfTIFF class ] ]
                 || [ inputImage imageFileIsMemberOf: [ ArfOpenEXR class ] ] )
             #else
-            if ( [ inputImage imageFileIsMemberOf: [ ArfARTCSP class ] ] )
+            if (   [ inputImage imageFileIsMemberOf: [ ArfARTCSP class ] ]
+                || [ inputImage imageFileIsMemberOf: [ ArfTIFF class ] ] )
             #endif
             {
                 #ifdef ART_WITH_OPENEXR
@@ -557,7 +559,15 @@ int tonemap(
                             ];
                 else
                 #endif
-                rawConversionAction = NOP_ACTION;
+                {
+                    if ( [ inputImage imageFileIsMemberOf: [ ArfTIFF class ] ] )
+                        rawConversionAction =
+                            [ IMAGECONVERSION_TIFF_TO_ARTCSP
+                                removeSource: NO
+                                ];
+                    else
+                        rawConversionAction = NOP_ACTION;
+                }
                 
                 //   If the user supplied an ARTCSP as root image, we don't
                 //   delete it after use.
@@ -568,11 +578,11 @@ int tonemap(
             else
         #ifdef ART_WITH_OPENEXR
                 ART_ERRORHANDLING_FATAL_ERROR(
-                    "Input has to be either an ARTRAW or ARTCSP image!"
+                    "Input has to be either an ARTRAW, ARTCSP, TIFF or OpenEXR image!"
                     );
         #else
                 ART_ERRORHANDLING_FATAL_ERROR(
-                    "Input has to be either an ARTRAW, ARTCSP or OpenEXR image!"
+                    "Input has to be either an ARTRAW, ARTCSP or TIFF image!"
                     );
         #endif
         }

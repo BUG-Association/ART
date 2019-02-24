@@ -114,6 +114,9 @@
 #define RGBA_SOURCE_BUFFER_ALPHA(_x) \
     ARRGBA_A(((ArnRGBAImage*)sourceScanlineBuffer[0])->data[(_x)])
 
+#define RGB24_SOURCE_BUFFER(_x) \
+    (((ArnRGB24Image*)sourceScanlineBuffer[0])->data[(_x)])
+
 #define RGBA32_SOURCE_BUFFER(_x) \
     (((ArnRGBA32Image*)sourceScanlineBuffer[0])->data[(_x)])
 

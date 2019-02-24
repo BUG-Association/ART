@@ -62,16 +62,16 @@ ArObj lightSpectrum(ART_GV * art_gv)
         CIE_ILLUMINANT_FL11;
 #endif
 
-//   The fall-thorugh default, if no lightsource #define is specified,
-//   is the original measured light source spectrum of the Cornell box.
+//   The image map version of the scene defaults to D65, with the original
+//   cornell box luminaire as option.
 
-#ifdef D65
-        CIE_ILLUMINANT_D65;
-#else
+#ifdef ORIGINAL_LIGHT
         CONST_COLOUR_RSSPECTRUM(400 NANOMETER, 100 NANOMETER, 1.0,
             0.0, 8.0, 15.6, 18.4,
             RSS_END
             );
+#else
+        CIE_ILLUMINANT_D65;
 #endif
 }
 
@@ -153,6 +153,8 @@ ArObj createShortBlock(ART_GV * art_gv) {
 ArObj createTallBlock(ART_GV * art_gv) {
     Pnt3D * blockPoints = ALLOC_ARRAY( Pnt3D, 9);
 
+//  Compared to the original Cornell box, the tall block has been
+//  shortened a bit, so that one can see the face of Gandalf.
 
     blockPoints[0] = PNT3D(265.0, 230.0, 296.0); // top    right front
     blockPoints[1] = PNT3D(314.0, 230.0, 456.0); // top    right rear
@@ -197,6 +199,54 @@ ArObj createTallBlock(ART_GV * art_gv) {
             ];
 }
 
+ArObj createPictureOnWall(ART_GV * art_gv) {
+    Pnt3D * picturePoints = ALLOC_ARRAY( Pnt3D, 5);
+    
+    double  wallsize_y = 548.8;
+    double  wallsize_z = 559.2;
+    
+    double  wallcenter_y = wallsize_y / 2.0;
+    double  wallcenter_z = wallsize_z / 2.0;
+    
+    double  picturesize_ratio = 0.42;  // in terms of y wall size
+    
+    double  picturesize_div_2 = ( wallsize_y * picturesize_ratio ) / 2.0;
+    
+    double  y_offset = 0.1;
+    
+    double  p_y_l = wallcenter_y - picturesize_div_2 + y_offset * wallsize_y;
+    double  p_y_h = wallcenter_y + picturesize_div_2 + y_offset * wallsize_y;
+    double  p_z_l = wallcenter_z - picturesize_div_2;
+    double  p_z_h = wallcenter_z + picturesize_div_2;
+
+    picturePoints[0] = PNT3D(   5.0, p_y_l, p_z_l ); // right  top    rear
+    picturePoints[1] = PNT3D(   5.0, p_y_h, p_z_l ); // right  top    front
+    picturePoints[2] = PNT3D(   5.0, p_y_h, p_z_h ); // right  bottom rear
+    picturePoints[3] = PNT3D(   5.0, p_y_l, p_z_h ); // right  bottom front
+
+    picturePoints[4] = PNT3D_HUGE;
+
+    ArObj vertices =
+        arnvertexset(
+            art_gv,
+            picturePoints,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+            );
+
+    id textureLambert = LAMBERT_REFLECTOR( IMAGE_MAP("MountCook.exr") );
+
+    ArObj pictureGeometry =
+        [ QUADRANGLE(2, 3, 0, 1) apply
+            : textureLambert
+            ];
+
+    return
+        [ pictureGeometry apply : vertices ];
+}
+
 ArObj createBox(ART_GV * art_gv) {
     Pnt3D * boxPoints = ALLOC_ARRAY( Pnt3D, 9 );
 
@@ -238,12 +288,12 @@ ArObj createBox(ART_GV * art_gv) {
 
     ArObj rightWallGeometry =
         [ QUADRANGLE(6, 7, 5, 4) apply
-            : greenLambert
+            : redLambert
             ];
 
     ArObj leftWallGeometry =
         [ QUADRANGLE(0, 1, 3, 2) apply
-            : redLambert
+            : greenLambert
             ];
 
     ArObj backWallGeometry =
@@ -271,6 +321,7 @@ ARM_MAIN_FUNCTION(CornellBoxImageMap)
             createBox(art_gv),
             createShortBlock(art_gv),
             createTallBlock(art_gv),
+            createPictureOnWall(art_gv),
             createLight(art_gv),
             UNION_END
             );
