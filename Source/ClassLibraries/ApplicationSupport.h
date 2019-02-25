@@ -270,6 +270,7 @@ int art_print_banner_and_process_standard_commandline_options(
         const char          * application_description,
         const char          * application_long_description,
         const char          * application_usage_line,
+        const char          * copyright_message,
         const BOOL            native_ART_app,
         const unsigned int    minArgs,
         const unsigned int    maxArgs
@@ -285,6 +286,7 @@ int art_print_banner_and_process_standard_commandline_options(
                __desc, \
                __ldesc, \
                __usage, \
+               NULL, \
                YES, \
                3, \
                3 \
@@ -302,6 +304,7 @@ int art_print_banner_and_process_standard_commandline_options(
                __desc, \
                "", \
                __usage, \
+               NULL, \
                YES, \
                2, \
                2 \
@@ -324,6 +327,7 @@ int art_print_banner_and_process_standard_commandline_options(
                __desc, \
                __ldesc, \
                __usage, \
+               NULL, \
                YES, \
                2, \
                2 \
@@ -346,6 +350,7 @@ int art_print_banner_and_process_standard_commandline_options(
                __desc, \
                __ldesc, \
                __usage, \
+               NULL, \
                YES, \
                1, \
                1 \
@@ -361,8 +366,9 @@ int art_print_banner_and_process_standard_commandline_options(
                art_gv, \
                __name, \
                __desc, \
-               "", \
+               NULL, \
                __usage, \
+               NULL, \
                YES, \
                1, \
                1 \
@@ -373,7 +379,8 @@ int art_print_banner_and_process_standard_commandline_options(
 #define ART_EXTERNAL_APP_NO_INPUT_FILES_APPLICATION_STARTUP( \
     __name, \
     __desc, \
-    __usage \
+    __usage, \
+    __copyright \
     ) \
 { \
     if ( ! art_print_banner_and_process_standard_commandline_options( \
@@ -382,8 +389,9 @@ int art_print_banner_and_process_standard_commandline_options(
                art_gv, \
                __name, \
                __desc, \
-               "", \
+               NULL, \
                __usage, \
+               __copyright, \
                NO, \
                1, \
                1 \
@@ -406,6 +414,7 @@ int art_print_banner_and_process_standard_commandline_options(
                __desc, \
                __ldesc, \
                __usage, \
+               NULL, \
                NO, \
                1, \
                1 \

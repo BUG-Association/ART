@@ -212,7 +212,7 @@ ArObj createPictureOnWall(ART_GV * art_gv) {
     
     double  picturesize_div_2 = ( wallsize_y * picturesize_ratio ) / 2.0;
     
-    double  y_offset = 0.1;
+    double  y_offset = 0.1; // this moves the picture upwards on the right wall
     
     double  p_y_l = wallcenter_y - picturesize_div_2 + y_offset * wallsize_y;
     double  p_y_h = wallcenter_y + picturesize_div_2 + y_offset * wallsize_y;
@@ -349,7 +349,7 @@ ARM_MAIN_FUNCTION(CornellBoxImageMap)
                 sampleProvider:
                     [ PATHTRACER
                         rayCaster:        STANDARD_RAYCASTER
-                        maximalRecursion: 8
+                        maximalRecursion: 32
                         mode:             MODE
                         ]
                 sampleSplattingKernel: TENT_KERNEL

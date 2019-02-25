@@ -784,6 +784,7 @@ int art_print_banner_and_process_standard_commandline_options(
         const char          * application_description,
         const char          * application_long_description,
         const char          * application_usage_line,
+        const char          * copyright_message,
         const BOOL            native_ART_app,
         const unsigned int    minArgs,
         const unsigned int    maxArgs
