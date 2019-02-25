@@ -917,6 +917,15 @@ int art_print_banner_and_process_standard_commandline_options(
                 & linked_against,
                   "linked against "
                 );
+            
+            if ( copyright_message )
+            {
+                asprintf(
+                    & third_line,
+                      "%s \n",
+                      copyright_message
+                    );
+            }
         }
         
         if ( THREAD_OPT )
