@@ -815,15 +815,17 @@ int art_print_banner_and_process_standard_commandline_options(
     
     *(_all_args-1) = 0;
 
-    [ ArcOption setUsageLine
-        :   art_gv
-        :   application_usage_line
-        ];
+    if ( application_usage_line )
+        [ ArcOption setUsageLine
+            :   art_gv
+            :   application_usage_line
+            ];
 
-    [ ArcOption setSynopsisLine
-        :   art_gv
-        :   application_long_description
-        ];
+    if ( application_long_description )
+        [ ArcOption setSynopsisLine
+            :   art_gv
+            :   application_long_description
+            ];
 
     arcoption_remove_empty_option_categories(
         art_gv
