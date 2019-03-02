@@ -45,6 +45,10 @@ message("")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake_modules/")
 
+# set default build type
+include( BuildType )
+
+# locate dependencies
 find_package( TIFF REQUIRED )
 find_package( LCMS2 REQUIRED )
 #find_package( JPEG REQUIRED )
