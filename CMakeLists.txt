@@ -49,6 +49,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake_modules/
 # set default build type
 include( BuildType )
 
+message("ART build type: " ${CMAKE_BUILD_TYPE})
+
 # locate dependencies
 find_package( TIFF REQUIRED )
 find_package( LCMS2 REQUIRED )
