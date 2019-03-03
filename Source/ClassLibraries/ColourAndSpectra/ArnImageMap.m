@@ -109,6 +109,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
 
     imageData = ALLOC_ARRAY( ArRGB, sourceImageDataSize );
 
+    double  max;
+    
     for ( int i = 0; i < sourceImageDataSize; i++)
     {
         ArRGB  pixelRGB;
@@ -134,9 +136,29 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
             }
         }
         
+        if ( RC(pixelRGB) > max ) max = RC(pixelRGB);
+        if ( GC(pixelRGB) > max ) max = GC(pixelRGB);
+        if ( BC(pixelRGB) > max ) max = BC(pixelRGB);
+        
         imageData[i] = pixelRGB;
     }
+    
+    //   If the maximum RGB component of any pixel in the texture is > 1.,
+    //   we force the entire texture down the hard way so that this component
+    //   gets a value of 1. That is probably not what the person who
+    //   modelled the scene intended - but reflectance values have to be <= 1,
+    //   no exceptions.
+    
+    if ( max > 1.0 )
+    {
+        double  scale_factor = 1. / max;
 
+        for ( int i = 0; i < sourceImageDataSize; i++)
+        {
+            rgb_d_mul_s( art_gv, scale_factor, & imageData[i] );
+        }
+    }
+    
     RELEASE_OBJECT(sourceImageBuffer);
 }
 

@@ -77,6 +77,7 @@ ART_MODULE_SHUTDOWN_FUNCTION
 typedef struct UCCEntry
 {
     Crd3   c;
+    Crd3   c_fluo;
     ArRGB  rgb;
 }
 UCCEntry;
@@ -84,9 +85,10 @@ UCCEntry;
 //    Versions of the coefficient cube data. We only read 1 and 2, and
 //    ignore all the extra debug data in version 2
 
-#define  UCC_VERSION_LEAN               1
-#define  UCC_VERSION_DEBUG              2
+#define  UCC_SUPPORTED_VERSION          1
 
+#define  UCC_VERSION(cc)                (cc)->version
+#define  UCC_FEATURES(cc)               (cc)->features
 #define  UCC_DIMENSION(cc)              (cc)->dimension
 #define  UCC_ROW_SIZE(cc)               UCC_DIMENSION(cc)
 #define  UCC_LEVEL_SIZE(cc)             (cc)->level_size
@@ -96,6 +98,7 @@ UCCEntry;
 #define  UCC_ENTRY(cc,i)                UCC_ENTRY_ARRAY(cc)[(i)]
 #define  UCC_ENTRY_RGB(cc,i)            UCC_ENTRY_ARRAY(cc)[(i)].rgb
 #define  UCC_ENTRY_C(cc,i)              UCC_ENTRY_ARRAY(cc)[(i)].c
+#define  UCC_ENTRY_CF(cc,i)             UCC_ENTRY_ARRAY(cc)[(i)].c_fluo
 
 #define  UCC_XYZ_TO_I(cc,x,y,z)  \
     ((x) + UCC_ROW_SIZE(cc) * (y) + UCC_LEVEL_SIZE(cc) * (z))
@@ -105,6 +108,19 @@ UCCEntry;
 #define  UCC_I_TO_Z(cc,i)     ((int) ((i) / UCC_LEVEL_SIZE(cc)))
 
 #define  UCC_F_TO_I(cc,f)     (floor(f*((double)(UCC_DIMENSION(cc)-1.))))
+
+typedef enum UCCFeatures
+{
+    ucc_features_none      = 0x00,
+    ucc_features_debuginfo = 0x01,
+    ucc_features_fluo      = 0x02,
+}
+UCCFeatures;
+
+#define  UCC_CONTAINS_DEBUG_DATA(cc) \
+    ( UCC_FEATURES(cc) & ucc_features_debuginfo )
+#define  UCC_CONTAINS_FLUO_DATA(cc) \
+    ( UCC_FEATURES(cc) & ucc_features_fluo )
 
 void  sps_sigmoid_sample(
               ART_GV            * art_gv,
@@ -147,21 +163,20 @@ void ucc_alloc_and_read_from_file(
 
     //   Read the cube version
     
-    int  cube_version;
+    art_binary_read_int( inputFile, & UCC_VERSION(cc) );
     
-    art_binary_read_int( inputFile, & cube_version );
-    
-    if (!(   cube_version == UCC_VERSION_LEAN
-          || cube_version == UCC_VERSION_DEBUG ))
+    if ( UCC_VERSION(cc) != UCC_SUPPORTED_VERSION )
     {
         ART_ERRORHANDLING_FATAL_ERROR(
-            "unsupported UCC version %d",
-            cube_version
+            "unsupported UCC version %d, supported is %d",
+            UCC_VERSION(cc),
+            UCC_SUPPORTED_VERSION
             );
     }
+
+    //   Read the features & lattice size
     
-    //   Read the lattice size
-    
+    art_binary_read_int( inputFile, & UCC_FEATURES(cc) );
     art_binary_read_int( inputFile, & UCC_DIMENSION(cc) );
 
     //   Precompute frequently needed multiples
@@ -220,9 +235,19 @@ void ucc_alloc_and_read_from_file(
             C3_CI( UCC_ENTRY_C(cc,i), j ) = f;
         }
         
+        if ( UCC_CONTAINS_FLUO_DATA(cc) )
+        {
+            for ( int j = 0; j < 3; j++ )
+            {
+                float  f;
+                art_binary_read_float( inputFile, & f );
+                C3_CI( UCC_ENTRY_CF(cc,i), j ) = f;
+            }
+        }
+
         //   Extra data is only present in debug versions of the cubes.
         
-        if ( cube_version == UCC_VERSION_DEBUG )
+        if ( UCC_CONTAINS_DEBUG_DATA(cc) )
         {
             //   Read & ignore the fitting target
             

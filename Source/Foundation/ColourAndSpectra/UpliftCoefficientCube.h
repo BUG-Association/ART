@@ -42,6 +42,8 @@ ART_MODULE_INTERFACE(UpliftCoefficientCube)
 
 typedef struct UCC
 {
+    int                version;      //  read from file
+    int                features;     //  read from file
     int                dimension;    //  read from file
     int                level_size;   //  <-+- pre-computed at init time
     int                overall_size; //  <-|---------
