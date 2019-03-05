@@ -124,7 +124,11 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         ArCIEXYZA * line = data + y * stride;
         for ( unsigned int x = 0; x < XC(size); x++ )
         {
-            double pixLum = ARCIEXYZA_Y(line[x]);
+            ArCIExyY  xyy;
+            
+            xyz_to_xyy( art_gv, & ARCIEXYZA_C(line[x]), & xyy );
+            
+            double pixLum = ARCIExyY_Y(xyy);
             double alpha = line[x].alpha;
             if (alpha > 0.0)
             {

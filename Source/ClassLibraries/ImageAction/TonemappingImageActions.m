@@ -200,12 +200,130 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
     [ REPORTER endAction ];
 }
 
-- (void) code
-        : (ArcObject <ArpCoder> *) coder
-{
-    [ super code: coder ];
+@end
 
-    [ coder codeDouble: & mappingValue ];
+@implementation ArnScaleToUnityToneMapper
+
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScaleToUnityToneMapper)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnScaleToUnityToneMapper)
+
+- (void) performOn
+        : (ArNode <ArpNodeStack> *) nodeStack
+{
+    [ REPORTER beginTimedAction
+        :   "applying scale to unity tone mapping operator"
+        ];
+
+
+    /* ------------------------------------------------------------------
+         Before calling the function that sets up the framework for
+         image manipulation we have to specify what colour type the
+         result image will have.
+
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
+    ---------------------------------------------------------------aw- */
+
+    destinationImageDataType = ardt_xyz;
+    destinationFileDataType  = ardt_xyz;
+
+
+    /* ------------------------------------------------------------------
+         Activation of the framework common to all image manipulation
+         actions. This takes the source image from the stack, and creates
+         the destination image along with all needed scanline buffers.
+
+         In order to do this properly it has to be informed of what
+         kind of source image to expect, and what kind of result image
+         we wish to create (in our case, two instances of ArfARTCSP).
+    ---------------------------------------------------------------aw- */
+
+    [ self prepareForImageManipulation
+        :   nodeStack
+        :   [ ArfARTCSP class ]
+        :   [ ArfARTCSP class ]
+        ];
+
+    ArcImageMetrics  * imageMetrics =
+        [ ALLOC_INIT_OBJECT(ArcImageMetrics)
+            :   sourceImage[0]
+            :   REPORTER
+            ];
+
+    [ REPORTER printf
+        :   "min/avg/max luminance = %f / %f / %f\n"
+        ,   [ imageMetrics minimumLuminance ]
+        ,   [ imageMetrics averageLuminance ]
+        ,   [ imageMetrics maximumLuminance ]
+        ];
+
+    double  luminanceScale = 1.0;
+    
+    if ( [ imageMetrics maximumLuminance ] > 1.0 )
+    {
+        luminanceScale = 1.0 / [ imageMetrics maximumLuminance ];
+    }
+
+    /* ------------------------------------------------------------------
+         Process all pixels in the image.
+    ---------------------------------------------------------------aw- */
+
+    for ( int i = 0; i < numberOfSourceImages; i++ )
+    {
+        for ( long y = 0; y < YC(destinationImageSize); y++ )
+        {
+            [ self loadSourceScanlineBuffer: i : y ];
+
+            for ( long x = 0; x < XC(destinationImageSize); x++ )
+            {
+                //   Convert the pixel to xyY colour space
+
+                ArCIExyY  xyyValue;
+
+                xyz_to_xyy(
+                      art_gv,
+                    & XYZA_SOURCE_BUFFER_XYZ(x),
+                    & xyyValue
+                    );
+
+                //   mapping
+
+                if ( ARCIExyY_Y( xyyValue ) > 0.0 )
+                {
+                    ARCIExyY_Y( xyyValue ) *= luminanceScale;
+                    //   back to XYZ
+
+                    xyy_to_xyz(
+                          art_gv,
+                        & xyyValue,
+                        & XYZA_DESTINATION_BUFFER_XYZ(x)
+                        );
+                }
+                else
+                {
+                    XYZA_DESTINATION_BUFFER_XYZ(x) = XYZA_SOURCE_BUFFER_XYZ(x);
+                }
+
+                XYZA_DESTINATION_BUFFER_ALPHA(x) = XYZA_SOURCE_BUFFER_ALPHA(x);
+            }
+
+            [ self writeDestinationScanlineBuffer: i : y ];
+        }
+    }
+
+
+    /* ------------------------------------------------------------------
+         Free the image manipulation infrastructure and end the action;
+         this also places the destination image on the stack.
+    ---------------------------------------------------------------aw- */
+
+    [ self finishImageManipulation
+        :   nodeStack
+        ];
+
+    RELEASE_OBJECT(imageMetrics);
+
+    [ REPORTER endAction ];
 }
 
 @end

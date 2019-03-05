@@ -105,6 +105,13 @@ int tonemap(
             ];
 #endif // ART_WITH_OPENEXR
 
+    id  scaleToUnityMapperOpt =
+        [ FLAG_OPTION
+            :   "scaleToUnit"
+            :   "stu"
+            :   "scale image max to unit luminance"
+            ];
+
     id  exponentialMapperOpt =
         [ FLAG_OPTION
             :   "exMap"
@@ -654,6 +661,9 @@ int tonemap(
         if ( [ exponentialMapperOpt hasBeenSpecified ] )
             numberOfSpecifiedTMOs++;
 
+        if ( [ scaleToUnityMapperOpt hasBeenSpecified ] )
+            numberOfSpecifiedTMOs++;
+
         //   If none have been specified, we default to -iac
 
         BOOL  useInteractiveCalibration = NO;
@@ -731,6 +741,14 @@ int tonemap(
                 colourSpaceTonemappingAction =
                     STANDARD_EXPONENTIAL_TONEMAPPING_OPERATOR;
 
+            //  done - go and assemble the action sequence
+            goto actionSequenceAssembly;
+        }
+        
+        if (   [ scaleToUnityMapperOpt hasBeenSpecified ] )
+        {
+            colourSpaceTonemappingAction = SCALE_TO_UNITY_TONEMAPPING_OPERATOR;
+            
             //  done - go and assemble the action sequence
             goto actionSequenceAssembly;
         }

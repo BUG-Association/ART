@@ -364,6 +364,12 @@ ART_MODULE_INTERFACE(ARM_Action)
                 ALLOC_OBJECT_AUTORELEASE(ArnExponentialToneMapper)
 
         /**
+         * @def SCALE_TO_UNITY_TONEMAPPING_OPERATOR
+         */
+        #define SCALE_TO_UNITY_TONEMAPPING_OPERATOR \
+                [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnScaleToUnityToneMapper) ]
+
+        /**
          * @def STANDARD_EXPONENTIAL_TONEMAPPING_OPERATOR
          */
         #define STANDARD_EXPONENTIAL_TONEMAPPING_OPERATOR \

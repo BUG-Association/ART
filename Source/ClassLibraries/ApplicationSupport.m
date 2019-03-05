@@ -951,7 +951,7 @@ int art_print_banner_and_process_standard_commandline_options(
                     & second_line,
                       "%s%s version %s%s%s, 1 core detected",
                       linked_against,
-                      art_long_name_string,
+                      art_short_name_string,
                       art_version_string,
                       is_debug_build_string,
                       assertions_on_string
@@ -964,7 +964,7 @@ int art_print_banner_and_process_standard_commandline_options(
                 & second_line,
                   "%s%s version %s%s%s",
                   linked_against,
-                  art_long_name_string,
+                  art_short_name_string,
                   art_version_string,
                   is_debug_build_string,
                   assertions_on_string

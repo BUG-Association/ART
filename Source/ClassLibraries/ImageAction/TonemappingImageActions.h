@@ -53,7 +53,13 @@ void tonemappingimageactions_initialise();
 @end
 
 
-extern ArnExponentialToneMapper   * ARNEXPONENTIAL_TONEMAPPER_MASTER;
+@interface ArnScaleToUnityToneMapper
+        : ArnSingleImageManipulationAction
+        < ArpCoding, ArpConcreteClass, ArpAction >
+{
+}
+
+@end
 
 
 @interface ArnInteractiveCalibrationToneMapper
