@@ -70,6 +70,8 @@ ART_MODULE_SHUTDOWN_FUNCTION
  
     'c'                         The sigmoid coefficients.
  
+    'c_other'                   Additional coefficients, unused at the moment.
+ 
     'lattice_rgb'               The RGB coords this point should represent
                                 in the original RGB unit cube.
 */
@@ -77,7 +79,7 @@ ART_MODULE_SHUTDOWN_FUNCTION
 typedef struct UCCEntry
 {
     Crd3   c;
-    Crd3   c_fluo;
+    Crd3   c_other;
     ArRGB  rgb;
 }
 UCCEntry;
@@ -98,7 +100,7 @@ UCCEntry;
 #define  UCC_ENTRY(cc,i)                UCC_ENTRY_ARRAY(cc)[(i)]
 #define  UCC_ENTRY_RGB(cc,i)            UCC_ENTRY_ARRAY(cc)[(i)].rgb
 #define  UCC_ENTRY_C(cc,i)              UCC_ENTRY_ARRAY(cc)[(i)].c
-#define  UCC_ENTRY_CF(cc,i)             UCC_ENTRY_ARRAY(cc)[(i)].c_fluo
+#define  UCC_ENTRY_CO(cc,i)             UCC_ENTRY_ARRAY(cc)[(i)].c_other
 
 #define  UCC_XYZ_TO_I(cc,x,y,z)  \
     ((x) + UCC_ROW_SIZE(cc) * (y) + UCC_LEVEL_SIZE(cc) * (z))
@@ -113,14 +115,14 @@ typedef enum UCCFeatures
 {
     ucc_features_none      = 0x00,
     ucc_features_debuginfo = 0x01,
-    ucc_features_fluo      = 0x02,
+    ucc_features_other     = 0x02,
 }
 UCCFeatures;
 
 #define  UCC_CONTAINS_DEBUG_DATA(cc) \
     ( UCC_FEATURES(cc) & ucc_features_debuginfo )
-#define  UCC_CONTAINS_FLUO_DATA(cc) \
-    ( UCC_FEATURES(cc) & ucc_features_fluo )
+#define  UCC_CONTAINS_OTHER_DATA(cc) \
+    ( UCC_FEATURES(cc) & ucc_features_other )
 
 void  sps_sigmoid_sample(
               ART_GV            * art_gv,
@@ -235,13 +237,13 @@ void ucc_alloc_and_read_from_file(
             C3_CI( UCC_ENTRY_C(cc,i), j ) = f;
         }
         
-        if ( UCC_CONTAINS_FLUO_DATA(cc) )
+        if ( UCC_CONTAINS_OTHER_DATA(cc) )
         {
             for ( int j = 0; j < 3; j++ )
             {
                 float  f;
                 art_binary_read_float( inputFile, & f );
-                C3_CI( UCC_ENTRY_CF(cc,i), j ) = f;
+                C3_CI( UCC_ENTRY_CO(cc,i), j ) = f;
             }
         }
 
