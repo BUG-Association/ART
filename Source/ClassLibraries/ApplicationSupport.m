@@ -87,7 +87,8 @@ typedef struct ApplicationSupport_GV
     id  srgbOpt;
     id  argbOpt;
     id  wrgbOpt;
-    id  acesrgbOpt;
+    id  ap0rgbOpt;
+    id  ap1rgbOpt;
     id  cctOpt;
     id  iccOpt;
     id  isrOpt;
@@ -159,7 +160,8 @@ ApplicationSupport_GV;
 #define SRGB_OPT        APPSUPPORT_GV->srgbOpt
 #define ARGB_OPT        APPSUPPORT_GV->argbOpt
 #define WRGB_OPT        APPSUPPORT_GV->wrgbOpt
-#define ACESRGB_OPT     APPSUPPORT_GV->acesrgbOpt
+#define AP0RGB_OPT      APPSUPPORT_GV->ap0rgbOpt
+#define AP1RGB_OPT      APPSUPPORT_GV->ap1rgbOpt
 #define IRGB_OPT        APPSUPPORT_GV->iccOpt
 #define CCT_OPT         APPSUPPORT_GV->cctOpt
 #define ISR_OPT         APPSUPPORT_GV->isrOpt
@@ -222,7 +224,8 @@ ART_MODULE_INITIALISATION_FUNCTION
     SRGB_OPT        = NULL;
     ARGB_OPT        = NULL;
     WRGB_OPT        = NULL;
-    ACESRGB_OPT     = NULL;
+    AP0RGB_OPT      = NULL;
+    AP1RGB_OPT      = NULL;
     IRGB_OPT        = NULL;
     CCT_OPT         = NULL;
     ISR_OPT         = NULL;
@@ -579,11 +582,18 @@ void art_define_standard_commandline_options(
                 :   "use Adobe Wide Gamut RGB"
                 ];
 
-        ACESRGB_OPT =
+        AP0RGB_OPT =
             [ FLAG_OPTION
-                :   "ACESRGB"
-                :   "aces"
+                :   "AP0RGB"
+                :   "ap0"
                 :   "use ACES AP0 RGB"
+                ];
+
+        AP1RGB_OPT =
+            [ FLAG_OPTION
+                :   "AP1RGB"
+                :   "ap1"
+                :   "use ACES AP1 RGB"
                 ];
 
         IRGB_OPT =
@@ -1076,9 +1086,17 @@ int art_print_banner_and_process_standard_commandline_options(
 
     //   ACES AP0 RGB
 
-    if ( [ ACESRGB_OPT hasBeenSpecified ] )
+    if ( [ AP0RGB_OPT hasBeenSpecified ] )
     {
-        art_set_default_rgbspace_ref ( art_gv, ARCSR_acesRGB );
+        art_set_default_rgbspace_ref ( art_gv, ARCSR_ap0RGB );
+        numberOfRequestedWorkingSpaces++;
+    }
+
+    //   ACES AP1 RGB
+
+    if ( [ AP1RGB_OPT hasBeenSpecified ] )
+    {
+        art_set_default_rgbspace_ref ( art_gv, ARCSR_ap1RGB );
         numberOfRequestedWorkingSpaces++;
     }
 
