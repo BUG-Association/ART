@@ -1,0 +1,321 @@
+/**
+ * This scene showcases MERL loading in ART.
+ * This requires the material to be downloaded from MERL database:
+ * http://people.csail.mit.edu/wojciech/BRDFDatabase/
+ * Those three materials are used in this scene:
+ * - alumina-oxide.binary
+ * - color-changing-paint1.binary
+ * - blue-metallic-paint.binary
+ *
+ * You can change those in lines 188-190.
+ */
+
+#ifndef SAMPLES
+#define SAMPLES 32
+#endif
+
+#ifdef ALG_LS
+    #define MODE arpathtracermode_light_sampling
+#elif defined ALG_DS
+    #define MODE arpathtracermode_direction_sampling
+#else
+    #define MODE arpathtracermode_mis
+#endif
+
+ArNode * createGroovedSphere(
+        ART_GV  * art_gv,
+        double    angle,
+        double    secondaryRadius
+        )
+{
+    double  deltaAngle = atan( secondaryRadius );
+    double  angleA = angle - deltaAngle;
+    double  angleB = angle + deltaAngle;
+	
+    id mainTorus = 
+        [ TORUS( ( 1.0 / cos(angle) ) * secondaryRadius ) apply
+            : USCALE( cos(angle) )
+            : TRANSLATION( 0.0, 0.0, sin(angle) ) 
+            ];
+
+    double  torusFactorA = 
+        ( 1.0 / ( ( 1.0 - secondaryRadius ) * cos(angleA) ) ) * secondaryRadius;
+        
+    id subTorusA = 
+        [ TORUS( torusFactorA ) apply
+            : USCALE( ( 1.0 - secondaryRadius ) * cos(angleA) )
+            : TRANSLATION( 0.0, 0.0, ( 1.0 - secondaryRadius ) * sin(angleA) ) 
+            ];
+
+
+    double  torusFactorB = 
+        ( 1.0 / ( ( 1.0 - secondaryRadius ) * cos(angleB) ) ) * secondaryRadius;
+
+    id subTorusB = 
+        [ TORUS( torusFactorB ) apply
+            : USCALE( ( 1.0 - secondaryRadius ) * cos(angleB) )
+            : TRANSLATION( 0.0, 0.0, ( 1.0 - secondaryRadius ) * sin(angleB) ) 
+            ];
+
+    id grooveObj =  [ mainTorus sub : [ subTorusA or : subTorusB ] ];
+    id groovePair = [ grooveObj or : [ grooveObj apply : ROT_X( 180 DEGREES )]];
+        
+    id  allGrooves =
+        UNION(
+            groovePair,
+            [ groovePair apply: ROT_X( 90 DEGREES ) ],
+            [ groovePair apply: ROT_Y( 90 DEGREES ) ],
+            UNION_END
+            );
+
+    return [ SPHERE sub: allGrooves ];
+}
+
+/* ---------------------------------------------------------------------------
+    'createSymetricLinesExpression'
+--------------------------------------------------------------------------- */
+id createSymetricLinesExpression(
+        ART_GV  * art_gv,
+        id        inputValue,
+        double    frequency,
+        double    thickness
+        )
+{
+    // R -> [0, 1]
+    id periodicExpr =
+            DD_XMOD_D( 
+                    DD_MUL_D( inputValue, CONST_D( frequency ) ),
+                    CONST_D( 1.0 )
+                    );
+            
+    // lines
+    id gridExpr =
+        DD_SUB_D(
+            CONST_D( 1.0 ),
+            DDD_PULSE_D(
+                CONST_D( thickness / 2.0 ),
+                CONST_D( 1.0 - thickness / 2.0 ),
+                periodicExpr
+                )
+            );
+
+    return gridExpr;
+}
+
+/* ---------------------------------------------------------------------------
+    'createXYGridSurface'
+--------------------------------------------------------------------------- */
+id createXYGridSurface(
+        ART_GV  * art_gv,
+        id        coordinates,
+        id        mainSurface,
+        id        gridSurface,
+        double    thickness,        // portion of the periodic interval
+        double    frequency
+        )
+{
+    id xLinesExpr =
+        createSymetricLinesExpression(
+            art_gv,
+            P3_X( coordinates ),
+            frequency,
+            thickness
+            );
+    id yLinesExpr =
+        createSymetricLinesExpression(
+            art_gv,
+            P3_Y( coordinates ),
+            frequency,
+            thickness
+            );
+    
+    id xyGridExpr =
+        DD_MAX_D(
+            xLinesExpr,
+            yLinesExpr
+            );
+    
+    return
+        MAPPED_SURFACE(
+            xyGridExpr,
+            SURFACE_MAP(
+                0.0, mainSurface,
+                1.0, gridSurface,
+                MAP_END
+                )
+            );
+}
+
+/* ---------------------------------------------------------------------------
+    'createXYGridSurface2Levels'
+--------------------------------------------------------------------------- */
+id createXYGridSurface2Levels(
+        ART_GV  * art_gv,
+        id        coordinates,
+        id        mainSurface,
+        id        gridSurfaceLevel1,
+        id        gridSurfaceLevel2,
+        double    level1Frequency,
+        int       level2SubCount,
+        double    thickness         // portion of the whole periodic interval
+        )
+{
+    id gridSurface2 =
+        createXYGridSurface(
+            art_gv,
+            coordinates,
+            mainSurface,
+            gridSurfaceLevel2,
+            thickness * level2SubCount / 2.0,
+            level1Frequency * level2SubCount
+            );
+
+    id gridSurface1 =
+        createXYGridSurface(
+            art_gv,
+            coordinates,
+            gridSurface2,
+            gridSurfaceLevel1,
+            thickness,
+            level1Frequency
+            );
+    
+    return gridSurface1;
+}
+
+ARM_MAIN_FUNCTION(MERL)
+{   
+    ArObj merlBRDF1 = MERL_SURFACE("alumina-oxide.binary");
+    ArObj merlBRDF2 = MERL_SURFACE("color-changing-paint1.binary");
+    ArObj merlBRDF3 = MERL_SURFACE("blue-metallic-paint.binary");
+    
+    id  base_sphere = createGroovedSphere( art_gv, 22 DEGREES, 0.1 );
+
+    id  sphere1 =
+        [ base_sphere apply
+            :   merlBRDF1
+            :   TRANSLATION(-2.4,0,1)
+            ];
+
+    id  sphere2 =
+        [ base_sphere apply
+            :   merlBRDF2
+            :   TRANSLATION_Z(1)
+            ];
+
+    id  sphere3 =
+        [ base_sphere apply
+            :   merlBRDF3
+            :   TRANSLATION(2.4,0,1)
+            ];
+
+    id whiteLambertSurface =
+        LAMBERT_REFLECTOR( MACBETH_WHITE );
+
+    id lightGreyLambertSurface =
+        LAMBERT_REFLECTOR( MACBETH_NEUTRAL65 );
+
+    id pinkLambertSurface =
+        LAMBERT_REFLECTOR( PINK_POSTIT_PLAIN );
+
+    id baseSurface =
+        createXYGridSurface2Levels(
+            art_gv,
+            WORLDSPACE_COORDS,
+            whiteLambertSurface,
+            pinkLambertSurface,
+            lightGreyLambertSurface,
+            1.0 / 7.7,
+            10,
+            0.018
+            );
+
+    id cylinder0   =
+        [ CYLINDER apply
+            :   SCALE( 4000.0, 4000.0, 1.0 )
+            :   TRANSLATION( 0.0, 0.0, -1.0)
+            :   baseSurface
+            ];
+
+    double tz = -0.7;
+    
+    id scene_geometry =
+        UNION(
+            sphere1,
+            sphere2,
+            sphere3,
+
+            cylinder0,
+
+            UNION_END
+            );
+            
+    id camera =
+        [ CAMERA
+            imageSize:  IVEC2D(640,320)
+            ray:        RAY3D(PNT3D(0,-8,6),VEC3D(0,8,-5))
+            zoom:       1.1
+            ];
+
+    id actionsequence =
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+
+            [ LIGHTSOURCE_COLLECTOR
+                sampler2D:   STANDARD_SAMPLER_2D
+                resolution:  5
+                type:        arlightsourcetype_area
+            ],
+
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+						maximalRecursion: 6
+                        mode:             MODE
+                    ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       SAMPLES
+                randomValueGeneration: PSEUDORANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    YES
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+    id skylight =
+        [ HOSEK_SKYLIGHT
+            elevation   : 40 DEGREES
+#ifdef BACKLIT
+            azimuth     : 55.0 DEGREES
+#else
+#ifdef SIDELIT
+            azimuth     : 180.0 DEGREES
+#else
+            azimuth     : 270.0 DEGREES
+#endif
+#endif
+            turbidity   : 2.0
+            groundAlbedo: CONST_COLOUR_GREY(0.5)
+            ];
+
+    return
+        [ SCENE
+            sceneGeometry : scene_geometry
+            skyModel      : skylight
+            camera        : camera
+            actionSequence: actionsequence
+            ];
+}
