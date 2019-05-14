@@ -502,5 +502,20 @@ TORRANCE_SPARROW_BLINN_SURFACE_WITH_MATERIAL_CONST( \
 #define GENERAL_SURFACE(surfaces...)    arngeneralsurfacematerial(art_gv, ## surfaces )
 
 
+/**
+ * @brief MERL Measured Surface
+ *
+ * Loads a material from the MERL library
+ *
+ * @def MERL_SURFACE(filename)
+ *
+ * @param filename  string File where the binary MERL material is stored
+ */
+#define MERL_SURFACE(_filename)                    \
+    ART_PARSE_EXISTING_FILE(                       \
+        (_filename),                               \
+        ArnMERLSurfaceMaterial                     \
+    )
+
 // ===========================================================================
 

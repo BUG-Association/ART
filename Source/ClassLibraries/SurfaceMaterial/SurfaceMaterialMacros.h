@@ -148,7 +148,7 @@
         trafo3d_v_world2local_from_worldspace_normal_t( & SURFACE_NORMAL_WORLDSPACE, & world2local ); \
         trafo3d_t_transpose_t( & world2local, & local2world ); \
         \
-        Vec3D localI, localO; \
+        Vec3D localI; \
         vec3d_v_trafo3d_v( & INCOMING_VECTOR_WORLDSPACE, \
                            & world2local, \
                            & localI); \

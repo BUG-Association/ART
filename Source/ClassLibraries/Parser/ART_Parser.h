@@ -35,6 +35,7 @@ ART_LIBRARY_INTERFACE(ART_Parser)
 #import "ArfNative.h"
 #import "ArfPLY.h"
 #import "ArfVol.h"
+#import "ArfMERL.h"
 #import "ArcBinaryCoder.h"
 #import "ArcObjCCoder.h"
 

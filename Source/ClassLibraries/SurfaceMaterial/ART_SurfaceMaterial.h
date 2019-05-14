@@ -50,4 +50,5 @@ ART_LIBRARY_INTERFACE(ART_SurfaceMaterial)
 
 #import "BlendedSurfacesCorrectnessTesting.h"
 
+#import "ArnMERLSurfaceMaterial.h"
 // ===========================================================================
