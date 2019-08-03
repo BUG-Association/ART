@@ -116,5 +116,9 @@ ArSpectrum500 const * arcmf_vlambda500(
         const ART_GV  * art_gv
         );
 
+ArPSSpectrum const * arcmf_vprimelambda(
+        const ART_GV  * art_gv
+        );
+
 #endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARCMF_H_ */
 /* ======================================================================== */

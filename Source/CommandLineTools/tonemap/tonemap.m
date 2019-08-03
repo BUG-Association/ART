@@ -234,6 +234,12 @@ int tonemap(
             :   "rcsp"
             :   "retain last intermediate ARTCSP file"
             ];
+    id  scotopicOpt =
+        [ FLAG_OPTION
+            :   "scotopic"
+            :   "sct"
+            :   "converts the spectral image assuming scotopic viewing conditions to most perceptually similar photopic one"
+            ];
 
     ART_SINGLE_INPUT_FILE_APPLICATION_STARTUP_WITH_SYNOPSIS(
         "tonemap",
@@ -340,6 +346,7 @@ int tonemap(
         ArNode <ArpAction>  * isrChangeAction = NOP_ACTION;
         ArNode <ArpAction>  * filterAction = NOP_ACTION;
         ArNode <ArpAction>  * rawConversionAction = NOP_ACTION;
+        ArNode <ArpAction>  * smoothingFilterAction = NOP_ACTION; 
         ArNode <ArpAction>  * colourSpaceTonemappingAction = NOP_ACTION;
         ArNode <ArpAction>  * luminanceClippingAction = NOP_ACTION;
         ArNode <ArpAction>  * convertToResultFormatActionA = NOP_ACTION;
@@ -546,6 +553,18 @@ int tonemap(
                 [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
                     removeSource: rawRemoveSource
                     ];
+
+            if ( [ scotopicOpt hasBeenSpecified ] )
+            {
+                rawConversionAction = 
+                    [ IMAGECONVERSION_ARTRAW_TO_SCOTOPIC_ARTCSP
+                        removeSource: rawRemoveSource
+                        ];
+
+                smoothingFilterAction =
+                   [ BILATERAL_FILTER_SMOOTHING sigmas: 1.0 : 0.5 ];
+                    //[ GAUSSIAN_FILTER_SMOOTHING sigma: 1.0 ];
+            }
         }
         else
         {
@@ -826,6 +845,11 @@ actionSequenceAssembly:
             }
         }
 
+
+        [ ART_GLOBAL_REPORTER printf
+            : "test of printf"
+        ];
+
         actionSequence =
             ACTION_SEQUENCE(
                 isrChangeAction,
@@ -835,6 +859,8 @@ actionSequenceAssembly:
                 filterAction,
 
                 rawConversionAction,
+
+                smoothingFilterAction,
 
                 colourSpaceTonemappingAction,
 

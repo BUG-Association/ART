@@ -26,14 +26,48 @@
 
 #include "ART_Foundation.h"
 
-ART_LIBRARY_INTERFACE(ART_ImageActions)
+ART_MODULE_INTERFACE(SmoothingFilterImageActions)
 
-#import "ArnImageOperators.h"
-#import "ActionsForPolarisationImages.h"
-#import "ImageComparisonActions.h"
-#import "ImageConversionActions.h"
-#import "MiscellaneousImageActions.h"
-#import "TonemappingImageActions.h"
-#import "SmoothingFilterImageActions.h"
+#import "ART_ImageData.h"
+
+#import "ArnSingleImageManipulationAction.h"
+
+@interface ArnBilateralFilterSmoothingAction
+        : ArnSingleImageManipulationAction
+        < ArpConcreteClass, ArpAction >
+{
+    double  sigma_d;
+    double  sigma_c;
+}
+
+- sigmas
+        : (double) newSigmaD
+        : (double) newSigmaC
+        ;
+
+- init
+        : (double) newSigmaD
+        : (double) newSigmaC
+        ;
+
+@end
+
+
+@interface ArnGaussianFilterSmoothingAction
+        : ArnSingleImageManipulationAction
+        < ArpConcreteClass, ArpAction >
+{
+    double  sigma;
+}
+
+- sigma
+        : (double) newSigma
+        ;
+
+- init
+        : (double) newSigma
+        ;
+
+@end
 
 // ===========================================================================
