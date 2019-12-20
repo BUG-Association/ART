@@ -57,6 +57,8 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
 {
     self =
         [ super  init ];
+    
+    return self;
 }
     
 - (void) dealloc

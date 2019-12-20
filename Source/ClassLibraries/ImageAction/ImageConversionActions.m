@@ -247,7 +247,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
         
     ArSpectrum* temp_col = spc_alloc( art_gv );
                 
-    ArSpddectrum* vlambda_spc = spc_alloc( art_gv );
+    ArSpectrum* vlambda_spc = spc_alloc( art_gv );
     ArPSSpectrum vlambda_pss;
                
     s500_to_spc( art_gv, arcmf_vlambda500(art_gv), vlambda_spc );

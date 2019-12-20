@@ -209,7 +209,16 @@ int tonemap(
             :   "<percent>"
             :   "strength of polariser in percent, default = 100%"
             ];
-
+#warning deactivated due to not being fully finished yet
+//#define SCOTOPIC
+#ifdef SCOTOPIC
+    id  scotopicOpt =
+        [ FLAG_OPTION
+            :   "scotopic"
+            :   "sct"
+            :   "perform simulation of scotopic viewing conditions"
+            ];
+#endif
     ART_APPLICATION_ADDITIONAL_OUTPUT_OPTIONS_FOLLOW
 
 #ifdef ART_WITH_OPENEXR
@@ -233,12 +242,6 @@ int tonemap(
             :   "retainCSP"
             :   "rcsp"
             :   "retain last intermediate ARTCSP file"
-            ];
-    id  scotopicOpt =
-        [ FLAG_OPTION
-            :   "scotopic"
-            :   "sct"
-            :   "converts the spectral image assuming scotopic viewing conditions to most perceptually similar photopic one"
             ];
 
     ART_SINGLE_INPUT_FILE_APPLICATION_STARTUP_WITH_SYNOPSIS(
@@ -554,8 +557,10 @@ int tonemap(
                     removeSource: rawRemoveSource
                     ];
 
+#ifdef SCOTOPIC
             if ( [ scotopicOpt hasBeenSpecified ] )
             {
+                #warning sloppy programming, this needs to free the existing one
                 rawConversionAction = 
                     [ IMAGECONVERSION_ARTRAW_TO_SCOTOPIC_ARTCSP
                         removeSource: rawRemoveSource
@@ -565,6 +570,7 @@ int tonemap(
                    [ BILATERAL_FILTER_SMOOTHING sigmas: 1.0 : 0.5 ];
                     //[ GAUSSIAN_FILTER_SMOOTHING sigma: 1.0 ];
             }
+#endif
         }
         else
         {
