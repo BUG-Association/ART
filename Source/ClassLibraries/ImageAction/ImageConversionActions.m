@@ -164,6 +164,233 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
 @end
 
+/* ===========================================================================
+    'ArnImageConverter_ARTRAW_To_Scotopic_ARTCSP'
+=========================================================================== */
+
+#define COMPUTE_REG_SIG(_cone,_rod,_k) \
+    (1.0 / sqrt(1.0 + 0.33*((_cone) + (_k)*(_rod))))
+
+@implementation ArnImageConverter_ARTRAW_To_Scotopic_ARTCSP
+
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_Scotopic_ARTCSP)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_Scotopic_ARTCSP)
+
+- (void) performOn
+        : (ArNode <ArpNodeStack> *) nodeStack
+{
+    /* ------------------------------------------------------------------
+         Before calling the function that sets up the framework for
+         image manipulation we have to specify what colour type the
+         result image will have.
+
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
+    ---------------------------------------------------------------aw- */
+
+    destinationImageDataType = ardt_xyz;
+    destinationFileDataType  = ardt_xyz;
+
+
+    /* ------------------------------------------------------------------
+         Activation of the framework common to all image manipulation
+         actions. This takes the source image from the stack, and creates
+         the destination image aint with all needed scanline buffers.
+
+         In order to do this properly it has to be informed of what
+         kind of source image to expect, and what kind of result image
+         we wish to create (in our case, ArfARTRAW and ArfARTCSP).
+    ---------------------------------------------------------------aw- */
+
+    [ self prepareForImageManipulation
+        :   nodeStack
+        :   [ ArfARTRAW class ]
+        :   [ ArfARTCSP class ]
+        ];
+
+    if ( numberOfSourceImages > 1 )
+        [ REPORTER beginTimedAction
+            :   "converting raw images to colour space with scotopic adaptation"
+            ];
+    else
+        [ REPORTER beginTimedAction
+            :   "converting raw image to colour space with scotopic adaptation"
+            ];
+
+    /* ------------------------------------------------------------------
+         Process all pixels in the image.
+    ---------------------------------------------------------------aw- */
+
+    /* ------------------------------------------------------------------
+        Based on SIGGRAPH 2011 Kirk
+
+        Spectrum -> LMSR -> opponency values -> LMS -> XYZ
+
+        Opponency values are calculated using regulated signals.
+        LMS <---> XYZ is done using CIECAM02 transformation matrix.
+    ---------------------------------------------------------------aw- */
+
+    const Mat3 opponency_inverse =
+        MAT3(  -0.5, 0.0, 0.5,
+                0.5, 0.0, 0.5,
+                0.0, 2.0, 2.0 );
+
+    const Mat3 xyz_to_lms =
+        MAT3(   0.7328, 0.4296, -0.1624,
+               -0.7036, 1.6975,  0.0061,
+                0.0030, 0.0136,  0.9834 );
+
+    const Mat3 lms_to_xyz =
+        MAT3(   1.0961, -0.2789, 0.1827,
+                0.4544,  0.4735, 0.0721,
+               -0.0096, -0.0057, 1.0153 );
+        
+    ArSpectrum* temp_col = spc_alloc( art_gv );
+                
+    ArSpddectrum* vlambda_spc = spc_alloc( art_gv );
+    ArPSSpectrum vlambda_pss;
+               
+    s500_to_spc( art_gv, arcmf_vlambda500(art_gv), vlambda_spc );
+    spc_to_pss_new( art_gv, vlambda_spc, &vlambda_pss );
+
+    for ( int i = 0; i < numberOfSourceImages; i++ )
+    {
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
+        {
+            [ self loadSourceScanlineBuffer: i : y ];
+
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
+            {
+                
+                arlightalpha_to_spc(
+                      art_gv,
+                      LIGHTALPHA_SOURCE_BUFFER(x),
+                      temp_col
+                    );
+
+                ArCIEXYZ xyz;
+
+                spc_to_xyz(
+                      art_gv,
+                      temp_col,
+                    & xyz
+                    );
+
+                ArPSSpectrum pss;
+
+                spc_to_pss_new(
+                      art_gv,
+                      temp_col,
+                    & pss
+                    );
+                
+                double rod = pss_inner_product(
+                      art_gv,
+                      arcmf_vprimelambda(art_gv),
+                    & pss
+                    );
+                
+                // Reduction in rod signal since we are using photopic scenes
+                rod *= 10e-2;
+                
+                Vec3D q; 
+
+                c3_cm_mul_c(
+                    & ARCIEXYZ_C(xyz),
+                    & xyz_to_lms,
+                    & q.c
+                    );
+
+                // Constants
+                const double kappa1 = 0.25;
+                const double kappa2 = 0.4;
+
+                const double lmax = 0.637;
+                const double mmax = 0.392;
+                const double smax = 1.606;
+
+                const double rho1 = 1.111;
+                const double rho2 = 0.939;
+                const double rho3 = 0.400;
+                const double rho4 = 0.150;
+
+                const double alpha = 0.619;
+
+                const double a = 15;
+                const double b = 15;
+                const double c = 5;
+
+                double gl = COMPUTE_REG_SIG(XC(q), rod, kappa1);
+                double gm = COMPUTE_REG_SIG(YC(q), rod, kappa1);
+                double gs = COMPUTE_REG_SIG(ZC(q), rod, kappa2);
+
+                // Normalise
+                gl /= lmax;
+                gm /= mmax;
+                gs /= smax;
+
+                const double lerp_ml = (1.0 - alpha)*gm + alpha*gl;
+
+                const double delta_o_rg     = a*kappa1*(rho1*gm - rho2*gl)*rod;
+                const double delta_o_by     = b*(rho3*gs - rho4*lerp_ml)*rod;
+                const double delta_o_lum    = c*lerp_ml*rod;
+                
+                Vec3D delta_o = VEC3D ( delta_o_rg, delta_o_by, delta_o_lum );
+                
+                //vec3d_d_mul_v(rod, &delta_o);
+
+                Vec3D delta_q;
+
+                c3_cm_mul_c(
+                    & delta_o.c,
+                    & opponency_inverse,
+                    & delta_q.c
+                    );
+                
+                vec3d_v_add_v(
+                    & delta_q,
+                    & q
+                    );
+
+                // LMS to XYZ
+                c3_cm_mul_c(
+                    & q.c,
+                    & lms_to_xyz,
+                    & XYZA_DESTINATION_BUFFER_XYZ(x).c
+                    );
+
+                //debugprintf("Result (%u|%u)\n",x,y);
+                //xyz_s_debugprintf(
+                //      art_gv,
+                //    & XYZA_DESTINATION_BUFFER_XYZ(x)
+                //    );
+
+                XYZA_DESTINATION_BUFFER_ALPHA(x) = LIGHTALPHA_SOURCE_BUFFER_ALPHA(x);
+            }
+
+            [ self writeDestinationScanlineBuffer: i : y ];
+        }
+    }
+
+    spc_free(
+        art_gv,
+        temp_col
+        );
+
+    /* ------------------------------------------------------------------
+         Free the image manipulation infrastructure and end the action;
+         this also places the destination image on the stack.
+    ---------------------------------------------------------------aw- */
+
+    [ self finishImageManipulation
+        :   nodeStack
+        ];
+
+    [ REPORTER endAction ];
+}
+
+@end
+
 
 #define MONOCHROME_SAMPLE_WIDTH     5 NM
 

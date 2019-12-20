@@ -46,6 +46,18 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 
 @end
 
+/* ===========================================================================
+    'ArnImageConverter_ARTRAW_To_Scotopic_ARTCSP'
+=========================================================================== */
+
+@interface ArnImageConverter_ARTRAW_To_Scotopic_ARTCSP
+        : ArnSingleImageManipulationAction
+        < ArpConcreteClass, ArpAction >
+{
+}
+
+@end
+
 #define ARTRAW_CONVERSION_WAVELENGTH_SAMPLE_TAG     "monochrome"
 
 /* ===========================================================================

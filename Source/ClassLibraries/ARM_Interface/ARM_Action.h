@@ -233,6 +233,15 @@ ART_MODULE_INTERFACE(ARM_Action)
 
         #define COMPUTE_2xARTCSP_AVG_DIFF \
                 ALLOC_OBJECT_AUTORELEASE(Arn2xARTCSP_avg_diff)
+
+        /*
+         * @def BILATERAL_FILTER_SMOOTHING
+         */
+        #define BILATERAL_FILTER_SMOOTHING \
+                ALLOC_OBJECT_AUTORELEASE(ArnBilateralFilterSmoothingAction)
+
+        #define GAUSSIAN_FILTER_SMOOTHING \
+                ALLOC_OBJECT_AUTORELEASE(ArnGaussianFilterSmoothingAction)
     /**
      * @popsection
      */
@@ -264,6 +273,14 @@ ART_MODULE_INTERFACE(ARM_Action)
          */
         #define IMAGECONVERSION_ARTRAW_TO_ARTCSP \
                 ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_ARTRAW_To_ARTCSP)
+
+        /**
+         * @def IMAGECONVERSION_ARTRAW_TO_SCOTOPIC_ARTCSP
+         * @brief ARTRAW to scotopic ARTCSP
+         * Converts an ARTRAW image from the stack to an scotopic ARTCSP image.
+         */
+        #define IMAGECONVERSION_ARTRAW_TO_SCOTOPIC_ARTCSP \
+                ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_ARTRAW_To_Scotopic_ARTCSP)
 
         /**
          * @def IMAGECONVERSION_ARTRAW_TO_MONO_ARTCSP
