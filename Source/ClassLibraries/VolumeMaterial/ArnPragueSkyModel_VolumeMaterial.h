@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2019 The ART Development Team
+    Copyright (c) 1996-2018 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -24,19 +24,24 @@
 
 =========================================================================== */
 
-#define ART_LIBRARY_NAME     ART_SkyModel
+#include "ART_Foundation.h"
+
+ART_MODULE_INTERFACE(ArnPragueSkyModel_VolumeMaterial)
 
 #import "ART_SkyModel.h"
 
-ART_LIBRARY_INITIALISATION_FUNCTION
-(
-    ART_PERFORM_MODULE_INITIALISATION( ArnSkyModel )
-    ART_PERFORM_MODULE_INITIALISATION( ArnPreethamSkyModel )
-    ART_PERFORM_MODULE_INITIALISATION( ArnHosekSkyModel )
-    ART_PERFORM_MODULE_INITIALISATION( ArnPragueSkyModel )
-)
 
-ART_AUTOMATIC_LIBRARY_SHUTDOWN_FUNCTION
+/* ===========================================================================
+    
+    ArpVolumeMaterial category of the Prague sky model. This extension of the
+    base class provides the attenuation and in-scattering values for finite
+    viewing directions.
+ 
+=========================================================================== */
+
+
+@interface ArnPragueSkyModel(VolumeMaterial) < ArpVolumeMaterial > @end
 
 
 // ===========================================================================
+
