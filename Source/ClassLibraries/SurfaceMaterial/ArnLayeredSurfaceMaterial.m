@@ -94,6 +94,15 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLayeredSurfaceMaterial)
     return self;
 }
 
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) emissionLocation
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    *albedo = SPS4(0.0);
+    return NO;
+}
+
 - (BOOL) noTransmission
 {
     return

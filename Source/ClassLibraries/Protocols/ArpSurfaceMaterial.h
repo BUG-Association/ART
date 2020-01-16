@@ -301,6 +301,16 @@ ArBSDFSamplingConstraint;
         : (ArPDFValue *) sampleProbability
         ;
 
+/* ---------------------------------------------------------------------------
+    'calculateAlbedoSampleAtWavelength'
+        The surface albedo at the chosen location and wavelength.
+------------------------------------------------------------------------aw- */
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) emissionLocation
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+        ;
+
 @end
 
 #define ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
@@ -386,7 +396,16 @@ ArBSDFSamplingConstraint;
 }
 
 #define ARPSURFACEMATERIAL_DEFAULT_NONDIFFUSE_NONEMISSIVE_IMPLEMENTATION \
-ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION
+ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
+\
+- (BOOL) calculateAlbedoSampleAtWavelength \
+        : (      ArcSurfacePoint *) emissionLocation \
+        : (const ArWavelength *) wavelength \
+        : (      ArSpectralSample *) albedo \
+{ \
+    *albedo = SPS4(0.0); \
+    return NO; \
+}
 
 #define ARPSURFACEMATERIAL_DEFAULT_BLACKBODY_EMITTER_IMPLEMENTATION \
 - (BOOL) sampleWavelengthShift \
@@ -464,6 +483,15 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION
         : (      ArPDFValue *) alternateReverseSampleProbability \
         : (      ArAttenuationSample *) attenuationSample \
 { \
+    return NO; \
+} \
+\
+- (BOOL) calculateAlbedoSampleAtWavelength \
+        : (      ArcSurfacePoint *) emissionLocation \
+        : (const ArWavelength *) wavelength \
+        : (      ArSpectralSample *) albedo \
+{ \
+    *albedo = SPS4(0.0); \
     return NO; \
 }
 

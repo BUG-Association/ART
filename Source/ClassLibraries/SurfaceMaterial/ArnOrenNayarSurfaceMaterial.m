@@ -67,6 +67,15 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return copiedInstance;
 }
 
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) emissionLocation
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    *albedo = SPS4(0.0);
+    return NO;
+}
+
 #define SPECTRUM_SUBNODE    ((ArNode <ArpSpectrum,ArpSpectrum2D,ArpSpectrumValues>*) ARNBINARY_SUBNODE_0)
 #define SIGMA_SUBNODE       ((ArNode <ArpDoubleValues>*) ARNBINARY_SUBNODE_1)
 

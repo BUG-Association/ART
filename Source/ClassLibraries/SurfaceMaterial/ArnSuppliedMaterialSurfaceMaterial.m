@@ -59,6 +59,14 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSuppliedMaterialSurfaceMaterial)
         return copiedInstance;
 }
 
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) emissionLocation
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    *albedo = SPS4(0.0);
+    return NO;
+}
 
 // TODO: remove undef, it is here just to be sure that it doesn't get accidentaly used
 #undef USER_SUPPLIED_SURFACE_MATERIAL_INTO

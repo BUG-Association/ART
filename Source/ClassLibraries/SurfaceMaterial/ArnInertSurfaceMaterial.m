@@ -50,6 +50,15 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
       NO
     )
 
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) emissionLocation
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    *albedo = SPS4(0.0);
+    return NO;
+}
+
 - (BOOL) calculateBidirectionalAttenuationSample
         : (      ArcIntersection *) incomingDirectionAndLocation
         : (      ArDirectionCosine *) outgoingDirection

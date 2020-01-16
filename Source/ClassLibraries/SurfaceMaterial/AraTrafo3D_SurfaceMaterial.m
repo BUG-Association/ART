@@ -39,6 +39,15 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 #define SURFACE_SUBNODE     ((ArNode <ArpSurfaceMaterial> *)ARNUNARY_SUBNODE)
 
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) emissionLocation
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    *albedo = SPS4(0.0);
+    return NO;
+}
+
 - (BOOL) noTransmission
 {
     return
