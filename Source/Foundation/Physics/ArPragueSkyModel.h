@@ -1,0 +1,204 @@
+/*
+This source is published under the following 3-clause BSD license.
+
+Copyright (c) 2016 <anonymous authors of SIGGRAPH paper submision 0155>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * None of the names of the contributors may be used to endorse or promote
+      products derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+
+/* ============================================================================
+
+1.0   January 17th, 2017
+      Initial release.
+
+============================================================================ */
+
+#ifndef _ARPRAGUESKYMODEL_H_
+#define _ARPRAGUESKYMODEL_H_
+
+#define PSM_PLANET_RADIUS                       6378000.0
+#define PSM_PLANET_RADIUS_SQR                   PSM_PLANET_RADIUS * PSM_PLANET_RADIUS
+
+#define PSM_MIN_ALTITUDE                              0.0
+#define PSM_MAX_ALTITUDE                          15000.0
+#define PSM_LIGHTCOLLECTION_VERTICAL_STEPSIZE       250.0
+#define PSM_ARRAYSIZE \
+    ((int) (( PSM_MAX_ALTITUDE / PSM_LIGHTCOLLECTION_VERTICAL_STEPSIZE ) + 1))
+
+#include "ART_Foundation_Geometry.h"
+
+//   This computes the canonical angles of the model from
+//   a normalised view vector and solar elevation.
+
+void arpragueskymodel_compute_altitude_and_elevation(
+        const Pnt3D   * viewpoint,
+        const double    groundLevelSolarElevationAtOrigin,
+        const double    groundLevelSolarAzimuthAtOrigin,
+              double  * solarElevationAtViewpoint,
+              double  * altitudeOfViewpoint,
+              Vec3D   * directionToPlanet
+        );
+void arpragueskymodel_compute_angles(
+        const Pnt3D   * viewpoint,
+        const Vec3D   * viewDirection,
+        const double    groundLevelSolarElevationAtOrigin,
+        const double    groundLevelSolarAzimuthAtOrigin,
+              double  * solarElevationAtViewpoint,
+              double  * altitudeOfViewpoint,
+              double  * theta,
+              double  * gamma,
+              double  * shadow,
+              double  * zero
+        );
+
+//   One blob of floats for each wavelength and task
+
+typedef struct ArPragueSkyModelState
+{
+    double  * radiance_dataset[11];
+    double  * polarisation_dataset[11];
+	
+	int background_nbreaks;
+	int solar_max_nbreaks;
+	int solar_ratio_nbreaks;
+    int backglow_vertical_nbreaks;
+    int backglow_ratio_nbreaks;
+    int frontglow_vertical_nbreaks;
+    int frontglow_ratio_nbreaks;
+    int shadow_nbreaks;
+    int shadow_v_nbreaks;
+	
+	int background_offset;
+    int solar_max_offset;
+    int solar_ratio_offset;
+    int backglow_vertical_offset;
+    int backglow_ratio_offset;
+    int frontglow_vertical_offset;
+    int frontglow_ratio_offset;
+    int shadow_offset;
+    int shadow_v_offset;
+    int total_coefs_single_config; // this is for one specific configuration
+    int total_coefs_all_configs;
+
+	
+	double* background_breaks;
+	double* solar_max_breaks;
+	double* solar_ratio_breaks;
+	double* backglow_vertical_breaks;
+	double* backglow_ratio_breaks;
+	double* frontglow_vertical_breaks;
+	double* frontglow_ratio_breaks;
+	double* shadow_breaks;
+	double* shadow_v_breaks;
+	
+    float   * transmission_dataset;
+}
+ArPragueSkyModelState;
+
+ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
+        const char  * library_path
+        );
+
+void arpragueskymodelstate_free(
+        ArPragueSkyModelState  * state
+        );
+
+//   theta  - zenith angle
+//   gamma  - sun angle
+//   shadow - angle from the shadow point, which is further 90 degrees above the sun
+//   zero   - angle from the zero point, which lies at the horizon below the sun
+//   altitude
+//   wavelength
+
+double arpragueskymodel_radiance(
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   gamma,
+        const double                   shadow,
+        const double                   zero,
+        const double                   elevation,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   albedo,
+        const double                   wavelength
+        );
+
+/* ----------------------------------------------------------------------------
+
+    arpragueskymodel_solar_radiance
+    ---------------------------
+
+    This computes transmittance between a point at 'altitude' and infinity in
+    the direction 'theta' at a wavelength 'wavelength'.
+
+---------------------------------------------------------------------------- */
+
+
+double arpragueskymodel_solar_radiance(
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   gamma,
+        const double                   shadow,
+        const double                   zero,
+        const double                   elevation,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   albedo,
+        const double                   wavelength
+        );
+
+double arpragueskymodel_polarisation(
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   gamma,
+        const double                   elevation,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   albedo,
+        const double                   wavelength
+        );
+
+/* ----------------------------------------------------------------------------
+
+    arpragueskymodel_tau
+    ------------------------------
+
+    This computes transmittance between a point at 'altitude' and infinity in
+    the direction 'theta' at a wavelength 'wavelength'.
+
+---------------------------------------------------------------------------- */
+
+double arpragueskymodel_tau(
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   wavelength,
+        const double                   distance
+        );
+
+
+#endif // _ARPRAGUESKYMODEL_H_
