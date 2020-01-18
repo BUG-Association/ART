@@ -133,6 +133,18 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 #ifdef ART_WITH_OPENEXR
 
 /* ===========================================================================
+    'ArnImageConverter_ARTRAW_To_SPECTRAL_EXR'
+=========================================================================== */
+
+@interface ArnImageConverter_ARTRAW_To_Spectral_EXR
+        : ArnSingleImageManipulationAction
+        < ArpConcreteClass, ArpAction >
+{
+}
+
+@end
+
+/* ===========================================================================
     'ArnImageConverter_ARTCSP_To_EXR'
 =========================================================================== */
 

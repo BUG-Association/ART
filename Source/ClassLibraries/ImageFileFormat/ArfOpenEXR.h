@@ -44,8 +44,13 @@
     struct ArfOpenEXR_members  * member_vars;
 }
 
-@end
+//  Used to pass an entire spectral image buffer to OpenEXR for writing
 
+- (void) setFloatImageBuffer
+        : (float *) imagebuffer
+        ;
+
+@end
 
 #endif // ART_WITH_OPENEXR
 

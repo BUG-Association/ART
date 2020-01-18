@@ -761,6 +761,20 @@ IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Spectrum8,s8)
 @end
 
 /* ===========================================================================
+    'ArnSpectrum11Image'
+=========================================================================== */
+@implementation ArnSpectrum11Image
+
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSpectrum11Image)
+ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnSpectrum11Image,Spectrum11)
+
+- (ArDataType) dataType { return ardt_spectrum11; }
+
+IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Spectrum11,s11)
+
+@end
+
+/* ===========================================================================
     'ArnSpectrum18Image'
 =========================================================================== */
 @implementation ArnSpectrum18Image

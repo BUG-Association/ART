@@ -159,6 +159,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
     }
     
     numberOfSourceImages = arlist_length( & sourceImageRefList );
+    #ifdef PATHNAME_DEBUGPRINTF
+    debugprintf(
+        "\nNumber of source images : %d \n"
+        ,   numberOfSourceImages
+        );
+    #endif
+    
 
     if ( numberOfSourceImages == 0 )
         ART_ERRORHANDLING_FATAL_ERROR(
@@ -167,6 +174,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
 
     numberOfDestinationImages =
         numberOfSourceImages * numberOfDestinationsPerSource;
+
+    #ifdef PATHNAME_DEBUGPRINTF
+    debugprintf(
+        "Number of dest. images  : %d \n"
+        ,   numberOfDestinationImages
+        );
+    #endif
 
     sourceImage =
         ALLOC_ARRAY( ArnFileImage <ArpImage> *, numberOfSourceImages );
@@ -206,7 +220,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
 
     #ifdef PATHNAME_DEBUGPRINTF
     debugprintf(
-        "\nMaster filename         : %s \n"
+        "Master filename         : %s \n"
         ,   [ nodeStack masterOutputFilename ]
         );
     #endif
@@ -579,7 +593,11 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
     #ifdef PATHNAME_DEBUGPRINTF
         debugprintf(
             "Creating %d destination images\n"
+            "Destination data type %s\n"
+            "Destination file type %s\n"
             ,   numberOfDestinationImages
+            ,   ardatatype_name(destinationImageDataType)
+            ,   ardatatype_name(destinationFileDataType)
             );
     #endif
     

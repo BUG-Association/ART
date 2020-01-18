@@ -1054,6 +1054,115 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
 #ifdef ART_WITH_OPENEXR
 
 /* ===========================================================================
+    'ArnImageConverter_ARTRAW_To_Spectral_EXR'
+=========================================================================== */
+
+@implementation ArnImageConverter_ARTRAW_To_Spectral_EXR
+
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_Spectral_EXR)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_Spectral_EXR)
+
+- (void) performOn
+        : (ArNode <ArpNodeStack> *) nodeStack
+{
+    /* ------------------------------------------------------------------
+         Before calling the function that sets up the framework for
+         image manipulation we have to specify what colour type the
+         result image will have.
+
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
+    ---------------------------------------------------------------aw- */
+
+    destinationImageDataType = art_foundation_isr(art_gv);
+    destinationFileDataType  = art_foundation_isr(art_gv);
+
+
+    /* ------------------------------------------------------------------
+         Activation of the framework common to all image manipulation
+         actions. This takes the source image from the stack, and creates
+         the destination image aint with all needed scanline buffers.
+
+         In order to do this properly it has to be informed of what
+         kind of source image to expect, and what kind of result image
+         we wish to create (in our case, ArfARTRAW and ArfARTCSP).
+    ---------------------------------------------------------------aw- */
+
+    [ self prepareForImageManipulation
+        :   nodeStack
+        :   [ ArfARTRAW class ]
+        :   [ ArfOpenEXR class ]
+        ];
+
+    if ( numberOfSourceImages > 1 )
+        [ REPORTER beginTimedAction
+            :   "converting raw images to spectral EXRs"
+            ];
+    else
+        [ REPORTER beginTimedAction
+            :   "converting raw image to spectral EXR"
+            ];
+
+    /* ------------------------------------------------------------------
+         Spectral EXRs are weird. They expect all the image data in
+         one huge block, so they get what they want - the source image
+         raw data in one huge block, which they then have to make sense
+         of somehow.
+    ---------------------------------------------------------------aw- */
+
+    int  nc = spc_channels(art_gv);
+    
+    float  * imagebuffer = ALLOC_ARRAY(float, XC(destinationImageSize)*YC(destinationImageSize)*nc);
+    
+    ArSpectrum  * temp_spc = spc_alloc(art_gv);
+    
+    for ( int i = 0; i < numberOfSourceImages; i++ )
+    {
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
+        {
+            [ self loadSourceScanlineBuffer: i : y ];
+
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
+            {
+                arlightalpha_to_spc(
+                      art_gv,
+                      LIGHTALPHA_SOURCE_BUFFER(x),
+                      temp_spc
+                    );
+
+                for ( int j = 0; j < nc; j++ )
+                {
+                    imagebuffer[ y * XC(destinationImageSize) * nc + x * nc + j ] =
+                        spc_si( art_gv, temp_spc, j );
+                }
+            }
+        }
+
+        [ (ArfOpenEXR*)(destinationImage[i]->imageFile)
+            setFloatImageBuffer
+            :   imagebuffer
+            ];
+    }
+    
+    spc_free(art_gv, temp_spc);
+    FREE_ARRAY(imagebuffer);
+
+    /* ------------------------------------------------------------------
+         Free the image manipulation infrastructure and end the action;
+         this also places the destination image on the stack.
+    ---------------------------------------------------------------aw- */
+
+    [ self finishImageManipulation
+        :   nodeStack
+        ];
+
+    [ REPORTER endAction ];
+}
+
+@end
+
+
+/* ===========================================================================
     'ArnImageConverter_ARTCSP_To_EXR'
 =========================================================================== */
 

@@ -293,7 +293,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     }
 
     if (XC(imageInfo->size) != XC(image->size))
-        ART_ERRORHANDLING_FATAL_ERROR( "cannot write image line of wrong length" );
+        ART_ERRORHANDLING_FATAL_ERROR(
+            "cannot write image line of wrong length: %d vs. %d, input class %s"
+            ,  XC(imageInfo->size)
+            ,  XC(image->size)
+            ,  [ image cStringClassName ]
+            );
 
     if (XC(start) != 0)
         ART_ERRORHANDLING_FATAL_ERROR( "cannot write image line at an offset" );
