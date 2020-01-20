@@ -48,7 +48,147 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PSM_ARRAYSIZE \
     ((int) (( PSM_MAX_ALTITUDE / PSM_LIGHTCOLLECTION_VERTICAL_STEPSIZE ) + 1))
 
+#define ARPRAGUESKYMODEL_USE_NEW
+
 #include "ART_Foundation_Geometry.h"
+
+#ifdef ARPRAGUESKYMODEL_USE_NEW
+
+//   This computes the canonical angles of the model from
+//   a normalised view vector and solar elevation.
+
+void arpragueskymodel_compute_altitude_and_elevation(
+        const Pnt3D   * viewpoint,
+        const double    groundLevelSolarElevationAtOrigin,
+        const double    groundLevelSolarAzimuthAtOrigin,
+              double  * solarElevationAtViewpoint,
+              double  * altitudeOfViewpoint,
+              Vec3D   * directionToPlanet
+        );
+void arpragueskymodel_compute_angles(
+        const Pnt3D   * viewpoint,
+        const Vec3D   * viewDirection,
+        const double    groundLevelSolarElevationAtOrigin,
+        const double    groundLevelSolarAzimuthAtOrigin,
+              double  * solarElevationAtViewpoint,
+              double  * altitudeOfViewpoint,
+              double  * theta,
+              double  * gamma,
+              double  * shadow,
+              double  * zero
+        );
+
+//   One blob of floats for each wavelength and task
+
+typedef struct ArPragueSkyModelState
+{
+	double  * radiance_dataset[11];
+	double  * polarisation_dataset[11];
+
+	int sun_nbreaks;
+	int sun_offset;
+	int sun_stride;
+	double * sun_breaks;
+
+	int zenith_nbreaks;
+	int zenith_offset;
+	int zenith_stride;
+	double * zenith_breaks;
+
+	int emph_nbreaks;
+	int emph_offset;
+	double * emph_breaks;
+
+	int total_coefs_single_config; // this is for one specific configuration
+	int total_coefs_all_configs;
+
+	float * transmission_dataset;
+}
+ArPragueSkyModelState;
+
+ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
+        const char  * library_path
+        );
+
+void arpragueskymodelstate_free(
+        ArPragueSkyModelState  * state
+        );
+
+//   theta  - zenith angle
+//   gamma  - sun angle
+//   shadow - angle from the shadow point, which is further 90 degrees above the sun
+//   zero   - angle from the zero point, which lies at the horizon below the sun
+//   altitude
+//   wavelength
+
+double arpragueskymodel_radiance(
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   gamma,
+        const double                   shadow,
+        const double                   zero,
+        const double                   elevation,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   albedo,
+        const double                   wavelength
+        );
+
+/* ----------------------------------------------------------------------------
+
+    arpragueskymodel_solar_radiance
+    ---------------------------
+
+    This computes transmittance between a point at 'altitude' and infinity in
+    the direction 'theta' at a wavelength 'wavelength'.
+
+---------------------------------------------------------------------------- */
+
+
+double arpragueskymodel_solar_radiance(
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   gamma,
+        const double                   shadow,
+        const double                   zero,
+        const double                   elevation,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   albedo,
+        const double                   wavelength
+        );
+
+double arpragueskymodel_polarisation(
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   gamma,
+        const double                   elevation,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   albedo,
+        const double                   wavelength
+        );
+
+/* ----------------------------------------------------------------------------
+
+    arpragueskymodel_tau
+    ------------------------------
+
+    This computes transmittance between a point at 'altitude' and infinity in
+    the direction 'theta' at a wavelength 'wavelength'.
+
+---------------------------------------------------------------------------- */
+
+double arpragueskymodel_tau(
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   wavelength,
+        const double                   distance
+        );
+
+#else
 
 //   This computes the canonical angles of the model from
 //   a normalised view vector and solar elevation.
@@ -200,5 +340,6 @@ double arpragueskymodel_tau(
         const double                   distance
         );
 
+#endif // ARPRAGUESKYMODEL_USE_NEW
 
 #endif // _ARPRAGUESKYMODEL_H_
