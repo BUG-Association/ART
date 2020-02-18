@@ -1,5 +1,5 @@
 /* ===========================================================================
-    Copyright (c) 1996-2016 The ART Development Team
+    Copyright (c) 1996-2020 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -37,7 +37,7 @@
     MANUAL:
         Original scene devised and coded by Robert F. Tobler at the very
         beginning of the ART 1.0 effort, way back when, at the Vienna 
-        Institute of Computer Graphcis. To honour his memory, this file 
+        Institute of Computer Graphics. To honour his memory, this file 
         retains the old-style project file header typical for ART 1.x which
         was also introduced by him.
         
