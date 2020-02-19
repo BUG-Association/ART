@@ -204,6 +204,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSampler)
 
 typedef struct ArPixelID
 {
+    long   globalRandomSeed;
     int    threadIndex;
     int    sampleIndex;
     Pnt2D  pixelCoord;
@@ -235,6 +236,7 @@ ArPixelID;
     ArPixelID  px_id;
     
     px_id.threadIndex = THREAD_INDEX;
+    px_id.globalRandomSeed = arrandom_global_seed(art_gv);
     
     int   threadStripWidth = YC(imageSize) / numberOfRenderThreads;
     int   threadOffset = threadStripWidth * THREAD_INDEX;

@@ -37,12 +37,14 @@ typedef struct ArRandom_GV
 {
     pthread_mutex_t  protectedGlobalNR2_mutex;
     ArRandomNR2      protectedGlobalNR2_state;
+    long             global_seed;
 }
 ArRandom_GV;
 
-#define ARRANDOM_GV         art_gv->arrandom_gv
-#define ARRANDOM_NR2_MUTEX  ARRANDOM_GV->protectedGlobalNR2_mutex
-#define ARRANDOM_NR2_STATE  ARRANDOM_GV->protectedGlobalNR2_state
+#define ARRANDOM_GV             art_gv->arrandom_gv
+#define ARRANDOM_NR2_MUTEX      ARRANDOM_GV->protectedGlobalNR2_mutex
+#define ARRANDOM_NR2_STATE      ARRANDOM_GV->protectedGlobalNR2_state
+#define ARRANDOM_GLOBAL_SEED    ARRANDOM_GV->global_seed
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
@@ -53,9 +55,11 @@ ART_MODULE_INITIALISATION_FUNCTION
           NULL
         );
 
+    ARRANDOM_GLOBAL_SEED = 18091970;
+    
     arrandom_nr2_seed(
         & ARRANDOM_NR2_STATE,
-          18091970
+          ARRANDOM_GLOBAL_SEED
         );
 )
 
@@ -71,17 +75,26 @@ ART_MODULE_SHUTDOWN_FUNCTION
 
 void arrandom_global_set_seed(
         ART_GV  * art_gv,
-        int       seed
+        long      seed
         )
 {
     pthread_mutex_lock( & ARRANDOM_NR2_MUTEX );
+    
+    ARRANDOM_GLOBAL_SEED = seed;
 
     arrandom_nr2_seed(
         & ARRANDOM_NR2_STATE,
-          seed
+          ARRANDOM_GLOBAL_SEED
         );
 
     pthread_mutex_unlock( & ARRANDOM_NR2_MUTEX );
+}
+
+long arrandom_global_seed(
+        ART_GV  * art_gv
+        )
+{
+    return ARRANDOM_GLOBAL_SEED;
 }
 
 
@@ -261,7 +274,7 @@ void arrandom_nr2_seed(
         long seed
         )
 {
-    int j;
+    long  j;
 
     seed &= ART_INT32_MAX;
     state->idum = seed ^ ARRANDOM_SEED_MASK;
