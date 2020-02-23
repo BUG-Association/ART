@@ -59,6 +59,13 @@ int tonemap(
             :   "dxr"
             :   "no tone mapping, direct RAW -> RGB OpenEXR conversion"
             ];
+        
+    id  outputSpectralEXROpt =
+        [ FLAG_OPTION
+            :   "directSpectralEXR"
+            :   "dse"
+            :   "no tone mapping, direct RAW -> Mitsuba-style spectral EXR conversion"
+            ];
 #endif // ART_WITH_OPENEXR
 
     id  singleWLtoCSVOpt =
@@ -404,6 +411,18 @@ int tonemap(
             }
         }
         
+#ifdef ART_WITH_OPENEXR
+        if ( [ outputSpectralEXROpt hasBeenSpecified ] && rawInput )
+        {
+            convertToResultFormatActionA =
+                [ IMAGECONVERSION_ARTRAW_TO_SPECTRAL_EXR
+                    removeSource: NO
+                    ];
+
+            goto actionSequenceAssembly;
+        }
+#endif
+
         if ( ! [ lpFilterOpt hasBeenSpecified ] )
             filterAction =
                 NOP_ACTION;
