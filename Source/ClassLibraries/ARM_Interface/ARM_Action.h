@@ -325,6 +325,14 @@ ART_MODULE_INTERFACE(ARM_Action)
 
         #ifdef ART_WITH_OPENEXR
             /**
+             * @def IMAGECONVERSION_ARTRAW_TO_SPECTRAL_EXR
+             * @brief ARTCSP to EXR
+             * Converts an ARTCSP image from the stack to an EXR file.
+             */
+            #define IMAGECONVERSION_ARTRAW_TO_SPECTRAL_EXR \
+                    ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_ARTRAW_To_Spectral_EXR)
+
+            /**
              * @def IMAGECONVERSION_ARTCSP_TO_EXR
              * @brief ARTCSP to EXR
              * Converts an ARTCSP image from the stack to an EXR file.
