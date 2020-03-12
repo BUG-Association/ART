@@ -35,6 +35,7 @@ ART_MODULE_INTERFACE(ARM_SkyModel)
 
 #import "ArnPreethamSkyModel.h"
 #import "ArnHosekSkyModel.h"
+#import "ArnPragueSkyModel.h"
 
 @interface ArnPreethamSkyModel ( ARM_Interface )
 
@@ -85,11 +86,25 @@ ART_MODULE_INTERFACE(ARM_SkyModel)
 
 @end
 
+@interface ArnPragueSkyModel ( ARM_Interface )
+
+- elevation
+                    : (double) newElevation
+        azimuth     : (double) newAzimuth
+        turbidity   : (double) newTurbidity
+        groundAlbedo: (ArNode <ArpSpectrum> *) newGroundAlbedo
+        ;
+
+@end
+
 #define DIFFUSE_INFINITESPHERE \
     ALLOC_INIT_OBJECT_AUTORELEASE(ArnSkyModel)
 
 #define PREETHAM_SKYLIGHT \
     ALLOC_OBJECT_AUTORELEASE(ArnPreethamSkyModel)
+
+#define PRAGUE_SKYLIGHT \
+    ALLOC_OBJECT_AUTORELEASE(ArnPragueSkyModel)
 
 /**
  * @brief Hosek sky model
