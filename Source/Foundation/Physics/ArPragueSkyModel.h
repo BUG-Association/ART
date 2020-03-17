@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ARPRAGUESKYMODEL_USE_NEW
 
 #include "ART_Foundation_Geometry.h"
+#include "ART_Foundation_ColourAndSpectra.h"
 
 #ifdef ARPRAGUESKYMODEL_USE_NEW
 
@@ -154,6 +155,21 @@ double arpragueskymodel_radiance(
         const double                   wavelength
         );
 
+void arpragueskymodel_radiance_hero(
+        const ART_GV                 * art_gv,
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   gamma,
+        const double                   shadow,
+        const double                   zero,
+        const double                   elevation,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   albedo,
+        const ArWavelength           * wavelength,
+              ArSpectralSample       * result
+        );
+
 /* ----------------------------------------------------------------------------
 
     arpragueskymodel_solar_radiance
@@ -189,6 +205,19 @@ double arpragueskymodel_polarisation(
         const double                   wavelength
         );
 
+void arpragueskymodel_polarisation_hero(
+        const ART_GV                 * art_gv,
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   gamma,
+        const double                   elevation,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   albedo,
+        const ArWavelength           * wavelength,
+              ArSpectralSample       * result
+        );
+
 /* ----------------------------------------------------------------------------
 
     arpragueskymodel_tau
@@ -208,6 +237,16 @@ double arpragueskymodel_tau(
         const double                   distance
         );
 
+void arpragueskymodel_tau_hero(
+        const ART_GV                 * art_gv,
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   altitude,
+        const double                   turbidity,
+        const ArWavelength           * wavelength,
+        const double                   distance,
+              ArSpectralSample       * result
+        );
 
 #else
 

@@ -689,6 +689,24 @@ double eval_pp(double x, int nbreaks, const double* breaks, const double* coefs)
   return sc[0] * x + sc[1];
 }
 
+int find_segment(const double x, const int nbreaks, const double* breaks)
+{
+  int segment = 0;
+  for (segment = 0; segment < nbreaks; ++segment)
+  {
+    if (breaks[segment+1] >= x)
+      break;
+  }
+  return segment;
+}
+
+double eval_pp2(double x, const int segment, const double * breaks, const double * coefs)
+{
+  x -= breaks[segment];
+  const double* sc = coefs + 2 * segment; // segment coefs
+  return sc[0] * x + sc[1];
+}
+
 double* control_params_single_config(
   const ArPragueSkyModelState  * state,
   int                     elevation,
@@ -722,6 +740,29 @@ double reconstruct(
   return M_MAX(res,0.);
 }
 
+double reconstruct2(
+  const ArPragueSkyModelState  * state,
+  const double                   gamma,
+  const double                   alpha,
+  const double                   zero,
+  const int                      gamma_segment,
+  const int                      alpha_segment,
+  const int                      zero_segment,
+  const double                 * control_params
+)
+{
+  double res = 0;
+  for (int t = 0; t < tensor_components; ++t) {
+	const double sun_val_t = eval_pp2(gamma, gamma_segment, state->sun_breaks, control_params + state->sun_offset + t * state->sun_stride);
+	const double zenith_val_t = eval_pp2(alpha, alpha_segment, state->zenith_breaks, control_params + state->zenith_offset + t * state->zenith_stride);
+	res += sun_val_t * zenith_val_t;
+  }
+  const double emph_val_t = eval_pp2(zero, zero_segment, state->emph_breaks, control_params + state->emph_offset);
+  res *= emph_val_t;
+
+  return M_MAX(res,0.);
+}
+
 double interpolate_elevation(
   const ArPragueSkyModelState  * state,
   double                  elevation,
@@ -731,7 +772,10 @@ double interpolate_elevation(
   int                     wavelength,
   double                  gamma,
   double                  alpha,
-  double                  zero
+  double                  zero,
+  int                     gamma_segment,
+  int                     alpha_segment,
+  int                     zero_segment
 )
 {
   const int elevation_low = (int)elevation;
@@ -745,11 +789,14 @@ double interpolate_elevation(
     albedo,
     wavelength);
 
-  double res_low = reconstruct(
+  double res_low = reconstruct2(
     state,
     gamma,
     alpha,
     zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
     control_params_low);    
 
   if (factor < 1e-6 || elevation_low >= (elevations - 1))
@@ -765,11 +812,14 @@ double interpolate_elevation(
     albedo,
     wavelength);
 
-  double res_high = reconstruct(
+  double res_high = reconstruct2(
     state,
     gamma,
     alpha,
     zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
     control_params_high); 
 
   return lerp(res_low, res_high, factor);
@@ -784,7 +834,10 @@ double interpolate_altitude(
   int                     wavelength,
   double                  gamma,
   double                  alpha,
-  double                  zero
+  double                  zero,
+  int                     gamma_segment,
+  int                     alpha_segment,
+  int                     zero_segment
 )
 {
   const int altitude_low = (int)altitude;
@@ -799,7 +852,10 @@ double interpolate_altitude(
     wavelength,
     gamma,
     alpha,
-    zero);    
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment);
 
   if (factor < 1e-6 || altitude_low >= (altitudes - 1))
   {
@@ -815,7 +871,10 @@ double interpolate_altitude(
     wavelength,
     gamma,
     alpha,
-    zero); 
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment);
 
   return lerp(res_low, res_high, factor);
 }
@@ -829,7 +888,10 @@ double interpolate_turbidity(
   int                     wavelength,
   double                  gamma,
   double                  alpha,
-  double                  zero
+  double                  zero,
+  int                     gamma_segment,
+  int                     alpha_segment,
+  int                     zero_segment
 )
 {
   // Ignore turbidity
@@ -843,7 +905,10 @@ double interpolate_turbidity(
     wavelength,
     gamma,
     alpha,
-    zero);
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment);
 }
 
 double interpolate_albedo(
@@ -855,7 +920,10 @@ double interpolate_albedo(
   int                     wavelength,
   double                  gamma,
   double                  alpha,
-  double                  zero
+  double                  zero,
+  int                     gamma_segment,
+  int                     alpha_segment,
+  int                     zero_segment
 )
 {
   const int albedo_low = (int)albedo;
@@ -870,7 +938,10 @@ double interpolate_albedo(
     wavelength,
     gamma,
     alpha,
-    zero);    
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment);
 
   if (factor < 1e-6 || albedo_low >= (albedos - 1))
   {
@@ -886,7 +957,10 @@ double interpolate_albedo(
     wavelength,
     gamma,
     alpha,
-    zero); 
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment);
 
   return lerp(res_low, res_high, factor);
 }
@@ -900,7 +974,10 @@ double interpolate_wavelength(
   double                  wavelength,
   double                  gamma,
   double                  alpha,
-  double                  zero
+  double                  zero,
+  int                     gamma_segment,
+  int                     alpha_segment,
+  int                     zero_segment
 )
 {
   // Don't interpolate, use the bin it belongs to
@@ -914,7 +991,10 @@ double interpolate_wavelength(
     (int)wavelength,
     gamma,
     alpha,
-    zero);
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment);
 }
 
 double arpragueskymodel_radiance(
@@ -994,6 +1074,11 @@ double arpragueskymodel_radiance(
   // Get params corresponding to the indices, reconstruct result and interpolate
 
   const double alpha = elevation < 0 ? shadow : zero;
+
+  const int gamma_segment = find_segment(gamma, state->sun_nbreaks, state->sun_breaks);
+  const int alpha_segment = find_segment(alpha, state->zenith_nbreaks, state->zenith_breaks);
+  const int zero_segment = find_segment(zero, state->emph_nbreaks, state->emph_breaks);
+
   return interpolate_wavelength(
     state,
     elevation_control,
@@ -1003,7 +1088,10 @@ double arpragueskymodel_radiance(
     channel,
     gamma,
     alpha,
-    zero);
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment);
 
   /*const int albedo_low = (int)albedo_control;
   //const double factor = albedo_control - (double)albedo_low;
@@ -1092,6 +1180,393 @@ double arpragueskymodel_radiance(
   //debugprintf("res1: %f, res2: %f, factor: %f", res, res2, factor);
 
   //return lerp(res, res2, factor);
+}
+
+void lerp_hero(const ART_GV * art_gv, ArSpectralSample * from, ArSpectralSample * to, const double factor, ArSpectralSample * result)
+{
+  sps_d_mul_s(art_gv, 1.0 - factor, from);
+  sps_d_mul_s(art_gv, factor, to);
+  sps_ss_add_s(art_gv, from, to, result);
+}
+
+void interpolate_elevation_hero(
+  const ART_GV                 * art_gv,
+  const ArPragueSkyModelState  * state,
+  const double                  elevation,
+  const int                     altitude,
+  const int                     turbidity,
+  const int                     albedo,
+  const ArSpectralSample      * wavelength,
+  const double                  gamma,
+  const double                  alpha,
+  const double                  zero,
+  const int                     gamma_segment,
+  const int                     alpha_segment,
+  const int                     zero_segment,
+        ArSpectralSample      * result
+)
+{
+  const int elevation_low = (int)elevation;
+  const double factor = elevation - (double)elevation_low;
+
+  ArSpectralSample res_low;
+  for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+  {
+    double* control_params_low = control_params_single_config(
+      state,
+      elevation_low,
+      altitude,
+      turbidity,
+      albedo,
+      (int)SPS_CI(*wavelength, i));
+
+    SPS_CI(res_low, i) = reconstruct2(
+      state,
+      gamma,
+      alpha,
+      zero,
+      gamma_segment,
+      alpha_segment,
+      zero_segment,
+      control_params_low);
+  }
+
+  if (factor < 1e-6 || elevation_low >= (elevations - 1))
+  {
+    sps_s_init_s(art_gv, &res_low, result);
+    return;
+  }
+
+  ArSpectralSample res_high;
+  for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+  {
+    double* control_params_high = control_params_single_config(
+      state,
+      elevation_low+1,
+      altitude,
+      turbidity,
+      albedo,
+      (int)SPS_CI(*wavelength, i));
+
+    SPS_CI(res_high, i) = reconstruct2(
+      state,
+      gamma,
+      alpha,
+      zero,
+      gamma_segment,
+      alpha_segment,
+      zero_segment,
+      control_params_high);
+  }
+
+  lerp_hero(art_gv, &res_low, &res_high, factor, result);
+}
+
+void interpolate_altitude_hero(
+  const ART_GV                * art_gv,
+  const ArPragueSkyModelState * state,
+  const double                  elevation,
+  const double                  altitude,
+  const int                     turbidity,
+  const int                     albedo,
+  const ArSpectralSample      * wavelength,
+  const double                  gamma,
+  const double                  alpha,
+  const double                  zero,
+  const int                     gamma_segment,
+  const int                     alpha_segment,
+  const int                     zero_segment,
+        ArSpectralSample      * result
+)
+{
+  const int altitude_low = (int)altitude;
+  const double factor = altitude - (double)altitude_low;
+
+  ArSpectralSample res_low;
+  interpolate_elevation_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude_low,
+    turbidity,
+    albedo,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    &res_low);
+
+  if (factor < 1e-6 || altitude_low >= (altitudes - 1))
+  {
+    sps_s_init_s(art_gv, &res_low, result);
+    return;
+  }
+
+  ArSpectralSample res_high;
+  interpolate_elevation_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude_low + 1,
+    turbidity,
+    albedo,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    &res_high);
+
+  lerp_hero(art_gv, &res_low, &res_high, factor, result);
+}
+
+void interpolate_turbidity_hero(
+  const ART_GV                * art_gv,
+  const ArPragueSkyModelState * state,
+  const double                  elevation,
+  const double                  altitude,
+  const double                  turbidity,
+  const int                     albedo,
+  const ArSpectralSample      * wavelength,
+  const double                  gamma,
+  const double                  alpha,
+  const double                  zero,
+  const int                     gamma_segment,
+  const int                     alpha_segment,
+  const int                     zero_segment,
+        ArSpectralSample      * result
+)
+{
+  // Ignore turbidity
+
+  interpolate_altitude_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude,
+    (int)turbidity,
+    albedo,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    result);
+}
+
+void interpolate_albedo_hero(
+  const ART_GV                * art_gv,
+  const ArPragueSkyModelState * state,
+  const double                  elevation,
+  const double                  altitude,
+  const double                  turbidity,
+  const double                  albedo,
+  const ArSpectralSample      * wavelength,
+  const double                  gamma,
+  const double                  alpha,
+  const double                  zero,
+  const int                     gamma_segment,
+  const int                     alpha_segment,
+  const int                     zero_segment,
+        ArSpectralSample      * result
+)
+{
+  const int albedo_low = (int)albedo;
+  const double factor = albedo - (double)albedo_low;
+
+  ArSpectralSample res_low;
+  interpolate_turbidity_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude,
+    turbidity,
+    albedo_low,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    &res_low);
+
+  if (factor < 1e-6 || albedo_low >= (albedos - 1))
+  {
+    sps_s_init_s(art_gv, &res_low, result);
+    return;
+  }
+
+  ArSpectralSample res_high;
+  interpolate_turbidity_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude,
+    turbidity,
+    albedo_low + 1,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    &res_high);
+
+  lerp_hero(art_gv, &res_low, &res_high, factor, result);
+}
+
+void interpolate_wavelength_hero(
+  const ART_GV                * art_gv,
+  const ArPragueSkyModelState * state,
+  const double                  elevation,
+  const double                  altitude,
+  const double                  turbidity,
+  const double                  albedo,
+  const ArSpectralSample      * wavelength,
+  const double                  gamma,
+  const double                  alpha,
+  const double                  zero,
+  const int                     gamma_segment,
+  const int                     alpha_segment,
+  const int                     zero_segment,
+        ArSpectralSample      * result
+)
+{
+  // Don't interpolate, we will use the respective bins the wavelengths belong to
+
+  interpolate_albedo_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude,
+    turbidity,
+    albedo,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    result);
+}
+
+void arpragueskymodel_radiance_hero(
+        const ART_GV                 * art_gv,
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   gamma,
+        const double                   shadow,
+        const double                   zero,
+        const double                   elevation,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   albedo,
+        const ArWavelength           * wavelength,
+              ArSpectralSample       * result
+        )
+{
+  // Translate parameter values to indices
+
+  double altitude_control;
+  if (altitude < altitude_vals[0])
+  {
+     altitude_control = 0;
+  }
+  else if (altitude > altitude_vals[altitudes - 1])
+  {
+     altitude_control = altitudes - 1;
+  }
+  else
+  {
+     for (int a = 1; a < altitudes; ++a)
+     {
+	double val = altitude_vals[a];
+        if (fabs(altitude - val) < 1e-6)
+        {
+           altitude_control = a;
+           break;
+        }
+	else if (altitude < val)
+        {
+	   altitude_control = a - ((val - altitude) / (val - altitude_vals[a - 1]));
+           break;
+        }
+     }
+  }
+
+  double elevation_control;
+  if (elevation < elevation_vals[0])
+  {
+     elevation_control = 0;
+  }
+  else if (elevation > elevation_vals[elevations - 1])
+  {
+     elevation_control = elevations - 1;
+  }
+  else
+  {
+     for (int e = 1; e < elevations; ++e)
+     {
+        double val = elevation_vals[e];
+        if (fabs(elevation - val) < 1e-6)
+        {
+           elevation_control = e;
+           break;
+        }
+	else if (elevation < val)
+        {
+	   elevation_control = e - ((val - elevation) / (val - elevation_vals[e - 1]));
+           break;
+        }
+     }
+  }
+
+  const double albedo_control = albedo * (albedos - 1);
+
+  ArSpectralSample channel;
+  sps_s_init_s(art_gv, wavelength, &channel);
+  sps_d_mul_s(art_gv, 1.0E9, &channel);
+  sps_d_add_s(art_gv, -320.0, &channel);
+  sps_d_mul_s(art_gv, 1.0 / 40.0, &channel);
+  if (sps_s_max(art_gv, &channel) >= 11. || sps_s_min(art_gv, &channel) < 0.)
+  {
+    sps_d_init_s(art_gv, 0, result);
+    return;
+  }
+
+  // Get params corresponding to the indices, reconstruct result and interpolate
+
+  const double alpha = elevation < 0 ? shadow : zero;
+
+  const int gamma_segment = find_segment(gamma, state->sun_nbreaks, state->sun_breaks);
+  const int alpha_segment = find_segment(alpha, state->zenith_nbreaks, state->zenith_breaks);
+  const int zero_segment = find_segment(zero, state->emph_nbreaks, state->emph_breaks);
+
+  interpolate_wavelength_hero(
+    art_gv,
+    state,
+    elevation_control,
+    altitude_control,
+    turbidity,
+    albedo_control,
+    &channel,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    result);
 }
 
 const double psm_originalSolarRadianceTable[] =
@@ -1415,8 +1890,10 @@ double arpragueskymodel_tau(
 )
 {
 
-	const double wavelength_norm = (wavelength - 340.0) / 40.0;
-	if (wavelength_norm > 10. || wavelength_norm < 0.)
+	//const double wavelength_norm = (wavelength - 340.0) / 40.0;
+	//if (wavelength_norm > 10. || wavelength_norm < 0.)
+        const double wavelength_norm = (wavelength - 320.0) / 40.0;
+        if (wavelength_norm >= 11. || wavelength_norm < 0.)
 		return 0.;
 	const int wavelength_low = (int)wavelength_norm;
 	const double wavelength_factor = wavelength_norm - (double)wavelength_low;
@@ -1442,6 +1919,51 @@ double arpragueskymodel_tau(
 	return trans;
 }
 
+void arpragueskymodel_tau_hero(
+        const ART_GV                 * art_gv,
+	const ArPragueSkyModelState  * state,
+	const double                   theta,
+	const double                   altitude,
+        const double                   turbidity,
+        const ArWavelength           * wavelength,
+        const double                   distance,
+              ArSpectralSample       * result
+)
+{
+	const double altitude_norm = 20.0 * cbrt(altitude / 15000.0);
+	const int altitude_low = (int)altitude_norm;
+	const double altitude_factor = altitude_norm - (double)altitude_low;
+	const int altitude_inc = altitude_low < 20 ? 1 : 0;
+
+	// Calculate normalized and non-linearly scaled position in the atmosphere
+	double a;
+	double d;
+	arpragueskymodel_toAD(theta, distance, altitude, &a, &d);
+
+        for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        {
+           //const double wavelength_norm = (ARWL_WI(*wavelength, i) * 1E9 - 340.0) / 40.0;
+	   //if (wavelength_norm > 10. || wavelength_norm < 0.)
+           const double wavelength_norm = (NANO_FROM_UNIT(ARWL_WI(*wavelength, i)) - 320.0) / 40.0;
+	   if (wavelength_norm >= 11. || wavelength_norm < 0.)
+           {
+               debugprintf("wavelength %d out of range: %f", i, wavelength_norm);
+               sps_d_init_s(art_gv, 0, result);
+               return;
+           }
+	   const int wavelength_low = (int)wavelength_norm;
+	   const double wavelength_factor = wavelength_norm - (double)wavelength_low;
+           const int wavelength_inc = wavelength_low < 10 ? 1 : 0;
+
+	   // Interpolate basis coefficients
+	   float interpolatedCoefs[transsvdrank];
+	   arpragueskymodel_transmittanceInterpolateAltitude(state, altitude_low, altitude_inc, altitude_factor, wavelength_low, wavelength_inc, wavelength_factor, interpolatedCoefs);
+
+	   // Evaluate basis
+	   SPS_CI(*result, i) = arpragueskymodel_calc_transmittance_svd(state, a, d, interpolatedCoefs);
+        }
+}
+
 double* control_params_single_config_pol(
   const ArPragueSkyModelState  * state,
   int                     elevation,
@@ -1455,7 +1977,7 @@ double* control_params_single_config_pol(
   return state->polarisation_dataset[wavelength] + state->total_coefs_single_config_pol * (elevation + elevations*altitude + elevations*altitudes*albedo);
 }
 
-double reconstruct_pol(
+/*double reconstruct_pol(
   const ArPragueSkyModelState  * state,
   double                         gamma,
   double                         alpha,
@@ -1470,6 +1992,24 @@ double reconstruct_pol(
   }
 
   return res;
+}*/
+
+double reconstruct_pol2(
+  const ArPragueSkyModelState  * state,
+  double                         gamma,
+  double                         alpha,
+  int                            gamma_segment,
+  int                            alpha_segment,
+  double*                        control_params
+)
+{
+  double res = 0;
+  for (int t = 0; t < tensor_components_pol; ++t) {
+	const double sun_val_t = eval_pp2(gamma, gamma_segment, state->sun_breaks_pol, control_params + state->sun_offset_pol + t * state->sun_stride_pol);
+	const double zenith_val_t = eval_pp2(alpha, alpha_segment, state->zenith_breaks_pol, control_params + state->zenith_offset_pol + t * state->zenith_stride_pol);
+	res += sun_val_t * zenith_val_t;
+  }
+  return res;
 }
 
 double interpolate_elevation_pol(
@@ -1480,7 +2020,9 @@ double interpolate_elevation_pol(
   int                     albedo,
   int                     wavelength,
   double                  gamma,
-  double                  alpha
+  double                  alpha,
+  int                     gamma_segment,
+  int                     alpha_segment
 )
 {
   const int elevation_low = (int)elevation;
@@ -1494,11 +2036,19 @@ double interpolate_elevation_pol(
     albedo,
     wavelength);
 
-  double res_low = reconstruct_pol(
+  /*double res_low = reconstruct_pol(
     state,
     gamma,
     alpha,
-    control_params_low);    
+    control_params_low);*/
+
+  double res_low = reconstruct_pol2(
+    state,
+    gamma,
+    alpha,
+    gamma_segment,
+    alpha_segment,
+    control_params_low);
 
   if (factor < 1e-6 || elevation_low >= (elevations - 1))
   {
@@ -1513,11 +2063,19 @@ double interpolate_elevation_pol(
     albedo,
     wavelength);
 
-  double res_high = reconstruct_pol(
+  /*double res_high = reconstruct_pol(
     state,
     gamma,
     alpha,
-    control_params_high); 
+    control_params_high);*/
+
+  double res_high = reconstruct_pol2(
+    state,
+    gamma,
+    alpha,
+    gamma_segment,
+    alpha_segment,
+    control_params_high);
 
   return lerp(res_low, res_high, factor);
 }
@@ -1530,7 +2088,9 @@ double interpolate_altitude_pol(
   int                     albedo,
   int                     wavelength,
   double                  gamma,
-  double                  alpha
+  double                  alpha,
+  int                     gamma_segment,
+  int                     alpha_segment
 )
 {
   const int altitude_low = (int)altitude;
@@ -1544,7 +2104,9 @@ double interpolate_altitude_pol(
     albedo,
     wavelength,
     gamma,
-    alpha);    
+    alpha,
+    gamma_segment,
+    alpha_segment);
 
   if (factor < 1e-6 || altitude_low >= (altitudes - 1))
   {
@@ -1559,7 +2121,9 @@ double interpolate_altitude_pol(
     albedo,
     wavelength,
     gamma,
-    alpha); 
+    alpha,
+    gamma_segment,
+    alpha_segment);
 
   return lerp(res_low, res_high, factor);
 }
@@ -1572,7 +2136,9 @@ double interpolate_turbidity_pol(
   int                     albedo,
   int                     wavelength,
   double                  gamma,
-  double                  alpha
+  double                  alpha,
+  int                     gamma_segment,
+  int                     alpha_segment
 )
 {
   // Ignore turbidity
@@ -1585,7 +2151,9 @@ double interpolate_turbidity_pol(
     albedo,
     wavelength,
     gamma,
-    alpha);
+    alpha,
+    gamma_segment,
+    alpha_segment);
 }
 
 double interpolate_albedo_pol(
@@ -1596,7 +2164,9 @@ double interpolate_albedo_pol(
   double                  albedo,
   int                     wavelength,
   double                  gamma,
-  double                  alpha
+  double                  alpha,
+  int                     gamma_segment,
+  int                     alpha_segment
 )
 {
   const int albedo_low = (int)albedo;
@@ -1610,7 +2180,9 @@ double interpolate_albedo_pol(
     albedo_low,
     wavelength,
     gamma,
-    alpha);    
+    alpha,
+    gamma_segment,
+    alpha_segment);
 
   if (factor < 1e-6 || albedo_low >= (albedos - 1))
   {
@@ -1625,7 +2197,9 @@ double interpolate_albedo_pol(
     albedo_low + 1,
     wavelength,
     gamma,
-    alpha); 
+    alpha,
+    gamma_segment,
+    alpha_segment);
 
   return lerp(res_low, res_high, factor);
 }
@@ -1638,7 +2212,9 @@ double interpolate_wavelength_pol(
   double                  albedo,
   double                  wavelength,
   double                  gamma,
-  double                  alpha
+  double                  alpha,
+  int                     gamma_segment,
+  int                     alpha_segment
 )
 {
   // Don't interpolate, use the bin it belongs to
@@ -1651,7 +2227,9 @@ double interpolate_wavelength_pol(
     albedo,
     (int)wavelength,
     gamma,
-    alpha);
+    alpha,
+    gamma_segment,
+    alpha_segment);
 }
 
 double arpragueskymodel_polarisation(
@@ -1724,7 +2302,10 @@ double arpragueskymodel_polarisation(
   const double albedo_control = albedo * (albedos - 1);
 
   const double channel = (wavelength - 320.0) / 40.0;
-  if ( channel >= 11. || channel < 0.) return 0.; 
+  if ( channel >= 11. || channel < 0.) return 0.;
+
+  const int gamma_segment = find_segment(gamma, state->sun_nbreaks_pol, state->sun_breaks_pol);
+  const int theta_segment = find_segment(theta, state->zenith_nbreaks_pol, state->zenith_breaks_pol);
 
   // Get params corresponding to the indices, reconstruct result and interpolate
 
@@ -1736,7 +2317,387 @@ double arpragueskymodel_polarisation(
     albedo_control,
     channel,
     gamma,
-    theta);
+    theta,
+    gamma_segment,
+    theta_segment);
+}
+
+void interpolate_elevation_pol_hero(
+  const ART_GV                 * art_gv,
+  const ArPragueSkyModelState  * state,
+  const double                  elevation,
+  const int                     altitude,
+  const int                     turbidity,
+  const int                     albedo,
+  const ArSpectralSample      * wavelength,
+  const double                  gamma,
+  const double                  alpha,
+  const double                  zero,
+  const int                     gamma_segment,
+  const int                     alpha_segment,
+  const int                     zero_segment,
+        ArSpectralSample      * result
+)
+{
+  const int elevation_low = (int)elevation;
+  const double factor = elevation - (double)elevation_low;
+
+  ArSpectralSample res_low;
+  for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+  {
+    double* control_params_low = control_params_single_config_pol(
+      state,
+      elevation_low,
+      altitude,
+      turbidity,
+      albedo,
+      (int)SPS_CI(*wavelength, i));
+
+    SPS_CI(res_low, i) = reconstruct_pol2(
+      state,
+      gamma,
+      alpha,
+      gamma_segment,
+      alpha_segment,
+      control_params_low);
+  }
+
+  if (factor < 1e-6 || elevation_low >= (elevations - 1))
+  {
+    sps_s_init_s(art_gv, &res_low, result);
+    return;
+  }
+
+  ArSpectralSample res_high;
+  for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+  {
+    double* control_params_high = control_params_single_config_pol(
+      state,
+      elevation_low+1,
+      altitude,
+      turbidity,
+      albedo,
+      (int)SPS_CI(*wavelength, i));
+
+    SPS_CI(res_high, i) = reconstruct_pol2(
+      state,
+      gamma,
+      alpha,
+      gamma_segment,
+      alpha_segment,
+      control_params_high);
+  }
+
+  lerp_hero(art_gv, &res_low, &res_high, factor, result);
+}
+
+void interpolate_altitude_pol_hero(
+  const ART_GV                * art_gv,
+  const ArPragueSkyModelState * state,
+  const double                  elevation,
+  const double                  altitude,
+  const int                     turbidity,
+  const int                     albedo,
+  const ArSpectralSample      * wavelength,
+  const double                  gamma,
+  const double                  alpha,
+  const double                  zero,
+  const int                     gamma_segment,
+  const int                     alpha_segment,
+  const int                     zero_segment,
+        ArSpectralSample      * result
+)
+{
+  const int altitude_low = (int)altitude;
+  const double factor = altitude - (double)altitude_low;
+
+  ArSpectralSample res_low;
+  interpolate_elevation_pol_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude_low,
+    turbidity,
+    albedo,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    &res_low);
+
+  if (factor < 1e-6 || altitude_low >= (altitudes - 1))
+  {
+    sps_s_init_s(art_gv, &res_low, result);
+    return;
+  }
+
+  ArSpectralSample res_high;
+  interpolate_elevation_pol_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude_low + 1,
+    turbidity,
+    albedo,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    &res_high);
+
+  lerp_hero(art_gv, &res_low, &res_high, factor, result);
+}
+
+void interpolate_turbidity_pol_hero(
+  const ART_GV                * art_gv,
+  const ArPragueSkyModelState * state,
+  const double                  elevation,
+  const double                  altitude,
+  const double                  turbidity,
+  const int                     albedo,
+  const ArSpectralSample      * wavelength,
+  const double                  gamma,
+  const double                  alpha,
+  const double                  zero,
+  const int                     gamma_segment,
+  const int                     alpha_segment,
+  const int                     zero_segment,
+        ArSpectralSample      * result
+)
+{
+  // Ignore turbidity
+
+  interpolate_altitude_pol_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude,
+    (int)turbidity,
+    albedo,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    result);
+}
+
+void interpolate_albedo_pol_hero(
+  const ART_GV                * art_gv,
+  const ArPragueSkyModelState * state,
+  const double                  elevation,
+  const double                  altitude,
+  const double                  turbidity,
+  const double                  albedo,
+  const ArSpectralSample      * wavelength,
+  const double                  gamma,
+  const double                  alpha,
+  const double                  zero,
+  const int                     gamma_segment,
+  const int                     alpha_segment,
+  const int                     zero_segment,
+        ArSpectralSample      * result
+)
+{
+  const int albedo_low = (int)albedo;
+  const double factor = albedo - (double)albedo_low;
+
+  ArSpectralSample res_low;
+  interpolate_turbidity_pol_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude,
+    turbidity,
+    albedo_low,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    &res_low);
+
+  if (factor < 1e-6 || albedo_low >= (albedos - 1))
+  {
+    sps_s_init_s(art_gv, &res_low, result);
+    return;
+  }
+
+  ArSpectralSample res_high;
+  interpolate_turbidity_pol_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude,
+    turbidity,
+    albedo_low + 1,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    &res_high);
+
+  lerp_hero(art_gv, &res_low, &res_high, factor, result);
+}
+
+void interpolate_wavelength_pol_hero(
+  const ART_GV                * art_gv,
+  const ArPragueSkyModelState * state,
+  const double                  elevation,
+  const double                  altitude,
+  const double                  turbidity,
+  const double                  albedo,
+  const ArSpectralSample      * wavelength,
+  const double                  gamma,
+  const double                  alpha,
+  const double                  zero,
+  const int                     gamma_segment,
+  const int                     alpha_segment,
+  const int                     zero_segment,
+        ArSpectralSample      * result
+)
+{
+  // Don't interpolate, we will use the respective bins the wavelengths belong to
+
+  interpolate_albedo_pol_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude,
+    turbidity,
+    albedo,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    result);
+}
+
+void arpragueskymodel_polarisation_hero(
+        const ART_GV                 * art_gv,
+        const ArPragueSkyModelState  * state,
+        const double                   theta,
+        const double                   gamma,
+        const double                   elevation,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   albedo,
+        const ArWavelength           * wavelength,
+              ArSpectralSample       * result
+        )
+{
+  // Translate parameter values to indices
+
+  double altitude_control;
+  if (altitude < altitude_vals[0])
+  {
+     altitude_control = 0;
+  }
+  else if (altitude > altitude_vals[altitudes - 1])
+  {
+     altitude_control = altitudes - 1;
+  }
+  else
+  {
+     for (int a = 1; a < altitudes; ++a)
+     {
+	double val = altitude_vals[a];
+        if (fabs(altitude - val) < 1e-6)
+        {
+           altitude_control = a;
+           break;
+        }
+	else if (altitude < val)
+        {
+	   altitude_control = a - ((val - altitude) / (val - altitude_vals[a - 1]));
+           break;
+        }
+     }
+  }
+
+  double elevation_control;
+  if (elevation < elevation_vals[0])
+  {
+     elevation_control = 0;
+  }
+  else if (elevation > elevation_vals[elevations - 1])
+  {
+     elevation_control = elevations - 1;
+  }
+  else
+  {
+     for (int e = 1; e < elevations; ++e)
+     {
+        double val = elevation_vals[e];
+        if (fabs(elevation - val) < 1e-6)
+        {
+           elevation_control = e;
+           break;
+        }
+	else if (elevation < val)
+        {
+	   elevation_control = e - ((val - elevation) / (val - elevation_vals[e - 1]));
+           break;
+        }
+     }
+  }
+
+  const double albedo_control = albedo * (albedos - 1);
+
+  ArSpectralSample channel;
+  sps_s_init_s(art_gv, wavelength, &channel);
+  sps_d_mul_s(art_gv, 1.0E9, &channel);
+  sps_d_add_s(art_gv, -320.0, &channel);
+  sps_d_mul_s(art_gv, 1.0 / 40.0, &channel);
+  if (sps_s_max(art_gv, &channel) >= 11. || sps_s_min(art_gv, &channel) < 0.)
+  {
+    sps_d_init_s(art_gv, 0, result);
+    return;
+  }
+
+  const int gamma_segment = find_segment(gamma, state->sun_nbreaks_pol, state->sun_breaks_pol);
+  const int theta_segment = find_segment(theta, state->zenith_nbreaks_pol, state->zenith_breaks_pol);
+
+  // Get params corresponding to the indices, reconstruct result and interpolate
+
+  interpolate_wavelength_pol_hero(
+     art_gv,
+     state,
+     elevation_control,
+     altitude_control,
+     turbidity,
+     albedo_control,
+   & channel,
+     gamma,
+     theta,
+     0,
+     gamma_segment,
+     theta_segment,
+     0,
+    result
+   );
+
+  sps_d_mul_s(
+    art_gv,
+    -1.0,
+    result
+   );
 }
 
 

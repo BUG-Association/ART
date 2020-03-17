@@ -49,6 +49,22 @@ void arpragueskymodel_polarised_light_sample(
               ArLightSample          * result
         );
 
+void arpragueskymodel_polarised_light_sample_hero(
+              ART_GV                 * art_gv,
+        const ArPragueSkyModelState  * state,
+        const double                   sunTheta,
+        const double                   sunPhi,
+        const Vec3D                  * viewDirection,
+        const double                   viewTheta,
+        const double                   viewGamma,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   albedo,
+        const ArWavelength           * wavelength,
+        const ArSpectralSample       * unpolarisedRadiance,
+              ArLightSample          * result
+        );
+
 void arpragueskymodel_spc(
         ART_GV                       * art_gv,
         const ArPragueSkyModelState  * state,

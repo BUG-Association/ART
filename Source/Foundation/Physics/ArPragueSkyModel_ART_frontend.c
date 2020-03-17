@@ -114,6 +114,87 @@ void arpragueskymodel_polarised_light_sample(
         );
 }
 
+void arpragueskymodel_polarised_light_sample_hero(
+              ART_GV                 * art_gv,
+        const ArPragueSkyModelState  * state,
+        const double                   sunTheta,
+        const double                   sunPhi,
+        const Vec3D                  * viewDirection,
+        const double                   viewTheta,
+        const double                   viewGamma,
+        const double                   altitude,
+        const double                   turbidity,
+        const double                   albedo,
+        const ArWavelength           * wavelength,
+        const ArSpectralSample       * unpolarisedRadiance,
+              ArLightSample          * result
+        )
+{
+    Vec3D  sunDir;
+
+    XC(sunDir) =     cos( sunPhi )
+                   * cos( sunTheta );
+    YC(sunDir) =     sin( sunPhi )
+                   * cos( sunTheta );
+    ZC(sunDir) =     sin( sunTheta );
+
+    Vec3D  base1;
+
+    vec3d_dv_mul_v( -1.0, viewDirection, & base1 );
+
+    Vec3D  base2;
+
+    vec3d_vv_cross_v( & base1, & sunDir, & base2 );
+
+    Vec3D  base3;
+
+    vec3d_vv_cross_v( & base1, & base2, & base3 );
+
+    ArSpectralSample dop;
+    arpragueskymodel_polarisation_hero(
+          art_gv,
+          state,
+          viewTheta,
+          viewGamma,
+          sunTheta,
+          altitude,
+          turbidity,
+          albedo,
+          wavelength,
+        & dop
+        );
+
+    ArSpectralSample linearPolarisation;
+    sps_ss_mul_s(
+          art_gv,
+        & dop,
+          unpolarisedRadiance,
+        & linearPolarisation
+        );
+
+    ArReferenceFrame  referenceFrame;
+
+    ARREFFRAME_RF_I( referenceFrame, 0 ) = base2;
+    ARREFFRAME_RF_I( referenceFrame, 1 ) = base3;
+
+    vec3d_norm_v( & ARREFFRAME_RF_I( referenceFrame, 0 ) );
+    vec3d_norm_v( & ARREFFRAME_RF_I( referenceFrame, 1 ) );
+
+    ArStokesVectorSample  svs;
+
+    ARSVS_I( svs, 0 ) = *unpolarisedRadiance;
+    ARSVS_I( svs, 1 ) = linearPolarisation;
+    ARSVS_I( svs, 2 ) = *SS_ZERO;
+    ARSVS_I( svs, 3 ) = *SS_ZERO;
+
+    arlightsample_s_rf_init_polarised_l(
+          art_gv,
+        & svs,
+        & referenceFrame,
+          result
+        );
+}
+
 void arpragueskymodel_spc(
         ART_GV                       * art_gv,
         const ArPragueSkyModelState  * state,
