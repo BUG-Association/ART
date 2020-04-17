@@ -104,6 +104,58 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
         [self _setupMappedSurface];
 }
 
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) location
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    ArSurfacePhaseCache  cache;
+
+    [ self _getCurrentSurfaceIndex
+        :   location
+        : & cache
+        ];
+
+    double  x = m_d_frac(cache.xf);
+
+    ArSpectralSample  albedo1;
+    ArSpectralSample  albedo2;
+
+    BOOL    resultBOOL1 = NO, resultBOOL2 = NO;
+
+    if ( 1.0 - x > 0.0 )
+    {
+        double  thisAlbedo;
+
+        resultBOOL1 =
+            [ cache.surface1 calculateAlbedoSampleAtWavelength
+                :   location
+                :   wavelength
+                : & albedo1
+                ];
+
+        sps_d_mul_s( art_gv, 1.0 - x, & albedo1 );
+    }
+
+    if ( x > 0.0)
+    {
+        double  thisAlbedo;
+
+        resultBOOL2 =
+            [ cache.surface2 calculateAlbedoSampleAtWavelength
+                :   location
+                :   wavelength
+                : & albedo2
+                ];
+
+        sps_d_mul_s( art_gv, x, & albedo2 );
+    }
+
+    sps_ss_add_s( art_gv, & albedo1, & albedo2, albedo );
+
+    return resultBOOL1 || resultBOOL2;
+}
+
 - (BOOL) calculateSingleConstrainedBSDFSample
         : (      ArcIntersection *) incomingDirectionAndLocation
         : (      ArPathDirection) pathDirection
