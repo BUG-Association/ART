@@ -121,6 +121,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
     ArSpectralSample  albedo1;
     ArSpectralSample  albedo2;
 
+    sps_d_init_s(art_gv, 0, &albedo1);
+    sps_d_init_s(art_gv, 0, &albedo2);
+
     BOOL    resultBOOL1 = NO, resultBOOL2 = NO;
 
     if ( 1.0 - x > 0.0 )
