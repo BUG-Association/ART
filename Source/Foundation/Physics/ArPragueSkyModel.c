@@ -83,10 +83,7 @@ const double altitude_vals[] = { 0, 1.875, 15, 50.625, 120, 234.38, 405, 643.12,
 const int tensor_components = 10;
 const int tensor_components_pol = 4;
 
-#define transsvdrank 32
-const int transmittance_coefs = 5;
-const int transmittance_altitudes = 86;
-int total_transmittance_values = (86 * 101 * transsvdrank) + (transsvdrank * 231);
+const int transsvdrank = 12;
 const double planet_radius = 6378000.0;
 
 ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
@@ -204,13 +201,23 @@ ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
 
     char filenametransmittance[1024];
     
-    sprintf(filenametransmittance, "%s/SkyModel/SVDFit32.dat", library_path);
+    sprintf(filenametransmittance, "%s/SkyModel/Transmittance.dat", library_path);
     
     FILE* handletrans = fopen(filenametransmittance, "rb");
     
-    state->transmission_dataset = ALLOC_ARRAY(float, total_transmittance_values);
-    
-    fread(state->transmission_dataset, sizeof(float), total_transmittance_values, handletrans);
+    fread(&state->trans_n_d, sizeof(int), 1, handletrans);
+    fread(&state->trans_n_a, sizeof(int), 1, handletrans);
+    fread(&state->trans_turbidities, sizeof(int), 1, handletrans);
+    fread(&state->trans_altitudes, sizeof(int), 1, handletrans);
+    fread(&state->trans_rank, sizeof(int), 1, handletrans);
+
+    int transmittance_values_per_turbidity = state->trans_rank * 11 * state->trans_altitudes;
+    int total_transmittance_values = (state->trans_n_d * state->trans_n_a * state->trans_rank * state->trans_altitudes) + (state->trans_turbidities * transmittance_values_per_turbidity);
+
+    state->transmission_dataset_U = ALLOC_ARRAY(float, state->trans_n_d * state->trans_n_a * state->trans_rank * state->trans_altitudes);
+    fread(state->transmission_dataset_U, sizeof(float), state->trans_n_d * state->trans_n_a * state->trans_rank * state->trans_altitudes, handletrans);
+    state->transmission_dataset_V = ALLOC_ARRAY(float, state->trans_turbidities * transmittance_values_per_turbidity);
+    fread(state->transmission_dataset_V, sizeof(float), state->trans_turbidities * transmittance_values_per_turbidity, handletrans);
     
     fclose(handletrans);
 
@@ -233,7 +240,8 @@ void arpragueskymodelstate_free(
         free(state->polarisation_dataset[wl]);
     }
 
-    free(state->transmission_dataset);
+    free(state->transmission_dataset_U);
+    free(state->transmission_dataset_V);
 
     FREE(state);
 }
@@ -1774,105 +1782,129 @@ void arpragueskymodel_toAD(
 	arpragueskymodel_scaleAD(x_p, y_p, a, d);
 }
 
-float *arpragueskymodel_transmittanceCoefsIndex(const ArPragueSkyModelState  * state,
-	int altitude,
-	int wavelength
+float *arpragueskymodel_transmittanceCoefsIndex(
+	const ArPragueSkyModelState  * state,
+	const int turbidity,
+	const int altitude,
+	const int wavelength
 )
 {
-	return &state->transmission_dataset[(transsvdrank * 86 * 101) + (((altitude * 11) + wavelength) * transsvdrank)];
+	int transmittance_values_per_turbidity = state->trans_rank * 11 * state->trans_altitudes;
+	return &state->transmission_dataset_V[(turbidity * transmittance_values_per_turbidity) + (((altitude * 11) + wavelength) * state->trans_rank)];
+}
+
+double clamp0_1(const double x)
+{
+	return (x < 0 ? 0 : (x > 1.0 ? 1.0 : x));
 }
 
 void arpragueskymodel_transmittanceInterpolateWaveLength(
 	const ArPragueSkyModelState  * state,
-	int altitude,
-	int wavelength_low,
-	int wavelength_inc,
-	double wavelength_w,
-	float *coefficients
+	const int turbidity,
+	const int altitude,
+	const int wavelength_low,
+	const int wavelength_inc,
+	const double wavelength_w,
+	double *coefficients
 )
 {
-	float *wll = arpragueskymodel_transmittanceCoefsIndex(state, altitude, wavelength_low);
-	float *wlu = arpragueskymodel_transmittanceCoefsIndex(state, altitude, wavelength_low + wavelength_inc);
-	double iw = 1.0 - wavelength_w;
-	for (int i = 0; i < transsvdrank; i++)
+	float *wll = arpragueskymodel_transmittanceCoefsIndex(state, turbidity, altitude, wavelength_low);
+	float *wlu = arpragueskymodel_transmittanceCoefsIndex(state, turbidity, altitude, wavelength_low + wavelength_inc);
+	for (int i = 0; i < state->trans_rank; i++)
 	{
-		coefficients[i] = (wll[i] * iw) + (wlu[i] * wavelength_w);
+		coefficients[i] = lerp(wll[i], wlu[i], wavelength_w);
 	}
 }
 
-void arpragueskymodel_transmittanceInterpolateAltitude(
-	const ArPragueSkyModelState  * state,
-	int altitude_low,
-	int altitude_inc,
-	double altitude_weight,
-	int wavelength_low,
-	int wavelength_inc,
-	double wavelength_w,
-	float *coefficients
-)
-{
-	float au[transsvdrank];
-	float al[transsvdrank];
-	arpragueskymodel_transmittanceInterpolateWaveLength(state, altitude_low, wavelength_low, wavelength_inc, wavelength_w, al);
-	arpragueskymodel_transmittanceInterpolateWaveLength(state, altitude_low + altitude_inc, wavelength_low, wavelength_inc, wavelength_w, au);
-	double iw = 1.0 - altitude_weight;
-	for (int i = 0; i < transsvdrank; i++)
-	{
-		coefficients[i] = (al[i] * iw) + (au[i] * altitude_weight);
-	}
-}
-
-double arpragueskymodel_calc_transmittance_svd(const ArPragueSkyModelState  * state, double a, double d, float *interpolated_coefficients)
+double arpragueskymodel_calc_transmittance_svd_altitude(
+	const ArPragueSkyModelState *state,
+	const int turbidity,
+	const int altitude,
+	const int wavelength_low,
+	const int wavelength_inc,
+	const double wavelength_factor,
+	const int a_int,
+	const int d_int,
+	const int a_inc,
+	const int d_inc,
+	const double wa,
+	const double wd)
 {
 	float t[4] = { 0.0, 0.0, 0.0, 0.0 };
-	int aa = (int)floor(a * 86.0);
-	int da = (int)floor(d * 101.0);
-	int aainc = 0;
-	int dainc = 0;
-	if (aa < 85)
-	{
-		aainc = 1;
-	} else
-	{
-		aa = 85;
-	}
-	if (da < 100)
-	{
-		dainc = 1;
-	} else
-	{
-		da = 100;
-	}
-	// TODO: Interpolate in actual space rather than pow space. This will make interpolation more accurate
-	double wa = (a * 86.0) - (double)aa;
-	double wd = (d * 101.0) - (double)da;
+	double interpolated_coefficients[transsvdrank];
+	arpragueskymodel_transmittanceInterpolateWaveLength(state, turbidity, altitude, wavelength_low, wavelength_inc, wavelength_factor, interpolated_coefficients);
 	int index = 0;
-	for (int al = aa; al <= aa + aainc; al++)
+	// Calculate pow space values
+	for (int al = a_int; al <= a_int + a_inc; al++)
 	{
-		for (int dl = da; dl <= da + dainc; dl++)
+		for (int dl = d_int; dl <= d_int + d_inc; dl++)
 		{
-			for (int i = 0; i < transsvdrank; i++)
+			for (int i = 0; i < state->trans_rank; i++)
 			{
-				t[index] = t[index] + (state->transmission_dataset[(((dl * 86) + al) * transsvdrank) + i] * interpolated_coefficients[i]);
+				t[index] = t[index] + (state->transmission_dataset_U[(altitude * state->trans_n_a * state->trans_n_d * state->trans_rank) + (((dl * state->trans_n_a) + al) * state->trans_rank) + i] * interpolated_coefficients[i]);
 			}
 			index++;
 		}
 	}
-	if (dainc == 1)
+	if (d_inc == 1)
 	{
-		t[0] = (t[0] * (1.0 - wd)) + (t[1] * wd);
-		t[1] = (t[2] * (1.0 - wd)) + (t[3] * wd);
+		t[0] = lerp(t[0], t[1], wd);
+		t[1] = lerp(t[2], t[3], wd);
 	}
-	t[0] = t[0] < 0 ? 0 : t[0];
-	t[0] = t[0] > 1.0 ? 1.0 : t[0];
-	if (aainc == 1)
+	if (a_inc == 1)
 	{
-		t[1] = t[1] < 0 ? 0 : t[1];
-		t[1] = t[1] > 1.0 ? 1.0 : t[1];
-		t[0] = (t[0] * (1.0 - wa)) + (t[1] * wa);
+		t[0] = lerp(t[0], t[1], wa);
 	}
-	t[0] = t[0] * t[0] * t[0];
 	return t[0];
+}
+
+double arpragueskymodel_calc_transmittance_svd(
+	const ArPragueSkyModelState *state,
+	const double a,
+	const double d,
+	const int turbidity,
+	const int wavelength_low,
+	const int wavelength_inc,
+	const double wavelength_factor,
+	const int altitude_low,
+	const int altitude_inc,
+	const double altitude_factor)
+{
+	float t[4] = { 0.0, 0.0, 0.0, 0.0 };
+	int a_int = (int)floor(a * (double)state->trans_n_a);
+	int d_int = (int)floor(d * (double)state->trans_n_d);
+	int a_inc = 0;
+	int d_inc = 0;
+	double wa = (a * (double)state->trans_n_a) - (double)a_int;
+	double wd = (d * (double)state->trans_n_d) - (double)d_int;
+	if (a_int < (state->trans_n_a - 1))
+	{
+		a_inc = 1;
+	} else
+	{
+		a_int = state->trans_n_a - 1;
+		wa = 0;
+	}
+	if (d_int < (state->trans_n_d - 1))
+	{
+		d_inc = 1;
+	} else
+	{
+		d_int = state->trans_n_d - 1;
+		wd = 0;
+	}
+	wa = wa < 0 ? 0 : wa;
+	wa = wa > 1.0 ? 1.0 : wa;
+	wd = wd < 0 ? 0 : wd;
+	wd = wd > 1.0 ? 1.0 : wd;
+	double trans[2];
+	trans[0] = arpragueskymodel_calc_transmittance_svd_altitude(state, turbidity, altitude_low, wavelength_low, wavelength_inc, wavelength_factor, a_int, d_int, a_inc, d_inc, wa, wd);
+	if (altitude_inc == 1)
+	{
+		trans[1] = arpragueskymodel_calc_transmittance_svd_altitude(state, turbidity, altitude_low + altitude_inc, wavelength_low, wavelength_inc, wavelength_factor, a_int, d_int, a_inc, d_inc, wa, wd);
+		trans[0] = lerp(trans[0], trans[1], altitude_factor);
+	}
+	return trans[0];
 }
 
 double cbrt(double x)
@@ -1889,11 +1921,8 @@ double arpragueskymodel_tau(
 	const double                   distance
 )
 {
-
-	//const double wavelength_norm = (wavelength - 340.0) / 40.0;
-	//if (wavelength_norm > 10. || wavelength_norm < 0.)
-        const double wavelength_norm = (wavelength - 320.0) / 40.0;
-        if (wavelength_norm >= 11. || wavelength_norm < 0.)
+	const double wavelength_norm = (wavelength - 340.0) / 40.0;
+	if (wavelength_norm > 10. || wavelength_norm < 0.)
 		return 0.;
 	const int wavelength_low = (int)wavelength_norm;
 	const double wavelength_factor = wavelength_norm - (double)wavelength_low;
@@ -1904,17 +1933,27 @@ double arpragueskymodel_tau(
 	const double altitude_factor = altitude_norm - (double)altitude_low;
 	const int altitude_inc = altitude_low < 20 ? 1 : 0;
 
+        int turb_low = (int)turbidity;
+	turb_low = turb_low < 0 ? 0 : turb_low;
+	turb_low = turb_low >= state->trans_turbidities ? state->trans_turbidities - 1 : turb_low;
+	double turb_w = turbidity - (float)turb_low;
+	int turb_inc = turb_low < (state->trans_turbidities - 1) ? 1 : 0;
+
 	// Calculate normalized and non-linearly scaled position in the atmosphere
 	double a;
 	double d;
 	arpragueskymodel_toAD(theta, distance, altitude, &a, &d);
 
-	// Interpolate basis coefficients
-	float interpolatedCoefs[transsvdrank];
-	arpragueskymodel_transmittanceInterpolateAltitude(state, altitude_low, altitude_inc, altitude_factor, wavelength_low, wavelength_inc, wavelength_factor, interpolatedCoefs);
+        // Evaluate basis at low turbidity
+	double trans_low = arpragueskymodel_calc_transmittance_svd(state, a, d, turb_low, wavelength_low, wavelength_inc, wavelength_factor, altitude_low, altitude_inc, altitude_factor);
+	// Evaluate basis at high turbidity
+	double trans_high = arpragueskymodel_calc_transmittance_svd(state, a, d, turb_low + turb_inc, wavelength_low, wavelength_inc, wavelength_factor, altitude_low, altitude_inc, altitude_factor);
 
-	// Evaluate basis
-	double trans = arpragueskymodel_calc_transmittance_svd(state, a, d, interpolatedCoefs);
+	// Return interpolated transmittance values
+	double trans = lerp(trans_low, trans_high, turb_w);
+
+	trans = clamp0_1(trans);
+	trans = trans * trans;
 
 	return trans;
 }
@@ -1935,6 +1974,12 @@ void arpragueskymodel_tau_hero(
 	const double altitude_factor = altitude_norm - (double)altitude_low;
 	const int altitude_inc = altitude_low < 20 ? 1 : 0;
 
+	int turb_low = (int)turbidity;
+	turb_low = turb_low < 0 ? 0 : turb_low;
+	turb_low = turb_low >= state->trans_turbidities ? state->trans_turbidities - 1 : turb_low;
+	double turb_w = turbidity - (float)turb_low;
+	int turb_inc = turb_low < (state->trans_turbidities - 1) ? 1 : 0;
+
 	// Calculate normalized and non-linearly scaled position in the atmosphere
 	double a;
 	double d;
@@ -1942,25 +1987,28 @@ void arpragueskymodel_tau_hero(
 
         for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
         {
-           //const double wavelength_norm = (ARWL_WI(*wavelength, i) * 1E9 - 340.0) / 40.0;
-	   //if (wavelength_norm > 10. || wavelength_norm < 0.)
-           const double wavelength_norm = (NANO_FROM_UNIT(ARWL_WI(*wavelength, i)) - 320.0) / 40.0;
-	   if (wavelength_norm >= 11. || wavelength_norm < 0.)
+           const double wavelength_norm = (NANO_FROM_UNIT(ARWL_WI(*wavelength, i)) - 340.0) / 40.0;
+	   if (wavelength_norm > 10. || wavelength_norm < 0.)
            {
-               debugprintf("wavelength %d out of range: %f", i, wavelength_norm);
-               sps_d_init_s(art_gv, 0, result);
-               return;
+               SPS_CI(*result, i);
+               continue;
            }
 	   const int wavelength_low = (int)wavelength_norm;
 	   const double wavelength_factor = wavelength_norm - (double)wavelength_low;
            const int wavelength_inc = wavelength_low < 10 ? 1 : 0;
 
-	   // Interpolate basis coefficients
-	   float interpolatedCoefs[transsvdrank];
-	   arpragueskymodel_transmittanceInterpolateAltitude(state, altitude_low, altitude_inc, altitude_factor, wavelength_low, wavelength_inc, wavelength_factor, interpolatedCoefs);
+	   // Evaluate basis at low turbidity
+	   double trans_low = arpragueskymodel_calc_transmittance_svd(state, a, d, turb_low, wavelength_low, wavelength_inc, wavelength_factor, altitude_low, altitude_inc, altitude_factor);
+	   // Evaluate basis at high turbidity
+	   double trans_high = arpragueskymodel_calc_transmittance_svd(state, a, d, turb_low + turb_inc, wavelength_low, wavelength_inc, wavelength_factor, altitude_low, altitude_inc, altitude_factor);
 
-	   // Evaluate basis
-	   SPS_CI(*result, i) = arpragueskymodel_calc_transmittance_svd(state, a, d, interpolatedCoefs);
+	   // Return interpolated transmittance values
+	   double trans = lerp(trans_low, trans_high, turb_w);
+
+	   trans = clamp0_1(trans);
+	   trans = trans * trans;
+
+	   SPS_CI(*result, i) = trans;
         }
 }
 
