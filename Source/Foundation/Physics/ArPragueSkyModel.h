@@ -123,7 +123,13 @@ typedef struct ArPragueSkyModelState
 
         // Tranmittance
 
-	float * transmission_dataset;
+	float * transmission_dataset_U;
+	float * transmission_dataset_V;
+	int     trans_n_a;
+	int     trans_n_d;
+	int     trans_altitudes;
+	int     trans_rank;
+	int     trans_turbidities;
 }
 ArPragueSkyModelState;
 
@@ -227,6 +233,14 @@ void arpragueskymodel_polarisation_hero(
     the direction 'theta' at a wavelength 'wavelength'.
 
 ---------------------------------------------------------------------------- */
+
+void arpragueskymodel_toAD(
+	double theta,
+	double distance,
+	double altitude,
+	double *a,
+	double *d
+);
 
 double arpragueskymodel_tau(
         const ArPragueSkyModelState  * state,
