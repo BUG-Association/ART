@@ -75,12 +75,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef ARPRAGUESKYMODEL_USE_NEW
 
-const int elevations = 24;
-const int altitudes = 21;
+const int elevations = 30;
+const int altitudes = 22;
 const int albedos = 4;
-const double elevation_vals[] = { -0.049742, -0.017453, -0.000175, 0.000000, 0.017453, 0.049742, 0.091281, 0.140499, 0.196350, 0.258134, 0.325329, 0.397411, 0.474206, 0.555364, 0.640710, 0.730071, 0.823097, 0.919963, 1.020319, 1.123992, 1.230981, 1.341111, 1.454557, 1.570796 };
-const double altitude_vals[] = { 0, 1.875, 15, 50.625, 120, 234.38, 405, 643.12, 960, 1366.9, 1875, 2495.6, 3240, 4119.4, 5145, 6328.1, 7680, 9211.9, 10935, 12861, 15000 };
-const int tensor_components = 10;
+const double elevation_vals[] = { -0.073304, -0.069813, -0.061087, -0.052360, -0.043633, -0.034907, -0.026180, -0.017453, -0.008727, 0.000000, 0.017453, 0.049742, 0.091281, 0.140499, 0.196350, 0.258134, 0.325329, 0.397411, 0.474206, 0.555364, 0.640710, 0.730071, 0.823097, 0.919963, 1.020319, 1.123992, 1.230981, 1.341111, 1.454557, 1.570796 };
+const double altitude_vals[] = { 0, 1.875, 15, 50.625, 120, 234.38, 405, 643.12, 960, 1366.9, 1875, 2000, 2495.6, 3240, 4119.4, 5145, 6328.1, 7680, 9211.9, 10935, 12861, 15000 };
+const int tensor_components = 9;
 const int tensor_components_pol = 4;
 
 const int transsvdrank = 12;
@@ -137,7 +137,7 @@ ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
 
 	char filename[1024];
 
-        sprintf(filename, "%s/SkyModel/new_params_t%d_wl%d.dat", library_path, 5, wl+1);
+        sprintf(filename, "%s/SkyModel/new_params_t%d_wl%d.dat", library_path, 2, wl+1);
 
         FILE* handle = fopen(filename, "rb");
 
@@ -1077,7 +1077,7 @@ double arpragueskymodel_radiance(
   const double albedo_control = albedo * (albedos - 1);
 
   const double channel = (wavelength - 320.0) / 40.0;
-  if ( channel >= 11. || channel < 0.) return 0.; 
+  if ( channel >= 11. || channel < 0.) return 0.;
 
   // Get params corresponding to the indices, reconstruct result and interpolate
 
@@ -1990,7 +1990,7 @@ void arpragueskymodel_tau_hero(
            const double wavelength_norm = (NANO_FROM_UNIT(ARWL_WI(*wavelength, i)) - 340.0) / 40.0;
 	   if (wavelength_norm > 10. || wavelength_norm < 0.)
            {
-               SPS_CI(*result, i);
+               SPS_CI(*result, i) = 0;
                continue;
            }
 	   const int wavelength_low = (int)wavelength_norm;
