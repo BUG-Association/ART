@@ -45,28 +45,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //   Some macro definitions that occur elsewhere in ART, and that have to be
 //   replicated to make this a stand-alone module.
 
-#ifndef NULL
-#define NULL                         NULL
-#endif
-
 #ifndef MATH_PI
 #define MATH_PI                     3.141592653589793
 #endif
 
-#ifndef MATH_DEG_TO_RAD
-#define MATH_DEG_TO_RAD             ( MATH_PI / 180.0 )
-#endif
-
 #ifndef MATH_RAD_TO_DEG
 #define MATH_RAD_TO_DEG             ( 180.0 / MATH_PI )
-#endif
-
-#ifndef DEGREES
-#define DEGREES                     * MATH_DEG_TO_RAD
-#endif
-
-#ifndef TERRESTRIAL_SOLAR_RADIUS
-#define TERRESTRIAL_SOLAR_RADIUS    ( ( 0.5334 DEGREES ) / 2.0 )
 #endif
 
 #ifndef ALLOC
@@ -246,8 +230,6 @@ void arpragueskymodelstate_free(
     FREE(state);
 }
 
-#define PLANET_RADIUS       6378000.0 METER
-
 void arpragueskymodel_compute_altitude_and_elevation(
         const Pnt3D   * viewpoint,
         const double    groundLevelSolarElevationAtOrigin,
@@ -257,8 +239,7 @@ void arpragueskymodel_compute_altitude_and_elevation(
               Vec3D   * directionToPlanet
         )
 {
-    Pnt3D  centerOfTheEarth = PNT3D(0,0,-PLANET_RADIUS);
-    //Pnt3D  centerOfTheEarth = PNT3D(0,0,0);
+    Pnt3D  centerOfTheEarth = PNT3D(0,0,-planet_radius);
 
     Vec3D  directionToPlanetCenter;
 
@@ -269,16 +250,9 @@ void arpragueskymodel_compute_altitude_and_elevation(
         );
 
     *altitudeOfViewpoint =
-        fabs( vec3d_v_len( & directionToPlanetCenter) ) - PLANET_RADIUS;
+        fabs( vec3d_v_len( & directionToPlanetCenter) ) - planet_radius;
 
-    // Altitude correction?
-    /*double C_a = fabs(vec3d_v_len( & directionToPlanetCenter)) - PSM_PLANET_RADIUS_SQR / fabs(vec3d_v_len( & directionToPlanetCenter));
-    double a = sqrt( vec3d_v_len( & directionToPlanetCenter) * vec3d_v_len( & directionToPlanetCenter) - PSM_PLANET_RADIUS_SQR );
-    double cosCorrectionAngle = a > 0.0 ? C_a / a : 0.0;
-    // assuming the sun is infinitely far away
-    *solarElevationAtViewpoint = groundLevelSolarElevationAtOrigin + acos(1. - cosCorrectionAngle);*/
-    *solarElevationAtViewpoint = groundLevelSolarElevationAtOrigin; // no correction
-
+    *solarElevationAtViewpoint = groundLevelSolarElevationAtOrigin;
     *altitudeOfViewpoint = M_MAX( *altitudeOfViewpoint, 0.0 );
 
     if(directionToPlanet)
@@ -298,10 +272,8 @@ void arpragueskymodel_compute_angles(
               double  * zero
         )
 {
-    // Altitude correction
+    Pnt3D  centerOfTheEarth = PNT3D(0,0,-planet_radius);
 
-    Pnt3D  centerOfTheEarth = PNT3D(0,0,-PLANET_RADIUS);
-    //Pnt3D  centerOfTheEarth = PNT3D(0,0,0);
     Vec3D  directionToPlanetCenter2;
     vec3d_pp_sub_v(
         & centerOfTheEarth,
@@ -336,12 +308,9 @@ void arpragueskymodel_compute_angles(
     Vec3D  sunDirection;
     XC(sunDirection) =   cos( groundLevelSolarAzimuthAtOrigin )
                        * cos( groundLevelSolarElevationAtOrigin );
-                       //* cos( *solarElevationAtViewpoint );
     YC(sunDirection) =   sin( groundLevelSolarAzimuthAtOrigin )
                        * cos( groundLevelSolarElevationAtOrigin );
-                       //* cos( *solarElevationAtViewpoint );
     ZC(sunDirection) =   sin( groundLevelSolarElevationAtOrigin );
-                         //sin( *solarElevationAtViewpoint );
 
     double  dotProductSun =
         vec3d_vv_dot(
@@ -353,31 +322,6 @@ void arpragueskymodel_compute_angles(
 
 
     // Shadow angle - requires correction
-
-    /*Vec3D  zeroDirection;
-    XC(zeroDirection) =   cos( groundLevelSolarAzimuthAtOrigin );
-    YC(zeroDirection) =   sin( groundLevelSolarAzimuthAtOrigin );
-    ZC(zeroDirection) =   0.0;
-
-    double  dotProductZero  =
-        vec3d_vv_dot(
-            //& correctViewN,
-              viewDirection,
-            & zeroDirection
-            );
-
-    Vec3D  zeroToView;
-    vec3d_vv_sub_v(
-        //& correctViewN,
-          viewDirection,
-        & zeroDirection,
-        & zeroToView
-        );
-
-    double  len = sqrt(M_SQR(XC(zeroToView)) + M_SQR(YC(zeroToView)));
-
-    *shadow = atan2(-ZC(zeroToView), len);
-    *zero   = acos(dotProductZero);*/
 
     Vec3D  shadowDirection;
     const double shadow_angle = groundLevelSolarElevationAtOrigin + MATH_PI * 0.5;
@@ -435,268 +379,6 @@ double lerp(double from, double to, double factor)
   return (1.0 - factor) * from + factor * to;
 }
 
-
-void lerp_control_params(double* from, double* to, double* result, double factor, int total_coefs)
-{
-  for (int i = 0; i < total_coefs; ++i)
-  {
-    result[i] = lerp(from[i], to[i], factor);
-  }
-}
-
-/*double* control_params_single_elevation(
-  const ArPragueSkyModelState  * state,
-  int                     elevation,
-  int                     altitude,
-  int                     turbidity,
-  int                     albedo,
-  int                     wavelength
-)
-{
-  // turbidity is completely ignored for now
-  return state->radiance_dataset[wavelength] + state->total_coefs_single_config * (elevation + elevations*altitude + elevations*altitudes*albedo);
-}
-
-void control_params_single_altitude(
-  const ArPragueSkyModelState  * state,
-  double                  elevation,
-  int                     altitude,
-  int                     turbidity,
-  int                     albedo,
-  int                     wavelength,
-  double*                 result
-)
-{
-  const int elevation_low = (int)elevation;
-  const double factor = elevation - (double)elevation_low;
-
-  double* control_params_low = control_params_single_elevation(
-    state,
-    elevation_low,
-    altitude,
-    turbidity,
-    albedo,
-    wavelength);
-
-  if (factor < 1e-6 || elevation_low >= (elevations - 1))
-  {
-    copy_params(control_params_low, result, state->total_coefs_single_config);
-    return;
-  }
-
-  double* control_params_high = control_params_single_elevation(
-    state,
-    elevation_low+1,
-    altitude,
-    turbidity,
-    albedo,
-    wavelength);
-
-  lerp_control_params(control_params_low, control_params_high, result, factor, state->total_coefs_single_config);
-}
-
-
-void control_params_single_turbidity(
-  const ArPragueSkyModelState  * state,
-  double                  elevation,
-  double                  altitude,
-  int                     turbidity,
-  int                     albedo,
-  int                     wavelength,
-  double*                 result
-)
-{
-  const int altitude_low = (int)altitude;
-  const double factor = altitude - (double)altitude_low;
-
-  if (factor < 1e-6 || altitude_low >= (altitudes - 1))
-  {
-    control_params_single_altitude(
-      state,
-      elevation,
-      altitude_low,
-      turbidity,
-      albedo,
-      wavelength,
-      result
-      );
-    return;
-  }
-
-  double control_params_low[state->total_coefs_single_config];
-  control_params_single_altitude(
-    state,
-    elevation,
-    altitude_low,
-    turbidity,
-    albedo,
-    wavelength,
-    control_params_low
-    );  
-
-  double control_params_high[state->total_coefs_single_config];
-  control_params_single_altitude(
-    state,
-    elevation,
-    altitude_low+1,
-    turbidity,
-    albedo,
-    wavelength,
-    control_params_high);
-
-  lerp_control_params(control_params_low, control_params_high, result, factor, state->total_coefs_single_config);
-}
-
-
-void control_params_single_albedo(
-  const ArPragueSkyModelState  * state,
-  double                  elevation,
-  double                  altitude,
-  double                  turbidity,
-  int                     albedo,
-  int                     wavelength,
-  double*                 result
-)
-{
-  //int turbidity_low = (int)turbidity;
-  //const double factor = turbidity - (double)turbidity_low;
-
-  //double control_params_low[state->total_coefs_single_config];
-  control_params_single_turbidity(
-    state,
-    elevation,
-    altitude,
-    0,           // we don't care about turbidity now
-    albedo,
-    wavelength,
-    result);
-
-  /*double control_params_high[state->total_coefs_single_config];
-  control_params_single_turbidity(
-    state,
-    elevation,
-    altitude,
-    turbidity_low+1,
-    albedo,
-    wavelength,
-    control_params_high);
-
-  lerp_control_params(control_params_low, control_params_high, result, factor, state->total_coefs_single_config);*//*
-}
-
-
-void control_params_single_wavelength(
-  const ArPragueSkyModelState  * state,
-  double                  elevation,
-  double                  altitude,
-  double                  turbidity,
-  double                  albedo,
-  int                     wavelength,
-  double*                 result
-)
-{
-  const int albedo_low = (int)albedo;
-  const double factor = albedo - (double)albedo_low;
-
-  if (factor < 1e-6 || albedo_low >= (albedos - 1)) {
-    control_params_single_albedo(
-      state,
-      elevation,
-      altitude,
-      turbidity,
-      albedo_low,
-      wavelength,
-      result);
-    return;
-  }
-
-  double control_params_low[state->total_coefs_single_config];
-  control_params_single_albedo(
-    state,
-    elevation,
-    altitude,
-    turbidity,
-    albedo_low,
-    wavelength,
-    control_params_low);  
-
-  double control_params_high[state->total_coefs_single_config];
-  control_params_single_albedo(
-    state,
-    elevation,
-    altitude,
-    turbidity,
-    albedo_low+1,
-    wavelength,
-    control_params_high);
-
-  lerp_control_params(control_params_low, control_params_high, result, factor, state->total_coefs_single_config);
-}
-
-
-void control_params(
-  const ArPragueSkyModelState  * state,
-  double                  elevation,
-  double                  altitude,
-  double                  turbidity,
-  double                  albedo,
-  double                  wavelength,
-  double*                 result
-)
-{
-  const int wavelength_low = (int)wavelength;
-  const double factor = wavelength - (double)wavelength_low;
-
-  if (factor < 1e-6 || wavelength_low >= 10) {
-    control_params_single_wavelength(
-      state,
-      elevation,
-      altitude,
-      turbidity,
-      albedo,
-      wavelength_low,
-      result); 
-    return;
-  }
-
-  double control_params_low[state->total_coefs_single_config];
-  control_params_single_wavelength(
-    state,
-    elevation,
-    altitude,
-    turbidity,
-    albedo,
-    wavelength_low,
-    control_params_low); 
-
-  double control_params_high[state->total_coefs_single_config];
-  control_params_single_wavelength(
-    state,
-    elevation,
-    altitude,
-    turbidity,
-    albedo,
-    wavelength_low+1,
-    control_params_high);
-
-  lerp_control_params(control_params_low, control_params_high, result, factor, state->total_coefs_single_config);
-}*/
-
-double eval_pp(double x, int nbreaks, const double* breaks, const double* coefs)
-{
-// determine which segment
-  int segment = 0;
-  for (segment = 0; segment < nbreaks; ++segment)
-  {
-    if (breaks[segment+1] >= x)
-      break;
-  }
-
-  x -= breaks[segment];
-  const double* sc = coefs + 2 * segment; // segment coefs
-  return sc[0] * x + sc[1];
-}
-
 int find_segment(const double x, const int nbreaks, const double* breaks)
 {
   int segment = 0;
@@ -708,7 +390,7 @@ int find_segment(const double x, const int nbreaks, const double* breaks)
   return segment;
 }
 
-double eval_pp2(double x, const int segment, const double * breaks, const double * coefs)
+double eval_pp(double x, const int segment, const double * breaks, const double * coefs)
 {
   x -= breaks[segment];
   const double* sc = coefs + 2 * segment; // segment coefs
@@ -730,26 +412,6 @@ double* control_params_single_config(
 
 double reconstruct(
   const ArPragueSkyModelState  * state,
-  double                         gamma,
-  double                         alpha,
-  double                         zero,
-  double*                        control_params
-)
-{
-  double res = 0;
-  for (int t = 0; t < tensor_components; ++t) {
-	const double sun_val_t = eval_pp(gamma, state->sun_nbreaks, state->sun_breaks, control_params + state->sun_offset + t * state->sun_stride);
-	const double zenith_val_t = eval_pp(alpha, state->zenith_nbreaks, state->zenith_breaks, control_params + state->zenith_offset + t * state->zenith_stride);
-	res += sun_val_t * zenith_val_t;
-  }
-  const double emph_val_t = eval_pp(zero, state->emph_nbreaks, state->emph_breaks, control_params + state->emph_offset);
-  res *= emph_val_t;
-
-  return M_MAX(res,0.);
-}
-
-double reconstruct2(
-  const ArPragueSkyModelState  * state,
   const double                   gamma,
   const double                   alpha,
   const double                   zero,
@@ -761,15 +423,22 @@ double reconstruct2(
 {
   double res = 0;
   for (int t = 0; t < tensor_components; ++t) {
-	const double sun_val_t = eval_pp2(gamma, gamma_segment, state->sun_breaks, control_params + state->sun_offset + t * state->sun_stride);
-	const double zenith_val_t = eval_pp2(alpha, alpha_segment, state->zenith_breaks, control_params + state->zenith_offset + t * state->zenith_stride);
+	const double sun_val_t = eval_pp(gamma, gamma_segment, state->sun_breaks, control_params + state->sun_offset + t * state->sun_stride);
+	const double zenith_val_t = eval_pp(alpha, alpha_segment, state->zenith_breaks, control_params + state->zenith_offset + t * state->zenith_stride);
 	res += sun_val_t * zenith_val_t;
   }
-  const double emph_val_t = eval_pp2(zero, zero_segment, state->emph_breaks, control_params + state->emph_offset);
+  const double emph_val_t = eval_pp(zero, zero_segment, state->emph_breaks, control_params + state->emph_offset);
   res *= emph_val_t;
 
   return M_MAX(res,0.);
 }
+
+
+
+///////////////////////////////////////////////
+// Radiance mono version
+///////////////////////////////////////////////
+
 
 double interpolate_elevation(
   const ArPragueSkyModelState  * state,
@@ -797,7 +466,7 @@ double interpolate_elevation(
     albedo,
     wavelength);
 
-  double res_low = reconstruct2(
+  double res_low = reconstruct(
     state,
     gamma,
     alpha,
@@ -820,7 +489,7 @@ double interpolate_elevation(
     albedo,
     wavelength);
 
-  double res_high = reconstruct2(
+  double res_high = reconstruct(
     state,
     gamma,
     alpha,
@@ -1099,96 +768,15 @@ double arpragueskymodel_radiance(
     zero,
     gamma_segment,
     alpha_segment,
-    zero_segment);
-
-  /*const int albedo_low = (int)albedo_control;
-  //const double factor = albedo_control - (double)albedo_low;
-  const int elevation_low = (int)elevation_control;
-  const double factor = elevation_control - (double)elevation_low;*/  
-  
-  /*double* control_params_low = state->radiance_dataset[(int)channel] 
-    + state->total_coefs_single_config * ((int)elevation_control + elevations*((int)altitude_control) + elevations*altitudes*albedo_low);
-
-  double* control_params_high;
-  if (factor < 1e-6 || albedo_low >= (albedos - 1)) {
-     control_params_high = control_params_low;
-  } else {
-     control_params_high = state->radiance_dataset[(int)channel] 
-    + state->total_coefs_single_config * ((int)elevation_control + elevations*((int)altitude_control) + elevations*altitudes*(albedo_low + 1));
-  }
-
-  double control_params_interpolated[state->total_coefs_single_config];
-  lerp_control_params(control_params_low, control_params_high, control_params_interpolated, factor, state->total_coefs_single_config);*/
-
-  // Interpolate params
-  /*double control_params_interpolated[state->total_coefs_single_config];
-  control_params(
-    state,
-    elevation_control,
-    altitude_control,
-    turbidity,
-    albedo_control,
-    channel,
-    control_params_interpolated);
-
-  const double alpha = elevation < 0 ? shadow : zero;
-  double res = 0;
-  for (int t = 0; t < tensor_components; ++t) {
-	const double sun_val_t = eval_pp(gamma, state->sun_nbreaks, state->sun_breaks, control_params_interpolated + state->sun_offset + t * state->sun_stride);
-	const double zenith_val_t = eval_pp(alpha, state->zenith_nbreaks, state->zenith_breaks, control_params_interpolated + state->zenith_offset + t * state->zenith_stride);
-	res += sun_val_t * zenith_val_t;
-  }
-  double emph_val_t = eval_pp(zero, state->emph_nbreaks, state->emph_breaks, control_params_interpolated + state->emph_offset);
-  res *= emph_val_t;
-
-  res = M_MAX(res,0.);*/
-
-
-  // No interpolation
-
-  // Compute radiance from the params for the lower albedo
-
-  /*const double alpha = elevation < 0 ? shadow : zero;
-
-  double* control_params_interpolated = state->radiance_dataset[(int)channel] 
-    + state->total_coefs_single_config * (elevation_low + elevations*((int)altitude_control) + elevations*altitudes*(albedo_low));
-  
-  double res = 0;
-  for (int t = 0; t < tensor_components; ++t) {
-	const double sun_val_t = eval_pp(gamma, state->sun_nbreaks, state->sun_breaks, control_params_interpolated + state->sun_offset + t * state->sun_stride);
-	const double zenith_val_t = eval_pp(alpha, state->zenith_nbreaks, state->zenith_breaks, control_params_interpolated + state->zenith_offset + t * state->zenith_stride);
-	res += sun_val_t * zenith_val_t;
-  }
-  double emph_val_t = eval_pp(zero, state->emph_nbreaks, state->emph_breaks, control_params_interpolated + state->emph_offset);
-  res *= emph_val_t;
-
-  res = M_MAX(res,0.);*/
-
-  /*if (factor < 1e-6 || albedo_low >= (albedos - 1)) {
-     return res;
-  }*/
-
-  // Compute radiance from the params for the higher albedo
-
-  /*control_params_interpolated = state->radiance_dataset[(int)channel] 
-    + state->total_coefs_single_config * (elevation_low + 1 + elevations*((int)altitude_control) + elevations*altitudes*(albedo_low));  
-
-  double res2 = 0;
-  for (int t = 0; t < tensor_components; ++t) {
-	const double sun_val_t = eval_pp(gamma, state->sun_nbreaks, state->sun_breaks, control_params_interpolated + state->sun_offset + t * state->sun_stride);
-	const double zenith_val_t = eval_pp(alpha, state->zenith_nbreaks, state->zenith_breaks, control_params_interpolated + state->zenith_offset + t * state->zenith_stride);
-	res2 += sun_val_t * zenith_val_t;
-  }
-  emph_val_t = eval_pp(zero, state->emph_nbreaks, state->emph_breaks, control_params_interpolated + state->emph_offset);
-  res2 *= emph_val_t;
-
-  res2 = M_MAX(res2,0.);*/
-
-  //debugprintf("elc1: %d, elc2: %d", (int)elevation_control, ((int)(elevation_control)+1));
-  //debugprintf("res1: %f, res2: %f, factor: %f", res, res2, factor);
-
-  //return lerp(res, res2, factor);
+    zero_segment);  
 }
+
+
+
+///////////////////////////////////////////////
+// Radiance hero version
+///////////////////////////////////////////////
+
 
 void lerp_hero(const ART_GV * art_gv, ArSpectralSample * from, ArSpectralSample * to, const double factor, ArSpectralSample * result)
 {
@@ -1228,7 +816,7 @@ void interpolate_elevation_hero(
       albedo,
       (int)SPS_CI(*wavelength, i));
 
-    SPS_CI(res_low, i) = reconstruct2(
+    SPS_CI(res_low, i) = reconstruct(
       state,
       gamma,
       alpha,
@@ -1256,7 +844,7 @@ void interpolate_elevation_hero(
       albedo,
       (int)SPS_CI(*wavelength, i));
 
-    SPS_CI(res_high, i) = reconstruct2(
+    SPS_CI(res_high, i) = reconstruct(
       state,
       gamma,
       alpha,
@@ -1612,32 +1200,6 @@ double arpragueskymodel_solar_radiance(
         const double                   wavelength
         )
 {
-    /*const int low_wl = (wavelength - 320.0 ) / 40.0;
-
-    if ( low_wl < 0 || low_wl >= 11 )
-        return 0.0f;
-
-    double result = psm_originalSolarRadianceTable[low_wl];
-
-    double interp = fmod((wavelength - 320.0 ) / 40.0, 1.0);
-    if ( interp > 1e-6 && low_wl < 10 )
-    {
-        result = ( 1.0 - interp ) * result;
-        result += interp * psm_originalSolarRadianceTable[low_wl+1];
-    }
-
-    double  tau =
-        arpragueskymodel_tau(
-            state,
-            theta,
-            altitude,
-            turbidity,
-            wavelength,
-            MATH_HUGE_DOUBLE
-            );
-    
-    return result * tau;*/
-
     int low_wl = (wavelength - 320.0 ) / 40.0;
 
     if ( low_wl < 0 || low_wl >= 11 )
@@ -1671,26 +1233,14 @@ double arpragueskymodel_solar_radiance(
             );
     
     return result * tau;
-
-    /*const int wl = (int)(wavelength - SunRadStartWL);
-
-    if ( wl < 0 || wl >= 521 )
-        return 0.0f;
-
-    double result = SunRadTable[wl];
-
-    double  tau =
-        arpragueskymodel_tau(
-            state,
-            theta,
-            altitude,
-            turbidity,
-            wavelength,
-            MATH_HUGE_DOUBLE
-            );
-    
-    return result * tau;*/
 }
+
+
+
+///////////////////////////////////////////////
+// Transmittance
+///////////////////////////////////////////////
+
 
 int arpragueskymodel_circleBounds2D(
 	double x_v,
@@ -2012,6 +1562,13 @@ void arpragueskymodel_tau_hero(
         }
 }
 
+
+
+///////////////////////////////////////////////
+// Polarisation mono version
+///////////////////////////////////////////////
+
+
 double* control_params_single_config_pol(
   const ArPragueSkyModelState  * state,
   int                     elevation,
@@ -2025,24 +1582,7 @@ double* control_params_single_config_pol(
   return state->polarisation_dataset[wavelength] + state->total_coefs_single_config_pol * (elevation + elevations*altitude + elevations*altitudes*albedo);
 }
 
-/*double reconstruct_pol(
-  const ArPragueSkyModelState  * state,
-  double                         gamma,
-  double                         alpha,
-  double*                        control_params
-)
-{
-  double res = 0;
-  for (int t = 0; t < tensor_components_pol; ++t) {
-	const double sun_val_t = eval_pp(gamma, state->sun_nbreaks_pol, state->sun_breaks_pol, control_params + state->sun_offset_pol + t * state->sun_stride_pol);
-	const double zenith_val_t = eval_pp(alpha, state->zenith_nbreaks_pol, state->zenith_breaks_pol, control_params + state->zenith_offset_pol + t * state->zenith_stride_pol);
-	res += sun_val_t * zenith_val_t;
-  }
-
-  return res;
-}*/
-
-double reconstruct_pol2(
+double reconstruct_pol(
   const ArPragueSkyModelState  * state,
   double                         gamma,
   double                         alpha,
@@ -2053,8 +1593,8 @@ double reconstruct_pol2(
 {
   double res = 0;
   for (int t = 0; t < tensor_components_pol; ++t) {
-	const double sun_val_t = eval_pp2(gamma, gamma_segment, state->sun_breaks_pol, control_params + state->sun_offset_pol + t * state->sun_stride_pol);
-	const double zenith_val_t = eval_pp2(alpha, alpha_segment, state->zenith_breaks_pol, control_params + state->zenith_offset_pol + t * state->zenith_stride_pol);
+	const double sun_val_t = eval_pp(gamma, gamma_segment, state->sun_breaks_pol, control_params + state->sun_offset_pol + t * state->sun_stride_pol);
+	const double zenith_val_t = eval_pp(alpha, alpha_segment, state->zenith_breaks_pol, control_params + state->zenith_offset_pol + t * state->zenith_stride_pol);
 	res += sun_val_t * zenith_val_t;
   }
   return res;
@@ -2084,13 +1624,7 @@ double interpolate_elevation_pol(
     albedo,
     wavelength);
 
-  /*double res_low = reconstruct_pol(
-    state,
-    gamma,
-    alpha,
-    control_params_low);*/
-
-  double res_low = reconstruct_pol2(
+  double res_low = reconstruct_pol(
     state,
     gamma,
     alpha,
@@ -2111,13 +1645,7 @@ double interpolate_elevation_pol(
     albedo,
     wavelength);
 
-  /*double res_high = reconstruct_pol(
-    state,
-    gamma,
-    alpha,
-    control_params_high);*/
-
-  double res_high = reconstruct_pol2(
+  double res_high = reconstruct_pol(
     state,
     gamma,
     alpha,
@@ -2370,6 +1898,13 @@ double arpragueskymodel_polarisation(
     theta_segment);
 }
 
+
+
+///////////////////////////////////////////////
+// Polarisation hero version
+///////////////////////////////////////////////
+
+
 void interpolate_elevation_pol_hero(
   const ART_GV                 * art_gv,
   const ArPragueSkyModelState  * state,
@@ -2401,7 +1936,7 @@ void interpolate_elevation_pol_hero(
       albedo,
       (int)SPS_CI(*wavelength, i));
 
-    SPS_CI(res_low, i) = reconstruct_pol2(
+    SPS_CI(res_low, i) = reconstruct_pol(
       state,
       gamma,
       alpha,
@@ -2427,7 +1962,7 @@ void interpolate_elevation_pol_hero(
       albedo,
       (int)SPS_CI(*wavelength, i));
 
-    SPS_CI(res_high, i) = reconstruct_pol2(
+    SPS_CI(res_high, i) = reconstruct_pol(
       state,
       gamma,
       alpha,
@@ -2751,6 +2286,10 @@ void arpragueskymodel_polarisation_hero(
 
 #else
 
+///////////////////////////////////////////////
+// Old code
+///////////////////////////////////////////////
+
 const double background_breaks[] = {0, 1.745329e-01, 3.490659e-01, 5.235988e-01, 6.981317e-01, 8.726646e-01, 1.047198e+00, 1.221730e+00, 1.396263e+00, 1.466077e+00, 1.483530e+00, 1.500983e+00, 1.518436e+00, 1.535890e+00, 1.553343e+00, 1.562070e+00, 1.570796e+00, 1.579523e+00, 1.588250e+00, 1.605703e+00, 1.623156e+00, 1.640609e+00, 1.658063e+00, 1.675516e+00, 1.745329e+00, 1.867502e+00, 2.094395e+00, 2.617994e+00, 3.141593e+00};
 const double solar_max_breaks[] = {0, 1.745329e-02, 5.235988e-02, 1.047198e-01, 1.570796e-01, 2.094395e-01, 2.617994e-01, 3.141593e-01, 3.665191e-01, 4.188790e-01, 4.712389e-01, 5.235988e-01, 5.759587e-01, 6.283185e-01, 6.806784e-01, 7.330383e-01, 7.853982e-01, 8.726646e-01, 9.599311e-01, 1.047198e+00, 1.134464e+00, 1.221730e+00, 1.308997e+00, 1.396263e+00, 1.483530e+00, 1.570796e+00, 3.141593e+00};
 const double solar_ratio_breaks[] = {0, 3.490659e-01, 6.981317e-01, 8.726646e-01, 1.047198e+00, 1.221730e+00, 1.256637e+00, 1.291544e+00, 1.326450e+00, 1.361357e+00, 1.396263e+00, 1.431170e+00, 1.466077e+00, 1.500983e+00, 1.535890e+00, 1.570796e+00, 1.605703e+00, 1.640609e+00, 1.675516e+00, 1.710423e+00, 1.745329e+00, 1.780236e+00, 1.815142e+00, 1.850049e+00, 1.884956e+00, 1.919862e+00, 2.094395e+00, 3.141593e+00};
@@ -2870,8 +2409,6 @@ void arpragueskymodelstate_free(
     FREE(state);
 }
 
-#define PLANET_RADIUS       6378000.0 METER
-
 void arpragueskymodel_compute_angles(
         const Pnt3D   * viewpoint,
         const Vec3D   * viewDirection,
@@ -2885,7 +2422,7 @@ void arpragueskymodel_compute_angles(
               double  * zero
         )
 {
-    Pnt3D  centerOfTheEarth = PNT3D(0,0,-PLANET_RADIUS);
+    Pnt3D  centerOfTheEarth = PNT3D(0,0,-planet_radius);
 
     Vec3D  directionToPlanetCenter;
     
@@ -2896,7 +2433,7 @@ void arpragueskymodel_compute_angles(
         );
 
     *altitudeOfViewpoint =
-        fabs( vec3d_v_len( & directionToPlanetCenter) ) - PLANET_RADIUS;
+        fabs( vec3d_v_len( & directionToPlanetCenter) ) - planet_radius;
 
 #warning this needs to be actually computed!
     *solarElevationAtViewpoint = groundLevelSolarElevationAtOrigin;
