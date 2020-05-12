@@ -70,6 +70,16 @@ const int tensor_components_pol = 4;
 const int transsvdrank = 12;
 const double planet_radius = 6378000.0;
 
+int compute_pp_coefs(const int nbreaks, const double * breaks, const float * values, double * coefs, const int offset)
+{
+	for (int i = 0; i < nbreaks - 1; ++i)
+	{
+		coefs[offset + 2 * i] = ((double)values[i+1] - (double)values[i]) / (breaks[i+1] - breaks[i]);
+		coefs[offset + 2 * i + 1] = (double)values[i];
+	}
+	return 2 * nbreaks - 2;
+}
+
 ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
         const char  * library_path
         )
@@ -97,7 +107,7 @@ ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
 	fread(state->zenith_breaks, sizeof(double), state->zenith_nbreaks, breaks_handle);
 	fread(state->emph_breaks, sizeof(double), state->emph_nbreaks, breaks_handle);
 
-    	fclose(breaks_handle);
+	fclose(breaks_handle);
 
 	// Calculate offsets and strides
 
@@ -112,24 +122,41 @@ ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
 	state->total_coefs_single_config = state->emph_offset + 2 * state->emph_nbreaks - 2; // this is for one specific configuration
 	state->total_coefs_all_configs = state->total_coefs_single_config * elevations * altitudes * albedos;
 
-	// Read coefficients
+    // Read coefficients
+
+    float * radiance_temp = ALLOC_ARRAY(float, M_MAX(state->sun_nbreaks, M_MAX(state->zenith_nbreaks, state->emph_nbreaks)));
 
     for (int wl = 0; wl < 11; ++wl)
     {
         // Radiance file structure:
-	// [[[[ sun_coefs ((2 * state->sun_nbreaks - 2) * double), zenith_coefs ((2 * state->zenith_nbreaks - 2) * double) ] * tensor_components, emph_coefs ((2 * state->emph_nbreaks - 2) * double) ] * elevations ] * altitudes ] * albedos
+	// [[[[ sun_coefs (state->sun_nbreaks * single), zenith_coefs (state->zenith_nbreaks * single) ] * tensor_components, emph_coefs (state->emph_nbreaks * single) ] * elevations ] * altitudes ] * albedos
 
 	char filename[1024];
-
         sprintf(filename, "%s/SkyModel/new_params_t%d_wl%d.dat", library_path, 2, wl+1);
-
         FILE* handle = fopen(filename, "rb");
 
-        state->radiance_dataset[wl] = ALLOC_ARRAY(double, state->total_coefs_all_configs);
+	int offset = 0;
+	state->radiance_dataset[wl] = ALLOC_ARRAY(double, state->total_coefs_all_configs);
 
-        size_t s = fread(state->radiance_dataset[wl], sizeof(double), state->total_coefs_all_configs, handle);
+	for (int comb = 0; comb < elevations * altitudes * albedos; ++comb)
+	{
+		for (int tc = 0; tc < tensor_components; ++tc)
+		{
+			fread(radiance_temp, sizeof(float), state->sun_nbreaks, handle);
+			offset += compute_pp_coefs(state->sun_nbreaks, state->sun_breaks, radiance_temp, state->radiance_dataset[wl], offset);
+
+			fread(radiance_temp, sizeof(float), state->zenith_nbreaks, handle);
+			offset += compute_pp_coefs(state->zenith_nbreaks, state->zenith_breaks, radiance_temp, state->radiance_dataset[wl], offset);
+		}
+
+		fread(radiance_temp, sizeof(float), state->emph_nbreaks, handle);
+		offset += compute_pp_coefs(state->emph_nbreaks, state->emph_breaks, radiance_temp, state->radiance_dataset[wl], offset);
+	}
+
         fclose(handle);
     }
+
+    free(radiance_temp);
 
     // Polarisation
 
