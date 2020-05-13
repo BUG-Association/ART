@@ -388,7 +388,7 @@ void arpragueskymodel_compute_angles(
             & directionToPlanetCenter
             );
 
-    *theta  = acos(cosTheta); 
+    *theta  = acos(cosTheta);
 
 #ifdef NEVERMORE
 debugprintf("\n" )
@@ -1192,21 +1192,6 @@ void arpragueskymodel_radiance_hero(
     result);
 }
 
-const double psm_originalSolarRadianceTable[] =
-{
-     7500.0,
-    12500.0,
-    21127.5,
-    26760.5,
-    30663.7,
-    27825.0,
-    25503.8,
-    25134.2,
-    23212.1,
-    21526.7,
-    19870.8
-};
-
 const double SunRadStartWL = 310;
 const double SunRadIncrementWL = 1;
 const double SunRadTable[] =
@@ -1227,39 +1212,29 @@ double arpragueskymodel_solar_radiance(
         const double                   wavelength
         )
 {
-    int low_wl = (wavelength - 320.0 ) / 40.0;
+        double idx = (wavelength - SunRadStartWL) / SunRadIncrementWL;
+        double sunRadiance = 0.0;
 
-    if ( low_wl < 0 || low_wl >= 11 )
-        return 0.0f;
+        if ( idx >= 0.0 )
+        {
+            int lowIdx = floor(idx);
+            double idxFloat = idx - floor(idx);
 
-    double interp = fmod((wavelength - 320.0 ) / 40.0, 1.0);
+            sunRadiance = SunRadTable[lowIdx] * (1.0 - idxFloat) + SunRadTable[lowIdx+1] * idxFloat;
+        }
 
-    double val_low =
-        psm_originalSolarRadianceTable[low_wl];
+	double tau = arpragueskymodel_tau(
+	      state,
+	      theta,
+	      altitude,
+	      1,
+	      wavelength,
+	      MATH_HUGE_DOUBLE
+	    );
 
-    if ( interp < 1e-6 )
-        return val_low;
+	m_dd_clamp_d( 0.001, MATH_HUGE_DOUBLE, & tau );
 
-    double result = ( 1.0 - interp ) * val_low;
-
-    if ( low_wl+1 < 11 )
-    {
-        result +=
-              interp
-            * psm_originalSolarRadianceTable[low_wl+1];
-    }
-
-    double  tau =
-        arpragueskymodel_tau(
-            state,
-            theta,
-            altitude,
-            turbidity,
-            wavelength,
-            MATH_HUGE_DOUBLE
-            );
-    
-    return result * tau;
+	return sunRadiance * tau;
 }
 
 

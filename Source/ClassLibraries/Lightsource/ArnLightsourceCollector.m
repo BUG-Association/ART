@@ -37,6 +37,7 @@
 #import "ArcSkydomeLightsource.h"
 #import "ArnPreethamSkyModel.h"
 #import "ArnHosekSkyModel.h"
+#import "ArnPragueSkyModel.h"
 #import "ArnLightsourceCollection.h"
 
 #import "FoundationAssertionMacros.h"
@@ -115,7 +116,9 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
            if (   [ ARTS_ENVIRONMENT_MATERIAL(state) isMemberOfClass
                       :   [ ArnPreethamSkyModel class ] ]
                || [ ARTS_ENVIRONMENT_MATERIAL(state) isMemberOfClass
-                      :   [ ArnHosekSkyModel class ] ] )
+                      :   [ ArnHosekSkyModel class ] ]
+               || [ ARTS_ENVIRONMENT_MATERIAL(state) isMemberOfClass
+                      :   [ ArnPragueSkyModel class ] ] )
 
            {
                 //  case 1
