@@ -144,7 +144,7 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
                   solarElevationAtQuery,
                   solarAzimuth,
                   queryDirection_worldspace,
-                  theta,
+                  zero, // altitude-corrected theta
                   gamma,
                   altitude,
                   atmosphericTurbidity,
@@ -222,7 +222,7 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
             ARNSKYLIGHT_SAMPLINGREGION_SKYDOME;
 
         ArSpectrum  * temp_colour = spc_alloc(art_gv);
-        
+
         arpragueskymodel_spc(
               art_gv,
               skymodel_state,
@@ -309,7 +309,7 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
             ARNSKYLIGHT_SAMPLINGREGION_SKYDOME;
 
         ArSpectrum  * temp_colour = spc_alloc(art_gv);
-        
+
         arpragueskymodel_spc(
               art_gv,
               skymodel_state,

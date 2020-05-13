@@ -522,7 +522,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
                       skymodel_state,
                       thetaA,
                       altitudeA,
-                      4.0,
+                      1.0,
                       NANO_FROM_UNIT(ARWL_WI(*wavelength,i)),
                       distance
                     );
@@ -602,7 +602,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
               solarElevationA,
               solarAzimuth,
             & RAY3D_V(*ray_worldspace),
-              thetaA,
+              zeroA, // altitude-corrected theta
               gammaA,
               altitudeA,
               atmosphericTurbidity,
