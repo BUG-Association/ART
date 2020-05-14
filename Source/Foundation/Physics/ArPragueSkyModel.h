@@ -58,14 +58,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //   This computes the canonical angles of the model from
 //   a normalised view vector and solar elevation.
 
-void arpragueskymodel_compute_altitude_and_elevation(
-        const Pnt3D   * viewpoint,
-        const double    groundLevelSolarElevationAtOrigin,
-        const double    groundLevelSolarAzimuthAtOrigin,
-              double  * solarElevationAtViewpoint,
-              double  * altitudeOfViewpoint,
-              Vec3D   * directionToPlanet
-        );
 void arpragueskymodel_compute_angles(
         const Pnt3D   * viewpoint,
         const Vec3D   * viewDirection,
