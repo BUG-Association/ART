@@ -35,6 +35,7 @@
 #import "ArcInfiniteSphereLightsource.h"
 #import "ArcPointLightsource.h"
 #import "ArcSkydomeLightsource.h"
+#import "ArcComplexSkydomeLightsource.h"
 #import "ArnPreethamSkyModel.h"
 #import "ArnHosekSkyModel.h"
 #import "ArnPragueSkyModel.h"
@@ -116,9 +117,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
            if (   [ ARTS_ENVIRONMENT_MATERIAL(state) isMemberOfClass
                       :   [ ArnPreethamSkyModel class ] ]
                || [ ARTS_ENVIRONMENT_MATERIAL(state) isMemberOfClass
-                      :   [ ArnHosekSkyModel class ] ]
-               || [ ARTS_ENVIRONMENT_MATERIAL(state) isMemberOfClass
-                      :   [ ArnPragueSkyModel class ] ] )
+                      :   [ ArnHosekSkyModel class ] ] )
 
            {
                 //  case 1
@@ -138,21 +137,42 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
            }
            else
            {
-                //  case 4
+                if ( [ ARTS_ENVIRONMENT_MATERIAL(state) isMemberOfClass
+                     :   [ ArnPragueSkyModel class ] ] )
+                {
+                    //  case 2
+                    
+                    ArcComplexSkydomeLightsource  * skylight;
 
-                ArcInfiniteSphereLightsource  * infLight;
+                    skylight =
+                        [ ALLOC_INIT_OBJECT( ArcComplexSkydomeLightsource )
+                            :   node
+                            : & state
+                            :   obj
+                            ];
 
-                infLight =
-                    [ ALLOC_INIT_OBJECT( ArcInfiniteSphereLightsource )
-                        :   node
-                        : & state
-                        :   obj ];
+                    [ LIGHTCOLLECTION addLightsource
+                        :   skylight
+                        :   REPORTER
+                        ];
+                }
+                else
+                {
+                    //  case 3
 
-                [ LIGHTCOLLECTION addLightsource
-                    :   infLight
-                    :   REPORTER
-                    ];
-               
+                    ArcInfiniteSphereLightsource  * infLight;
+
+                    infLight =
+                        [ ALLOC_INIT_OBJECT( ArcInfiniteSphereLightsource )
+                            :   node
+                            : & state
+                            :   obj ];
+
+                    [ LIGHTCOLLECTION addLightsource
+                        :   infLight
+                        :   REPORTER
+                        ];
+                }
            }
 
            [ REPORTER endAction ];

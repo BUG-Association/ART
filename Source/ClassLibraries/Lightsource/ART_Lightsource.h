@@ -33,6 +33,7 @@ ART_LIBRARY_INTERFACE(ART_Lightsource)
 #import "ArcInfiniteSphereLightsource.h"
 #import "ArcPointLightsource.h"
 #import "ArcSkydomeLightsource.h"
+#import "ArcComplexSkydomeLightsource.h"
 
 #import "ArnLightsourceCollection.h"
 #import "ArnLightsourceCollector.h"

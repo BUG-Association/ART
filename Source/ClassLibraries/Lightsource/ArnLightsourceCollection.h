@@ -30,7 +30,7 @@ ART_MODULE_INTERFACE(ArnLightsourceCollection)
 
 #import "ART_Scenegraph.h"
 
-#define LSC_LIGHT(__i)      light[(__i)]
+#define LSC_LIGHT(__a,__i)      light[(__a)+(__i)*PSM_ARRAYSIZE]
 
 typedef struct ArLightsourceEntry
 {
@@ -53,15 +53,17 @@ ArLightsourceEntry;
 
     double                overallArea;
     int                   overallNumberOfPatches;
-    double                altitude[1];
-    double                overallRadiantPower[1];
-    ArSpectralIntensity * overallSpectralPower[1];
-    ArLightIntensity    * overallLowresSpectralPower[1];
+    double                altitude[PSM_ARRAYSIZE];
+    double                overallRadiantPower[PSM_ARRAYSIZE];
+    ArSpectralIntensity * overallSpectralPower[PSM_ARRAYSIZE];
+    ArLightIntensity    * overallLowresSpectralPower[PSM_ARRAYSIZE];
 
     //   The actual light source collection
 
     BOOL                   ownsLights;
+    BOOL                   complexSkydomePresent;
     unsigned int           numberOfSlots;
+    unsigned int           numberOfActualSlots;
     unsigned int           numberOfLights;
     ArLightsourceEntry  * light;
 }
