@@ -263,27 +263,48 @@ void arpragueskymodel_compute_altitude_and_elevation(
         const double    groundLevelSolarAzimuthAtOrigin,
               double  * solarElevationAtViewpoint,
               double  * altitudeOfViewpoint,
-              Vec3D   * directionToPlanet
+              Vec3D   * directionToZenith,
+              Vec3D   * directionToZenithN,
+              Vec3D   * directionToSunN
         )
 {
-    Pnt3D  centerOfTheEarth = PNT3D(0,0,-planet_radius);
+    // Direction to zenith
 
-    Vec3D  directionToPlanetCenter;
+    Pnt3D  centerOfTheEarth = PNT3D(0,0,-planet_radius);
 
     vec3d_pp_sub_v(
         & centerOfTheEarth,
           viewpoint,
-        & directionToPlanetCenter
+          directionToZenith
         );
+    vec3d_v_norm_v( directionToZenith, directionToZenithN );
+
+
+    // Altitude of viewpoint
 
     *altitudeOfViewpoint =
-        fabs( vec3d_v_len( & directionToPlanetCenter) ) - planet_radius;
-
-    *solarElevationAtViewpoint = groundLevelSolarElevationAtOrigin;
+        fabs( vec3d_v_len( directionToZenith) ) - planet_radius;
     *altitudeOfViewpoint = M_MAX( *altitudeOfViewpoint, 0.0 );
 
-    if(directionToPlanet)
-        vec3d_v_norm_v( & directionToPlanetCenter, directionToPlanet );
+
+    // Direction to sun
+
+    XC(*directionToSunN) = cos( groundLevelSolarAzimuthAtOrigin )
+                       * cos( groundLevelSolarElevationAtOrigin );
+    YC(*directionToSunN) = sin( groundLevelSolarAzimuthAtOrigin )
+                       * cos( groundLevelSolarElevationAtOrigin );
+    ZC(*directionToSunN) = sin( groundLevelSolarElevationAtOrigin );
+
+
+    // Solar elevation at viewpoint (more precisely, solar elevation at the point on the ground directly below viewpoint)
+
+    const double dotZenithSun =
+        vec3d_vv_dot(
+            directionToZenithN,
+            directionToSunN
+            );
+
+    *solarElevationAtViewpoint = 0.5 * MATH_PI - acos(dotZenithSun);
 }
 
 void arpragueskymodel_compute_angles(
@@ -299,16 +320,23 @@ void arpragueskymodel_compute_angles(
               double  * zero
         )
 {
-    Pnt3D  centerOfTheEarth = PNT3D(0,0,-planet_radius);
+    Vec3D directionToZenith;
+    Vec3D directionToZenithN;
+    Vec3D directionToSunN;
 
-    Vec3D  directionToPlanetCenter2;
-    vec3d_pp_sub_v(
-        & centerOfTheEarth,
+    arpragueskymodel_compute_altitude_and_elevation(
           viewpoint,
-        & directionToPlanetCenter2
+          groundLevelSolarElevationAtOrigin,
+          groundLevelSolarAzimuthAtOrigin,
+          solarElevationAtViewpoint,
+          altitudeOfViewpoint,
+        & directionToZenith,
+        & directionToZenithN,
+        & directionToSunN
         );
-    const double C_a = fabs(vec3d_v_len( & directionToPlanetCenter2)) - PSM_PLANET_RADIUS_SQR / fabs(vec3d_v_len( & directionToPlanetCenter2));
-    const double a = sqrt( vec3d_v_len( & directionToPlanetCenter2) * vec3d_v_len( & directionToPlanetCenter2) - PSM_PLANET_RADIUS_SQR );
+
+    const double C_a = fabs(vec3d_v_len( & directionToZenith)) - PSM_PLANET_RADIUS_SQR / fabs(vec3d_v_len( & directionToZenith));
+    const double a = sqrt( vec3d_v_len( & directionToZenith) * vec3d_v_len( & directionToZenith) - PSM_PLANET_RADIUS_SQR );
     const double cosCorrectionAngle = a > 0.0 ? C_a / a : 0.0;    
     const Vec3D corr = VEC3D(0,0,cosCorrectionAngle);
     Vec3D correctView;
@@ -318,31 +346,15 @@ void arpragueskymodel_compute_angles(
         & correctView
         );
     Vec3D correctViewN;
-    vec3d_v_norm_v( & correctView, & correctViewN );    
+    vec3d_v_norm_v( & correctView, & correctViewN );
 
-    Vec3D directionToPlanetCenter;
-    arpragueskymodel_compute_altitude_and_elevation(
-          viewpoint,
-          groundLevelSolarElevationAtOrigin,
-          groundLevelSolarAzimuthAtOrigin,
-          solarElevationAtViewpoint,
-          altitudeOfViewpoint,
-        & directionToPlanetCenter
-        );
 
-    // Sun angle (gamma) - no correction
-
-    Vec3D  sunDirection;
-    XC(sunDirection) =   cos( groundLevelSolarAzimuthAtOrigin )
-                       * cos( groundLevelSolarElevationAtOrigin );
-    YC(sunDirection) =   sin( groundLevelSolarAzimuthAtOrigin )
-                       * cos( groundLevelSolarElevationAtOrigin );
-    ZC(sunDirection) =   sin( groundLevelSolarElevationAtOrigin );
+   // Sun angle (gamma) - no correction
 
     double  dotProductSun =
         vec3d_vv_dot(
               viewDirection,
-            & sunDirection
+            & directionToSunN
             );
 
     *gamma = acos(dotProductSun);
@@ -350,9 +362,12 @@ void arpragueskymodel_compute_angles(
 
     // Shadow angle - requires correction
 
+    const double effectiveElevation = *solarElevationAtViewpoint;
+    const double effectiveAzimuth = groundLevelSolarAzimuthAtOrigin;
+    const double shadow_angle = effectiveElevation + MATH_PI * 0.5;
+    const double rotation = effectiveAzimuth - MATH_PI * 0.5;
+
     Vec3D  shadowDirection;
-    const double shadow_angle = groundLevelSolarElevationAtOrigin + MATH_PI * 0.5;
-    const double rotation = groundLevelSolarAzimuthAtOrigin - MATH_PI * 0.5;
     XC(shadowDirection) = 0.0;
     YC(shadowDirection) = cos(shadow_angle);
     ZC(shadowDirection) = sin(shadow_angle);
@@ -360,22 +375,26 @@ void arpragueskymodel_compute_angles(
     const double shadow_y = YC(shadowDirection);
     XC(shadowDirection) = shadow_x * cos(rotation) - shadow_y * sin(rotation);
     YC(shadowDirection) = shadow_x * sin(rotation) + shadow_y * cos(rotation);
+
     const double  dotProductShadow  =
         vec3d_vv_dot(
             & correctViewN,
             & shadowDirection
             );
+
     *shadow = acos(dotProductShadow);
+
 
     // Zenith angle (theta) - corrected version stored in otherwise unused zero angle
 
     double  cosThetaCor =
         vec3d_vv_dot(
             & correctViewN,
-            & directionToPlanetCenter
+            & directionToZenithN
             );
 
     *zero  = acos(cosThetaCor); 
+
 
     // Zenith angle (theta) - uncorrected version goes outside
      
@@ -385,7 +404,7 @@ void arpragueskymodel_compute_angles(
     double  cosTheta =
         vec3d_vv_dot(
             & viewDirNorm,
-            & directionToPlanetCenter
+            & directionToZenithN
             );
 
     *theta  = acos(cosTheta);
@@ -394,7 +413,7 @@ void arpragueskymodel_compute_angles(
 debugprintf("\n" )
 debugprintf("Point   : " PNT3D_FORMAT("%f") "\n",PNT3D_P_PRINTF(*viewpoint) )
 debugprintf("ViewDir : " VEC3D_FORMAT("%f") "\n",VEC3D_V_PRINTF(*viewDirection) )
-debugprintf("DirTC   : " VEC3D_FORMAT("%f") "\n",VEC3D_V_PRINTF(directionToPlanetCenter) )
+debugprintf("DirTC   : " VEC3D_FORMAT("%f") "\n",VEC3D_V_PRINTF(directionToZenith) )
 debugprintf("Altitude: %f\n",*altitudeOfViewpoint )
 debugprintf("Theta   : %f\n",*theta * MATH_RAD_TO_DEG)
 debugprintf("Gamma   : %f\n",*gamma * MATH_RAD_TO_DEG)
