@@ -50,6 +50,9 @@ ART_MODULE_INTERFACE(ArpLightsourceSampling_Categories)
 @interface ArcSkydomeLightsource ( RaySampling )
 < ArpLightsourceSampling >
 @end
+@interface ArcComplexSkydomeLightsource ( RaySampling )
+< ArpLightsourceSampling >
+@end
 
 @interface ArnLightsourceCollection ( RaySampling )
 < ArpLightsourceCollectionRaySampling >
@@ -60,6 +63,7 @@ ART_MODULE_INTERFACE(ArcAreaLightsourceSampling)
 ART_MODULE_INTERFACE(ArcInfiniteSphereLightsourceSampling)
 ART_MODULE_INTERFACE(ArcPointLightsourceSampling)
 ART_MODULE_INTERFACE(ArcSkydomeLightsourceSampling)
+ART_MODULE_INTERFACE(ArcComplexSkydomeLightsourceSampling)
 ART_MODULE_INTERFACE(ArnLightsourceCollectionSampling)
 
 // ===========================================================================
