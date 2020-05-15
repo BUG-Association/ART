@@ -207,7 +207,7 @@ ArObj createBox(ART_GV * art_gv) {
     id greenLambert = LAMBERT_REFLECTOR(greenReflectance(art_gv));
 
     ArObj floorGeometry = 
-        [ QUADRANGLE(2, 3, 1, 6) apply
+        [ QUADRANGLE(2, 3, 7, 6) apply
             : whiteLambert
             ];
 
