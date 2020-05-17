@@ -47,6 +47,10 @@ double ray3d_rd_planet_intersection_t(
         const Ray3D  * ray
         );
 
+int altitudeOfPoint(
+	const Pnt3D * point
+        );
+
 - (BOOL) sampleLightsource
         : (      ArcPointContext *)              illuminatedPoint /* optional */
         : (      ArLightsourceSamplingContext *) samplingContext
@@ -69,24 +73,7 @@ double ray3d_rd_planet_intersection_t(
 
     double  targetPercentile = [ RANDOM_GENERATOR valueFromNewSequence ];
     int     i = 0;
-    int     a = 0;
-    
-    double  zValue =
-        ZC(ARCPOINTCONTEXT_WORLDSPACE_POINT(illuminatedPoint));
-        
-    if ( zValue > PSM_MAX_ALTITUDE )
-    {
-        a = PSM_ARRAYSIZE - 1;
-    }
-    else
-    {
-        //  it's 3 am, this works, even if it's stupid...
-        
-        while( altitude[a] < zValue && a < PSM_ARRAYSIZE )
-        {
-            a++;
-        }
-    }
+    int     a = altitudeOfPoint(&ARCPOINTCONTEXT_WORLDSPACE_POINT(illuminatedPoint));
 
     while( patch[i].skydomeRadiantPowerPercentile[a] < targetPercentile ) i++;
     
@@ -267,23 +254,8 @@ double ray3d_rd_planet_intersection_t(
         patchIndex = 1;
     else
         patchIndex = 0;
-    int  a = 0;
-    double  zValue =
-        ZC(ARCPOINTCONTEXT_WORLDSPACE_POINT(illuminatedPoint));
-        
-    if ( zValue > PSM_MAX_ALTITUDE )
-    {
-        a = PSM_ARRAYSIZE - 1;
-    }
-    else
-    {
-        //  it's 3 am, this works, even if it's stupid...
-        
-        while( altitude[a] < zValue && a < PSM_ARRAYSIZE )
-        {
-            a++;
-        }
-    }
+    int  a = altitudeOfPoint(&ARCPOINTCONTEXT_WORLDSPACE_POINT(illuminatedPoint));
+
     double pdf = patch[patchIndex].percentOfSkydomeRadiantPower[a] * patch[patchIndex].probability;
     if(illuminationProbability)
     {

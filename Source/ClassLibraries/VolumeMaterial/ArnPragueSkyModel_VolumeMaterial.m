@@ -475,29 +475,31 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
         );
     
     Pnt3D  pointB;
-    
-    pnt3d_dr_eval_p(
-          distance,
-          ray_worldspace,
-        & pointB
-        );
+    double  thetaB = 0, gammaB = 0, shadowB = 0, zeroB = 0;
+    double  solarElevationB = 0, altitudeB = 0;
 
-    double  thetaB, gammaB, shadowB, zeroB;
-    double  solarElevationB, altitudeB;
-    
-    arpragueskymodel_compute_angles(
-        & pointB,
-        & RAY3D_V(*ray_worldspace),
-          solarElevation,
-          solarAzimuth,
-        & solarElevationB,
-        & altitudeB,
-        & thetaB,
-        & gammaB,
-        & shadowB,
-        & zeroB
-        );
-    
+    if (distance != MATH_HUGE_DOUBLE)
+    {
+	    pnt3d_dr_eval_p(
+		  distance,
+		  ray_worldspace,
+		& pointB
+		);
+
+	    arpragueskymodel_compute_angles(
+		& pointB,
+		& RAY3D_V(*ray_worldspace),
+		  solarElevation,
+		  solarAzimuth,
+		& solarElevationB,
+		& altitudeB,
+		& thetaB,
+		& gammaB,
+		& shadowB,
+		& zeroB
+		);
+    }
+
     //   numerical stability gremlins show otherwise
     
     if ( altitudeA < 0. ) altitudeA = 0.;

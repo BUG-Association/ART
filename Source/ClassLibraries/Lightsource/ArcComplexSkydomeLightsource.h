@@ -51,14 +51,14 @@ ART_MODULE_INTERFACE(ArcComplexSkydomeLightsource)
 
 typedef struct ArComplexSkydomeLightsourcePatch
 {
-    int                 index;
-    ArLightIntensity ** spectralPower;                                 //  W * m^-1
-    double              radiantPower[PSM_ARRAYSIZE];                   //  W
-    double              area;
-    double              percentOfSkydomeRadiantPower[PSM_ARRAYSIZE];   //  [0..1]
-    double              skydomeRadiantPowerPercentile[PSM_ARRAYSIZE];  //  [0..1]
-    double              probability;
-    ArSamplingRegion    samplingRegion;
+    int                    index;
+    ArSpectralIntensity ** spectralPower;                                 //  W * m^-1
+    double                 radiantPower[PSM_ARRAYSIZE];                   //  W
+    double                 area;
+    double                 percentOfSkydomeRadiantPower[PSM_ARRAYSIZE];   //  [0..1]
+    double                 skydomeRadiantPowerPercentile[PSM_ARRAYSIZE];  //  [0..1]
+    double                 probability;
+    ArSamplingRegion       samplingRegion;
 }
 ArComplexSkydomeLightsourcePatch;
 
@@ -73,12 +73,12 @@ ArComplexSkydomeLightsourcePatch;
     HTrafo3D                            skydome2world;
     HTrafo3D                            world2skydome;
     double                              altitude[PSM_ARRAYSIZE];
-    ArLightIntensity                 ** spectralPowerAlt;               //  W * m^-1
+    ArSpectralIntensity              ** spectralPowerAlt;               //  W * m^-1
     double                              radiantPowerAlt[PSM_ARRAYSIZE]; //  W
 }
 
 - init
-        : (ArNode *) shapeRef
+        : (ArNode <ArpShape> *) shapeRef
         : (ArTraversalState *) traversalState
         : (ArnLightsourceCollector *) lightsourceCollector
         ;
