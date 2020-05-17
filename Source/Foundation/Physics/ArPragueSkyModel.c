@@ -66,9 +66,7 @@ const double elevation_vals[] = { -0.073304, -0.069813, -0.061087, -0.052360, -0
 const double altitude_vals[] = { 0, 1.875, 15, 50.625, 120, 234.38, 405, 643.12, 960, 1366.9, 1875, 2000, 2495.6, 3240, 4119.4, 5145, 6328.1, 7680, 9211.9, 10935, 12861, 15000 };
 const int tensor_components = 9;
 const int tensor_components_pol = 4;
-
 const int transsvdrank = 12;
-const double planet_radius = 6378000.0;
 
 int compute_pp_coefs(const int nbreaks, const double * breaks, const float * values, double * coefs, const int offset)
 {
@@ -263,27 +261,31 @@ void arpragueskymodel_compute_altitude_and_elevation(
         const double    groundLevelSolarAzimuthAtOrigin,
               double  * solarElevationAtViewpoint,
               double  * altitudeOfViewpoint,
-              Vec3D   * directionToZenith,
+              double  * distanceToView,
               Vec3D   * directionToZenithN,
               Vec3D   * directionToSunN
         )
 {
     // Direction to zenith
 
-    Pnt3D  centerOfTheEarth = PNT3D(0,0,-planet_radius);
+    Pnt3D  centerOfTheEarth = PNT3D(0,0,-PSM_PLANET_RADIUS);
+    Vec3D directionToZenith;
 
     vec3d_pp_sub_v(
         & centerOfTheEarth,
           viewpoint,
-          directionToZenith
+        & directionToZenith
         );
-    vec3d_v_norm_v( directionToZenith, directionToZenithN );
+    vec3d_v_norm_v(& directionToZenith, directionToZenithN);
 
 
     // Altitude of viewpoint
 
-    *altitudeOfViewpoint =
-        fabs( vec3d_v_len( directionToZenith) ) - planet_radius;
+    *distanceToView = vec3d_v_len(& directionToZenith);
+    ASSERT_DOUBLE_LARGER_THAN(*distanceToView, -0.0001);
+    *distanceToView = M_MAX(*distanceToView, 0.0);
+
+    *altitudeOfViewpoint = *distanceToView - PSM_PLANET_RADIUS;
     *altitudeOfViewpoint = M_MAX( *altitudeOfViewpoint, 0.0 );
 
 
@@ -320,7 +322,13 @@ void arpragueskymodel_compute_angles(
               double  * zero
         )
 {
-    Vec3D directionToZenith;
+    ASSERT_VALID_DOUBLE(groundLevelSolarElevationAtOrigin);
+    ASSERT_VALID_DOUBLE(groundLevelSolarAzimuthAtOrigin);
+
+    Vec3D viewDirectionN;
+    vec3d_v_norm_v(viewDirection, & viewDirectionN);
+
+    double distanceToView;
     Vec3D directionToZenithN;
     Vec3D directionToSunN;
 
@@ -330,30 +338,61 @@ void arpragueskymodel_compute_angles(
           groundLevelSolarAzimuthAtOrigin,
           solarElevationAtViewpoint,
           altitudeOfViewpoint,
-        & directionToZenith,
+        & distanceToView,
         & directionToZenithN,
         & directionToSunN
         );
 
-    const double C_a = fabs(vec3d_v_len( & directionToZenith)) - PSM_PLANET_RADIUS_SQR / fabs(vec3d_v_len( & directionToZenith));
-    const double a = sqrt( vec3d_v_len( & directionToZenith) * vec3d_v_len( & directionToZenith) - PSM_PLANET_RADIUS_SQR );
-    const double cosCorrectionAngle = a > 0.0 ? C_a / a : 0.0;    
-    const Vec3D corr = VEC3D(0,0,cosCorrectionAngle);
-    Vec3D correctView;
-    vec3d_vv_add_v(
-        & corr,
-          viewDirection,
-        & correctView
-        );
+
+    // Altitude-corrected view direction
+
     Vec3D correctViewN;
-    vec3d_v_norm_v( & correctView, & correctViewN );
+    if (distanceToView > PSM_PLANET_RADIUS)
+    {
+        Pnt3D lookAt;
+        pnt3d_vp_add_p(
+           & viewDirectionN,
+             viewpoint,
+           & lookAt
+           );
+
+        const double correction = sqrt(distanceToView * distanceToView - PSM_PLANET_RADIUS_SQR) / distanceToView;
+
+        Vec3D toNewOrigin;
+        vec3d_dv_mul_v(
+             distanceToView - correction,
+           & directionToZenithN,
+           & toNewOrigin
+           );
+
+        Pnt3D centerOfTheEarth = PNT3D(0,0,-PSM_PLANET_RADIUS);
+        Pnt3D newOrigin;
+        pnt3d_vp_add_p(
+           & toNewOrigin,
+           & centerOfTheEarth,
+           & newOrigin
+           );
+
+        Vec3D correctView;
+        vec3d_pp_sub_v(
+           & newOrigin,
+           & lookAt,
+           & correctView
+           );
+
+        vec3d_v_norm_v( & correctView, & correctViewN );
+    }
+    else
+    {
+        correctViewN = viewDirectionN;
+    }
 
 
-   // Sun angle (gamma) - no correction
+    // Sun angle (gamma) - no correction
 
     double  dotProductSun =
         vec3d_vv_dot(
-              viewDirection,
+            & viewDirectionN,
             & directionToSunN
             );
 
@@ -362,24 +401,19 @@ void arpragueskymodel_compute_angles(
 
     // Shadow angle - requires correction
 
-    const double effectiveElevation = *solarElevationAtViewpoint;
+    const double effectiveElevation = groundLevelSolarElevationAtOrigin;
     const double effectiveAzimuth = groundLevelSolarAzimuthAtOrigin;
     const double shadow_angle = effectiveElevation + MATH_PI * 0.5;
-    const double rotation = effectiveAzimuth - MATH_PI * 0.5;
 
-    Vec3D  shadowDirection;
-    XC(shadowDirection) = 0.0;
-    YC(shadowDirection) = cos(shadow_angle);
-    ZC(shadowDirection) = sin(shadow_angle);
-    const double shadow_x = XC(shadowDirection);
-    const double shadow_y = YC(shadowDirection);
-    XC(shadowDirection) = shadow_x * cos(rotation) - shadow_y * sin(rotation);
-    YC(shadowDirection) = shadow_x * sin(rotation) + shadow_y * cos(rotation);
+    Vec3D shadowDirectionN;
+    XC(shadowDirectionN) = cos(shadow_angle) * cos(effectiveAzimuth);
+    YC(shadowDirectionN) = cos(shadow_angle) * sin(effectiveAzimuth);
+    ZC(shadowDirectionN) = sin(shadow_angle);
 
     const double  dotProductShadow  =
         vec3d_vv_dot(
             & correctViewN,
-            & shadowDirection
+            & shadowDirectionN
             );
 
     *shadow = acos(dotProductShadow);
@@ -397,13 +431,10 @@ void arpragueskymodel_compute_angles(
 
 
     // Zenith angle (theta) - uncorrected version goes outside
-     
-    Vec3D  viewDirNorm;
-    vec3d_v_norm_v(   viewDirection, & viewDirNorm );
 
     double  cosTheta =
         vec3d_vv_dot(
-            & viewDirNorm,
+            & viewDirectionN,
             & directionToZenithN
             );
 
@@ -802,7 +833,7 @@ double arpragueskymodel_radiance(
   const int alpha_segment = find_segment(alpha, state->zenith_nbreaks, state->zenith_breaks);
   const int zero_segment = find_segment(zero, state->emph_nbreaks, state->emph_breaks);
 
-  return interpolate_wavelength(
+  const double res = interpolate_wavelength(
     state,
     elevation_control,
     altitude_control,
@@ -814,7 +845,11 @@ double arpragueskymodel_radiance(
     zero,
     gamma_segment,
     alpha_segment,
-    zero_segment);  
+    zero_segment);
+
+  ASSERT_NONNEGATIVE_DOUBLE(res);
+
+  return res;
 }
 
 
@@ -1240,6 +1275,7 @@ double arpragueskymodel_solar_radiance(
             double idxFloat = idx - floor(idx);
 
             sunRadiance = SunRadTable[lowIdx] * (1.0 - idxFloat) + SunRadTable[lowIdx+1] * idxFloat;
+            ASSERT_POSITIVE_DOUBLE(sunRadiance);
         }
 
 	double tau = arpragueskymodel_tau(
@@ -1250,8 +1286,7 @@ double arpragueskymodel_solar_radiance(
 	      wavelength,
 	      MATH_HUGE_DOUBLE
 	    );
-
-	m_dd_clamp_d( 0.001, MATH_HUGE_DOUBLE, & tau );
+        ASSERT_UNIT_RANGE_DOUBLE(tau);
 
 	return sunRadiance * tau;
 }
@@ -1301,10 +1336,10 @@ void arpragueskymodel_scaleAD(
 {
 	double n;
 	n = sqrt((x_p * x_p) + (y_p * y_p));
-	*a = n - planet_radius;
+	*a = n - PSM_PLANET_RADIUS;
 	*a = *a > 0 ? *a : 0;
 	*a = pow(*a / 100000.0, 1.0 / 3.0);
-	*d = acos(y_p / n) * planet_radius;
+	*d = acos(y_p / n) * PSM_PLANET_RADIUS;
 	*d = *d / 1571524.413613; // Maximum distance to the edge of the atmosphere in the transmittance model
 	*d = pow(*d, 0.25);
 	*d = *d > 1.0 ? 1.0 : *d;
@@ -1322,34 +1357,56 @@ void arpragueskymodel_toAD(
 	double x_v = sin(theta);
 	double y_v = cos(theta);
 	double x_c = 0;
-	double y_c = planet_radius + altitude;
-	double atmo_edge = planet_radius + 100000;
+	double y_c = PSM_PLANET_RADIUS + altitude;
+	double atmo_edge = PSM_PLANET_RADIUS + 100000;
 	double n;
-	if (arpragueskymodel_circleBounds2D(x_v, y_v, y_c, planet_radius, &n) == 1) // Check for planet intersection
+        if (altitude < 0.001) // Handle altitudes close to 0 separately to avoid reporting intersections on the other side of the planet
 	{
-		if (n <= distance) // We do intersect the planet so return a and d at the surface
+		if (theta <= 0.5 * MATH_PI)
 		{
-			double x_p = x_v * n;
-			double y_p = (y_v * n) + planet_radius + altitude;
-			arpragueskymodel_scaleAD(x_p, y_p, a, d);
-			return;
+			if (arpragueskymodel_circleBounds2D(x_v, y_v, y_c, atmo_edge, &n) == 0)
+			{
+				// Then we have a problem!
+				// Return something, but this should never happen so long as the camera is inside the atmosphere
+				// Which it should be in this work
+				*a = 0;
+				*d = 0;
+				return;
+			}
+		}
+		else
+		{
+			n = 0;
 		}
 	}
-	if (arpragueskymodel_circleBounds2D(x_v, y_v, y_c, atmo_edge, &n) == 0)
+	else
 	{
-		// Then we have a problem!
-		// Return something, but this should never happen so long as the camera is inside the atmosphere
-		// Which it should be in this work
-		*a = 0;
-		*d = 0;
-		return;
+		if (arpragueskymodel_circleBounds2D(x_v, y_v, y_c, PSM_PLANET_RADIUS, &n) == 1) // Check for planet intersection
+		{
+			if (n <= distance) // We do intersect the planet so return a and d at the surface
+			{
+				double x_p = x_v * n;
+				double y_p = (y_v * n) + PSM_PLANET_RADIUS + altitude;
+				arpragueskymodel_scaleAD(x_p, y_p, a, d);
+				return;
+			}
+		}
+		if (arpragueskymodel_circleBounds2D(x_v, y_v, y_c, atmo_edge, &n) == 0)
+		{
+			// Then we have a problem!
+			// Return something, but this should never happen so long as the camera is inside the atmosphere
+			// Which it should be in this work
+			*a = 0;
+			*d = 0;
+			return;
+		}
 	}
 	double distance_corrected = n;
 	// Use the smaller of the distances
 	distance_corrected = distance < distance_corrected ? distance : distance_corrected;
 	// Points in world space
 	double x_p = x_v * distance_corrected;
-	double y_p = (y_v * distance_corrected) + planet_radius + altitude;
+	double y_p = (y_v * distance_corrected) + PSM_PLANET_RADIUS + altitude;
 	arpragueskymodel_scaleAD(x_p, y_p, a, d);
 }
 
@@ -1492,17 +1549,29 @@ double arpragueskymodel_tau(
 	const double                   distance
 )
 {
+	ASSERT_DOUBLE_WITHIN_RANGE(theta, 0.0, MATH_PI);
+	ASSERT_DOUBLE_WITHIN_RANGE(altitude, 0.0, 15000.0);
+	ASSERT_NONNEGATIVE_DOUBLE(turbidity);
+	ASSERT_POSITIVE_DOUBLE(wavelength);
+	ASSERT_POSITIVE_DOUBLE(distance);
+
 	const double wavelength_norm = (wavelength - 340.0) / 40.0;
 	if (wavelength_norm > 10. || wavelength_norm < 0.)
 		return 0.;
 	const int wavelength_low = (int)wavelength_norm;
 	const double wavelength_factor = wavelength_norm - (double)wavelength_low;
 	const int wavelength_inc = wavelength_low < 10 ? 1 : 0;
+        ASSERT_INTEGER_WITHIN_RANGE(wavelength_low, 0, 10);
+        ASSERT_DOUBLE_WITHIN_RANGE(wavelength_factor, 0.0, 1.0);
+        ASSERT_INTEGER_WITHIN_RANGE(wavelength_inc, 0, 1);
 
 	const double altitude_norm = 20.0 * cbrt(altitude / 15000.0);
 	const int altitude_low = (int)altitude_norm;
 	const double altitude_factor = altitude_norm - (double)altitude_low;
 	const int altitude_inc = altitude_low < 20 ? 1 : 0;
+        ASSERT_INTEGER_WITHIN_RANGE(altitude_low, 0, 20);
+        ASSERT_DOUBLE_WITHIN_RANGE(altitude_factor, 0.0, 1.0);
+        ASSERT_INTEGER_WITHIN_RANGE(altitude_inc, 0, 1);
 
         int turb_low = (int)turbidity;
 	turb_low = turb_low < 0 ? 0 : turb_low;
@@ -1514,17 +1583,24 @@ double arpragueskymodel_tau(
 	double a;
 	double d;
 	arpragueskymodel_toAD(theta, distance, altitude, &a, &d);
+	ASSERT_NONNEGATIVE_DOUBLE(a);
+	ASSERT_NONNEGATIVE_DOUBLE(d);
 
+        /* No turbity interpolation for now
         // Evaluate basis at low turbidity
 	double trans_low = arpragueskymodel_calc_transmittance_svd(state, a, d, turb_low, wavelength_low, wavelength_inc, wavelength_factor, altitude_low, altitude_inc, altitude_factor);
-	// Evaluate basis at high turbidity
+
+        // Evaluate basis at high turbidity
 	double trans_high = arpragueskymodel_calc_transmittance_svd(state, a, d, turb_low + turb_inc, wavelength_low, wavelength_inc, wavelength_factor, altitude_low, altitude_inc, altitude_factor);
 
 	// Return interpolated transmittance values
-	double trans = lerp(trans_low, trans_high, turb_w);
+	double trans = lerp(trans_low, trans_high, turb_w);*/
+        double trans = arpragueskymodel_calc_transmittance_svd(state, a, d, 1, wavelength_low, wavelength_inc, wavelength_factor, altitude_low, altitude_inc, altitude_factor);
+        ASSERT_VALID_DOUBLE(trans);
 
 	trans = clamp0_1(trans);
 	trans = trans * trans;
+        ASSERT_UNIT_RANGE_DOUBLE(trans);
 
 	return trans;
 }

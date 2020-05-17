@@ -387,6 +387,27 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLightsourceCollection)
             ];
 }
 
+- (double) selectionProbabilityOfSource
+        : (const Pnt3D *)           queryLocationWorldspace
+        : ( ArNode *)               emissiveObject
+        : ( ArSamplingRegion *)     samplingRegionOnEmissiveObject
+        : ( id <ArpLightsource> *)  lightsource
+{
+    unsigned int  i = 0;
+
+    while (   i < ( numberOfLights - 1 )
+           && (id)[ light[i].source shape ] != (id)emissiveObject )
+        i++;
+
+    *lightsource = light[i].source;
+
+    return
+        [ light[i].source selectionProbabilityOfRegion
+            :   samplingRegionOnEmissiveObject
+            :   queryLocationWorldspace
+            ];
+}
+
 - (void) dealloc
 {
     if ( ownsLights && light )

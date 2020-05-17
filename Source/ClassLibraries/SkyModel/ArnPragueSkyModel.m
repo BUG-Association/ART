@@ -89,6 +89,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPragueSkyModel)
         arpragueskymodelstate_alloc_init(
             resourcePaths[existingPathIndex]
             );
+
+    solarRadius = PSM_SUN_RADIUS;
 }
 
 - (void) prepareForUse
@@ -132,7 +134,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPragueSkyModel)
         : (ArNode <ArpTrafo3D> *) newTrafo
 {
     [ super init
-        :   0.0
+        :   PSM_SUN_RADIUS
         :   newElevation
         :   newAzimuth
         :   0.0
