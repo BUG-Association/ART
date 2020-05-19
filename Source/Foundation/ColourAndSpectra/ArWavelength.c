@@ -104,6 +104,22 @@ void arwavelength_sd_init_w(
     ASSERT_VALID_WAVELENGTH( wavelength_r )
 }
 
+void arwavelength_i_deterministic_init_w(
+        const ART_GV        * art_gv,
+        const int             wavelengthStartIndex,
+              ArWavelength  * wavelength_r
+        )
+{
+    ASSERT_ALLOCATED_WAVELENGTH( wavelength_r )
+    
+    for ( int i = 0; i < 4; i++ )
+    {
+        ARWL_WI( *wavelength_r, i ) = spc_channel_center(art_gv, wavelengthStartIndex );
+    }
+
+    ASSERT_VALID_WAVELENGTH( wavelength_r )
+}
+
 unsigned int arwavelength_w_valid(
         const ART_GV        * art_gv,
         const ArWavelength  * w0

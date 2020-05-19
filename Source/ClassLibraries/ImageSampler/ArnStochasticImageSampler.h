@@ -98,6 +98,16 @@ ART_MODULE_INTERFACE(ArnStochasticImageSampler)
     //   An array of splattingKernelArea length.
 
     IPnt2D        * sampleSplattingOffset;
+    
+    //   Special operation mode: don't jitter the wavelengths
+    
+    BOOL            deterministicWavelengths;
+    
+    //   Steps needed to traverse the wavelength range
+    //   1 if stochastic, as only one sample is taken
+    //   number of WLs div 4 in the deterministic case, precomputed
+    
+    int             wavelengthSteps;
 }
 
 - init
@@ -107,6 +117,9 @@ ART_MODULE_INTERFACE(ArnStochasticImageSampler)
         : (int) newRandomValueGeneration
         ;
 
+- (void) useDeterministicWavelengths
+        ;
+        
 @end
 
 // ===========================================================================
