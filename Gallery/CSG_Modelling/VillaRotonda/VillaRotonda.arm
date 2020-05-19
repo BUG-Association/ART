@@ -601,9 +601,10 @@ ARM_MAIN_FUNCTION(VillaRotonda)
 #else
 #ifdef PRAGUE_SKY
     skyModel: [ PRAGUE_SKYLIGHT
-            elevation   : 2.5 DEGREES
-            azimuth     : 160.0 DEGREES
-            turbidity   : 4.0
+            elevation   : -2 DEGREES
+//            azimuth     : 160.0 DEGREES
+            azimuth     : 250.0 DEGREES
+            turbidity   : 2.5
             groundAlbedo: MUNSELL_075GY_04_06
             ]
 #else

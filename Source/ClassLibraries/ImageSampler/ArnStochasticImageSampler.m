@@ -70,7 +70,17 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSampler)
             :   newRandomValueGeneration
             ];
 
+    deterministicWavelengths = NO;
+    wavelengthSteps = 1;
+    
     return self;
+}
+
+- (void) useDeterministicWavelengths
+{
+    deterministicWavelengths = YES;
+    wavelengthSteps = spc_channels(art_gv);
+    art_set_hero_samples_to_splat( art_gv, 1 );
 }
 
 - (void) prepareForSampling
@@ -275,156 +285,169 @@ ArPixelID;
                 
                 XC(px_id.pixelCoord) = x + XC(imageOrigin);
 
-                [ THREAD_RANDOM_GENERATOR reInitializeWith
-                    :   crc32_of_data( & px_id, sizeof(ArPixelID) )
-                    ];
-
-                /* --------------------------------------------------------------
-                    We double-check whether a given sample should be
-                    included: first the validity of the ray is checked (rays are
-                    always valid for normal cameras, but e.g. fisheye cameras
-                    have pixels which lie outside the imaged area) and secondly
-                    all rays which do not contain plausible radiance information
-                    (all components > 0) are simply not used.
-
-                    The latter check should not be necessary in a perfect world,
-                    but in reality malformed mesh data and other gremlins can
-                    lead to artefacts if this is not looked after.
-                ------------------------------------------------------------aw- */
-
-                BOOL  validSample = FALSE;
-
-                [ THREAD_RANDOM_GENERATOR setCurrentSequenceID
-                    :  startingSequenceID
-                    ];
-
-                Ray3D              ray;
-                ArReferenceFrame   referenceFrame;
-                ArWavelength       wavelength;
-                
-                arwavelength_sd_init_w(
-                      art_gv,
-                    & spectralSamplingData,
-                      [ THREAD_RANDOM_GENERATOR valueFromNewSequence ],
-                    & wavelength
-                    );
-                
-                if ( [ camera getWorldspaceRay
-                         : & VEC2D(
-                                XC(px_id.pixelCoord) + XC(sampleCoord[subpixelIdx]),
-                                YC(px_id.pixelCoord) + YC(sampleCoord[subpixelIdx])
-                                )
-                         :   THREAD_RANDOM_GENERATOR
-                         : & referenceFrame
-                         : & ray
-                         ] )
+                for ( int w = 0; w < wavelengthSteps; w++ )
                 {
-                    [ THREAD_PATHSPACE_INTEGRATOR calculateLightSamples
-                        : & ray
-                        : & wavelength
-                        :   sampleValue
+                    [ THREAD_RANDOM_GENERATOR reInitializeWith
+                        :   crc32_of_data( & px_id, sizeof(ArPixelID) )
                         ];
 
-                    if ( arlightalphasample_l_valid(
-                            art_gv,
-                            ARPATHSPACERESULT_LIGHTALPHASAMPLE(*sampleValue[0])
-                            ) )
+                    /* --------------------------------------------------------------
+                        We double-check whether a given sample should be
+                        included: first the validity of the ray is checked (rays are
+                        always valid for normal cameras, but e.g. fisheye cameras
+                        have pixels which lie outside the imaged area) and secondly
+                        all rays which do not contain plausible radiance information
+                        (all components > 0) are simply not used.
+
+                        The latter check should not be necessary in a perfect world,
+                        but in reality malformed mesh data and other gremlins can
+                        lead to artefacts if this is not looked after.
+                    ------------------------------------------------------------aw- */
+
+                    BOOL  validSample = FALSE;
+
+                    [ THREAD_RANDOM_GENERATOR setCurrentSequenceID
+                        :  startingSequenceID
+                        ];
+
+                    Ray3D              ray;
+                    ArReferenceFrame   referenceFrame;
+                    ArWavelength       wavelength;
+                    
+                    if ( deterministicWavelengths )
                     {
-                        if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
-                        {
-                            for ( int im = 0; im < numberOfImagesToWrite; im++ )
-                                arlightsample_realign_to_coaxial_refframe_l(
-                                      art_gv,
-                                    & referenceFrame,
-                                      ARPATHSPACERESULT_LIGHTSAMPLE( *sampleValue[im] )
-                                    );
-                        }
-                        
-                        validSample = TRUE;
-                    }
-                }
-                else
-                {
-                    for ( int im = 0; im < numberOfImagesToWrite; im++ )
-                    {
-                        sampleValue[im] =
-                            (ArPathspaceResult*) arfreelist_pop(
-                                & pathspaceResultFreelist[THREAD_INDEX]
-                                );
-                        
-                        ARPATHSPACERESULT_NEXT(*sampleValue[im]) = NULL;
-                        
-                        arlightalphasample_l_init_l(
+                        arwavelength_i_deterministic_init_w(
                               art_gv,
-                              ARLIGHTALPHASAMPLE_NONE_A0,
-                              ARPATHSPACERESULT_LIGHTALPHASAMPLE(*sampleValue[im])
+                              w,
+                            & wavelength
                             );
                     }
-
-                    validSample = TRUE;
-                }
-
-                if ( validSample )
-                {
-                    if ( splattingKernelWidth == 1 )
+                    else
                     {
-                        for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                        arwavelength_sd_init_w(
+                              art_gv,
+                            & spectralSamplingData,
+                              [ THREAD_RANDOM_GENERATOR valueFromNewSequence ],
+                            & wavelength
+                            );
+                    }
+                    
+                    if ( [ camera getWorldspaceRay
+                             : & VEC2D(
+                                    XC(px_id.pixelCoord) + XC(sampleCoord[subpixelIdx]),
+                                    YC(px_id.pixelCoord) + YC(sampleCoord[subpixelIdx])
+                                    )
+                             :   THREAD_RANDOM_GENERATOR
+                             : & referenceFrame
+                             : & ray
+                             ] )
+                    {
+                        [ THREAD_PATHSPACE_INTEGRATOR calculateLightSamples
+                            : & ray
+                            : & wavelength
+                            :   sampleValue
+                            ];
+
+                        if ( arlightalphasample_l_valid(
+                                art_gv,
+                                ARPATHSPACERESULT_LIGHTALPHASAMPLE(*sampleValue[0])
+                                ) )
                         {
-                            PIXEL_SAMPLE_COUNT( x, y, THREAD_INDEX, im ) += 1.0;
+                            if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
+                            {
+                                for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                                    arlightsample_realign_to_coaxial_refframe_l(
+                                          art_gv,
+                                        & referenceFrame,
+                                          ARPATHSPACERESULT_LIGHTSAMPLE( *sampleValue[im] )
+                                        );
+                            }
                             
-                            arlightalpha_wsd_sloppy_add_l(
-                                  art_gv,
-                                  ARPATHSPACERESULT_LIGHTALPHASAMPLE(*sampleValue[im]),
-                                & wavelength,
-                                & spectralSplattingData,
-                                  3.0 DEGREES,
-                                  PIXEL_SAMPLE_VALUE( x, y, THREAD_INDEX, im )
-                                );
+                            validSample = TRUE;
                         }
                     }
                     else
                     {
-                        for ( unsigned int l = 0; l < splattingKernelArea; l++ )
+                        for ( int im = 0; im < numberOfImagesToWrite; im++ )
                         {
-                            int  cX = x + XC( sampleSplattingOffset[l] );
-                            int  cY = y + YC( sampleSplattingOffset[l] );
+                            sampleValue[im] =
+                                (ArPathspaceResult*) arfreelist_pop(
+                                    & pathspaceResultFreelist[THREAD_INDEX]
+                                    );
+                            
+                            ARPATHSPACERESULT_NEXT(*sampleValue[im]) = NULL;
+                            
+                            arlightalphasample_l_init_l(
+                                  art_gv,
+                                  ARLIGHTALPHASAMPLE_NONE_A0,
+                                  ARPATHSPACERESULT_LIGHTALPHASAMPLE(*sampleValue[im])
+                                );
+                        }
 
-                            if (   cX >= 0
-                                && cX < XC(imageSize)
-                                && cY >= 0
-                                && cY < YC(imageSize) )
+                        validSample = TRUE;
+                    }
+
+                    if ( validSample )
+                    {
+                        if ( splattingKernelWidth == 1 )
+                        {
+                            for ( int im = 0; im < numberOfImagesToWrite; im++ )
                             {
-                                for ( int im = 0; im < numberOfImagesToWrite; im++ )
-                                {
-                                    PIXEL_SAMPLE_COUNT( cX, cY, THREAD_INDEX, im ) += SAMPLE_SPLATTING_FACTOR( subpixelIdx, l );
+                                PIXEL_SAMPLE_COUNT( x, y, THREAD_INDEX, im ) += 1.0;
+                                
+                                arlightalpha_wsd_sloppy_add_l(
+                                      art_gv,
+                                      ARPATHSPACERESULT_LIGHTALPHASAMPLE(*sampleValue[im]),
+                                    & wavelength,
+                                    & spectralSplattingData,
+                                      3.0 DEGREES,
+                                      PIXEL_SAMPLE_VALUE( x, y, THREAD_INDEX, im )
+                                    );
+                            }
+                        }
+                        else
+                        {
+                            for ( unsigned int l = 0; l < splattingKernelArea; l++ )
+                            {
+                                int  cX = x + XC( sampleSplattingOffset[l] );
+                                int  cY = y + YC( sampleSplattingOffset[l] );
 
+                                if (   cX >= 0
+                                    && cX < XC(imageSize)
+                                    && cY >= 0
+                                    && cY < YC(imageSize) )
+                                {
                                     for ( int im = 0; im < numberOfImagesToWrite; im++ )
                                     {
-                                        arlightalpha_dwsd_mul_sloppy_add_l(
-                                              art_gv,
-                                              SAMPLE_SPLATTING_FACTOR( subpixelIdx, l ),
-                                              ARPATHSPACERESULT_LIGHTALPHASAMPLE(*sampleValue[im]),
-                                            & wavelength,
-                                            & spectralSplattingData,
-                                              5.0 DEGREES,
-                                              THREAD_RESULT_PIXEL( cX, cY, im )
-                                            );
+                                        PIXEL_SAMPLE_COUNT( cX, cY, THREAD_INDEX, im ) += SAMPLE_SPLATTING_FACTOR( subpixelIdx, l );
+
+                                        for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                                        {
+                                            arlightalpha_dwsd_mul_sloppy_add_l(
+                                                  art_gv,
+                                                  SAMPLE_SPLATTING_FACTOR( subpixelIdx, l ),
+                                                  ARPATHSPACERESULT_LIGHTALPHASAMPLE(*sampleValue[im]),
+                                                & wavelength,
+                                                & spectralSplattingData,
+                                                  5.0 DEGREES,
+                                                  THREAD_RESULT_PIXEL( cX, cY, im )
+                                                );
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                for ( int im = 0; im < numberOfImagesToWrite; im++ )
-                {
-                    arpathspaceresult_free_to_freelist(
-                          art_gv,
-                        & pathspaceResultFreelist[THREAD_INDEX],
-                          sampleValue[im]
-                        );
+                    for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                    {
+                        arpathspaceresult_free_to_freelist(
+                              art_gv,
+                            & pathspaceResultFreelist[THREAD_INDEX],
+                              sampleValue[im]
+                            );
+                    }
                 }
-
             } // x, XC(image)
         } // y, YC(image)
 
@@ -462,6 +485,16 @@ ArPixelID;
         : (ArcObject <ArpCoder> *) coder
 {
     [ super code: coder ];
+    [ coder codeBOOL: & deterministicWavelengths ];
+    
+    if ([coder isReading])
+    {
+#warning  this whole thing is fragile and should not be in a release version of ART (aw)
+        if ( ! deterministicWavelengths )
+            wavelengthSteps = 1;
+        else
+            wavelengthSteps = spc_channels(art_gv) / 4;
+    }
 }
 
 @end
