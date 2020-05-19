@@ -1358,7 +1358,8 @@ void arpragueskymodel_toAD(
 	double y_v = cos(theta);
 	double x_c = 0;
 	double y_c = PSM_PLANET_RADIUS + altitude;
-	double atmo_edge = PSM_PLANET_RADIUS + 100000;
+        #warning The true atmosphere thickness is 120010 but this low value compansates for the insufficient resolution of the transmittance fit. This is just temporary hack that needs to be fixed!
+	double atmo_edge = PSM_PLANET_RADIUS + 40000;
 	double n;
         if (altitude < 0.001) // Handle altitudes close to 0 separately to avoid reporting intersections on the other side of the planet
 	{
