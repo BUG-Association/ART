@@ -1,10 +1,12 @@
 #define EPS	0.001
+#define PLANET_RADIUS       6378000.00
 
 #define GREEN_LAWN
-//#define WHITE_WALLS
+#define WHITE_WALLS
 
 //#define DIFFUSE_ILLUMINATION
 //#define SHOW_INTERIOR
+#define PRAGUE_SKY
 
 ArObj create_Figure(
         ART_GV  * art_gv
@@ -66,7 +68,8 @@ ArObj create_Rotonda(
     ArObj green =	LAMBERT_REFLECTOR( MACBETH_NEUTRAL5 );
 #endif
     ArObj darkGrey =	LAMBERT_REFLECTOR( MACBETH_SG_K7 );
-    ArObj darkRed =	LAMBERT_REFLECTOR( MACBETH_MODERATERED );
+    ArObj darkRed =	LAMBERT_REFLECTOR( MUNSELL_050R_04_04 );
+//    ArObj darkRed =	LAMBERT_REFLECTOR( MACBETH_MODERATERED );
 #ifdef WHITE_WALLS
     ArObj whiteGrey =	LAMBERT_REFLECTOR( MACBETH_SG_F5 );
 #else
@@ -489,10 +492,19 @@ ArObj create_Rotonda(
 				:TRANSLATION(-190,-190,10) ] surfaceMaterial: subtraction_surface ] ];
 #endif
 
-    return UNION(lawn, ways, villa, UNION_END);
+    id planet   =
+        [ SPHERE apply
+            :   USCALE( PLANET_RADIUS + 0.1 )
+            :   TRANSLATION_Z(-PLANET_RADIUS)
+            :   green
+            ];
+
+    return UNION(planet, ways, villa, UNION_END);
+//    return UNION(UNION_END);
 }
 
-#define ELEVATED_OVERALL_VIEW
+#define CLOSE_VIEW
+//#define ELEVATED_OVERALL_VIEW
 //#define ELEVATED_OVERALL_CLOSEUP
 //#define GROUNDLEVEL_ZOOM
 
@@ -504,7 +516,13 @@ ArNode <ArpCamera> * create_RotondaCamera(
     [ [ CAMERA
 //	imageSize:	IVEC2D( 1280, 1024 )
 //	imageSize:	IVEC2D( 1024, 768 )
-	imageSize:	IVEC2D( 640, 480 )
+	imageSize:	IVEC2D( 1980, 1080 )
+//	imageSize:	IVEC2D( 640, 480 )
+#ifdef CLOSE_VIEW
+	ray:		RAY3D(PNT3D( -400, -250, 5 ),VEC3D(160, 100, 24 )) //-8
+//	ray:		RAY3D(PNT3D( -800, -500, 10 ),VEC3D(160, 100, 12 )) //-8
+	zoom:		1 // 5.5
+#endif
 #ifdef ELEVATED_OVERALL_VIEW
 	ray:		RAY3D(PNT3D( -1600, -1000, 300 ),VEC3D(160, 100, -26 ))
 	zoom:		5.0 // 5.5
@@ -581,12 +599,21 @@ ARM_MAIN_FUNCTION(VillaRotonda)
 #ifdef DIFFUSE_ILLUMINATION
         environmentMaterial   : environmentMaterial
 #else
-	skyModel:  [ HOSEK_SKYLIGHT
+#ifdef PRAGUE_SKY
+    skyModel: [ PRAGUE_SKYLIGHT
+            elevation   : 2.5 DEGREES
+            azimuth     : 160.0 DEGREES
+            turbidity   : 4.0
+            groundAlbedo: MUNSELL_075GY_04_06
+            ]
+#else
+	skyModel: [ HOSEK_SKYLIGHT
             elevation   : 25 DEGREES
             azimuth     : 160.0 DEGREES
             turbidity   : 4.0
             groundAlbedo: CONST_COLOUR_GREY(0.5)
             ]
+#endif
 #endif
 	camera:		create_RotondaCamera(art_gv)
         actionSequence: create_RotondaActionSequence(art_gv)
