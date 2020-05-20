@@ -348,13 +348,13 @@ void sps_splatting_data_from_current_ISR_s(
         if ( sr->splatChannel0[i] != INVALID_SPLAT_CHANNEL )
         {
             sr->splatFactor0[i] *=
-                spc_channel_weight(art_gv, sr->splatChannel0[i]) * numChannels * 0.01;
+                spc_channel_weight(art_gv, sr->splatChannel0[i]) * numChannels;// * 0.01;
         }
 
         if ( sr->splatChannel1[i] != INVALID_SPLAT_CHANNEL )
         {
             sr->splatFactor1[i] *=
-                spc_channel_weight(art_gv, sr->splatChannel1[i]) * numChannels * 0.01;
+                spc_channel_weight(art_gv, sr->splatChannel1[i]) * numChannels;// * 0.01;
         }
     }
     
