@@ -67,6 +67,7 @@ const double altitude_vals[] = { 0, 1.875, 15, 50.625, 120, 234.38, 405, 643.12,
 const int tensor_components = 9;
 const int tensor_components_pol = 4;
 const int transsvdrank = 12;
+const double safety_altitude = 50.0;
 
 int compute_pp_coefs(const int nbreaks, const double * breaks, const float * values, double * coefs, const int offset)
 {
@@ -325,6 +326,19 @@ void arpragueskymodel_compute_angles(
     ASSERT_VALID_DOUBLE(groundLevelSolarElevationAtOrigin);
     ASSERT_VALID_DOUBLE(groundLevelSolarAzimuthAtOrigin);
 
+    // Shift viewpoint about safety altitude up
+
+    Pnt3D centerOfTheEarth = PNT3D(0,0,-PSM_PLANET_RADIUS);
+    Vec3D toViewpoint;
+    Vec3D toViewpointN;
+    vec3d_pp_sub_v(& centerOfTheEarth, viewpoint, & toViewpoint);
+    vec3d_v_norm_v(& toViewpoint, & toViewpointN);
+    const double distanceToViewTmp = vec3d_v_len(& toViewpoint) + safety_altitude;
+    Vec3D toShiftedViewpoint;
+    vec3d_dv_mul_v(distanceToViewTmp, & toViewpointN, & toShiftedViewpoint);
+    Pnt3D shiftedViewpoint;
+    pnt3d_vp_add_p(& toShiftedViewpoint, & centerOfTheEarth, & shiftedViewpoint);
+
     Vec3D viewDirectionN;
     vec3d_v_norm_v(viewDirection, & viewDirectionN);
 
@@ -333,7 +347,7 @@ void arpragueskymodel_compute_angles(
     Vec3D directionToSunN;
 
     arpragueskymodel_compute_altitude_and_elevation(
-          viewpoint,
+        & shiftedViewpoint,
           groundLevelSolarElevationAtOrigin,
           groundLevelSolarAzimuthAtOrigin,
           solarElevationAtViewpoint,
@@ -352,7 +366,7 @@ void arpragueskymodel_compute_angles(
         Pnt3D lookAt;
         pnt3d_vp_add_p(
            & viewDirectionN,
-             viewpoint,
+           & shiftedViewpoint,
            & lookAt
            );
 
