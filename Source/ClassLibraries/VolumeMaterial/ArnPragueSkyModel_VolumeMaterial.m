@@ -808,7 +808,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
         : (      ArAttenuationSample *) attenuation_r
         : (      ArLightSample *)       light_r
 {
-	const int sampleCount = 3;
+	const int sampleCount = 7;
 	const double maxSampleDeviation = 0.25 DEGREES;
 	const double limitAltitude = 200;
 	const double limitTheta = 0.5 * MATH_PI - 3 DEGREES;
@@ -863,7 +863,6 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 		int validSampleCount = 0;
 		for (int i = 0; i < sampleCount; ++i)
 		{
-			//const double shift = 0;
 			const double shift = tan(shiftStart + i * shiftStep);
 			
 			const double distToLookAtNew = distToLookAtOrig + shift;
