@@ -810,7 +810,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 {
 	const int sampleCount = 7;
 	const double maxSampleDeviation = 0.25 DEGREES;
-	const double limitAltitude = 200;
+	const double limitAltitude = 300;
 	const double limitTheta = 0.5 * MATH_PI - 3 DEGREES;
 
 	Pnt3D  pointA = RAY3D_P(*ray_worldspace);
@@ -904,7 +904,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 		{
 			sps_d_mul_s(art_gv, 1.0 / validSampleCount, & attenuation_sum);
 			sps_d_mul_s(art_gv, 1.0 / validSampleCount, & light_sum);
-		}	
+		}
 
 		if (  LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
 		{

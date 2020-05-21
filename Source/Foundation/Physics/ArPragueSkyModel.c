@@ -67,7 +67,7 @@ const double altitude_vals[] = { 0, 1.875, 15, 50.625, 120, 234.38, 405, 643.12,
 const int tensor_components = 9;
 const int tensor_components_pol = 4;
 const int transsvdrank = 12;
-const double safety_altitude = 20.0;
+const double safety_altitude = 50.0;
 
 int compute_pp_coefs(const int nbreaks, const double * breaks, const float * values, double * coefs, const int offset)
 {
