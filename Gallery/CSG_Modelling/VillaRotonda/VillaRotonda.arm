@@ -5,7 +5,7 @@
 #define WHITE_WALLS
 
 //#define DIFFUSE_ILLUMINATION
-//#define SHOW_INTERIOR
+#define SHOW_INTERIOR
 #define PRAGUE_SKY
 
 ArObj create_Figure(
@@ -503,8 +503,8 @@ ArObj create_Rotonda(
 //    return UNION(UNION_END);
 }
 
-#define CLOSE_VIEW
-//#define ELEVATED_OVERALL_VIEW
+//#define CLOSE_VIEW
+#define ELEVATED_OVERALL_VIEW
 //#define ELEVATED_OVERALL_CLOSEUP
 //#define GROUNDLEVEL_ZOOM
 
@@ -514,9 +514,9 @@ ArNode <ArpCamera> * create_RotondaCamera(
 {
     return
     [ [ CAMERA
-//	imageSize:	IVEC2D( 1280, 1024 )
+	imageSize:	IVEC2D( 1280, 1024 )
 //	imageSize:	IVEC2D( 1024, 768 )
-	imageSize:	IVEC2D( 1980, 1080 )
+//	imageSize:	IVEC2D( 1980, 1080 )
 //	imageSize:	IVEC2D( 640, 480 )
 #ifdef CLOSE_VIEW
 	ray:		RAY3D(PNT3D( -400, -250, 5 ),VEC3D(160, 100, 24 )) //-8
@@ -524,8 +524,10 @@ ArNode <ArpCamera> * create_RotondaCamera(
 	zoom:		1 // 5.5
 #endif
 #ifdef ELEVATED_OVERALL_VIEW
-	ray:		RAY3D(PNT3D( -1600, -1000, 300 ),VEC3D(160, 100, -26 ))
-	zoom:		5.0 // 5.5
+	ray:		RAY3D(PNT3D( -800, -500, 150 ),VEC3D(160, 100, -21 ))
+	zoom:		5.5 // 2.5 5.5
+//	ray:		RAY3D(PNT3D( -1600, -1000, 300 ),VEC3D(160, 100, -26 ))
+//	zoom:		5.0 // 5.5
 #endif
 #ifdef ELEVATED_OVERALL_CLOSEUP
 	ray:		RAY3D(PNT3D( -1600, -1000, 300 ),VEC3D(160, 105, -28 ))
@@ -601,9 +603,9 @@ ARM_MAIN_FUNCTION(VillaRotonda)
 #else
 #ifdef PRAGUE_SKY
     skyModel: [ PRAGUE_SKYLIGHT
-            elevation   : -2 DEGREES
+            elevation   : 20 DEGREES
 //            azimuth     : 160.0 DEGREES
-            azimuth     : 250.0 DEGREES
+            azimuth     : 180.0 DEGREES
             turbidity   : 2.5
             groundAlbedo: MUNSELL_075GY_04_06
             ]
