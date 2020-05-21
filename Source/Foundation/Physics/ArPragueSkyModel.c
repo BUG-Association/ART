@@ -65,7 +65,7 @@ const int albedos = 4;
 const double elevation_vals[] = { -0.073304, -0.069813, -0.061087, -0.052360, -0.043633, -0.034907, -0.026180, -0.017453, -0.008727, 0.000000, 0.017453, 0.049742, 0.091281, 0.140499, 0.196350, 0.258134, 0.325329, 0.397411, 0.474206, 0.555364, 0.640710, 0.730071, 0.823097, 0.919963, 1.020319, 1.123992, 1.230981, 1.341111, 1.454557, 1.570796 };
 const double altitude_vals[] = { 0, 1.875, 15, 50.625, 120, 234.38, 405, 643.12, 960, 1366.9, 1875, 2000, 2495.6, 3240, 4119.4, 5145, 6328.1, 7680, 9211.9, 10935, 12861, 15000 };
 const int tensor_components = 9;
-const int tensor_components_pol = 4;
+const int tensor_components_pol = 5;
 const int transsvdrank = 12;
 const double safety_altitude = 50.0;
 
@@ -189,23 +189,36 @@ ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
 
 	// Read coefficients
 
+	float * pol_temp = ALLOC_ARRAY(float, M_MAX(state->sun_nbreaks_pol, state->zenith_nbreaks_pol));
+
     for (int wl = 0; wl < 11; ++wl)
     {
         // Polarisation file structure:
 	// [[[[ sun_coefs ((2 * state->sun_nbreaks_pol - 2) * double), zenith_coefs ((2 * state->zenith_nbreaks_pol - 2) * double) ] * tensor_components_pol ] * elevations ] * altitudes ] * albedos
 
 	char filename[1024];
-
-        sprintf(filename, "%s/SkyModel/new_params_t%d_wl%d_pol.dat", library_path, 5, wl+1);
-
+        sprintf(filename, "%s/SkyModel/new_params_t%d_wl%d_pol.dat", library_path, 2, wl+1);
         FILE* handle = fopen(filename, "rb");
 
-        state->polarisation_dataset[wl] = ALLOC_ARRAY(double, state->total_coefs_all_configs_pol);
+	int offset = 0;
+	state->polarisation_dataset[wl] = ALLOC_ARRAY(double, state->total_coefs_all_configs_pol);
 
-        size_t s = fread(state->polarisation_dataset[wl], sizeof(double), state->total_coefs_all_configs_pol, handle);
+	for (int comb = 0; comb < elevations * altitudes * albedos; ++comb)
+	{
+		for (int tc = 0; tc < tensor_components_pol; ++tc)
+		{
+			fread(pol_temp, sizeof(float), state->sun_nbreaks_pol, handle);
+			offset += compute_pp_coefs(state->sun_nbreaks_pol, state->sun_breaks_pol, pol_temp, state->polarisation_dataset[wl], offset);
+
+			fread(pol_temp, sizeof(float), state->zenith_nbreaks_pol, handle);
+			offset += compute_pp_coefs(state->zenith_nbreaks_pol, state->zenith_breaks_pol, pol_temp, state->polarisation_dataset[wl], offset);
+		}
+	}
+
         fclose(handle);
     }
 
+    free(pol_temp);
 
     // Transmittance
 
