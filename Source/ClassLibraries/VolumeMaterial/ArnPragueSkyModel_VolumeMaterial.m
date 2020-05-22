@@ -597,9 +597,9 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     if (  LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
     {
-        arpragueskymodel_polarised_light_sample(
+        arpragueskymodel_polarised_light_sample_halfhero(
               art_gv,
-            skymodel_state,
+              skymodel_state,
               solarElevationA,
               solarAzimuth,
             & RAY3D_V(*ray_worldspace),
@@ -607,8 +607,8 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
               gammaA,
               altitudeA,
               atmosphericTurbidity,
-              SPS_CI(albedoSample,0),
-              NANO_FROM_UNIT( ARWL_WI(*wavelength,0) ),
+            & albedoSample,
+              wavelength,
             & lightSpectralSample,
               light_r
             );
@@ -915,7 +915,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 			    & albedoSample
 			    );			
 
-			arpragueskymodel_polarised_light_sample(
+                        arpragueskymodel_polarised_light_sample_halfhero(
 			      art_gv,
 			      skymodel_state,
 			      solarElevationA,
@@ -925,8 +925,8 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 			      gammaA,
 			      altitudeA,
 			      atmosphericTurbidity,
-			      SPS_CI(albedoSample,0),
-			      NANO_FROM_UNIT( ARWL_WI(*wavelength,0) ),
+			    & albedoSample,
+			      wavelength,
 			    & light_sum,
 			      light_r
 			    );
