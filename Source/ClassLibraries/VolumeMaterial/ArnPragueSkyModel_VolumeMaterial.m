@@ -509,6 +509,12 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     ArSpectralSample  attenuationSpectralSample;
 
     ArSpectralSample albedoSample;
+    sps_sw_init_s(
+	art_gv,
+	groundAlbedo,
+	wavelength,
+	& albedoSample
+	);
 
     if ( distance == MATH_HUGE_DOUBLE || altitudeB > 15000. )
     {
@@ -530,13 +536,6 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
                     );
 
         sps_dd_clamp_s(art_gv, 0.001, MATH_HUGE_DOUBLE, & tau);
-    
-        sps_sw_init_s(
-              art_gv,
-              groundAlbedo,
-              wavelength,
-            & albedoSample
-            );
 
         ArSpectralSample radianceA;
         for(int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
