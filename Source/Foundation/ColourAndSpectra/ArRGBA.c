@@ -32,6 +32,18 @@ ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
+unsigned int rgba_s_valid(
+        const ART_GV  * art_gv,
+        const ArRGBA  * c0
+        )
+{
+    return
+        rgb_s_valid(
+              art_gv,
+            & ARRGBA_C(*c0)
+            );
+}
+
 void rgba_s_debugprintf(
         const ART_GV     * art_gv,
         const ArRGBA  * c_0

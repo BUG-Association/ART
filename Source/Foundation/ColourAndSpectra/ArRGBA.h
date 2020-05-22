@@ -68,6 +68,11 @@ ArFloatRGBA;
 #define ARFLOATRGBA(_r,_g,_b,_a) ((ArFLOATRGBA){FCRD3( (_r),(_g),(_b) ), (_a) })
 #define ARFLOATRGBA_GREY(_d,_a)  ARFLOATRGBA( (_d), (_d), (_d), (_a) )
 
+unsigned int rgba_s_valid(
+        const ART_GV  * art_gv,
+        const ArRGBA  * c0
+        );
+        
 void rgba_s_debugprintf(
         const ART_GV  * art_gv,
         const ArRGBA  * c0
