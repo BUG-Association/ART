@@ -6,7 +6,7 @@
 
 //#define DIFFUSE_ILLUMINATION
 //#define SHOW_INTERIOR
-#define PRAGUE_SKY
+//#define PRAGUE_SKY
 
 ArObj create_Figure(
         ART_GV  * art_gv
