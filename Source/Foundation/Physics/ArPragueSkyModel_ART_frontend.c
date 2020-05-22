@@ -90,7 +90,7 @@ void arpragueskymodel_polarised_light_sample(
               albedo,
               wavelength
             );
-    
+
     ArReferenceFrame  referenceFrame;
 
     ARREFFRAME_RF_I( referenceFrame, 0 ) = base2;
@@ -102,9 +102,93 @@ void arpragueskymodel_polarised_light_sample(
     ArStokesVectorSample  svs;
 
     ARSVS_I( svs, 0 ) = *unpolarisedRadiance;
+    ARSVS_I( svs, 1 ) = SPS4(0.0);
     SPS_CI(ARSVS_I( svs, 1 ), 0) = dop * SPS_CI(*unpolarisedRadiance,0);
-    SPS_CI(ARSVS_I( svs, 2 ), 0) = 0;
-    SPS_CI(ARSVS_I( svs, 3 ), 0) = 0;
+    ARSVS_I( svs, 2 ) = SPS4(0.0);
+    ARSVS_I( svs, 3 ) = SPS4(0.0);
+
+    arlightsample_s_rf_init_polarised_l(
+          art_gv,
+        & svs,
+        & referenceFrame,
+          result
+        );
+}
+
+void arpragueskymodel_polarised_light_sample_halfhero(
+              ART_GV                 * art_gv,
+        const ArPragueSkyModelState  * state,
+        const double                   sunTheta,
+        const double                   sunPhi,
+        const Vec3D                  * viewDirection,
+        const double                   viewTheta,
+        const double                   viewGamma,
+        const double                   altitude,
+        const double                   turbidity,
+        const ArSpectralSample       * albedo,
+        const ArWavelength           * wavelength,
+        const ArSpectralSample       * unpolarisedRadiance,
+              ArLightSample          * result
+        )
+{
+    Vec3D  sunDir;
+
+    XC(sunDir) =     cos( sunPhi )
+                   * cos( sunTheta );
+    YC(sunDir) =     sin( sunPhi )
+                   * cos( sunTheta );
+    ZC(sunDir) =     sin( sunTheta );
+
+    Vec3D  base1;
+
+    vec3d_dv_mul_v( -1.0, viewDirection, & base1 );
+
+    Vec3D  base2;
+
+    vec3d_vv_cross_v( & base1, & sunDir, & base2 );
+
+    Vec3D  base3;
+
+    vec3d_vv_cross_v( & base1, & base2, & base3 );
+
+    ArSpectralSample dop;
+    for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+    {
+        SPS_CI(dop, i) =
+        arpragueskymodel_polarisation(
+              state,
+              viewTheta,
+              viewGamma,
+              sunTheta,
+              altitude,
+              turbidity,
+              SPS_CI(*albedo,i),
+              NANO_FROM_UNIT(ARWL_WI(*wavelength,i))
+            );
+    }
+
+    ArSpectralSample linearPolarisation;
+    sps_ss_mul_s(
+          art_gv,
+        & dop,
+          unpolarisedRadiance,
+        & linearPolarisation
+        );
+
+    ArReferenceFrame  referenceFrame;
+
+    ARREFFRAME_RF_I( referenceFrame, 0 ) = base2;
+    ARREFFRAME_RF_I( referenceFrame, 1 ) = base3;
+
+    vec3d_norm_v( & ARREFFRAME_RF_I( referenceFrame, 0 ) );
+    vec3d_norm_v( & ARREFFRAME_RF_I( referenceFrame, 1 ) );
+
+    ArStokesVectorSample  svs;
+
+    ARSVS_I( svs, 0 ) = *unpolarisedRadiance;
+    ARSVS_I( svs, 1 ) = linearPolarisation;
+    ARSVS_I( svs, 2 ) = SPS4(0.0);
+    ARSVS_I( svs, 3 ) = SPS4(0.0);
 
     arlightsample_s_rf_init_polarised_l(
           art_gv,

@@ -137,10 +137,9 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
 
         if (  LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
         {
-            // TODO: hero sampling
-            arpragueskymodel_polarised_light_sample(
+            arpragueskymodel_polarised_light_sample_halfhero(
                   art_gv,
-                skymodel_state,
+                  skymodel_state,
                   solarElevationAtQuery,
                   solarAzimuth,
                   queryDirection_worldspace,
@@ -148,8 +147,8 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
                   gamma,
                   altitude,
                   atmosphericTurbidity,
-                  SPS_CI(albedoSample,0),
-                  NANO_FROM_UNIT( ARWL_WI(*wavelength,0) ),
+                & albedoSample,
+                  wavelength,
                 & sky_sample,
                   resultLightSample
                 );
