@@ -847,7 +847,9 @@ double arpragueskymodel_radiance(
      }
   }
 
-  const double albedo_control = albedo * (albedos - 1);
+  double albedo_control = albedo * (albedos - 1);
+  if (albedo_control < 0) albedo_control = 0;
+  if (albedo_control > albedos - 1) albedo_control = albedos - 1;
 
   const double channel = (wavelength - 320.0) / 40.0;
   if ( channel >= 11. || channel < 0.) return 0.;
@@ -1235,7 +1237,9 @@ void arpragueskymodel_radiance_hero(
      }
   }
 
-  const double albedo_control = albedo * (albedos - 1);
+  double albedo_control = albedo * (albedos - 1);
+  if (albedo_control < 0) albedo_control = 0;
+  if (albedo_control > albedos - 1) albedo_control = albedos - 1;
 
   ArSpectralSample channel;
   sps_s_init_s(art_gv, wavelength, &channel);
@@ -2000,7 +2004,9 @@ double arpragueskymodel_polarisation(
      }
   }
 
-  const double albedo_control = albedo * (albedos - 1);
+  double albedo_control = albedo * (albedos - 1);
+  if (albedo_control < 0) albedo_control = 0;
+  if (albedo_control > albedos - 1) albedo_control = albedos - 1;
 
   const double channel = (wavelength - 320.0) / 40.0;
   if ( channel >= 11. || channel < 0.) return 0.;
@@ -2366,7 +2372,9 @@ void arpragueskymodel_polarisation_hero(
      }
   }
 
-  const double albedo_control = albedo * (albedos - 1);
+  double albedo_control = albedo * (albedos - 1);
+  if (albedo_control < 0) albedo_control = 0;
+  if (albedo_control > albedos - 1) albedo_control = albedos - 1;
 
   ArSpectralSample channel;
   sps_s_init_s(art_gv, wavelength, &channel);
