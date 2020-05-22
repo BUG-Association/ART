@@ -117,7 +117,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPragueSkyModel)
 
 - (BOOL) servesAsVolumeMaterial
 {
-    return YES;
+    return NO;
 }
 
 - (ArNode *) atmosphericMaterial

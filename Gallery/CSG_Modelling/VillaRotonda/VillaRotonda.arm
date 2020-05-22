@@ -5,7 +5,7 @@
 #define WHITE_WALLS
 
 //#define DIFFUSE_ILLUMINATION
-#define SHOW_INTERIOR
+//#define SHOW_INTERIOR
 #define PRAGUE_SKY
 
 ArObj create_Figure(
@@ -524,10 +524,10 @@ ArNode <ArpCamera> * create_RotondaCamera(
 	zoom:		1 // 5.5
 #endif
 #ifdef ELEVATED_OVERALL_VIEW
-	ray:		RAY3D(PNT3D( -800, -500, 150 ),VEC3D(160, 100, -21 ))
-	zoom:		5.5 // 2.5 5.5
-//	ray:		RAY3D(PNT3D( -1600, -1000, 300 ),VEC3D(160, 100, -26 ))
-//	zoom:		5.0 // 5.5
+//	ray:		RAY3D(PNT3D( -800, -500, 150 ),VEC3D(160, 100, -21 ))
+//	zoom:		5.5 // 2.5 5.5
+	ray:		RAY3D(PNT3D( -1600, -1000, 299 ),VEC3D(160, 100, -26 ))
+	zoom:		2.5 // 5.5
 #endif
 #ifdef ELEVATED_OVERALL_CLOSEUP
 	ray:		RAY3D(PNT3D( -1600, -1000, 300 ),VEC3D(160, 105, -28 ))
@@ -603,18 +603,18 @@ ARM_MAIN_FUNCTION(VillaRotonda)
 #else
 #ifdef PRAGUE_SKY
     skyModel: [ PRAGUE_SKYLIGHT
-            elevation   : 20 DEGREES
+            elevation   : 8 DEGREES
 //            azimuth     : 160.0 DEGREES
-            azimuth     : 180.0 DEGREES
-            turbidity   : 2.5
+            azimuth     : 120.0 DEGREES
+            turbidity   : 2.0
             groundAlbedo: MUNSELL_075GY_04_06
             ]
 #else
 	skyModel: [ HOSEK_SKYLIGHT
-            elevation   : 25 DEGREES
-            azimuth     : 160.0 DEGREES
-            turbidity   : 4.0
-            groundAlbedo: CONST_COLOUR_GREY(0.5)
+            elevation   : 8 DEGREES
+            azimuth     : 120.0 DEGREES
+            turbidity   : 2.0
+            groundAlbedo: MUNSELL_075GY_04_06
             ]
 #endif
 #endif
