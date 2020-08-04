@@ -103,7 +103,37 @@ ARPFILE_DEFAULT_IMPLEMENTATION(
     arfiletypecapabilites_write
     )
 #warning This needs to be made more specific, to return whatever the real contents are. Plus the entire thing should be cleaned up that it only uses Imf::OutputFile, and not Imf::RgbaOutputFile anymore (which would get rid of some code duplication). Also, as is, the class can write RGB and spectral EXRs, but only read RGB ones.
-ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
+//ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
+ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exr)
+
+- (Class) nativeContentClass
+{
+    switch ( INPUT_DATA_TYPE ) {
+        case ardt_rgba:
+            return [ ArnRGBAImage class ];
+            
+        case ardt_spectrum8:
+            return [ ArnSpectrum8Image class ];
+        
+#warning Link error: missing some header somewhere ?
+        // case ardt_spectrum11:
+        //    return [ ArnSpectrum11Image class ];
+            
+        case ardt_spectrum18:
+            return [ ArnSpectrum18Image class ];
+            
+        case ardt_spectrum46:
+            return [ ArnSpectrum46Image class ];
+            
+        default:
+            ART_ERRORHANDLING_FATAL_ERROR(
+                  "unsupported EXR colour type %d requested",
+                  INPUT_DATA_TYPE
+            );
+    }
+    
+    return [ ArnRGBAImage class ];
+}
 
 - (void) parseFile
         : (ArNode **) objectPtr
