@@ -910,11 +910,11 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
                 }
             }
         }
-
-        [ (ArfOpenEXR*)(destinationImage[i]->imageFile)
-            setFloatImageBuffer
-            :   imagebuffer
-            ];
+#warning update: Now OpenEXR have the same interface as ARTRAW
+//        [ (ArfOpenEXR*)(destinationImage[i]->imageFile)
+//            setFloatImageBuffer
+//            :   imagebuffer
+//            ];
     }
     
     spc_free(art_gv, temp_spc);

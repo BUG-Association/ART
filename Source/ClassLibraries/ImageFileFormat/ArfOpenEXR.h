@@ -55,16 +55,10 @@ ART_MODULE_INTERFACE(ArfOpenEXR)
     
     ArReferenceFrame             _referenceFrame;
     
-    ArLightAlpha              ** _scanline; // More convinient to have a single allocation
+    ArLightAlpha              ** _scanline; // More convenient to have a single allocation
 
     struct ArfOpenEXR_members  * _exr_cpp_vars; // Opaque struct to hide C++ member vars
 }
-
-//  Used to pass an entire spectral image buffer to OpenEXR for writing
-
-- (void) setFloatImageBuffer
-        : (float *) imagebuffer
-        ;
 
 @end
 
