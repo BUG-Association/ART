@@ -50,6 +50,7 @@ ART_MODULE_INITIALISATION_FUNCTION
     [ ArnCIEXYZAImage     registerWithRuntime ];
 
     [ ArnSpectrum8Image   registerWithRuntime ];
+    [ ArnSpectrum11Image  registerWithRuntime ];
     [ ArnSpectrum18Image  registerWithRuntime ];
     [ ArnSpectrum46Image  registerWithRuntime ];
     [ ArnLightAlphaImage  registerWithRuntime ];
@@ -395,6 +396,13 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnPlainImage)
         case ardt_spectrum8:
             return
                 [ ALLOC_OBJECT_AGV(new_art_gv,ArnSpectrum8Image)
+                    initWithSize
+                    :   s
+                    ];
+            
+        case ardt_spectrum11:
+            return
+                [ ALLOC_OBJECT_AGV(new_art_gv,ArnSpectrum11Image)
                     initWithSize
                     :   s
                     ];
@@ -757,6 +765,20 @@ ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnSpectrum8Image,Spectrum8)
 - (ArDataType) dataType { return ardt_spectrum8; }
 
 IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Spectrum8,s8)
+
+@end
+
+/* ===========================================================================
+    'ArnSpectrum11Image'
+=========================================================================== */
+@implementation ArnSpectrum11Image
+
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSpectrum11Image)
+ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(ArnSpectrum11Image,Spectrum11)
+
+- (ArDataType) dataType { return ardt_spectrum11; }
+
+IMAGE_CONVERSION_GENERAL_IMPLEMENTATION(Spectrum11,s11)
 
 @end
 
