@@ -1220,6 +1220,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
     /* ------------------------------------------------------------------
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
+    ArSpectrum  * temp_col = spc_alloc( art_gv );
 
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
@@ -1231,31 +1232,47 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
 
             for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
-    #ifdef IMAGECONVERSION_DEBUGPRINTF
-                rgb_s_debugprintf( art_gv,& RGBA_SOURCE_BUFFER_RGB(x) );
-    #endif
-                rgb_to_xyz(
+                #ifdef IMAGECONVERSION_DEBUGPRINTF
+                debugprintf("Source (%u|%u)\n",x,y);
+                arlight_l_debugprintf(
                       art_gv,
-                    & RGBA_SOURCE_BUFFER_RGB(x),
+                      LIGHTALPHA_SOURCE_BUFFER_LIGHT(x)
+                    );
+                #endif
+
+                arlightalpha_to_spc(
+                      art_gv,
+                      LIGHTALPHA_SOURCE_BUFFER(x),
+                      temp_col
+                    );
+
+                spc_to_xyz(
+                      art_gv,
+                      temp_col,
                     & XYZA_DESTINATION_BUFFER_XYZ(x)
                     );
 
-    #ifdef IMAGECONVERSION_DEBUGPRINTF
-                xyz_s_debugprintf( art_gv,& XYZA_DESTINATION_BUFFER_XYZ(x) );
-    #endif
+                #ifdef IMAGECONVERSION_DEBUGPRINTF
+                debugprintf("Result (%u|%u)\n",x,y);
+                xyz_s_debugprintf(
+                      art_gv,
+                    & XYZA_DESTINATION_BUFFER_XYZ(x)
+                    );
+                #endif
 
-                //   Copy the alpha channel from the source image
-
-                XYZA_DESTINATION_BUFFER_ALPHA(x) = RGBA_SOURCE_BUFFER_ALPHA(x);
+                XYZA_DESTINATION_BUFFER_ALPHA(x) = LIGHTALPHA_SOURCE_BUFFER_ALPHA(x);
             }
-
-            //   Write the destination scanline buffer to disk for this line
 
             [ self writeDestinationScanlineBuffer: i : y ];
         }
     }
 
+    spc_free(
+        art_gv,
+        temp_col
+        );
 
+    
     /* ------------------------------------------------------------------
          Free the image manipulation infrastructure and end the action;
          this also places the destination image on the stack.

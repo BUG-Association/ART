@@ -27,8 +27,9 @@
 #include "ART_Foundation.h"
 #include <OpenEXRSettings.h>
 
+#warning check this
 // temporarily moved to the library file for ObjC/C++ crosslinking reasons
-//ART_MODULE_INTERFACE(ArfOpenEXR)
+ART_MODULE_INTERFACE(ArfOpenEXR)
 
 #ifdef ART_WITH_OPENEXR
 
@@ -41,6 +42,27 @@
 @interface ArfOpenEXR
            : ArfRasterImage
 {
+    int                  _channels;
+    int                  _spectralChannels;
+    int                  _bufferChannels;
+    BOOL                 _isSpectral;
+    BOOL                 _containsPolarisationData;
+    ArDataType           _dataType;
+    float               * _bufferS0;
+    float               * _bufferS1;
+    float               * _bufferS2;
+    float               * _bufferS3;
+
+    
+    ArLightAlpha      ** _scanline;
+    double             * _bufferA;
+    int                * _bufferP;
+    ArSpectrum        ** _colBufS0;
+    ArSpectrum        ** _colBufS1;
+    ArSpectrum        ** _colBufS2;
+    ArSpectrum        ** _colBufS3;
+    ArReferenceFrame     _referenceFrame;
+    unsigned char      * _charBuffer;
     struct ArfOpenEXR_members  * member_vars;
 }
 
