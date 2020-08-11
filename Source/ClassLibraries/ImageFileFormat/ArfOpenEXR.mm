@@ -205,6 +205,7 @@ ArfOpenEXR_members;
             ];
 }
 
+
 /* ----------------------------------------------------------------------
 
     Opening an OpenEXR for *reading*
@@ -313,7 +314,9 @@ Otherwise, we have to handle it with PSSpectrum
             for scanlines and individual pixels.
        ------------------------------------------------------------------ */
     ArnImageInfo  * imageInfo;
-
+    // This does not work on Linux... compilation fails.
+    // So, we set each parameter at once.
+    /*
     imageInfo =
         [ ALLOC_INIT_OBJECT(ArnImageInfo)
             :   _size
@@ -321,7 +324,12 @@ Otherwise, we have to handle it with PSSpectrum
             :   _dataType
             :   resolution
             ];
-    
+    */
+    imageInfo = [ ALLOC_INIT_OBJECT(ArnImageInfo) :_size ];
+    [imageInfo setDataType :_dataType];
+    [imageInfo setFileDataType :_dataType];
+    [imageInfo setResolution :resolution];
+
     _bufferS0 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _bufferChannels);
     
     if ( _containsPolarisationData )
