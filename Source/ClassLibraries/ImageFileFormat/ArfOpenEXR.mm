@@ -540,6 +540,8 @@ Otherwise, we have to handle it with PSSpectrum
 
 ---------------------------------------------------------------------- */
 
+#define WRITE_RGB_VERSION
+
 #define RED     ARCSR_R(cs)
 #define GREEN   ARCSR_G(cs)
 #define BLUE    ARCSR_B(cs)
@@ -606,7 +608,32 @@ Otherwise, we have to handle it with PSSpectrum
                 );
         }
         
+#ifdef WRITE_RGB_VERSION
+        _bufferChannels = _spectralChannels + 4;
+        exrChannels.insert("R", Imf::Channel(Imf::FLOAT));
+        exrChannels.insert("G", Imf::Channel(Imf::FLOAT));
+        exrChannels.insert("B", Imf::Channel(Imf::FLOAT));
+        exrChannels.insert("A", Imf::Channel(Imf::FLOAT));
+        
+        ArColourSpace  const * cs = DEFAULT_RGB_SPACE_REF;
+        
+        //   Rec. 709 a.k.a. sRGB is assumed in OpenEXRs if the
+        //   primaries are not specified in the header
+        
+        if ( DEFAULT_RGB_SPACE_REF != ARCSR_sRGB )
+        {
+            Imf::Chromaticities exrChr = Imf::Chromaticities
+                (Imath::V2f (XC(RED),   YC(RED)),
+                 Imath::V2f (XC(GREEN), YC(GREEN)),
+                 Imath::V2f (XC(BLUE),  YC(BLUE)),
+                 Imath::V2f (XC(WHITE), YC(WHITE)));
+
+            addChromaticities (exrHeader, exrChr);
+            addAdoptedNeutral (exrHeader, exrChr.white);
+        }
+#else
         _bufferChannels = _spectralChannels;
+#endif
         
         // Build channel names
         char* channelName = ALLOC_ARRAY( char, 128 ); // way longer than needed, but whatever
@@ -772,13 +799,28 @@ Otherwise, we have to handle it with PSSpectrum
                             sv
                             );
 
-                        // Max component ignored here
                         for ( int c = 0; c < _spectralChannels; c++ ) {
-                            _bufferS0[ _bufferChannels * (targetY * XC(_size) + targetX) + c ] = spc_si( art_gv, ARSV_I( *sv, 0), c );
-                            _bufferS1[ _bufferChannels * (targetY * XC(_size) + targetX) + c ] = spc_si( art_gv, ARSV_I( *sv, 1), c );
-                            _bufferS2[ _bufferChannels * (targetY * XC(_size) + targetX) + c ] = spc_si( art_gv, ARSV_I( *sv, 2), c );
-                            _bufferS3[ _bufferChannels * (targetY * XC(_size) + targetX) + c ] = spc_si( art_gv, ARSV_I( *sv, 3), c );
+                            _bufferS0[ _bufferChannels   * (targetY * XC(_size) + targetX) + c ] = spc_si( art_gv, ARSV_I( *sv, 0), c );
+                            // Max components ignored here
+                            _bufferS1[ _spectralChannels * (targetY * XC(_size) + targetX) + c ] = spc_si( art_gv, ARSV_I( *sv, 1), c );
+                            _bufferS2[ _spectralChannels * (targetY * XC(_size) + targetX) + c ] = spc_si( art_gv, ARSV_I( *sv, 2), c );
+                            _bufferS3[ _spectralChannels * (targetY * XC(_size) + targetX) + c ] = spc_si( art_gv, ARSV_I( *sv, 3), c );
                         }
+                        
+#ifdef WRITE_RGB_VERSION
+                        ArRGBA  rgba;
+                        
+                        spc_to_rgba(
+                              art_gv,
+                              ARSV_I( *sv, 0),
+                            & rgba
+                            );
+                        
+                        _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 0] = ARRGBA_R(rgba);
+                        _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 1] = ARRGBA_G(rgba);
+                        _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 2] = ARRGBA_B(rgba);
+                        _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 3] = ARRGBA_A(rgba);
+#endif
                         
                         arstokesvector_free( art_gv, sv );
                     }
@@ -803,22 +845,38 @@ Otherwise, we have to handle it with PSSpectrum
                         & rgba
                         );
 
-                    spc_set_sid( art_gv, spc, 0, ARRGBA_R(rgba) );
-                    spc_set_sid( art_gv, spc, 1, ARRGBA_G(rgba) );
-                    spc_set_sid( art_gv, spc, 2, ARRGBA_B(rgba) );
-                    spc_set_sid( art_gv, spc, 3, ARRGBA_A(rgba) );
+                    _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + 0] = ARRGBA_R(rgba);
+                    _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + 1] = ARRGBA_G(rgba);
+                    _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + 2] = ARRGBA_B(rgba);
+                    _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + 3] = ARRGBA_A(rgba);
                 } else {
                     arlightalpha_to_spc(
                           art_gv,
                           _scanline[x],
                           spc
                         );
+                    
+                    for ( int c = 0; c < _spectralChannels; c++ )
+                    {
+                        _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + c] = spc_si( art_gv, spc, c );
+                    }
+#ifdef WRITE_RGB_VERSION
+                    ArRGBA  rgba;
+                    
+                    spc_to_rgba(
+                          art_gv,
+                          spc,
+                        & rgba
+                        );
+                    
+                    _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 0] = ARRGBA_R(rgba);
+                    _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 1] = ARRGBA_G(rgba);
+                    _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 2] = ARRGBA_B(rgba);
+                    _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 3] = ARRGBA_A(rgba);
+#endif
                 }
                 
-                for ( int c = 0; c < _bufferChannels; c++ )
-                {
-                    _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + c] = spc_si( art_gv, spc, c );
-                }
+
             }
         }
     }
@@ -866,10 +924,21 @@ Otherwise, we have to handle it with PSSpectrum
         Imf::FrameBuffer frameBuffer;
 
         if (_isSpectral) {
-            const size_t xStride = sizeof(_bufferS0[0]) * _bufferChannels;
-            const size_t yStride = xStride * XC(_size);
+            const size_t xStrideS0 = sizeof(_bufferS0[0]) * _bufferChannels;
+            const size_t yStrideS0 = xStrideS0 * XC(_size);
+
+            const size_t xStrideSn = sizeof(_bufferS0[0]) * _spectralChannels;
+            const size_t yStrideSn = xStrideSn * XC(_size);
+            
             char* channelName = ALLOC_ARRAY( char, 128 ); // way longer than needed, but whatever
 
+#ifdef WRITE_RGB_VERSION
+            frameBuffer.insert("R", Imf::Slice(Imf::FLOAT, (char*)(&_bufferS0[_spectralChannels + 0]), xStrideS0, yStrideS0));
+            frameBuffer.insert("G", Imf::Slice(Imf::FLOAT, (char*)(&_bufferS0[_spectralChannels + 1]), xStrideS0, yStrideS0));
+            frameBuffer.insert("B", Imf::Slice(Imf::FLOAT, (char*)(&_bufferS0[_spectralChannels + 2]), xStrideS0, yStrideS0));
+            frameBuffer.insert("A", Imf::Slice(Imf::FLOAT, (char*)(&_bufferS0[_spectralChannels + 3]), xStrideS0, yStrideS0));
+#endif
+            
             for (  int c = 0; c < _spectralChannels; c++ ) {
                 float central = 0.F;
                 
@@ -906,8 +975,8 @@ Otherwise, we have to handle it with PSSpectrum
                     }
                 }
                 
-                char* ptr = (char*)(&_bufferS0[c]);
-                frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptr, xStride, yStride));
+                char* ptrS0 = (char*)(&_bufferS0[c]);
+                frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS0, xStrideS0, yStrideS0));
                 
                 if (_containsPolarisationData) {
                     char* ptrS1 = (char*)(&_bufferS1[c]);
@@ -915,13 +984,13 @@ Otherwise, we have to handle it with PSSpectrum
                     char* ptrS3 = (char*)(&_bufferS3[c]);
                     
                     channelName[1] = '1';
-                    frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS1, xStride, yStride));
+                    frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS1, xStrideSn, yStrideSn));
 
                     channelName[1] = '2';
-                    frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS2, xStride, yStride));
+                    frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS2, xStrideSn, yStrideSn));
 
                     channelName[1] = '3';
-                    frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS3, xStride, yStride));
+                    frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS3, xStrideSn, yStrideSn));
                 }
             }
             
