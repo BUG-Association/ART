@@ -53,6 +53,7 @@ extern "C"{
 #include <OpenEXR/ImfConvert.h>
 #include <OpenEXR/half.h>
 #include <OpenEXR/Iex.h>
+
 #include <ImfStandardAttributes.h>
 
 
@@ -60,6 +61,41 @@ extern "C"{
 #include <regex>
 #include <algorithm>
 #include <map>
+
+
+#import "ArfRasterImageImplementationMacros.h"
+
+static const char * arfexr_short_class_name = "EXR";
+static const char * arfexr_long_class_name  = "OpenEXR";
+static const char * arfexr_extension[] =
+{
+    "exr", "EXR",
+    0
+};
+
+#define G8_DATA         ((Grey8 *)dataLine)
+#define C32_DATA        ((Colour32 *)dataLine)
+
+#define G8_DATA_NC      dataLine
+#define C32_DATA_NC     dataLine
+
+@class ArfOpenEXR;
+
+@implementation ArfOpenEXR
+
+ARPFILE_DEFAULT_IMPLEMENTATION(
+    ArfOpenEXR,
+    arfiletypecapabilites_read |
+    arfiletypecapabilites_write
+    )
+
+ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
+
+/**
+ * C++ code for parsing the EXR channel name
+ */
+
+#define REGEX_SPECTRAL_CHANNELS "^S([0-3])\\.(\\d*,?\\d*([Ee][+-]?\\d+)?)(Y|Z|E|P|T|G|M|k|h|da|d|c|m|u|n|p)?(m|Hz)$"
 
 float getUnitMultiplier(const std::string& value) {
     if (value == "Y") {
@@ -104,8 +140,7 @@ bool isSpectralChannel(
           int        & stokes_component,
           float      & wavelength_nm)
 {
-    const std::regex expr
-        ("^S([0-3])\\.(\\d*,?\\d*([Ee][+-]?\\d+)?)(Y|Z|E|P|T|G|M|k|h|da|d|c|m|u|n|p)?(m|Hz)$");
+    const std::regex expr(REGEX_SPECTRAL_CHANNELS);
     std::smatch matches;
 
     const bool matched = std::regex_search(s, matches, expr);
@@ -153,111 +188,10 @@ bool isSpectralChannel(
 
 typedef struct ArfOpenEXR_members
 {
-    Imf::Array2D<float> s0;
-    Imf::Array2D<float> s1;
-    Imf::Array2D<float> s2;
-    Imf::Array2D<float> s3;
-
-    ArDataType                 dataType;
-    unsigned int               numberOfChannels;
-    unsigned int               numberOfSpectralChannels;
-    BOOL                       polarised;
-    char                    ** channelName;
-    IVec2D                     imageSize;
-    Imf::RgbaOutputFile      * rgba_exrfile_out;
-    Imf::OutputFile          * spc_exrfile_out;
-    ArRGBA                   * pixels_art;
-    Imf::Array2D<Imf::Rgba>  * pixels_exr_in;
-    Imf::Rgba                * rgba_pixels_exr_out;
-    Imf::Rgba                * spc_pixels_exr_out;
+    Imf::OutputFile          * exrfile_out;
 }
 ArfOpenEXR_members;
 
-#define INPUT_DATA_TYPE     member_vars->dataType
-#define IMAGE_CHANNELS      member_vars->numberOfChannels
-#define SPECTRAL_CHANNELS   member_vars->numberOfSpectralChannels
-#define POLARISED           member_vars->polarised
-#define CHANNEL_NAME        member_vars->channelName
-#define IMAGE_SIZE          member_vars->imageSize
-#define RGBA_EXRFILE_OUT    member_vars->rgba_exrfile_out
-#define SPC_EXRFILE_OUT     member_vars->spc_exrfile_out
-#define PIXELS_ART          member_vars->pixels_art
-#define PIXELS_EXR_IN_PTR   member_vars->pixels_exr_in
-#define PIXELS_EXR_IN       (*member_vars->pixels_exr_in)
-#define RGBA_PIXELS_EXR_OUT member_vars->rgba_pixels_exr_out
-#define SPC_PIXELS_EXR_OUT  member_vars->spc_pixels_exr_out
-
-
-#define ARFEXR_ALLOC_BUFFER_ARRAY(__variable,__number) \
-switch (wavelength_index_S[0].size()) \
-{ \
-    case 0: \
-    { \
-        (__variable) = ALLOC_ARRAY( ArRGB, (__number) ); \
-        break; \
-    } \
-    case 8: \
-    { \
-        (__variable) = ALLOC_ARRAY( ArSpectrum8, (__number) ); \
-        break; \
-    } \
-    case 11: \
-    { \
-        (__variable) = ALLOC_ARRAY( ArSpectrum11, (__number) ); \
-        break; \
-    } \
-    case 18: \
-    { \
-        (__variable) = ALLOC_ARRAY( ArSpectrum18, (__number) ); \
-        break; \
-    } \
-    case 46: \
-    { \
-        (__variable) = ALLOC_ARRAY( ArSpectrum46, (__number) ); \
-        break; \
-    } \
-}
-
-#define REGEX_SPECTRAL_CHANNELS "^(S[0-3])\.(\d*,?\d*([Ee][+-]?\d+)?)(\D{0,2})(m|Hz)$"
-
-#import "ArfRasterImageImplementationMacros.h"
-
-static const char * arfexr_short_class_name = "EXR";
-static const char * arfexr_long_class_name  = "OpenEXR";
-static const char * arfexr_extension[] =
-{
-    "exr", "EXR",
-    0
-};
-
-#define G8_DATA         ((Grey8 *)dataLine)
-#define C32_DATA        ((Colour32 *)dataLine)
-
-#define G8_DATA_NC      dataLine
-#define C32_DATA_NC     dataLine
-
-@class ArfOpenEXR;
-
-@implementation ArfOpenEXR
-
-ARPFILE_DEFAULT_IMPLEMENTATION(
-    ArfOpenEXR,
-    arfiletypecapabilites_read |
-    arfiletypecapabilites_write
-    )
-#warning This needs to be made more specific, to return whatever the real contents are. Plus the entire thing should be cleaned up that it only uses Imf::OutputFile, and not Imf::RgbaOutputFile anymore (which would get rid of some code duplication). Also, as is, the class can write RGB and spectral EXRs, but only read RGB ones.
-//ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
-ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exr)
-//ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
-
-- (Class) nativeContentClass
-{
-   // if (_spectralChannels > 0) {
-        return [ ArnLightAlphaImage class ];
-    //} else {
-   //     return [ ArnRGBAImage class ];
-   // }
-}
 
 - (void) parseFile
         : (ArNode **) objectPtr
@@ -296,10 +230,9 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exr)
     Imf::InputFile  exrfile_in ( [ self->file name ] );
     Imf::Header header = exrfile_in.header();
     Imath::Box2i dw = header.dataWindow();
-    
-    IVec2D size;
-    XC(size)= dw.max.x - dw.min.x + 1;
-    YC(size) = dw.max.y - dw.min.y + 1;
+
+    XC(_size)= dw.max.x - dw.min.x + 1;
+    YC(_size) = dw.max.y - dw.min.y + 1;
     FVec2D  resolution = FVEC2D(72.0, 72.0);
     
     /* ------------------------------------------------------------------
@@ -377,19 +310,29 @@ Otherwise, we have to handle it with PSSpectrum
 
     imageInfo =
         [ ALLOC_INIT_OBJECT(ArnImageInfo)
-            :   size
+            :   _size
             :   _dataType
             :   _dataType
             :   resolution
             ];
     
-    _bufferS0 = ALLOC_ARRAY(float, XC(size) * YC(size) * _bufferChannels);
+    _bufferS0 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _bufferChannels);
     
     if ( _containsPolarisationData )
     {
-        _bufferS1 = ALLOC_ARRAY(float, XC(size) * YC(size) * _spectralChannels);
-        _bufferS2 = ALLOC_ARRAY(float, XC(size) * YC(size) * _spectralChannels);
-        _bufferS3 = ALLOC_ARRAY(float, XC(size) * YC(size) * _spectralChannels);
+        _bufferS1 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _spectralChannels);
+        _bufferS2 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _spectralChannels);
+        _bufferS3 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _spectralChannels);
+    }
+    
+    _scanline = ALLOC_ARRAY( ArLightAlpha *, XC(_size) );
+
+    for ( unsigned int i = 0; i < XC(_size); i++ ) {
+        _scanline[i] =
+            arlightalpha_d_alloc_init_unpolarised(
+                art_gv,
+                0.0
+                );
     }
     
     // We tell OpenEXR lib how we want our data organised for reading
@@ -399,15 +342,13 @@ Otherwise, we have to handle it with PSSpectrum
     if (_isSpectral) {
         const Imf::PixelType compType = Imf::FLOAT;
         const size_t xStride = sizeof(_bufferS0[0]) * _bufferChannels;
-        const size_t yStride = xStride * XC(size);
+        const size_t yStride = xStride * XC(_size);
         
-        for (int i = 0; i < wavelength_index_S[0].size(); i++) {
-            char* ptr = (char*)(&_bufferS0[i]);
-            frameBuffer.insert(wavelength_index_S[0][i].second, Imf::Slice(compType, ptr, xStride, yStride));
-        }
-        
-        if (_containsPolarisationData) {
-            for (int i = 0; i < wavelength_index_S[1].size(); i++) {
+        for (int i = 0; i < _spectralChannels; i++) {
+            char* ptrS0 = (char*)(&_bufferS0[i]);
+            frameBuffer.insert(wavelength_index_S[0][i].second, Imf::Slice(compType, ptrS0, xStride, yStride));
+            
+            if (_containsPolarisationData) {
                 char* ptrS1 = (char*)(&_bufferS1[i]);
                 char* ptrS2 = (char*)(&_bufferS2[i]);
                 char* ptrS3 = (char*)(&_bufferS3[i]);
@@ -419,7 +360,7 @@ Otherwise, we have to handle it with PSSpectrum
     } else {
         const Imf::PixelType compType = Imf::FLOAT;
         const size_t xStride = sizeof(_bufferS0[0]) * _bufferChannels;
-        const size_t yStride = xStride * XC(size);
+        const size_t yStride = xStride * XC(_size);
         
         frameBuffer.insert("R", Imf::Slice(compType, (char*)(&_bufferS0[0]), xStride, yStride));
         frameBuffer.insert("G", Imf::Slice(compType, (char*)(&_bufferS0[1]), xStride, yStride));
@@ -437,92 +378,82 @@ Otherwise, we have to handle it with PSSpectrum
         : (float *)          vals
         : (ArSpectrum *)     outBuf
 {
-        switch (_spectralChannels)
+    switch (_spectralChannels)
+    {
+        case 0:
         {
-            case 0:
-            {
-                ArRGB  rgb = ARRGB(vals[0], vals[1], vals[2]);
-                rgb_to_spc(
-                      art_gv,
-                    & rgb,
-                      outBuf
-                    ) ;
-                break;
-            }
-            case 8:
-            {
-                ArSpectrum8 inSpec;
-                for (int i = 0; i < 8; i++)
-                    inSpec.c.x[i] = vals[i];
-                    
-                s8_to_spc(
-                      art_gv,
-                    & inSpec,
-                      outBuf
-                    ) ;
-                break;
-            }
-            case 11:
-            {
-                ArSpectrum11 inSpec;
-                for (int i = 0; i < 11; i++)
-                    inSpec.c.x[i] = vals[i];
-                    
-                s11_to_spc(
-                      art_gv,
-                    & inSpec,
-                      outBuf
-                    ) ;
-                break;
-            }
-            case 18:
-            {
-                ArSpectrum18 inSpec;
-                for (int i = 0; i < 18; i++)
-                    inSpec.c.x[i] = vals[i];
-                    
-                s18_to_spc(
-                      art_gv,
-                    & inSpec,
-                      outBuf
-                    ) ;
-                break;
-            }
-            case 46:
-            {
-                ArSpectrum46 inSpec;
-                for (int i = 0; i < 46; i++)
-                    inSpec.c.x[i] = vals[i];
-                    
-                s46_to_spc(
-                      art_gv,
-                    & inSpec,
-                      outBuf
-                    ) ;
-                break;
-            }
+            ArRGB  rgb = ARRGB(vals[0], vals[1], vals[2]);
+            rgb_to_spc(
+                  art_gv,
+                & rgb,
+                  outBuf
+                ) ;
+            break;
         }
+        case 8:
+        {
+            ArSpectrum8 inSpec;
+            for (int i = 0; i < 8; i++)
+                inSpec.c.x[i] = vals[i];
+                
+            s8_to_spc(
+                  art_gv,
+                & inSpec,
+                  outBuf
+                ) ;
+            break;
+        }
+        case 11:
+        {
+            ArSpectrum11 inSpec;
+            for (int i = 0; i < 11; i++)
+                inSpec.c.x[i] = vals[i];
+                
+            s11_to_spc(
+                  art_gv,
+                & inSpec,
+                  outBuf
+                ) ;
+            break;
+        }
+        case 18:
+        {
+            ArSpectrum18 inSpec;
+            for (int i = 0; i < 18; i++)
+                inSpec.c.x[i] = vals[i];
+                
+            s18_to_spc(
+                  art_gv,
+                & inSpec,
+                  outBuf
+                ) ;
+            break;
+        }
+        case 46:
+        {
+            ArSpectrum46 inSpec;
+            for (int i = 0; i < 46; i++)
+                inSpec.c.x[i] = vals[i];
+                
+            s46_to_spc(
+                  art_gv,
+                & inSpec,
+                  outBuf
+                ) ;
+            break;
+        }
+    }
 }
 
 - (void) getPlainImage
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
-    ArLightAlpha ** scanline = ALLOC_ARRAY( ArLightAlpha *, XC(image->size) );
-    
     ArSpectrum *colBufS0 = spc_d_alloc_init( art_gv, 0.0 );
     ArSpectrum *colBufS1 = spc_d_alloc_init( art_gv, 0.0 );
     ArSpectrum *colBufS2 = spc_d_alloc_init( art_gv, 0.0 );
     ArSpectrum *colBufS3 = spc_d_alloc_init( art_gv, 0.0 );
-    
-    for ( unsigned int i = 0; i < XC(image->size); i++ ) {
-        scanline[i] =
-            arlightalpha_d_alloc_init_unpolarised(
-                art_gv,
-                0.0
-                );
-    }
-    
+        
     for ( long y = 0; y < YC(image->size); y++ ) {
         for ( long x = 0; x < XC(image->size); x++ ) {
             [ self _convertPixelToCol
@@ -560,18 +491,18 @@ Otherwise, we have to handle it with PSSpectrum
                       art_gv,
                     & sv,
                     & _referenceFrame,
-                      ARLIGHTALPHA_LIGHT( *scanline[x] )
+                      ARLIGHTALPHA_LIGHT( *_scanline[x] )
                     );
                 
             } else {
                 arlight_s_init_unpolarised_l(
                       art_gv,
                       colBufS0,
-                      ARLIGHTALPHA_LIGHT( *scanline[x] )
+                      ARLIGHTALPHA_LIGHT( *_scanline[x] )
                     );
             }
             
-            ARLIGHTALPHA_ALPHA( *scanline[x] ) = 1.0;
+            ARLIGHTALPHA_ALPHA( *_scanline[x] ) = 1.0;
         }
         
         
@@ -584,15 +515,10 @@ Otherwise, we have to handle it with PSSpectrum
         [ ((ArnLightAlphaImage*)image) setLightAlphaRegion
             :   IPNT2D(0, y)
             :   IVEC2D(XC(image->size), 1)
-            :   scanline
+            :   _scanline
             :   0
             ];
     }
-    
-    for ( unsigned int i = 0; i < XC(image->size); i++ )
-        arlightalpha_free(art_gv, scanline[i]);
-    
-    FREE_ARRAY(scanline);
     
     spc_free(art_gv, colBufS0);
     spc_free(art_gv, colBufS1);
@@ -607,30 +533,29 @@ Otherwise, we have to handle it with PSSpectrum
 #define BLUE    ARCSR_B(cs)
 #define WHITE   ARCSR_W(cs)
 
-- (void) useImageInfo
+- (void) open
         : (ArnImageInfo *) imageInfo
 {
-    if ( ! member_vars )
-    {
-        member_vars = ALLOC(ArfOpenEXR_members);
-        RGBA_EXRFILE_OUT = NULL;
-        SPC_EXRFILE_OUT = NULL;
-        PIXELS_ART = NULL;
-        PIXELS_EXR_IN_PTR = NULL;
-        RGBA_PIXELS_EXR_OUT = NULL;
-        SPC_PIXELS_EXR_OUT = NULL;
-    }
+    _size = [ imageInfo size ];
+    Imf::Header exrHeader (XC(_size), YC(_size));
+    Imf::ChannelList & exrChannels = exrHeader.channels();
 
-    IMAGE_SIZE = [ imageInfo size ];
+    _dataType = [ imageInfo dataType ];
+    
+    if (   _dataType == ardt_rgb
+        || _dataType == ardt_rgba
+        || _dataType == ardt_xyz
+        || _dataType == ardt_xyza) {
+        _dataType = ardt_rgba;
+        _isSpectral = NO;
+        _containsPolarisationData = NO;
 
-    Imf::Header newHeader (XC(IMAGE_SIZE), YC(IMAGE_SIZE));
-    
-    INPUT_DATA_TYPE = [ imageInfo dataType ];
-    
-    if ( INPUT_DATA_TYPE == ardt_rgba )
-    {
+        _spectralChannels = 0;
+        _bufferChannels = 4;
+        _channels = 4;
+        
         ArColourSpace  const * cs = DEFAULT_RGB_SPACE_REF;
-
+        
         //   Rec. 709 a.k.a. sRGB is assumed in OpenEXRs if the
         //   primaries are not specified in the header
         
@@ -642,126 +567,182 @@ Otherwise, we have to handle it with PSSpectrum
                  Imath::V2f (XC(BLUE),  YC(BLUE)),
                  Imath::V2f (XC(WHITE), YC(WHITE)));
 
-            addChromaticities (newHeader, exrChr);
-            addAdoptedNeutral (newHeader, exrChr.white);
+            addChromaticities (exrHeader, exrChr);
+            addAdoptedNeutral (exrHeader, exrChr.white);
         }
         
-        IMAGE_CHANNELS = 4;
-        RGBA_EXRFILE_OUT = new Imf::RgbaOutputFile(
-                [ self->file name ],
-                newHeader,
-                Imf::WRITE_RGBA
+        exrChannels.insert("R", Imf::Channel(Imf::FLOAT));
+        exrChannels.insert("G", Imf::Channel(Imf::FLOAT));
+        exrChannels.insert("B", Imf::Channel(Imf::FLOAT));
+        exrChannels.insert("A", Imf::Channel(Imf::FLOAT));
+    } else {
+        _isSpectral = YES;
+        _containsPolarisationData = _dataType & ardt_polarisable;
+        
+        switch (_dataType) {
+            case ardt_spectrum8:                _spectralChannels = 8; _channels = 8; break;
+            case ardt_spectrum8_polarisable:    _spectralChannels = 8; _channels = 4*8; break;
+            case ardt_spectrum11:               _spectralChannels = 11; _channels = 11; break;
+            case ardt_spectrum11_polarisable:   _spectralChannels = 11; _channels = 4*11; break;
+            case ardt_spectrum18:               _spectralChannels = 18; _channels = 18; break;
+            case ardt_spectrum18_polarisable:   _spectralChannels = 18; _channels = 4*18; break;
+            case ardt_spectrum46:               _spectralChannels = 46; _channels = 46; break;
+            case ardt_spectrum46_polarisable:   _spectralChannels = 46; _channels = 4*46; break;
+            default:
+                ART_ERRORHANDLING_FATAL_ERROR(
+                      "unsupported EXR colour type %d requested",
+                      _dataType
                 );
-
-        PIXELS_ART = ALLOC_ARRAY( ArRGBA, XC(IMAGE_SIZE) );
-        RGBA_PIXELS_EXR_OUT =
-            ALLOC_ARRAY(
-                Imf::Rgba,
-                XC(IMAGE_SIZE)*YC(IMAGE_SIZE)
-                );
-        RGBA_EXRFILE_OUT->setFrameBuffer(RGBA_PIXELS_EXR_OUT, 1, XC(IMAGE_SIZE));
+        }
         
-        return;
-    }
+        _bufferChannels = _spectralChannels;
         
-    if (    INPUT_DATA_TYPE == ardt_spectrum8
-         || INPUT_DATA_TYPE == ardt_spectrum11
-         || INPUT_DATA_TYPE == ardt_spectrum18
-         || INPUT_DATA_TYPE == ardt_spectrum46 )
-    {
-        Imf::ChannelList & channels = newHeader.channels();
+        // Build channel names
+        char* channelName = ALLOC_ARRAY( char, 128 ); // way longer than needed, but whatever
 
-        if ( INPUT_DATA_TYPE == ardt_spectrum8  ) IMAGE_CHANNELS = 8;
-        if ( INPUT_DATA_TYPE == ardt_spectrum11 ) IMAGE_CHANNELS = 11;
-        if ( INPUT_DATA_TYPE == ardt_spectrum18 ) IMAGE_CHANNELS = 18;
-        if ( INPUT_DATA_TYPE == ardt_spectrum46 ) IMAGE_CHANNELS = 46;
-
-        CHANNEL_NAME = ALLOC_ARRAY( char *, IMAGE_CHANNELS );
-        
-        for ( int i = 0; i < IMAGE_CHANNELS; ++i )
-        {
+        for (int i = 0; i < _spectralChannels; i++) {
             float central = 0.F;
             
-            switch(INPUT_DATA_TYPE) {
+            switch(_dataType) {
                 case ardt_spectrum8:
+                case ardt_spectrum8_polarisable:
                     central = s8_channel_center( art_gv, i );
                     break;
                 case ardt_spectrum11:
+                case ardt_spectrum11_polarisable:
                     central = s11_channel_center( art_gv, i );
                     break;
                 case ardt_spectrum18:
+                case ardt_spectrum18_polarisable:
                     central = s18_channel_center( art_gv, i );
                     break;
                 case ardt_spectrum46:
+                case ardt_spectrum46_polarisable:
                     central = s46_channel_center( art_gv, i );
                     break;
                 default:
                     ART_ERRORHANDLING_FATAL_ERROR(
                           "unsupported EXR colour type %d requested",
-                          INPUT_DATA_TYPE
+                          _dataType
                     );
             }
             
-            CHANNEL_NAME[i] = ALLOC_ARRAY( char, 128 ); // way longer than needed, but whatever
-                                    
-            sprintf( CHANNEL_NAME[i], "S0.%.2fnm", NANO_FROM_UNIT(central) );
-            
-            // Replace . with ,
-            for (int j = 3; j < strlen(CHANNEL_NAME[i]) - 2; j++) {
-                if (CHANNEL_NAME[i][j] == '.') {
-                    CHANNEL_NAME[i][j] = ',';
+            for (int stokes = 0; stokes < (_containsPolarisationData ? 4 : 1); stokes++) {
+                sprintf( channelName, "S%d.%.2fnm", stokes, NANO_FROM_UNIT(central) );
+                
+                // Replace . with ,
+                for (int j = 3; j < strlen(channelName) - 2; j++) {
+                    if (channelName[j] == '.') {
+                        channelName[j] = ',';
+                    }
                 }
+                
+                exrChannels.insert(channelName, Imf::Channel(Imf::FLOAT));
             }
-            
-            channels.insert(CHANNEL_NAME[i], Imf::Channel(Imf::FLOAT));
         }
-
-        SPC_EXRFILE_OUT = new Imf::OutputFile(
-                [ self->file name ],
-                newHeader
-                );
-
-        return;
     }
-        
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "unsupported EXR colour type %d requested",
-        [ imageInfo dataType ]
-        );
+    
+    // Memory allocation
+    _bufferS0 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _bufferChannels);
+    
+    if ( _containsPolarisationData )
+    {
+        _bufferS1 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _spectralChannels);
+        _bufferS2 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _spectralChannels);
+        _bufferS3 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _spectralChannels);
+    }
+    
+    _scanline = ALLOC_ARRAY( ArLightAlpha *, XC(_size) );
+
+    for ( unsigned int i = 0; i < XC(_size); i++ ) {
+        _scanline[i] =
+            arlightalpha_d_alloc_init_unpolarised(
+                art_gv,
+                0.0
+                );
+    }
+    
+    if ( ! _exr_cpp_vars )
+    {
+        _exr_cpp_vars = ALLOC(ArfOpenEXR_members);
+        _exr_cpp_vars->exrfile_out = new Imf::OutputFile(
+            [ self->file name ],
+            exrHeader
+            );
+    }
+    else
+    {
+        ART_ERRORHANDLING_FATAL_ERROR("Trying to open an image on a object already allocated.");
+    }
 }
 
-- (void) open
-        : (ArnImageInfo *) imageInfo
+
+- (void) _getPixelValue
+        : (ArSpectrum *) colour
+        : (float *) buffer
 {
-    [ self useImageInfo: imageInfo ];
+    for ( int c = 0; c < _spectralChannels; c++ )
+    {
+        buffer[c] = spc_si( art_gv, colour, c );
+    }
 }
+
 
 - (void) setPlainImage
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
-    if ( INPUT_DATA_TYPE == ardt_rgba )
+    ArSpectrum  * spc = spc_alloc( art_gv );
+
+    for ( long y = 0; y < YC(image->size); y++ )
     {
-        for ( int y = 0; y < YC(image->size); y++ )
-        {
-            [ image getRGBARegion
-                :  IPNT2D( 0, y )
-                :  IVEC2D( XC(image->size), 1 )
-                :  PIXELS_ART
-                :  0
-                ];
+        const long targetY = y + YC(start);
 
-            for ( int x = 0; x < XC(image->size); x++ )
+        [ ((ArnLightAlphaImage *)image) getLightAlphaRegion
+            :   IPNT2D(0, y)
+            :   IVEC2D(XC(image->size), 1)
+            :   _scanline
+            :   0 ];
+    
+        
+        for (long x = 0; x < XC(image->size); x++) {
+            const long targetX = x + XC(start);
+            
+            if ( _dataType == ardt_rgba ) { // art_foundation_isr(art_gv) ?
+                ArRGBA  rgba;
+
+                arlightalpha_to_spc(
+                      art_gv,
+                      _scanline[x],
+                      spc
+                    );
+
+                spc_to_rgba(
+                      art_gv,
+                      spc,
+                    & rgba
+                    );
+
+                spc_set_sid( art_gv, spc, 0, ARRGBA_R(rgba) );
+                spc_set_sid( art_gv, spc, 1, ARRGBA_G(rgba) );
+                spc_set_sid( art_gv, spc, 2, ARRGBA_B(rgba) );
+                spc_set_sid( art_gv, spc, 3, ARRGBA_A(rgba) );
+            } else {
+                arlightalpha_to_spc(
+                      art_gv,
+                      _scanline[x],
+                      spc
+                    );
+            }
+            
+            for ( int c = 0; c < _bufferChannels; c++ )
             {
-                int  i = XC(IMAGE_SIZE) * ( YC(start) + y ) + x;
-
-                RGBA_PIXELS_EXR_OUT[i].r = Imf::floatToHalf(ARRGBA_R(PIXELS_ART[x]));
-                RGBA_PIXELS_EXR_OUT[i].g = Imf::floatToHalf(ARRGBA_G(PIXELS_ART[x]));
-                RGBA_PIXELS_EXR_OUT[i].b = Imf::floatToHalf(ARRGBA_B(PIXELS_ART[x]));
-                RGBA_PIXELS_EXR_OUT[i].a = Imf::floatToHalf(ARRGBA_A(PIXELS_ART[x]));
+                _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + c] = spc_si( art_gv, spc, c );
             }
         }
     }
+    
+    spc_free(art_gv, spc);
 }
 
 - (void) setFloatImageBuffer
@@ -769,53 +750,141 @@ Otherwise, we have to handle it with PSSpectrum
 {
     //   Safety check - this should only be called if we initialised this for spectral image writing
     
-    if (    INPUT_DATA_TYPE == ardt_spectrum8
-         || INPUT_DATA_TYPE == ardt_spectrum11
-         || INPUT_DATA_TYPE == ardt_spectrum18
-         || INPUT_DATA_TYPE == ardt_spectrum46 )
-    {
-        Imf::FrameBuffer  frameBuffer;
-        Imf::PixelType compType = Imf::FLOAT;
-        char * ptr = (char *) imagebuffer;
-        size_t  compStride = 4;
-        size_t  pixelStride = IMAGE_CHANNELS * compStride;
-        size_t  rowStride = pixelStride * XC(IMAGE_SIZE);
-
-        for ( int i = 0; i < IMAGE_CHANNELS; ++i )
-        {
-            frameBuffer.insert(CHANNEL_NAME[i], Imf::Slice(compType, ptr, pixelStride, rowStride));
-            ptr += compStride;
-        }
-        
-        SPC_EXRFILE_OUT->setFrameBuffer(frameBuffer);
-        SPC_EXRFILE_OUT->writePixels(YC(IMAGE_SIZE));
-        
-        delete SPC_EXRFILE_OUT;
-    }
+//    if (    INPUT_DATA_TYPE == ardt_spectrum8
+//         || INPUT_DATA_TYPE == ardt_spectrum11
+//         || INPUT_DATA_TYPE == ardt_spectrum18
+//         || INPUT_DATA_TYPE == ardt_spectrum46 )
+//    {
+//        Imf::FrameBuffer  frameBuffer;
+//        Imf::PixelType compType = Imf::FLOAT;
+//        char * ptr = (char *) imagebuffer;
+//        size_t  compStride = 4;
+//        size_t  pixelStride = IMAGE_CHANNELS * compStride;
+//        size_t  rowStride = pixelStride * XC(IMAGE_SIZE);
+//
+//        for ( int i = 0; i < IMAGE_CHANNELS; ++i )
+//        {
+//            frameBuffer.insert(CHANNEL_NAME[i], Imf::Slice(compType, ptr, pixelStride, rowStride));
+//            ptr += compStride;
+//        }
+//
+//        SPC_EXRFILE_OUT->setFrameBuffer(frameBuffer);
+//        SPC_EXRFILE_OUT->writePixels(YC(IMAGE_SIZE));
+//
+//        delete SPC_EXRFILE_OUT;
+//    }
 }
 
 - (void) close
 {
-    if ( member_vars )
-    {
-        if ( RGBA_EXRFILE_OUT )
-        {
-            RGBA_EXRFILE_OUT->writePixels(YC(IMAGE_SIZE));
+    // This method is only used for writting:
+    // We locally store the data chunk and write the whole file when closing.
+    
+    if ( _exr_cpp_vars && _exr_cpp_vars->exrfile_out) {
+        // Now tell OpenEXR how our data is organised
+        Imf::FrameBuffer frameBuffer;
 
-            delete RGBA_EXRFILE_OUT;
+        if (_isSpectral) {
+            const size_t xStride = sizeof(_bufferS0[0]) * _bufferChannels;
+            const size_t yStride = xStride * XC(_size);
+            char* channelName = ALLOC_ARRAY( char, 128 ); // way longer than needed, but whatever
+
+            for (  int c = 0; c < _spectralChannels; c++ ) {
+                float central = 0.F;
+                
+                switch(_dataType) {
+                    case ardt_spectrum8:
+                    case ardt_spectrum8_polarisable:
+                        central = s8_channel_center( art_gv, c );
+                        break;
+                    case ardt_spectrum11:
+                    case ardt_spectrum11_polarisable:
+                        central = s11_channel_center( art_gv, c );
+                        break;
+                    case ardt_spectrum18:
+                    case ardt_spectrum18_polarisable:
+                        central = s18_channel_center( art_gv, c );
+                        break;
+                    case ardt_spectrum46:
+                    case ardt_spectrum46_polarisable:
+                        central = s46_channel_center( art_gv, c );
+                        break;
+                    default:
+                        ART_ERRORHANDLING_FATAL_ERROR(
+                              "unsupported EXR colour type %d requested",
+                              _dataType
+                        );
+                }
+
+                sprintf( channelName, "S0.%.2fnm", NANO_FROM_UNIT(central) );
+                
+                // Replace . with ,
+                for (int j = 3; j < strlen(channelName) - 2; j++) {
+                    if (channelName[j] == '.') {
+                        channelName[j] = ',';
+                    }
+                }
+                
+                char* ptr = (char*)(&_bufferS0[c]);
+                frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptr, xStride, yStride));
+                
+                
+                if (_containsPolarisationData) {
+                    char* ptrS1 = (char*)(&_bufferS1[c]);
+                    char* ptrS2 = (char*)(&_bufferS2[c]);
+                    char* ptrS3 = (char*)(&_bufferS3[c]);
+                    channelName[1] = '1';
+                    frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS1, xStride, yStride));
+                    channelName[1] = '2';
+                    frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS2, xStride, yStride));
+                    channelName[1] = '3';
+                    frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS3, xStride, yStride));
+                }
+            }
+        } else {
+            const size_t xStride = sizeof(_bufferS0[0]) * _bufferChannels;
+            const size_t yStride = xStride * XC(_size);
+            
+            frameBuffer.insert("R", Imf::Slice(Imf::FLOAT, (char*)(&_bufferS0[0]), xStride, yStride));
+            frameBuffer.insert("G", Imf::Slice(Imf::FLOAT, (char*)(&_bufferS0[1]), xStride, yStride));
+            frameBuffer.insert("B", Imf::Slice(Imf::FLOAT, (char*)(&_bufferS0[2]), xStride, yStride));
+            frameBuffer.insert("A", Imf::Slice(Imf::FLOAT, (char*)(&_bufferS0[3]), xStride, yStride));
         }
-
-        if ( PIXELS_ART )
-            FREE_ARRAY(PIXELS_ART);
-
-        if ( PIXELS_EXR_IN_PTR )
-            delete PIXELS_EXR_IN_PTR;
-
-        if ( RGBA_PIXELS_EXR_OUT )
-            FREE_ARRAY(RGBA_PIXELS_EXR_OUT);
-
-        FREE(member_vars);
+        
+        _exr_cpp_vars->exrfile_out->setFrameBuffer(frameBuffer);
+        _exr_cpp_vars->exrfile_out->writePixels(YC(_size));
+        
+        delete _exr_cpp_vars->exrfile_out;
+        _exr_cpp_vars->exrfile_out = NULL;
     }
+}
+
+- (void) dealloc
+{
+    FREE_ARRAY(_bufferS0);
+        
+    if ( _containsPolarisationData )
+    {
+        FREE_ARRAY(_bufferS1);
+        FREE_ARRAY(_bufferS2);
+        FREE_ARRAY(_bufferS3);
+    }
+    
+    for ( unsigned int i = 0; i < XC(_size); i++ ) {
+        arlightalpha_free(art_gv, _scanline[i]);
+    }
+    
+    FREE_ARRAY(_scanline);
+         
+    
+    if ( _exr_cpp_vars ) {
+        if (_exr_cpp_vars->exrfile_out) {
+            delete _exr_cpp_vars->exrfile_out;
+        }
+        FREE(_exr_cpp_vars);
+    }
+
+    [ super dealloc ];
 }
 
 @end
