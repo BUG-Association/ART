@@ -552,6 +552,44 @@ Otherwise, we have to handle it with PSSpectrum
 {
     _size = [ imageInfo size ];
     Imf::Header exrHeader (XC(_size), YC(_size));
+    
+    char  * createdByString = NULL;
+    
+    time_t timer = time(NULL); //gets time of day
+    struct tm *tblock = localtime(&timer); //converts date/time to a structure
+    //   File creation information
+    /*
+    * Link issue
+    */
+    /*
+    asprintf(
+        & createdByString,
+          "%s, ART %s",
+          ART_APPLICATION_NAME,
+          art_version_string
+        );
+
+    exrHeader.insert("File created by", Imf::StringAttribute(createdByString));
+    FREE(creationDateStr);
+    exrHeader.insert("Platform", Imf::StringAttribute(ART_APPLICATION_PLATFORM_DESCRIPTION));
+    exrHeader.insert("Command line", Imf::StringAttribute(ART_APPLICATION_ENTIRE_COMMANDLINE));
+    */
+    char * creationDateStr = NULL;
+    asprintf(
+         & creationDateStr,
+           "%.2d.%.2d.%d %.2d:%.2d\n",
+           tblock->tm_mday,
+           tblock->tm_mon + 1,
+           tblock->tm_year + 1900,
+           tblock->tm_hour,
+           tblock->tm_min);
+    
+    exrHeader.insert("Creation date", Imf::StringAttribute(creationDateStr));
+    exrHeader.insert("Render time", Imf::StringAttribute([ imageInfo rendertimeString ]));
+    exrHeader.insert("Samples per pixel", Imf::StringAttribute([ imageInfo samplecountString ]));
+    
+    FREE(creationDateStr);
+    
     Imf::ChannelList & exrChannels = exrHeader.channels();
 
     _dataType = [ imageInfo dataType ];
@@ -633,11 +671,9 @@ Otherwise, we have to handle it with PSSpectrum
         }
 #else
         _bufferChannels = _spectralChannels;
-#endif
+#endif // WRITE_RGB_VERSION
         
         // Build channel names
-        char* channelName = ALLOC_ARRAY( char, 128 ); // way longer than needed, but whatever
-
         for (int i = 0; i < _spectralChannels; i++) {
             float central = 0.F;
             
@@ -662,7 +698,8 @@ Otherwise, we have to handle it with PSSpectrum
             }
             
             for (int stokes = 0; stokes < (_containsPolarisationData ? 4 : 1); stokes++) {
-                sprintf( channelName, "S%d.%.2fnm", stokes, NANO_FROM_UNIT(central) );
+                char * channelName = NULL;
+                asprintf( &channelName, "S%d.%.2fnm", stokes, NANO_FROM_UNIT(central) );
                 
                 // Replace . with ,
                 for (int j = 3; j < strlen(channelName) - 2; j++) {
@@ -672,6 +709,8 @@ Otherwise, we have to handle it with PSSpectrum
                 }
                 
                 exrChannels.insert(channelName, Imf::Channel(Imf::FLOAT));
+                
+                FREE(channelName);
             }
         }
     }
@@ -820,7 +859,7 @@ Otherwise, we have to handle it with PSSpectrum
                         _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 1] = ARRGBA_G(rgba);
                         _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 2] = ARRGBA_B(rgba);
                         _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 3] = ARRGBA_A(rgba);
-#endif
+#endif // WRITE_RGB_VERSION
                         
                         arstokesvector_free( art_gv, sv );
                     }
@@ -873,10 +912,8 @@ Otherwise, we have to handle it with PSSpectrum
                     _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 1] = ARRGBA_G(rgba);
                     _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 2] = ARRGBA_B(rgba);
                     _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + _spectralChannels + 3] = ARRGBA_A(rgba);
-#endif
+#endif // WRITE_RGB_VERSION
                 }
-                
-
             }
         }
     }
@@ -884,35 +921,6 @@ Otherwise, we have to handle it with PSSpectrum
     spc_free(art_gv, spc);
 }
 
-- (void) setFloatImageBuffer
-    : (float *) imagebuffer
-{
-    //   Safety check - this should only be called if we initialised this for spectral image writing
-    
-//    if (    INPUT_DATA_TYPE == ardt_spectrum8
-//         || INPUT_DATA_TYPE == ardt_spectrum11
-//         || INPUT_DATA_TYPE == ardt_spectrum18
-//         || INPUT_DATA_TYPE == ardt_spectrum46 )
-//    {
-//        Imf::FrameBuffer  frameBuffer;
-//        Imf::PixelType compType = Imf::FLOAT;
-//        char * ptr = (char *) imagebuffer;
-//        size_t  compStride = 4;
-//        size_t  pixelStride = IMAGE_CHANNELS * compStride;
-//        size_t  rowStride = pixelStride * XC(IMAGE_SIZE);
-//
-//        for ( int i = 0; i < IMAGE_CHANNELS; ++i )
-//        {
-//            frameBuffer.insert(CHANNEL_NAME[i], Imf::Slice(compType, ptr, pixelStride, rowStride));
-//            ptr += compStride;
-//        }
-//
-//        SPC_EXRFILE_OUT->setFrameBuffer(frameBuffer);
-//        SPC_EXRFILE_OUT->writePixels(YC(IMAGE_SIZE));
-//
-//        delete SPC_EXRFILE_OUT;
-//    }
-}
 
 - (void) close
 {
@@ -929,8 +937,6 @@ Otherwise, we have to handle it with PSSpectrum
 
             const size_t xStrideSn = sizeof(_bufferS0[0]) * _spectralChannels;
             const size_t yStrideSn = xStrideSn * XC(_size);
-            
-            char* channelName = ALLOC_ARRAY( char, 128 ); // way longer than needed, but whatever
 
 #ifdef WRITE_RGB_VERSION
             frameBuffer.insert("R", Imf::Slice(Imf::FLOAT, (char*)(&_bufferS0[_spectralChannels + 0]), xStrideS0, yStrideS0));
@@ -965,8 +971,8 @@ Otherwise, we have to handle it with PSSpectrum
                               _dataType
                         );
                 }
-
-                sprintf( channelName, "S0.%.2fnm", NANO_FROM_UNIT(central) );
+                char * channelName = NULL;
+                asprintf( &channelName, "S0.%.2fnm", NANO_FROM_UNIT(central) );
                 
                 // Replace . with ,
                 for (int j = 3; j < strlen(channelName) - 2; j++) {
@@ -992,9 +998,9 @@ Otherwise, we have to handle it with PSSpectrum
                     channelName[1] = '3';
                     frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS3, xStrideSn, yStrideSn));
                 }
+                
+                FREE(channelName);
             }
-            
-            FREE_ARRAY(channelName);
         } else {
             const size_t xStride = sizeof(_bufferS0[0]) * _bufferChannels;
             const size_t yStride = xStride * XC(_size);
