@@ -47,21 +47,14 @@ extern "C"{
 #include <OpenEXR/ImathBox.h>
 #include <OpenEXR/ImfOutputFile.h>
 #include <OpenEXR/ImfInputFile.h>
-#include <OpenEXR/ImfRgbaFile.h>
 #include <OpenEXR/ImfArray.h>
 #include <OpenEXR/ImfChannelList.h>
-#include <OpenEXR/ImfConvert.h>
-#include <OpenEXR/half.h>
-#include <OpenEXR/Iex.h>
-
-#include <ImfStandardAttributes.h>
-
+#include <OpenEXR/ImfStandardAttributes.h>
 
 #include <string>
 #include <regex>
 #include <algorithm>
 #include <map>
-
 
 #import "ArfRasterImageImplementationMacros.h"
 
@@ -214,7 +207,7 @@ ArfOpenEXR_members;
 
 /* ----------------------------------------------------------------------
 
-    Opening an EXR for *reading*
+    Opening an OpenEXR for *reading*
     
     This returns an ImageInfo for the new image
 
@@ -223,9 +216,23 @@ ArfOpenEXR_members;
 - (ArnImageInfo *) open
 {
     // Init
+    _spectralChannels = 0;
+    _bufferChannels = 0;
+    
     _isSpectral = NO;
     _containsPolarisationData = NO;
-    _channels = 0;
+
+    _bufferS0 = NULL;
+    _bufferS1 = NULL;
+    _bufferS2 = NULL;
+    _bufferS3 = NULL;
+    
+    _scanline = NULL;
+    _exr_cpp_vars = NULL;
+    
+    /* ------------------------------------------------------------------
+        Read image dimensions
+     ------------------------------------------------------------------ */
     
     Imf::InputFile  exrfile_in ( [ self->file name ] );
     Imf::Header header = exrfile_in.header();
@@ -246,13 +253,12 @@ ArfOpenEXR_members;
     
     for (Imf::ChannelList::Iterator it = channels_list.begin();
          it != channels_list.end(); it++) {
-        ++_channels;
         
         // Check if the channel is a spectral one
         int stokes;
         float wavelength_nm;
         bool spectral_chanel = isSpectralChannel(it.name(), stokes, wavelength_nm);
-        
+
         if (spectral_chanel) {
             _isSpectral = YES;
 
@@ -526,7 +532,13 @@ Otherwise, we have to handle it with PSSpectrum
     spc_free(art_gv, colBufS3);
 }
 
-//   image writing
+/* ----------------------------------------------------------------------
+
+    Opening an OpenEXR for *writing*
+    
+    The provided ImageInfo is used to set the file specifics
+
+---------------------------------------------------------------------- */
 
 #define RED     ARCSR_R(cs)
 #define GREEN   ARCSR_G(cs)
@@ -552,7 +564,6 @@ Otherwise, we have to handle it with PSSpectrum
 
         _spectralChannels = 0;
         _bufferChannels = 4;
-        _channels = 4;
         
         ArColourSpace  const * cs = DEFAULT_RGB_SPACE_REF;
         
@@ -577,17 +588,17 @@ Otherwise, we have to handle it with PSSpectrum
         exrChannels.insert("A", Imf::Channel(Imf::FLOAT));
     } else {
         _isSpectral = YES;
-        _containsPolarisationData = _dataType & ardt_polarisable;
+        _containsPolarisationData = (LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE) ? YES : NO;
         
         switch (_dataType) {
-            case ardt_spectrum8:                _spectralChannels = 8; _channels = 8; break;
-            case ardt_spectrum8_polarisable:    _spectralChannels = 8; _channels = 4*8; break;
-            case ardt_spectrum11:               _spectralChannels = 11; _channels = 11; break;
-            case ardt_spectrum11_polarisable:   _spectralChannels = 11; _channels = 4*11; break;
-            case ardt_spectrum18:               _spectralChannels = 18; _channels = 18; break;
-            case ardt_spectrum18_polarisable:   _spectralChannels = 18; _channels = 4*18; break;
-            case ardt_spectrum46:               _spectralChannels = 46; _channels = 46; break;
-            case ardt_spectrum46_polarisable:   _spectralChannels = 46; _channels = 4*46; break;
+            case ardt_spectrum8:
+            case ardt_spectrum8_polarisable:  _spectralChannels = 8; break;
+            case ardt_spectrum11:
+            case ardt_spectrum11_polarisable: _spectralChannels = 11; break;
+            case ardt_spectrum18:
+            case ardt_spectrum18_polarisable: _spectralChannels = 18;  break;
+            case ardt_spectrum46:
+            case ardt_spectrum46_polarisable: _spectralChannels = 46;  break;
             default:
                 ART_ERRORHANDLING_FATAL_ERROR(
                       "unsupported EXR colour type %d requested",
@@ -603,27 +614,23 @@ Otherwise, we have to handle it with PSSpectrum
         for (int i = 0; i < _spectralChannels; i++) {
             float central = 0.F;
             
-            switch(_dataType) {
-                case ardt_spectrum8:
-                case ardt_spectrum8_polarisable:
+            switch(_spectralChannels) {
+                case 8:
                     central = s8_channel_center( art_gv, i );
                     break;
-                case ardt_spectrum11:
-                case ardt_spectrum11_polarisable:
+                case 11:
                     central = s11_channel_center( art_gv, i );
                     break;
-                case ardt_spectrum18:
-                case ardt_spectrum18_polarisable:
+                case 18:
                     central = s18_channel_center( art_gv, i );
                     break;
-                case ardt_spectrum46:
-                case ardt_spectrum46_polarisable:
+                case 46:
                     central = s46_channel_center( art_gv, i );
                     break;
                 default:
                     ART_ERRORHANDLING_FATAL_ERROR(
-                          "unsupported EXR colour type %d requested",
-                          _dataType
+                          "Unrecognised number of spectral channels %d requested",
+                          _spectralChannels
                     );
             }
             
@@ -705,39 +712,113 @@ Otherwise, we have to handle it with PSSpectrum
             :   0 ];
     
         
-        for (long x = 0; x < XC(image->size); x++) {
-            const long targetX = x + XC(start);
+        if ( _containsPolarisationData ) {
+            // See ARTRAW from line 1295
             
-            if ( _dataType == ardt_rgba ) { // art_foundation_isr(art_gv) ?
-                ArRGBA  rgba;
+            /* ------------------------------------------------------------------
+                 Scanline writing code for the polarising renderer. This branch
+                 always treats 8 pixels at once, since we use a flag byte to
+                 indicate the polarisation status of these pixels.
+            ---------------------------------------------------------------aw- */
 
-                arlightalpha_to_spc(
-                      art_gv,
-                      _scanline[x],
-                      spc
-                    );
+            ARREFFRAME_RF_I( _referenceFrame, 0 ) = VEC3D( 1.0, 0.0, 0.0 );
+            ARREFFRAME_RF_I( _referenceFrame, 1 ) = VEC3D( 0.0, 1.0, 0.0 );
+                        
+            for (long x = 0; x < XC(image->size) / 8 + 1; x++) {
 
-                spc_to_rgba(
-                      art_gv,
-                      spc,
-                    & rgba
-                    );
+                // We ignore this information for now
 
-                spc_set_sid( art_gv, spc, 0, ARRGBA_R(rgba) );
-                spc_set_sid( art_gv, spc, 1, ARRGBA_G(rgba) );
-                spc_set_sid( art_gv, spc, 2, ARRGBA_B(rgba) );
-                spc_set_sid( art_gv, spc, 3, ARRGBA_A(rgba) );
-            } else {
-                arlightalpha_to_spc(
-                      art_gv,
-                      _scanline[x],
-                      spc
-                    );
+//                char  flagByte = 0;
+//
+//                /* ----------------------------------------------------------
+//                    Part 1 - compilation of the information in the flag byte.
+//                ---------------------------------------------------------- */
+//
+//                for ( int i = 0; i < 8; i++ )
+//                {
+//                    if (    x * 8 + i < XC(image->size)
+//                        &&  arlightalpha_l_polarised( art_gv, _scanline[ x * 8 + i ] ) )
+//                       flagByte |= 0x01;
+//
+//                    if ( i < 7 ) flagByte = flagByte << 1;
+//                }
+                
+                
+
+                /* ----------------------------------------------------------
+                    Part 2 - the individual stokes vectors are written to
+                    disk in order as needed. The maxComponents
+                    variable determines the number of active
+                    components; only these are written.
+                -------------------------------------------------------aw- */
+                for ( unsigned int i = 0; i < 8; i++ )
+                {
+                    if ( x * 8 + i < XC(image->size) )
+                    {
+                        const long targetX = x*8 + XC(start) + i;
+
+                        unsigned int  maxComponents;
+
+//                        if ( arlightalpha_l_polarised( art_gv, _scanline[ x * 8 + i ] ) )
+//                            maxComponents = 4;
+//                        else
+//                            maxComponents = 1;
+
+                        ArStokesVector  * sv = arstokesvector_alloc( art_gv );
+
+                        arlightalpha_l_to_sv(
+                            art_gv,
+                            _scanline[ x * 8 + i ],
+                            sv
+                            );
+
+                        // Max component ignored here
+                        for ( int c = 0; c < _spectralChannels; c++ ) {
+                            _bufferS0[ _bufferChannels * (targetY * XC(_size) + targetX) + c ] = spc_si( art_gv, ARSV_I( *sv, 0), c );
+                            _bufferS1[ _bufferChannels * (targetY * XC(_size) + targetX) + c ] = spc_si( art_gv, ARSV_I( *sv, 1), c );
+                            _bufferS2[ _bufferChannels * (targetY * XC(_size) + targetX) + c ] = spc_si( art_gv, ARSV_I( *sv, 2), c );
+                            _bufferS3[ _bufferChannels * (targetY * XC(_size) + targetX) + c ] = spc_si( art_gv, ARSV_I( *sv, 3), c );
+                        }
+                        
+                        arstokesvector_free( art_gv, sv );
+                    }
+                }
             }
-            
-            for ( int c = 0; c < _bufferChannels; c++ )
-            {
-                _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + c] = spc_si( art_gv, spc, c );
+        } else {
+            for (long x = 0; x < XC(image->size); x++) {
+                const long targetX = x + XC(start);
+
+                if ( _dataType == ardt_rgba ) { // art_foundation_isr(art_gv) ?
+                    ArRGBA  rgba;
+
+                    arlightalpha_to_spc(
+                          art_gv,
+                          _scanline[x],
+                          spc
+                        );
+
+                    spc_to_rgba(
+                          art_gv,
+                          spc,
+                        & rgba
+                        );
+
+                    spc_set_sid( art_gv, spc, 0, ARRGBA_R(rgba) );
+                    spc_set_sid( art_gv, spc, 1, ARRGBA_G(rgba) );
+                    spc_set_sid( art_gv, spc, 2, ARRGBA_B(rgba) );
+                    spc_set_sid( art_gv, spc, 3, ARRGBA_A(rgba) );
+                } else {
+                    arlightalpha_to_spc(
+                          art_gv,
+                          _scanline[x],
+                          spc
+                        );
+                }
+                
+                for ( int c = 0; c < _bufferChannels; c++ )
+                {
+                    _bufferS0[_bufferChannels * (targetY * XC(_size) + targetX) + c] = spc_si( art_gv, spc, c );
+                }
             }
         }
     }
@@ -828,19 +909,23 @@ Otherwise, we have to handle it with PSSpectrum
                 char* ptr = (char*)(&_bufferS0[c]);
                 frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptr, xStride, yStride));
                 
-                
                 if (_containsPolarisationData) {
                     char* ptrS1 = (char*)(&_bufferS1[c]);
                     char* ptrS2 = (char*)(&_bufferS2[c]);
                     char* ptrS3 = (char*)(&_bufferS3[c]);
+                    
                     channelName[1] = '1';
                     frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS1, xStride, yStride));
+
                     channelName[1] = '2';
                     frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS2, xStride, yStride));
+
                     channelName[1] = '3';
                     frameBuffer.insert(channelName, Imf::Slice(Imf::FLOAT, ptrS3, xStride, yStride));
                 }
             }
+            
+            FREE_ARRAY(channelName);
         } else {
             const size_t xStride = sizeof(_bufferS0[0]) * _bufferChannels;
             const size_t yStride = xStride * XC(_size);

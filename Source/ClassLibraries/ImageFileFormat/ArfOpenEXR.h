@@ -42,7 +42,6 @@ ART_MODULE_INTERFACE(ArfOpenEXR)
     IVec2D                      _size;
     ArDataType                  _dataType;
     
-    int                         _channels;
     int                         _spectralChannels;
     int                         _bufferChannels;
     
