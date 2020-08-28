@@ -2,7 +2,7 @@
 #define SAMPLES 32
 #endif
 
-ARM_MAIN_FUNCTION(GlowingObjects)
+ARM_MAIN_FUNCTION(RingOfGlowingObjects)
 {
 #define WITH_DIFFUSE_ENVIRONMENT
 //#define NICKEL
@@ -379,7 +379,7 @@ ARM_MAIN_FUNCTION(GlowingObjects)
                 :   material
                 ];
 
-    id lambertBaseSurface = LAMBERT_REFLECTOR_CONST( CONST_COLOUR_GREY( 0.8 ) );
+    id lambertBaseSurface = LAMBERT_REFLECTOR( CONST_COLOUR_GREY( 0.8 ) );
 
     id cylinder0   =
         [ CYLINDER apply
