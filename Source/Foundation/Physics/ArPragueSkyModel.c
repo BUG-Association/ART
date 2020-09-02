@@ -1731,11 +1731,11 @@ double arpragueskymodel_tau(
 	ASSERT_POSITIVE_DOUBLE(wavelength);
 	ASSERT_POSITIVE_DOUBLE(distance);
 
-	const double wavelength_norm = (wavelength - 340.0) / 40.0;
-	if (wavelength_norm > 10. || wavelength_norm < 0.)
+	const double wavelength_norm = (wavelength - state->channel_start) / state->channel_width;
+	if (wavelength_norm >= state->channels || wavelength_norm < 0.)
 		return 0.;
 	const int wavelength_low = (int)wavelength_norm;
-	const double wavelength_factor = wavelength_norm - (double)wavelength_low;
+	const double wavelength_factor = 0.0;
 	const int wavelength_inc = wavelength_low < 10 ? 1 : 0;
         ASSERT_INTEGER_WITHIN_RANGE(wavelength_low, 0, 10);
         ASSERT_DOUBLE_WITHIN_RANGE(wavelength_factor, 0.0, 1.0);
