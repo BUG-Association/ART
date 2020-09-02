@@ -59,17 +59,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef ARPRAGUESKYMODEL_USE_NEW
 
-const int elevations = 30;
-const int altitudes = 22;
-const int albedos = 4;
-const double elevation_vals[] = { -0.073304, -0.069813, -0.061087, -0.052360, -0.043633, -0.034907, -0.026180, -0.017453, -0.008727, 0.000000, 0.017453, 0.049742, 0.091281, 0.140499, 0.196350, 0.258134, 0.325329, 0.397411, 0.474206, 0.555364, 0.640710, 0.730071, 0.823097, 0.919963, 1.020319, 1.123992, 1.230981, 1.341111, 1.454557, 1.570796 };
-const double altitude_vals[] = { 0, 1.875, 15, 50.625, 120, 234.38, 405, 643.12, 960, 1366.9, 1875, 2000, 2495.6, 3240, 4119.4, 5145, 6328.1, 7680, 9211.9, 10935, 12861, 15000 };
-const int tensor_components = 9;
-const int tensor_components_pol = 5;
 const int transsvdrank = 12;
 const double safety_altitude = 50.0;
 
-int compute_pp_coefs(const int nbreaks, const double * breaks, const float * values, double * coefs, const int offset)
+double double_from_half(const unsigned short value)
+{
+	unsigned long hi = (unsigned long)(value&0x8000) << 16;
+	unsigned int abs = value & 0x7FFF;
+	if(abs)
+	{
+		hi |= 0x3F000000 << (unsigned)(abs>=0x7C00);
+		for(; abs<0x400; abs<<=1,hi-=0x100000) ;
+		hi += (unsigned long)(abs) << 10;
+	}
+	unsigned long dbits = (unsigned long)(hi) << 32;
+	double out;
+	memcpy(&out, &dbits, sizeof(double));
+	return out;
+}
+
+int compute_pp_coefs_from_half(const int nbreaks, const double * breaks, const unsigned short * values, double * coefs, const int offset, const double scale)
+{
+	for (int i = 0; i < nbreaks - 1; ++i)
+	{
+		const double val1 = double_from_half(values[i+1]) / scale;
+		const double val2 = double_from_half(values[i]) / scale;
+		const double diff = val1 - val2;
+
+		coefs[offset + 2 * i] = diff / (breaks[i+1] - breaks[i]);
+		coefs[offset + 2 * i + 1]  = val2;
+	}
+	return 2 * nbreaks - 2;
+}
+
+int compute_pp_coefs_from_float(const int nbreaks, const double * breaks, const float * values, double * coefs, const int offset)
 {
 	for (int i = 0; i < nbreaks - 1; ++i)
 	{
@@ -79,34 +102,90 @@ int compute_pp_coefs(const int nbreaks, const double * breaks, const float * val
 	return 2 * nbreaks - 2;
 }
 
-ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
-        const char  * library_path
-        )
+void printErrorAndExit(const char * message) {
+	fprintf(stderr, message);
+	fprintf(stderr, "\n");
+	fflush(stderr);
+	exit(-1);
+}
+
+void read_radiance(ArPragueSkyModelState * state, FILE * handle)
 {
-    ArPragueSkyModelState  * state = ALLOC(ArPragueSkyModelState);
+	// Read metadata
 
-        // Radiance
+	// Structure of the metadata part of the data file:
+	// turbidities       (1 * int),  turbidity_vals (turbidities * double),
+	// albedos           (1 * int),  albedo_vals    (albedos * double),
+	// altitudes         (1 * int),  altitude_vals  (altitudes * double),
+	// elevations        (1 * int),  elevation_vals (elevations * double),
+	// channels          (1 * int),  channel_start  (1 * double), channel_width (1 * double),
+	// tensor_components (1 * int),
+        // sun_nbreaks       (1 * int),  sun_breaks     (sun_nbreaks * double),
+	// zenith_nbreaks    (1 * int),  zenith_breaks  (zenith_nbreaks * double),
+	// emph_nbreaks      (1 * int),  emph_breaks    (emph_nbreaks * double)
 
-	// Read breaks
-	// Breaks file structure:
-	// sun_nbreaks (1 * int), zenith_nbreaks (1 * int), emph_nbreaks (1 * int), sun_breaks (sun_nbreaks * double), zenith_breaks (zenith_nbreaks * double), emph_breaks (emph_nbreaks * double)
+	int valsRead;
 
-	char breaks_filename[1024];
-	sprintf(breaks_filename, "%s/SkyModel/new_breaks_c.dat", library_path);
-	FILE* breaks_handle = fopen(breaks_filename, "rb");
-	fread(&state->sun_nbreaks, sizeof(int), 1, breaks_handle);
-	fread(&state->zenith_nbreaks, sizeof(int), 1, breaks_handle);
-	fread(&state->emph_nbreaks, sizeof(int), 1, breaks_handle);
+	valsRead = fread(&state->turbidities, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->turbidities < 1) printErrorAndExit("Error reading sky model data: turbidities");
+
+	state->turbidity_vals = ALLOC_ARRAY(double, state->turbidities);
+	valsRead = fread(state->turbidity_vals, sizeof(double), state->turbidities, handle);
+	if (valsRead != state->turbidities) printErrorAndExit("Error reading sky model data: turbidity_vals");
+
+	valsRead = fread(&state->albedos, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->albedos < 1) printErrorAndExit("Error reading sky model data: albedos");
+
+	state->albedo_vals = ALLOC_ARRAY(double, state->albedos);
+	valsRead = fread(state->albedo_vals, sizeof(double), state->albedos, handle);
+	if (valsRead != state->albedos) printErrorAndExit("Error reading sky model data: albedo_vals");
+
+	valsRead = fread(&state->altitudes, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->altitudes < 1) printErrorAndExit("Error reading sky model data: altitudes");
+
+	state->altitude_vals = ALLOC_ARRAY(double, state->altitudes);
+	valsRead = fread(state->altitude_vals, sizeof(double), state->altitudes, handle);
+	if (valsRead != state->altitudes) printErrorAndExit("Error reading sky model data: altitude_vals");
+
+	valsRead = fread(&state->elevations, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->elevations < 1) printErrorAndExit("Error reading sky model data: elevations");
+
+	state->elevation_vals = ALLOC_ARRAY(double, state->elevations);
+	valsRead = fread(state->elevation_vals, sizeof(double), state->elevations, handle);
+	if (valsRead != state->elevations) printErrorAndExit("Error reading sky model data: elevation_vals");
+
+	valsRead = fread(&state->channels, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->channels < 1) printErrorAndExit("Error reading sky model data: channels");
+
+	valsRead = fread(&state->channel_start, sizeof(double), 1, handle);
+	if (valsRead != 1 || state->channel_start < 0) printErrorAndExit("Error reading sky model data: channel_start");
+
+	valsRead = fread(&state->channel_width, sizeof(double), 1, handle);
+	if (valsRead != 1 || state->channel_width <= 0) printErrorAndExit("Error reading sky model data: channel_width");
+
+	valsRead = fread(&state->tensor_components, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->tensor_components < 1) printErrorAndExit("Error reading sky model data: tensor_components");
+
+	valsRead = fread(&state->sun_nbreaks, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->sun_nbreaks < 2) printErrorAndExit("Error reading sky model data: sun_nbreaks");
 
 	state->sun_breaks = ALLOC_ARRAY(double, state->sun_nbreaks);
+	valsRead = fread(state->sun_breaks, sizeof(double), state->sun_nbreaks, handle);
+	if (valsRead != state->sun_nbreaks) printErrorAndExit("Error reading sky model data: sun_breaks");
+
+	valsRead = fread(&state->zenith_nbreaks, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->zenith_nbreaks < 2) printErrorAndExit("Error reading sky model data: zenith_nbreaks");
+
 	state->zenith_breaks = ALLOC_ARRAY(double, state->zenith_nbreaks);
+	valsRead = fread(state->zenith_breaks, sizeof(double), state->zenith_nbreaks, handle);
+	if (valsRead != state->zenith_nbreaks) printErrorAndExit("Error reading sky model data: zenith_breaks");
+
+	valsRead = fread(&state->emph_nbreaks, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->emph_nbreaks < 2) printErrorAndExit("Error reading sky model data: emph_nbreaks");
+
 	state->emph_breaks = ALLOC_ARRAY(double, state->emph_nbreaks);
-
-	fread(state->sun_breaks, sizeof(double), state->sun_nbreaks, breaks_handle);
-	fread(state->zenith_breaks, sizeof(double), state->zenith_nbreaks, breaks_handle);
-	fread(state->emph_breaks, sizeof(double), state->emph_nbreaks, breaks_handle);
-
-	fclose(breaks_handle);
+	valsRead = fread(state->emph_breaks, sizeof(double), state->emph_nbreaks, handle);
+	if (valsRead != state->emph_nbreaks) printErrorAndExit("Error reading sky model data: emph_breaks");
 
 	// Calculate offsets and strides
 
@@ -116,65 +195,141 @@ ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
 	state->zenith_offset = state->sun_offset + 2 * state->sun_nbreaks - 2;
 	state->zenith_stride = state->sun_stride;
 
-	state->emph_offset = state->sun_offset + tensor_components * state->sun_stride;
+	state->emph_offset = state->sun_offset + state->tensor_components * state->sun_stride;
 
 	state->total_coefs_single_config = state->emph_offset + 2 * state->emph_nbreaks - 2; // this is for one specific configuration
-	state->total_coefs_all_configs = state->total_coefs_single_config * elevations * altitudes * albedos;
+	state->total_configs = state->channels * state->elevations * state->altitudes * state->albedos * state->turbidities;
+	state->total_coefs_all_configs = state->total_coefs_single_config * state->total_configs;
 
-    // Read coefficients
+	// Read data
 
-    float * radiance_temp = ALLOC_ARRAY(float, M_MAX(state->sun_nbreaks, M_MAX(state->zenith_nbreaks, state->emph_nbreaks)));
-
-    for (int wl = 0; wl < 11; ++wl)
-    {
-        // Radiance file structure:
-	// [[[[ sun_coefs (state->sun_nbreaks * single), zenith_coefs (state->zenith_nbreaks * single) ] * tensor_components, emph_coefs (state->emph_nbreaks * single) ] * elevations ] * altitudes ] * albedos
-
-	char filename[1024];
-        sprintf(filename, "%s/SkyModel/new_params_t%d_wl%d.dat", library_path, 2, wl+1);
-        FILE* handle = fopen(filename, "rb");
+	// Structure of the data part of the data file:
+	// [[[[[[ sun_coefs (sun_nbreaks * half), zenith_scale (1 * double), zenith_coefs (zenith_nbreaks * half) ] * tensor_components, emph_coefs (emph_nbreaks * half) ]
+	//   * channels ] * elevations ] * altitudes ] * albedos ] * turbidities
 
 	int offset = 0;
-	state->radiance_dataset[wl] = ALLOC_ARRAY(double, state->total_coefs_all_configs);
+	state->radiance_dataset = ALLOC_ARRAY(double, state->total_coefs_all_configs);
 
-	for (int comb = 0; comb < elevations * altitudes * albedos; ++comb)
-	{
-		for (int tc = 0; tc < tensor_components; ++tc)
+	if (1) {
+		unsigned short * radiance_temp = ALLOC_ARRAY(unsigned short, M_MAX(state->sun_nbreaks, M_MAX(state->zenith_nbreaks, state->emph_nbreaks)));
+
+		for (int con = 0; con < state->total_configs; ++con)
 		{
-			fread(radiance_temp, sizeof(float), state->sun_nbreaks, handle);
-			offset += compute_pp_coefs(state->sun_nbreaks, state->sun_breaks, radiance_temp, state->radiance_dataset[wl], offset);
+			for (int tc = 0; tc < state->tensor_components; ++tc)
+			{
+				const double sun_scale = 1.0;
+				valsRead = fread(radiance_temp, sizeof(unsigned short), state->sun_nbreaks, handle);
+				if (valsRead != state->sun_nbreaks) printErrorAndExit("Error reading sky model data: sun_coefs");
+				offset += compute_pp_coefs_from_half(state->sun_nbreaks, state->sun_breaks, radiance_temp, state->radiance_dataset, offset, sun_scale);
 
-			fread(radiance_temp, sizeof(float), state->zenith_nbreaks, handle);
-			offset += compute_pp_coefs(state->zenith_nbreaks, state->zenith_breaks, radiance_temp, state->radiance_dataset[wl], offset);
+				double zenith_scale;
+				valsRead = fread(&zenith_scale, sizeof(double), 1, handle);
+				if (valsRead != 1) printErrorAndExit("Error reading sky model data: zenith_scale");
+
+				valsRead = fread(radiance_temp, sizeof(unsigned short), state->zenith_nbreaks, handle);
+				if (valsRead != state->zenith_nbreaks) printErrorAndExit("Error reading sky model data: zenith_coefs");
+				offset += compute_pp_coefs_from_half(state->zenith_nbreaks, state->zenith_breaks, radiance_temp, state->radiance_dataset, offset, zenith_scale);
+			}
+
+			const double emph_scale = 1.0;
+			valsRead = fread(radiance_temp, sizeof(unsigned short), state->emph_nbreaks, handle);
+			if (valsRead != state->emph_nbreaks) printErrorAndExit("Error reading sky model data: emph_coefs");
+			offset += compute_pp_coefs_from_half(state->emph_nbreaks, state->emph_breaks, radiance_temp, state->radiance_dataset, offset, emph_scale);
 		}
 
-		fread(radiance_temp, sizeof(float), state->emph_nbreaks, handle);
-		offset += compute_pp_coefs(state->emph_nbreaks, state->emph_breaks, radiance_temp, state->radiance_dataset[wl], offset);
+		free(radiance_temp);
+	}
+	else {
+		float * radiance_temp = ALLOC_ARRAY(float, M_MAX(state->sun_nbreaks, M_MAX(state->zenith_nbreaks, state->emph_nbreaks)));
+
+		for (int con = 0; con < state->total_configs; ++con)
+		{
+			for (int tc = 0; tc < state->tensor_components; ++tc)
+			{
+				fread(radiance_temp, sizeof(float), state->sun_nbreaks, handle);
+				offset += compute_pp_coefs_from_float(state->sun_nbreaks, state->sun_breaks, radiance_temp, state->radiance_dataset, offset);
+
+				fread(radiance_temp, sizeof(float), state->zenith_nbreaks, handle);
+				offset += compute_pp_coefs_from_float(state->zenith_nbreaks, state->zenith_breaks, radiance_temp, state->radiance_dataset, offset);
+			}
+
+			fread(radiance_temp, sizeof(float), state->emph_nbreaks, handle);
+			offset += compute_pp_coefs_from_float(state->emph_nbreaks, state->emph_breaks, radiance_temp, state->radiance_dataset, offset);
+		}
+
+		free(radiance_temp);
+	}
+}
+
+void read_transmittance(ArPragueSkyModelState * state, FILE * handle)
+{
+	// Read metadata
+
+	int valsRead;
+
+	valsRead = fread(&state->trans_n_d, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->trans_n_d < 1) printErrorAndExit("Error reading sky model data: trans_n_d");
+
+	valsRead = fread(&state->trans_n_a, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->trans_n_a < 1) printErrorAndExit("Error reading sky model data: trans_n_a");
+
+	valsRead = fread(&state->trans_turbidities, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->trans_turbidities < 1) printErrorAndExit("Error reading sky model data: trans_turbidities");
+
+	valsRead = fread(&state->trans_altitudes, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->trans_altitudes < 1) printErrorAndExit("Error reading sky model data: trans_altitudes");
+
+	valsRead = fread(&state->trans_rank, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->trans_rank < 1) printErrorAndExit("Error reading sky model data: trans_rank");
+
+	const int total_coefs_U = state->trans_n_d * state->trans_n_a * state->trans_rank * state->trans_altitudes;
+	const int total_coefs_V = state->trans_turbidities * state->trans_rank * 11 * state->trans_altitudes;
+
+	// Read data
+
+	state->transmission_dataset_U = ALLOC_ARRAY(float, total_coefs_U);
+	valsRead = fread(state->transmission_dataset_U, sizeof(float), total_coefs_U, handle);
+	if (valsRead != total_coefs_U) printErrorAndExit("Error reading sky model data: transmission_dataset_U");
+
+	state->transmission_dataset_V = ALLOC_ARRAY(float, total_coefs_V);
+	valsRead = fread(state->transmission_dataset_V, sizeof(float), total_coefs_V, handle);
+	if (valsRead != total_coefs_V) printErrorAndExit("Error reading sky model data: transmission_dataset_V");
+}
+
+void read_polarisation(ArPragueSkyModelState * state, FILE * handle)
+{
+	// Read metadata
+
+	// Structure of the metadata part of the data file:
+	// tensor_components_pol (1 * int),
+        // sun_nbreaks_pol       (1 * int),  sun_breaks_pol     (sun_nbreaks_pol * double),
+	// zenith_nbreaks_pol    (1 * int),  zenith_breaks_pol  (zenith_nbreaks_pol * double),
+	// emph_nbreaks_pol      (1 * int),  emph_breaks_pol    (emph_nbreaks_pol * double)
+
+	int valsRead;
+
+	valsRead = fread(&state->tensor_components_pol, sizeof(int), 1, handle);
+	if (valsRead != 1)
+	{
+		// Polarisation dataset not present
+		state->tensor_components_pol = 0;
+		debugprintf("No polarisation dataset available!\n");
+		return;
 	}
 
-        fclose(handle);
-    }
-
-    free(radiance_temp);
-
-    // Polarisation
-
-	// Read breaks
-	// Breaks file structure:
-	// sun_nbreaks_pol (1 * int), zenith_nbreaks_pol (1 * int), sun_breaks_pol (sun_nbreaks_pol * double), zenith_breaks_pol (zenith_nbreaks_pol * double)
-
-	sprintf(breaks_filename, "%s/SkyModel/new_breaks_c_pol.dat", library_path);
-	breaks_handle = fopen(breaks_filename, "rb");
-	fread(&state->sun_nbreaks_pol, sizeof(int), 1, breaks_handle);
-	fread(&state->zenith_nbreaks_pol, sizeof(int), 1, breaks_handle);
+	valsRead = fread(&state->sun_nbreaks_pol, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->sun_nbreaks_pol < 1) printErrorAndExit("Error reading sky model data: sun_nbreaks_pol");
 
 	state->sun_breaks_pol = ALLOC_ARRAY(double, state->sun_nbreaks_pol);
+	valsRead = fread(state->sun_breaks_pol, sizeof(double), state->sun_nbreaks_pol, handle);
+	if (valsRead != state->sun_nbreaks_pol) printErrorAndExit("Error reading sky model data: sun_breaks_pol");
+
+	valsRead = fread(&state->zenith_nbreaks_pol, sizeof(int), 1, handle);
+	if (valsRead != 1 || state->zenith_nbreaks_pol < 1) printErrorAndExit("Error reading sky model data: zenith_nbreaks_pol");
+
 	state->zenith_breaks_pol = ALLOC_ARRAY(double, state->zenith_nbreaks_pol);
-
-	fread(state->sun_breaks_pol, sizeof(double), state->sun_nbreaks_pol, breaks_handle);
-	fread(state->zenith_breaks_pol, sizeof(double), state->zenith_nbreaks_pol, breaks_handle);
-
-    	fclose(breaks_handle);
+	valsRead = fread(state->zenith_breaks_pol, sizeof(double), state->zenith_nbreaks_pol, handle);
+	if (valsRead != state->zenith_nbreaks_pol) printErrorAndExit("Error reading sky model data: zenith_breaks_pol");
 
 	// Calculate offsets and strides
 
@@ -184,89 +339,89 @@ ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
 	state->zenith_offset_pol = state->sun_offset_pol + 2 * state->sun_nbreaks_pol - 2;
 	state->zenith_stride_pol = state->sun_stride_pol;
 
-	state->total_coefs_single_config_pol = state->sun_offset_pol + tensor_components_pol * state->sun_stride_pol; // this is for one specific configuration
-	state->total_coefs_all_configs_pol = state->total_coefs_single_config_pol * elevations * altitudes * albedos;
+	state->total_coefs_single_config_pol = state->sun_offset_pol + state->tensor_components_pol * state->sun_stride_pol; // this is for one specific configuration
+	state->total_coefs_all_configs_pol = state->total_coefs_single_config_pol * state->total_configs;
 
-	// Read coefficients
+	// Read data
 
-	float * pol_temp = ALLOC_ARRAY(float, M_MAX(state->sun_nbreaks_pol, state->zenith_nbreaks_pol));
-
-    for (int wl = 0; wl < 11; ++wl)
-    {
-        // Polarisation file structure:
-	// [[[[ sun_coefs ((2 * state->sun_nbreaks_pol - 2) * double), zenith_coefs ((2 * state->zenith_nbreaks_pol - 2) * double) ] * tensor_components_pol ] * elevations ] * altitudes ] * albedos
-
-	char filename[1024];
-        sprintf(filename, "%s/SkyModel/new_params_t%d_wl%d_pol.dat", library_path, 2, wl+1);
-        FILE* handle = fopen(filename, "rb");
+	// Structure of the data part of the data file:
+	// [[[[[[ sun_coefs_pol (sun_nbreaks_pol * float), zenith_coefs_pol (zenith_nbreaks_pol * float) ] * tensor_components_pol]
+	//   * channels ] * elevations ] * altitudes ] * albedos ] * turbidities
 
 	int offset = 0;
-	state->polarisation_dataset[wl] = ALLOC_ARRAY(double, state->total_coefs_all_configs_pol);
+	state->polarisation_dataset = ALLOC_ARRAY(double, state->total_coefs_all_configs_pol);
+	float * polarisation_temp = ALLOC_ARRAY(float, M_MAX(state->sun_nbreaks_pol, state->zenith_nbreaks_pol));
 
-	for (int comb = 0; comb < elevations * altitudes * albedos; ++comb)
+	for (int con = 0; con < state->total_configs; ++con)
 	{
-		for (int tc = 0; tc < tensor_components_pol; ++tc)
+		for (int tc = 0; tc < state->tensor_components_pol; ++tc)
 		{
-			fread(pol_temp, sizeof(float), state->sun_nbreaks_pol, handle);
-			offset += compute_pp_coefs(state->sun_nbreaks_pol, state->sun_breaks_pol, pol_temp, state->polarisation_dataset[wl], offset);
+			valsRead = fread(polarisation_temp, sizeof(float), state->sun_nbreaks_pol, handle);
+			if (valsRead != state->sun_nbreaks_pol) printErrorAndExit("Error reading sky model data: sun_coefs_pol");
+			offset += compute_pp_coefs_from_float(state->sun_nbreaks_pol, state->sun_breaks_pol, polarisation_temp, state->polarisation_dataset, offset);
 
-			fread(pol_temp, sizeof(float), state->zenith_nbreaks_pol, handle);
-			offset += compute_pp_coefs(state->zenith_nbreaks_pol, state->zenith_breaks_pol, pol_temp, state->polarisation_dataset[wl], offset);
+			valsRead = fread(polarisation_temp, sizeof(float), state->zenith_nbreaks_pol, handle);
+			if (valsRead != state->zenith_nbreaks_pol) printErrorAndExit("Error reading sky model data: zenith_coefs_pol");
+			offset += compute_pp_coefs_from_float(state->zenith_nbreaks_pol, state->zenith_breaks_pol, polarisation_temp, state->polarisation_dataset, offset);
 		}
 	}
 
-        fclose(handle);
-    }
+	free(polarisation_temp);
+}
 
-    free(pol_temp);
+ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
+	const char  * library_path
+	)
+{
+	ArPragueSkyModelState * state = ALLOC(ArPragueSkyModelState);
 
-    // Transmittance
+	char filename[1024];
+	//sprintf(filename, "%s/SkyModel/Full.dat", library_path);
+	//sprintf(filename, "%s/SkyModel/FullHazy.dat", library_path);
+	//sprintf(filename, "%s/SkyModel/Full_Float.dat", library_path);
+	//sprintf(filename, "%s/SkyModel/VisLow.dat", library_path);
+	//sprintf(filename, "%s/SkyModel/VisGround.dat", library_path);
+	sprintf(filename, "%s/SkyModel/FullPol.dat", library_path);
+	//sprintf(filename, "%s/SkyModel/FullPol_Float.dat", library_path);
+	//sprintf(filename, "%s/SkyModel/VisLowPol.dat", library_path);
+	//sprintf(filename, "%s/SkyModel/VisGroundPol.dat", library_path);
+	FILE * handle = fopen(filename, "rb");
 
-    char filenametransmittance[1024];
-    
-    sprintf(filenametransmittance, "%s/SkyModel/Transmittance.dat", library_path);
-    
-    FILE* handletrans = fopen(filenametransmittance, "rb");
-    
-    fread(&state->trans_n_d, sizeof(int), 1, handletrans);
-    fread(&state->trans_n_a, sizeof(int), 1, handletrans);
-    fread(&state->trans_turbidities, sizeof(int), 1, handletrans);
-    fread(&state->trans_altitudes, sizeof(int), 1, handletrans);
-    fread(&state->trans_rank, sizeof(int), 1, handletrans);
+	// Read data
+	read_radiance(state, handle);
+	read_transmittance(state, handle);
+	read_polarisation(state, handle);
 
-    int transmittance_values_per_turbidity = state->trans_rank * 11 * state->trans_altitudes;
-    int total_transmittance_values = (state->trans_n_d * state->trans_n_a * state->trans_rank * state->trans_altitudes) + (state->trans_turbidities * transmittance_values_per_turbidity);
+	fclose(handle);
 
-    state->transmission_dataset_U = ALLOC_ARRAY(float, state->trans_n_d * state->trans_n_a * state->trans_rank * state->trans_altitudes);
-    fread(state->transmission_dataset_U, sizeof(float), state->trans_n_d * state->trans_n_a * state->trans_rank * state->trans_altitudes, handletrans);
-    state->transmission_dataset_V = ALLOC_ARRAY(float, state->trans_turbidities * transmittance_values_per_turbidity);
-    fread(state->transmission_dataset_V, sizeof(float), state->trans_turbidities * transmittance_values_per_turbidity, handletrans);
-    
-    fclose(handletrans);
-
-    return state;
+	return state;
 }
 
 void arpragueskymodelstate_free(
-        ArPragueSkyModelState  * state
-        )
+	ArPragueSkyModelState  * state
+	)
 {
-    free(state->sun_breaks);
-    free(state->zenith_breaks);
-    free(state->emph_breaks);
-    free(state->sun_breaks_pol);
-    free(state->zenith_breaks_pol);
+	free(state->turbidity_vals);
+	free(state->albedo_vals);
+	free(state->altitude_vals);
+	free(state->elevation_vals);
 
-    for (int wl = 1; wl < 11; ++wl)
-    {
-        free(state->radiance_dataset[wl]);
-        free(state->polarisation_dataset[wl]);
-    }
+	free(state->sun_breaks);
+	free(state->zenith_breaks);
+	free(state->emph_breaks);
+	free(state->radiance_dataset);
 
-    free(state->transmission_dataset_U);
-    free(state->transmission_dataset_V);
+	free(state->transmission_dataset_U);
+	free(state->transmission_dataset_V);
 
-    FREE(state);
+	if (state->tensor_components_pol > 0)
+	{
+		free(state->sun_breaks_pol);
+		free(state->zenith_breaks_pol);
+		free(state->polarisation_dataset);
+	}
+
+	FREE(state);
 }
 
 void arpragueskymodel_compute_altitude_and_elevation(
@@ -478,40 +633,47 @@ debugprintf("Gamma   : %f\n",*gamma * MATH_RAD_TO_DEG)
 #endif
 }
 
-double lerp(double from, double to, double factor)
+double lerp(const double from, const double to, const double factor)
 {
-  return (1.0 - factor) * from + factor * to;
+	return (1.0 - factor) * from + factor * to;
 }
 
 int find_segment(const double x, const int nbreaks, const double* breaks)
 {
-  int segment = 0;
-  for (segment = 0; segment < nbreaks; ++segment)
-  {
-    if (breaks[segment+1] >= x)
-      break;
-  }
-  return segment;
+	int segment = 0;
+	for (segment = 0; segment < nbreaks; ++segment)
+	{
+		if (breaks[segment+1] >= x)
+		break;
+	}
+	return segment;
 }
 
-double eval_pp(double x, const int segment, const double * breaks, const double * coefs)
+double eval_pp(const double x, const int segment, const double * breaks, const double * coefs)
 {
-  x -= breaks[segment];
-  const double* sc = coefs + 2 * segment; // segment coefs
-  return sc[0] * x + sc[1];
+	const double x0 = x - breaks[segment];
+	const double * sc = coefs + 2 * segment; // segment coefs
+	return sc[0] * x0 + sc[1];
 }
 
-double* control_params_single_config(
-  const ArPragueSkyModelState  * state,
-  int                     elevation,
-  int                     altitude,
-  int                     turbidity,
-  int                     albedo,
-  int                     wavelength
+const double * control_params_single_config(
+	const ArPragueSkyModelState * state,
+	const double *                dataset,
+	const int                     total_coefs_single_config,
+	const int                     elevation,
+	const int                     altitude,
+	const int                     turbidity,
+	const int                     albedo,
+	const int                     wavelength
 )
 {
-  // turbidity is completely ignored for now
-  return state->radiance_dataset[wavelength] + state->total_coefs_single_config * (elevation + elevations*altitude + elevations*altitudes*albedo);
+	return dataset + (total_coefs_single_config * (
+		wavelength +
+		state->channels*elevation +
+		state->channels*state->elevations*altitude +
+		state->channels*state->elevations*state->altitudes*albedo +
+		state->channels*state->elevations*state->altitudes*state->albedos*turbidity
+	));
 }
 
 double reconstruct(
@@ -525,8 +687,8 @@ double reconstruct(
   const double                 * control_params
 )
 {
-  double res = 0;
-  for (int t = 0; t < tensor_components; ++t) {
+  double res = 0.0;
+  for (int t = 0; t < state->tensor_components; ++t) {
 	const double sun_val_t = eval_pp(gamma, gamma_segment, state->sun_breaks, control_params + state->sun_offset + t * state->sun_stride);
 	const double zenith_val_t = eval_pp(alpha, alpha_segment, state->zenith_breaks, control_params + state->zenith_offset + t * state->zenith_stride);
 	res += sun_val_t * zenith_val_t;
@@ -534,9 +696,39 @@ double reconstruct(
   const double emph_val_t = eval_pp(zero, zero_segment, state->emph_breaks, control_params + state->emph_offset);
   res *= emph_val_t;
 
-  return M_MAX(res,0.);
+  return M_MAX(res, 0.0);
 }
 
+double map_parameter(const double param, const int value_count, const double * values)
+{
+	double mapped;
+	if (param < values[0])
+	{
+		mapped = 0.0;
+	}
+	else if (param > values[value_count - 1])
+	{
+		mapped = (double)value_count - 1.0;
+	}
+	else
+	{
+		for (int v = 0; v < value_count; ++v)
+		{
+			const double val = values[v];
+			if (fabs(val - param) < 1e-6)
+			{
+				mapped = v;
+				break;
+			}
+			else if (param < val)
+			{
+				mapped = v - ((val - param) / (val - values[v - 1]));
+				break;
+			}
+		}
+	}
+	return mapped;
+}
 
 
 ///////////////////////////////////////////////
@@ -562,8 +754,10 @@ double interpolate_elevation(
   const int elevation_low = (int)elevation;
   const double factor = elevation - (double)elevation_low;
 
-  double* control_params_low = control_params_single_config(
+  const double * control_params_low = control_params_single_config(
     state,
+    state->radiance_dataset,
+    state->total_coefs_single_config,
     elevation_low,
     altitude,
     turbidity,
@@ -580,13 +774,15 @@ double interpolate_elevation(
     zero_segment,
     control_params_low);    
 
-  if (factor < 1e-6 || elevation_low >= (elevations - 1))
+  if (factor < 1e-6 || elevation_low >= (state->elevations - 1))
   {
     return res_low;
   }
 
-  double* control_params_high = control_params_single_config(
+  const double * control_params_high = control_params_single_config(
     state,
+    state->radiance_dataset,
+    state->total_coefs_single_config,
     elevation_low+1,
     altitude,
     turbidity,
@@ -638,7 +834,7 @@ double interpolate_altitude(
     alpha_segment,
     zero_segment);
 
-  if (factor < 1e-6 || altitude_low >= (altitudes - 1))
+  if (factor < 1e-6 || altitude_low >= (state->altitudes - 1))
   {
     return res_low;
   }
@@ -675,13 +871,14 @@ double interpolate_turbidity(
   int                     zero_segment
 )
 {
-  // Ignore turbidity
+  const int turbidity_low = (int)turbidity;
+  const double factor = turbidity - (double)turbidity_low;
 
-  return interpolate_altitude(
+  double res_low = interpolate_altitude(
     state,
     elevation,
     altitude,
-    (int)turbidity,
+    turbidity_low,
     albedo,
     wavelength,
     gamma,
@@ -690,6 +887,27 @@ double interpolate_turbidity(
     gamma_segment,
     alpha_segment,
     zero_segment);
+
+  if (factor < 1e-6 || turbidity_low >= (state->turbidities - 1))
+  {
+    return res_low;
+  }
+
+  double res_high = interpolate_altitude(
+    state,
+    elevation,
+    altitude,
+    turbidity_low + 1,
+    albedo,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment);
+
+  return lerp(res_low, res_high, factor);
 }
 
 double interpolate_albedo(
@@ -724,7 +942,7 @@ double interpolate_albedo(
     alpha_segment,
     zero_segment);
 
-  if (factor < 1e-6 || albedo_low >= (albedos - 1))
+  if (factor < 1e-6 || albedo_low >= (state->albedos - 1))
   {
     return res_low;
   }
@@ -793,66 +1011,14 @@ double arpragueskymodel_radiance(
 {
   // Translate parameter values to indices
 
-  double altitude_control;
-  if (altitude < altitude_vals[0])
-  {
-     altitude_control = 0;
-  }
-  else if (altitude > altitude_vals[altitudes - 1])
-  {
-     altitude_control = altitudes - 1;
-  }
-  else
-  {
-     for (int a = 1; a < altitudes; ++a)
-     {
-	double val = altitude_vals[a];
-        if (fabs(altitude - val) < 1e-6)
-        {
-           altitude_control = a;
-           break;
-        }
-	else if (altitude < val)
-        {
-	   altitude_control = a - ((val - altitude) / (val - altitude_vals[a - 1]));
-           break;
-        }
-     }
-  }
+  const double turbidity_control = map_parameter(turbidity, state->turbidities, state->turbidity_vals);
+  const double albedo_control    = map_parameter(albedo, state->albedos, state->albedo_vals);
+  const double altitude_control  = map_parameter(altitude, state->altitudes, state->altitude_vals);
+  const double elevation_control = map_parameter(elevation * MATH_RAD_TO_DEG, state->elevations, state->elevation_vals);
 
-  double elevation_control;
-  if (elevation < elevation_vals[0])
-  {
-     elevation_control = 0;
-  }
-  else if (elevation > elevation_vals[elevations - 1])
-  {
-     elevation_control = elevations - 1;
-  }
-  else
-  {
-     for (int e = 1; e < elevations; ++e)
-     {
-        double val = elevation_vals[e];
-        if (fabs(elevation - val) < 1e-6)
-        {
-           elevation_control = e;
-           break;
-        }
-	else if (elevation < val)
-        {
-	   elevation_control = e - ((val - elevation) / (val - elevation_vals[e - 1]));
-           break;
-        }
-     }
-  }
+  const double channel_control = (wavelength - state->channel_start) / state->channel_width;
 
-  double albedo_control = albedo * (albedos - 1);
-  if (albedo_control < 0) albedo_control = 0;
-  if (albedo_control > albedos - 1) albedo_control = albedos - 1;
-
-  const double channel = (wavelength - 320.0) / 40.0;
-  if ( channel >= 11. || channel < 0.) return 0.;
+  if ( channel_control >= state->channels || channel_control < 0.) return 0.;
 
   // Get params corresponding to the indices, reconstruct result and interpolate
 
@@ -866,9 +1032,9 @@ double arpragueskymodel_radiance(
     state,
     elevation_control,
     altitude_control,
-    turbidity,
+    turbidity_control,
     albedo_control,
-    channel,
+    channel_control,
     gamma,
     alpha,
     zero,
@@ -918,8 +1084,10 @@ void interpolate_elevation_hero(
   ArSpectralSample res_low;
   for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
   {
-    double* control_params_low = control_params_single_config(
+    const double * control_params_low = control_params_single_config(
       state,
+      state->radiance_dataset,
+      state->total_coefs_single_config,
       elevation_low,
       altitude,
       turbidity,
@@ -937,7 +1105,7 @@ void interpolate_elevation_hero(
       control_params_low);
   }
 
-  if (factor < 1e-6 || elevation_low >= (elevations - 1))
+  if (factor < 1e-6 || elevation_low >= (state->elevations - 1))
   {
     sps_s_init_s(art_gv, &res_low, result);
     return;
@@ -946,8 +1114,10 @@ void interpolate_elevation_hero(
   ArSpectralSample res_high;
   for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
   {
-    double* control_params_high = control_params_single_config(
+    const double * control_params_high = control_params_single_config(
       state,
+      state->radiance_dataset,
+      state->total_coefs_single_config,
       elevation_low+1,
       altitude,
       turbidity,
@@ -1005,7 +1175,7 @@ void interpolate_altitude_hero(
     zero_segment,
     &res_low);
 
-  if (factor < 1e-6 || altitude_low >= (altitudes - 1))
+  if (factor < 1e-6 || altitude_low >= (state->altitudes - 1))
   {
     sps_s_init_s(art_gv, &res_low, result);
     return;
@@ -1048,14 +1218,16 @@ void interpolate_turbidity_hero(
         ArSpectralSample      * result
 )
 {
-  // Ignore turbidity
+  const int turbidity_low = (int)turbidity;
+  const double factor = turbidity - (double)turbidity_low;
 
+  ArSpectralSample res_low;
   interpolate_altitude_hero(
     art_gv,
     state,
     elevation,
     altitude,
-    (int)turbidity,
+    turbidity_low,
     albedo,
     wavelength,
     gamma,
@@ -1064,7 +1236,32 @@ void interpolate_turbidity_hero(
     gamma_segment,
     alpha_segment,
     zero_segment,
-    result);
+    &res_low);
+
+  if (factor < 1e-6 || turbidity_low >= (state->turbidities - 1))
+  {
+    sps_s_init_s(art_gv, &res_low, result);
+    return;
+  }
+
+  ArSpectralSample res_high;
+  interpolate_altitude_hero(
+    art_gv,
+    state,
+    elevation,
+    altitude,
+    turbidity_low + 1,
+    albedo,
+    wavelength,
+    gamma,
+    alpha,
+    zero,
+    gamma_segment,
+    alpha_segment,
+    zero_segment,
+    &res_high);
+
+  lerp_hero(art_gv, &res_low, &res_high, factor, result);
 }
 
 void interpolate_albedo_hero(
@@ -1104,7 +1301,7 @@ void interpolate_albedo_hero(
     zero_segment,
     &res_low);
 
-  if (factor < 1e-6 || albedo_low >= (albedos - 1))
+  if (factor < 1e-6 || albedo_low >= (state->albedos - 1))
   {
     sps_s_init_s(art_gv, &res_low, result);
     return;
@@ -1183,70 +1380,17 @@ void arpragueskymodel_radiance_hero(
 {
   // Translate parameter values to indices
 
-  double altitude_control;
-  if (altitude < altitude_vals[0])
-  {
-     altitude_control = 0;
-  }
-  else if (altitude > altitude_vals[altitudes - 1])
-  {
-     altitude_control = altitudes - 1;
-  }
-  else
-  {
-     for (int a = 1; a < altitudes; ++a)
-     {
-	double val = altitude_vals[a];
-        if (fabs(altitude - val) < 1e-6)
-        {
-           altitude_control = a;
-           break;
-        }
-	else if (altitude < val)
-        {
-	   altitude_control = a - ((val - altitude) / (val - altitude_vals[a - 1]));
-           break;
-        }
-     }
-  }
+  const double turbidity_control = map_parameter(turbidity, state->turbidities, state->turbidity_vals);
+  const double albedo_control    = map_parameter(albedo, state->albedos, state->albedo_vals);
+  const double altitude_control  = map_parameter(altitude, state->altitudes, state->altitude_vals);
+  const double elevation_control = map_parameter(elevation * MATH_RAD_TO_DEG, state->elevations, state->elevation_vals);
 
-  double elevation_control;
-  if (elevation < elevation_vals[0])
-  {
-     elevation_control = 0;
-  }
-  else if (elevation > elevation_vals[elevations - 1])
-  {
-     elevation_control = elevations - 1;
-  }
-  else
-  {
-     for (int e = 1; e < elevations; ++e)
-     {
-        double val = elevation_vals[e];
-        if (fabs(elevation - val) < 1e-6)
-        {
-           elevation_control = e;
-           break;
-        }
-	else if (elevation < val)
-        {
-	   elevation_control = e - ((val - elevation) / (val - elevation_vals[e - 1]));
-           break;
-        }
-     }
-  }
-
-  double albedo_control = albedo * (albedos - 1);
-  if (albedo_control < 0) albedo_control = 0;
-  if (albedo_control > albedos - 1) albedo_control = albedos - 1;
-
-  ArSpectralSample channel;
-  sps_s_init_s(art_gv, wavelength, &channel);
-  sps_d_mul_s(art_gv, 1.0E9, &channel);
-  sps_d_add_s(art_gv, -320.0, &channel);
-  sps_d_mul_s(art_gv, 1.0 / 40.0, &channel);
-  if (sps_s_max(art_gv, &channel) >= 11. || sps_s_min(art_gv, &channel) < 0.)
+  ArSpectralSample channel_control;
+  sps_s_init_s(art_gv, wavelength, &channel_control);
+  sps_d_mul_s(art_gv, 1.0E9, &channel_control);
+  sps_d_add_s(art_gv, -state->channel_start, &channel_control);
+  sps_d_mul_s(art_gv, 1.0 / state->channel_width, &channel_control);
+  if (sps_s_max(art_gv, &channel_control) >= state->channels || sps_s_min(art_gv, &channel_control) < 0.)
   {
     sps_d_init_s(art_gv, 0, result);
     return;
@@ -1265,9 +1409,9 @@ void arpragueskymodel_radiance_hero(
     state,
     elevation_control,
     altitude_control,
-    turbidity,
+    turbidity_control,
     albedo_control,
-    &channel,
+    &channel_control,
     gamma,
     alpha,
     zero,
@@ -1697,31 +1841,17 @@ void arpragueskymodel_tau_hero(
 // Polarisation mono version
 ///////////////////////////////////////////////
 
-
-double* control_params_single_config_pol(
-  const ArPragueSkyModelState  * state,
-  int                     elevation,
-  int                     altitude,
-  int                     turbidity,
-  int                     albedo,
-  int                     wavelength
-)
-{
-  // turbidity is completely ignored for now
-  return state->polarisation_dataset[wavelength] + state->total_coefs_single_config_pol * (elevation + elevations*altitude + elevations*altitudes*albedo);
-}
-
 double reconstruct_pol(
-  const ArPragueSkyModelState  * state,
-  double                         gamma,
-  double                         alpha,
-  int                            gamma_segment,
-  int                            alpha_segment,
-  double*                        control_params
+  const ArPragueSkyModelState * state,
+  const double                  gamma,
+  const double                  alpha,
+  const int                     gamma_segment,
+  const int                     alpha_segment,
+  const double *                control_params
 )
 {
   double res = 0;
-  for (int t = 0; t < tensor_components_pol; ++t) {
+  for (int t = 0; t < state->tensor_components_pol; ++t) {
 	const double sun_val_t = eval_pp(gamma, gamma_segment, state->sun_breaks_pol, control_params + state->sun_offset_pol + t * state->sun_stride_pol);
 	const double zenith_val_t = eval_pp(alpha, alpha_segment, state->zenith_breaks_pol, control_params + state->zenith_offset_pol + t * state->zenith_stride_pol);
 	res += sun_val_t * zenith_val_t;
@@ -1745,8 +1875,10 @@ double interpolate_elevation_pol(
   const int elevation_low = (int)elevation;
   const double factor = elevation - (double)elevation_low;
 
-  double* control_params_low = control_params_single_config_pol(
+  const double * control_params_low = control_params_single_config(
     state,
+    state->polarisation_dataset,
+    state->total_coefs_single_config_pol,
     elevation_low,
     altitude,
     turbidity,
@@ -1761,13 +1893,15 @@ double interpolate_elevation_pol(
     alpha_segment,
     control_params_low);
 
-  if (factor < 1e-6 || elevation_low >= (elevations - 1))
+  if (factor < 1e-6 || elevation_low >= (state->elevations - 1))
   {
     return res_low;
   }
 
-  double* control_params_high = control_params_single_config_pol(
+  const double * control_params_high = control_params_single_config(
     state,
+    state->polarisation_dataset,
+    state->total_coefs_single_config_pol,
     elevation_low+1,
     altitude,
     turbidity,
@@ -1813,7 +1947,7 @@ double interpolate_altitude_pol(
     gamma_segment,
     alpha_segment);
 
-  if (factor < 1e-6 || altitude_low >= (altitudes - 1))
+  if (factor < 1e-6 || altitude_low >= (state->altitudes - 1))
   {
     return res_low;
   }
@@ -1889,7 +2023,7 @@ double interpolate_albedo_pol(
     gamma_segment,
     alpha_segment);
 
-  if (factor < 1e-6 || albedo_low >= (albedos - 1))
+  if (factor < 1e-6 || albedo_low >= (state->albedos - 1))
   {
     return res_low;
   }
@@ -1948,81 +2082,34 @@ double arpragueskymodel_polarisation(
         const double                   wavelength
         )
 {
+  // If no polarisation data available
+  if (state->tensor_components_pol == 0)
+  {
+    return 0.0;
+  }
+
   // Translate parameter values to indices
 
-  double altitude_control;
-  if (altitude < altitude_vals[0])
-  {
-     altitude_control = 0;
-  }
-  else if (altitude > altitude_vals[altitudes - 1])
-  {
-     altitude_control = altitudes - 1;
-  }
-  else
-  {
-     for (int a = 1; a < altitudes; ++a)
-     {
-	double val = altitude_vals[a];
-        if (fabs(altitude - val) < 1e-6)
-        {
-           altitude_control = a;
-           break;
-        }
-	else if (altitude < val)
-        {
-	   altitude_control = a - ((val - altitude) / (val - altitude_vals[a - 1]));
-           break;
-        }
-     }
-  }
+  const double turbidity_control = map_parameter(turbidity, state->turbidities, state->turbidity_vals);
+  const double albedo_control    = map_parameter(albedo, state->albedos, state->albedo_vals);
+  const double altitude_control  = map_parameter(altitude, state->altitudes, state->altitude_vals);
+  const double elevation_control = map_parameter(elevation * MATH_RAD_TO_DEG, state->elevations, state->elevation_vals);
 
-  double elevation_control;
-  if (elevation < elevation_vals[0])
-  {
-     elevation_control = 0;
-  }
-  else if (elevation > elevation_vals[elevations - 1])
-  {
-     elevation_control = elevations - 1;
-  }
-  else
-  {
-     for (int e = 1; e < elevations; ++e)
-     {
-        double val = elevation_vals[e];
-        if (fabs(elevation - val) < 1e-6)
-        {
-           elevation_control = e;
-           break;
-        }
-	else if (elevation < val)
-        {
-	   elevation_control = e - ((val - elevation) / (val - elevation_vals[e - 1]));
-           break;
-        }
-     }
-  }
+  const double channel_control = (wavelength - state->channel_start) / state->channel_width;
+  if ( channel_control >= state->channels || channel_control < 0.) return 0.;
 
-  double albedo_control = albedo * (albedos - 1);
-  if (albedo_control < 0) albedo_control = 0;
-  if (albedo_control > albedos - 1) albedo_control = albedos - 1;
-
-  const double channel = (wavelength - 320.0) / 40.0;
-  if ( channel >= 11. || channel < 0.) return 0.;
+  // Get params corresponding to the indices, reconstruct result and interpolate
 
   const int gamma_segment = find_segment(gamma, state->sun_nbreaks_pol, state->sun_breaks_pol);
   const int theta_segment = find_segment(theta, state->zenith_nbreaks_pol, state->zenith_breaks_pol);
-
-  // Get params corresponding to the indices, reconstruct result and interpolate
 
   return -interpolate_wavelength_pol(
     state,
     elevation_control,
     altitude_control,
-    turbidity,
+    turbidity_control,
     albedo_control,
-    channel,
+    channel_control,
     gamma,
     theta,
     gamma_segment,
@@ -2059,8 +2146,10 @@ void interpolate_elevation_pol_hero(
   ArSpectralSample res_low;
   for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
   {
-    double* control_params_low = control_params_single_config_pol(
+    const double * control_params_low = control_params_single_config(
       state,
+      state->polarisation_dataset,
+      state->total_coefs_single_config_pol,
       elevation_low,
       altitude,
       turbidity,
@@ -2076,7 +2165,7 @@ void interpolate_elevation_pol_hero(
       control_params_low);
   }
 
-  if (factor < 1e-6 || elevation_low >= (elevations - 1))
+  if (factor < 1e-6 || elevation_low >= (state->elevations - 1))
   {
     sps_s_init_s(art_gv, &res_low, result);
     return;
@@ -2085,8 +2174,10 @@ void interpolate_elevation_pol_hero(
   ArSpectralSample res_high;
   for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
   {
-    double* control_params_high = control_params_single_config_pol(
+    const double * control_params_high = control_params_single_config(
       state,
+      state->polarisation_dataset,
+      state->total_coefs_single_config_pol,
       elevation_low+1,
       altitude,
       turbidity,
@@ -2142,7 +2233,7 @@ void interpolate_altitude_pol_hero(
     zero_segment,
     &res_low);
 
-  if (factor < 1e-6 || altitude_low >= (altitudes - 1))
+  if (factor < 1e-6 || altitude_low >= (state->altitudes - 1))
   {
     sps_s_init_s(art_gv, &res_low, result);
     return;
@@ -2241,7 +2332,7 @@ void interpolate_albedo_pol_hero(
     zero_segment,
     &res_low);
 
-  if (factor < 1e-6 || albedo_low >= (albedos - 1))
+  if (factor < 1e-6 || albedo_low >= (state->albedos - 1))
   {
     sps_s_init_s(art_gv, &res_low, result);
     return;
@@ -2316,90 +2407,44 @@ void arpragueskymodel_polarisation_hero(
               ArSpectralSample       * result
         )
 {
-  // Translate parameter values to indices
-
-  double altitude_control;
-  if (altitude < altitude_vals[0])
-  {
-     altitude_control = 0;
-  }
-  else if (altitude > altitude_vals[altitudes - 1])
-  {
-     altitude_control = altitudes - 1;
-  }
-  else
-  {
-     for (int a = 1; a < altitudes; ++a)
-     {
-	double val = altitude_vals[a];
-        if (fabs(altitude - val) < 1e-6)
-        {
-           altitude_control = a;
-           break;
-        }
-	else if (altitude < val)
-        {
-	   altitude_control = a - ((val - altitude) / (val - altitude_vals[a - 1]));
-           break;
-        }
-     }
-  }
-
-  double elevation_control;
-  if (elevation < elevation_vals[0])
-  {
-     elevation_control = 0;
-  }
-  else if (elevation > elevation_vals[elevations - 1])
-  {
-     elevation_control = elevations - 1;
-  }
-  else
-  {
-     for (int e = 1; e < elevations; ++e)
-     {
-        double val = elevation_vals[e];
-        if (fabs(elevation - val) < 1e-6)
-        {
-           elevation_control = e;
-           break;
-        }
-	else if (elevation < val)
-        {
-	   elevation_control = e - ((val - elevation) / (val - elevation_vals[e - 1]));
-           break;
-        }
-     }
-  }
-
-  double albedo_control = albedo * (albedos - 1);
-  if (albedo_control < 0) albedo_control = 0;
-  if (albedo_control > albedos - 1) albedo_control = albedos - 1;
-
-  ArSpectralSample channel;
-  sps_s_init_s(art_gv, wavelength, &channel);
-  sps_d_mul_s(art_gv, 1.0E9, &channel);
-  sps_d_add_s(art_gv, -320.0, &channel);
-  sps_d_mul_s(art_gv, 1.0 / 40.0, &channel);
-  if (sps_s_max(art_gv, &channel) >= 11. || sps_s_min(art_gv, &channel) < 0.)
+  // If no polarisation data available
+  if (state->tensor_components_pol == 0)
   {
     sps_d_init_s(art_gv, 0, result);
     return;
   }
 
-  const int gamma_segment = find_segment(gamma, state->sun_nbreaks_pol, state->sun_breaks_pol);
-  const int theta_segment = find_segment(theta, state->zenith_nbreaks_pol, state->zenith_breaks_pol);
+  // Translate parameter values to indices
+
+  const double turbidity_control = map_parameter(turbidity, state->turbidities, state->turbidity_vals);
+  const double albedo_control    = map_parameter(albedo, state->albedos, state->albedo_vals);
+  const double altitude_control  = map_parameter(altitude, state->altitudes, state->altitude_vals);
+  const double elevation_control = map_parameter(elevation * MATH_RAD_TO_DEG, state->elevations, state->elevation_vals);
+
+  ArSpectralSample channel_control;
+  sps_s_init_s(art_gv, wavelength, &channel_control);
+  sps_d_mul_s(art_gv, 1.0E9, &channel_control);
+  sps_d_add_s(art_gv, -state->channel_start, &channel_control);
+  sps_d_mul_s(art_gv, 1.0 / state->channel_width, &channel_control);
+  if (sps_s_max(art_gv, &channel_control) >= state->channels || sps_s_min(art_gv, &channel_control) < 0.)
+  {
+    sps_d_init_s(art_gv, 0, result);
+    return;
+  }
 
   // Get params corresponding to the indices, reconstruct result and interpolate
+
+  const int gamma_segment = find_segment(gamma, state->sun_nbreaks_pol, state->sun_breaks_pol);
+  const int theta_segment = find_segment(theta, state->zenith_nbreaks_pol, state->zenith_breaks_pol);
 
   interpolate_wavelength_pol_hero(
      art_gv,
      state,
      elevation_control,
      altitude_control,
-     turbidity,
+     turbidity_control,
      albedo_control,
-   & channel,
+   & channel_control,
      gamma,
      theta,
      0,

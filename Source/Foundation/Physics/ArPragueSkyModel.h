@@ -75,9 +75,25 @@ void arpragueskymodel_compute_angles(
 
 typedef struct ArPragueSkyModelState
 {
-	// Radiance
+	// Radiance metadata
 
-        double  * radiance_dataset[11];
+	int turbidities;
+	double * turbidity_vals;
+
+	int albedos;
+	double * albedo_vals;
+
+	int altitudes;
+	double * altitude_vals;
+
+	int elevations;
+	double * elevation_vals;
+
+	int channels;
+	double channel_start;
+	double channel_width;
+
+	int tensor_components;
 
 	int sun_nbreaks;
 	int sun_offset;
@@ -95,10 +111,32 @@ typedef struct ArPragueSkyModelState
 
 	int total_coefs_single_config; // this is for one specific configuration
 	int total_coefs_all_configs;
+	int total_configs;
 
-        // Polarisation   
+	// Radiance data
 
-	double  * polarisation_dataset[11];
+	double * radiance_dataset;
+
+
+
+        // Tranmittance metadata
+
+	int     trans_n_a;
+	int     trans_n_d;
+	int     trans_altitudes;
+	int     trans_rank;
+	int     trans_turbidities;
+
+        // Tranmittance data
+
+	float * transmission_dataset_U;
+	float * transmission_dataset_V;
+
+
+
+        // Polarisation metadata
+
+	int tensor_components_pol;
      
         int sun_nbreaks_pol;
 	int sun_offset_pol;
@@ -113,15 +151,9 @@ typedef struct ArPragueSkyModelState
 	int total_coefs_single_config_pol; // this is for one specific configuration
 	int total_coefs_all_configs_pol;
 
-        // Tranmittance
+	// Polarisation data
 
-	float * transmission_dataset_U;
-	float * transmission_dataset_V;
-	int     trans_n_a;
-	int     trans_n_d;
-	int     trans_altitudes;
-	int     trans_rank;
-	int     trans_turbidities;
+	double * polarisation_dataset;
 }
 ArPragueSkyModelState;
 
