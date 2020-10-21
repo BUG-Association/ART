@@ -282,6 +282,14 @@ void read_transmittance(ArPragueSkyModelState * state, FILE * handle)
 	valsRead = fread(&state->trans_rank, sizeof(int), 1, handle);
 	if (valsRead != 1 || state->trans_rank < 1) printErrorAndExit("Error reading sky model data: trans_rank");
 
+	state->transmission_altitudes = ALLOC_ARRAY(float, state->trans_altitudes);
+	valsRead = fread(state->transmission_altitudes, sizeof(float), state->trans_altitudes, handle);
+	if (valsRead != state->trans_altitudes) printErrorAndExit("Error reading sky model data: transmission_altitudes");
+
+	state->transmission_turbities = ALLOC_ARRAY(float, state->trans_turbidities);
+	valsRead = fread(state->transmission_turbities, sizeof(float), state->trans_turbidities, handle);
+	if (valsRead != state->trans_turbidities) printErrorAndExit("Error reading sky model data: transmission_turbities");
+
 	const int total_coefs_U = state->trans_n_d * state->trans_n_a * state->trans_rank * state->trans_altitudes;
 	const int total_coefs_V = state->trans_turbidities * state->trans_rank * 11 * state->trans_altitudes;
 
@@ -413,6 +421,8 @@ void arpragueskymodelstate_free(
 
 	free(state->transmission_dataset_U);
 	free(state->transmission_dataset_V);
+	free(state->transmission_altitudes);
+	free(state->transmission_turbities);
 
 	if (state->tensor_components_pol > 0)
 	{
@@ -1457,7 +1467,7 @@ double arpragueskymodel_solar_radiance(
 	      state,
 	      theta,
 	      altitude,
-	      1,
+	      turbidity,
 	      wavelength,
 	      MATH_HUGE_DOUBLE
 	    );
@@ -1533,8 +1543,7 @@ void arpragueskymodel_toAD(
 	double y_v = cos(theta);
 	double x_c = 0;
 	double y_c = PSM_PLANET_RADIUS + altitude;
-        #warning The true atmosphere thickness is 120010 but this low value compansates for the insufficient resolution of the transmittance fit. This is just temporary hack that needs to be fixed!
-	double atmo_edge = PSM_PLANET_RADIUS + 40000;
+	double atmo_edge = PSM_PLANET_RADIUS + 90000;
 	double n;
         if (altitude < 0.001) // Handle altitudes close to 0 separately to avoid reporting intersections on the other side of the planet
 	{
@@ -1662,6 +1671,13 @@ double arpragueskymodel_calc_transmittance_svd_altitude(
 	return t[0];
 }
 
+double nonlinlerp(const double a, const double b, const double w, const double p)
+{
+	double c1 = pow(a, p);
+	double c2 = pow(b, p);
+	return ((pow(w, p) - c1) / (c2 - c1));
+}
+
 double arpragueskymodel_calc_transmittance_svd(
 	const ArPragueSkyModelState *state,
 	const double a,
@@ -1684,6 +1700,7 @@ double arpragueskymodel_calc_transmittance_svd(
 	if (a_int < (state->trans_n_a - 1))
 	{
 		a_inc = 1;
+		wa = nonlinlerp((double)a_int / (double)state->trans_n_a, (double)(a_int + a_inc) / (double)state->trans_n_a, a, 3.0);
 	} else
 	{
 		a_int = state->trans_n_a - 1;
@@ -1692,6 +1709,7 @@ double arpragueskymodel_calc_transmittance_svd(
 	if (d_int < (state->trans_n_d - 1))
 	{
 		d_inc = 1;
+		wd = nonlinlerp((double)d_int / (double)state->trans_n_d, (double)(d_int + d_inc) / (double)state->trans_n_d, d, 4.0);
 	} else
 	{
 		d_int = state->trans_n_d - 1;
@@ -1716,6 +1734,33 @@ double cbrt(double x)
 	return pow(x, 1.0 / 3.0);
 }
 
+void arpragueskymodel_findInArray(const float *arr, const int arrLength, const double value, int *index, int *inc, double *w)
+{
+	*inc = 0;
+	if (value <= arr[0])
+	{
+		*index = 0;
+		*w = 1.0;
+		return;
+	}
+	if (value >= arr[arrLength - 1])
+	{
+		*index = arrLength - 1;
+		*w = 0;
+		return;
+	}
+	for (int i = 1; i < arrLength; i++)
+	{
+		if (value < arr[i])
+		{
+			*index = i - 1;
+			*inc = 1;
+			*w = (value - arr[i - 1]) / (arr[i] - arr[i - 1]); // Assume linear
+			return;
+		}
+	}
+}
+
 double arpragueskymodel_tau(
 	const ArPragueSkyModelState  * state,
 	const double                   theta,
@@ -1737,23 +1782,25 @@ double arpragueskymodel_tau(
 	const int wavelength_low = (int)wavelength_norm;
 	const double wavelength_factor = 0.0;
 	const int wavelength_inc = wavelength_low < 10 ? 1 : 0;
-        ASSERT_INTEGER_WITHIN_RANGE(wavelength_low, 0, 10);
-        ASSERT_DOUBLE_WITHIN_RANGE(wavelength_factor, 0.0, 1.0);
-        ASSERT_INTEGER_WITHIN_RANGE(wavelength_inc, 0, 1);
+    ASSERT_INTEGER_WITHIN_RANGE(wavelength_low, 0, 10);
+    ASSERT_DOUBLE_WITHIN_RANGE(wavelength_factor, 0.0, 1.0);
+    ASSERT_INTEGER_WITHIN_RANGE(wavelength_inc, 0, 1);
 
-	const double altitude_norm = 20.0 * cbrt(altitude / 15000.0);
-	const int altitude_low = (int)altitude_norm;
-	const double altitude_factor = altitude_norm - (double)altitude_low;
-	const int altitude_inc = altitude_low < 20 ? 1 : 0;
-        ASSERT_INTEGER_WITHIN_RANGE(altitude_low, 0, 20);
-        ASSERT_DOUBLE_WITHIN_RANGE(altitude_factor, 0.0, 1.0);
-        ASSERT_INTEGER_WITHIN_RANGE(altitude_inc, 0, 1);
+	int altitude_low;
+	double altitude_factor;
+	int altitude_inc;
+	arpragueskymodel_findInArray(state->transmission_altitudes, state->trans_altitudes, altitude, &altitude_low, &altitude_inc, &altitude_factor);
+	ASSERT_INTEGER_WITHIN_RANGE(altitude_low, 0, 21);
+    ASSERT_DOUBLE_WITHIN_RANGE(altitude_factor, 0.0, 1.0);
+    ASSERT_INTEGER_WITHIN_RANGE(altitude_inc, 0, 1);
 
-        int turb_low = (int)turbidity;
-	turb_low = turb_low < 0 ? 0 : turb_low;
-	turb_low = turb_low >= state->trans_turbidities ? state->trans_turbidities - 1 : turb_low;
-	double turb_w = turbidity - (float)turb_low;
-	int turb_inc = turb_low < (state->trans_turbidities - 1) ? 1 : 0;
+	int turb_low;
+	double turb_w;
+	int turb_inc;
+	arpragueskymodel_findInArray(state->transmission_turbities, state->trans_turbidities, turbidity, &turb_low, &turb_inc, &turb_w);
+	ASSERT_INTEGER_WITHIN_RANGE(turb_low, 0, 2);
+    ASSERT_DOUBLE_WITHIN_RANGE(turb_w, 0.0, 1.0);
+    ASSERT_INTEGER_WITHIN_RANGE(turb_inc, 0, 1);
 
 	// Calculate normalized and non-linearly scaled position in the atmosphere
 	double a;
@@ -1762,21 +1809,19 @@ double arpragueskymodel_tau(
 	ASSERT_NONNEGATIVE_DOUBLE(a);
 	ASSERT_NONNEGATIVE_DOUBLE(d);
 
-        /* No turbity interpolation for now
-        // Evaluate basis at low turbidity
+    // Evaluate basis at low turbidity
 	double trans_low = arpragueskymodel_calc_transmittance_svd(state, a, d, turb_low, wavelength_low, wavelength_inc, wavelength_factor, altitude_low, altitude_inc, altitude_factor);
 
-        // Evaluate basis at high turbidity
+    // Evaluate basis at high turbidity
 	double trans_high = arpragueskymodel_calc_transmittance_svd(state, a, d, turb_low + turb_inc, wavelength_low, wavelength_inc, wavelength_factor, altitude_low, altitude_inc, altitude_factor);
 
 	// Return interpolated transmittance values
-	double trans = lerp(trans_low, trans_high, turb_w);*/
-        double trans = arpragueskymodel_calc_transmittance_svd(state, a, d, 1, wavelength_low, wavelength_inc, wavelength_factor, altitude_low, altitude_inc, altitude_factor);
-        ASSERT_VALID_DOUBLE(trans);
+	double trans = lerp(trans_low, trans_high, turb_w);
+    ASSERT_VALID_DOUBLE(trans);
 
 	trans = clamp0_1(trans);
 	trans = trans * trans;
-        ASSERT_UNIT_RANGE_DOUBLE(trans);
+    ASSERT_UNIT_RANGE_DOUBLE(trans);
 
 	return trans;
 }

@@ -119,26 +119,28 @@ typedef struct ArPragueSkyModelState
 
 
 
-        // Tranmittance metadata
+    // Tranmittance metadata
 
 	int     trans_n_a;
 	int     trans_n_d;
+	int     trans_turbidities;
 	int     trans_altitudes;
 	int     trans_rank;
-	int     trans_turbidities;
+	float * transmission_altitudes;
+	float * transmission_turbities;
 
-        // Tranmittance data
+    // Tranmittance data
 
 	float * transmission_dataset_U;
 	float * transmission_dataset_V;
 
 
 
-        // Polarisation metadata
+    // Polarisation metadata
 
 	int tensor_components_pol;
      
-        int sun_nbreaks_pol;
+    int sun_nbreaks_pol;
 	int sun_offset_pol;
 	int sun_stride_pol;
 	double * sun_breaks_pol;

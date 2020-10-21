@@ -530,7 +530,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
                       skymodel_state,
                       thetaA,
                       altitudeA,
-                      1.0,
+                      atmosphericTurbidity,
                       NANO_FROM_UNIT(ARWL_WI(*wavelength,i)),
                       distance
                     );
@@ -721,7 +721,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
                       skymodel_state,
                       thetaA,
                       altitudeA,
-                      1.0,
+                      atmosphericTurbidity,
                       NANO_FROM_UNIT(ARWL_WI(*wavelength,i)),
                       distance
                     );
