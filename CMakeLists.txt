@@ -14,6 +14,10 @@ set ( ART_VERSION_MINOR 0 )
 set ( ART_VERSION_PATCH 3 )
 set ( ART_VERSION_DEVTAG )
 
+# [Sebastian]: I added this line to enable debugging functionality in my IDE
+# TODO: remove line when not needed anymore
+set( CMAKE_BUILD_TYPE Debug )
+
 if ( APPLE )
 set(CMAKE_MACOSX_RPATH 1)
 endif ( APPLE )
@@ -50,6 +54,7 @@ find_package( LCMS2 REQUIRED )
 #find_package( JPEG REQUIRED )
 find_package( GSL )
 find_package( OPENEXR )
+find_package( EMBREE 3.0 )
 
 if ( APPLE )
 
@@ -82,6 +87,8 @@ message("GSL library:           ${GSL_LIBRARY}")
 message("OPENEXR_FOUND:         ${OPENEXR_FOUND}")
 message("OPENEXR include dir:   ${OPENEXR_INCLUDE_DIR}")
 message("OPENEXR library:       ${OPENEXR_LIBRARY}")
+message("EMBREE found:          ${EMBREE_FOUND}")
+message("EMBREE library:        ${EMBREE_LIBRARY}")
 message("")
 
 
@@ -379,6 +386,16 @@ if ( OPENEXR_FOUND )
         )
 
 endif ( OPENEXR_FOUND )
+
+if ( EMBREE_FOUND )
+
+	set (
+			art_other_link_libraries
+			${art_other_link_libraries}
+			${EMBREE_LIBRARIES}
+	)
+
+endif ( EMBREE_FOUND )
 
 
 set (

@@ -28,6 +28,7 @@
 #import "_ArLight_GV.h"
 #import "FoundationAssertionMacros.h"
 
+
 /* ===========================================================================
 
     'artist' comand line rendering tool
@@ -115,7 +116,7 @@ int artist(
         ART_GV   * art_gv
         )
 {
-
+    
 // =============================   PHASE 1   =================================
 //
 //                  Definition of the command line options.
@@ -249,6 +250,7 @@ int artist(
 //         Parsing the input files, and assembly of the scene graph.
 //
 // ===========================================================================
+
 
 
     //   Start of the overall, top-level input parsing action
