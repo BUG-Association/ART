@@ -256,11 +256,19 @@ int artist(
         art_set_hero_samples_to_splat( art_gv, 1 );
 
     // [Sebastian] TODO remove this block, once embree parsing works
-    if ( [ embreeOpt hasBeenSpecified ])
+    if ( [ embreeOpt hasBeenSpecified ]) {
+#if EMBREE_INSTALLED
         art_gv_enable_embree( art_gv, true);
+
+#else
+        printf("error: embree support enabled without embree being installed...\n");
+        exit(0);
+#endif
+    }
     else
         art_gv_enable_embree( art_gv, false);
     printf("embree enabled: %s", art_gv->embree_enabed ? "true\n" : "false\n");
+
 
 // =============================   PHASE 4   =================================
 //

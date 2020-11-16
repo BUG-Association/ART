@@ -26,6 +26,31 @@
 #ifndef _ART_FOUNDATION_AREMBREE_H_
 #define _ART_FOUNDATION_AREMBREE_H_
 
+#if EMBREE_INSTALLED
+
+#include "ART_Foundation_System.h"
 #include <embree3/rtcore.h>
 
+enum EmbreeState {
+    Scene_Initialized,
+    Scene_Commited,
+    Embree_Released
+};
+
+typedef struct ArEmbreeStruct // I need to come up with a better name -.-
+{
+    enum EmbreeState state;
+    RTCDevice device;
+    RTCScene scene;
+    RTCGeometry geometry;
+}
+ArEmbreeStruct;
+
+
+ArEmbreeStruct * initEmbree();
+void addGeometryToScene(RTCGeometry * geom, RTCScene * scene);
+
+void errorFunction(void* userPtr, enum RTCError error, const char* str);
+
+#endif // EMBREE_INSTALLED
 #endif //ART_AREMBREE_H

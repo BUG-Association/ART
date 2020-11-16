@@ -395,7 +395,9 @@ if ( EMBREE_FOUND )
 			${EMBREE_LIBRARIES}
 	)
 
-endif ( EMBREE_FOUND )
+endif( EMBREE_FOUND )
+
+add_compile_definitions( EMBREE_INSTALLED=${EMBREE_FOUND} )
 
 
 set (

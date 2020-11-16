@@ -126,7 +126,7 @@
 //   entry <module name in lowercase>_gv
 
 
-#import <objc/objc.h> // [Sebastian TODO] remove this, when not needed anymore
+#include <objc/objc.h> // [Sebastian TODO] remove this, when not needed anymore
 
 typedef struct ART_GV
 {

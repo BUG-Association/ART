@@ -31,6 +31,10 @@ ART_MODULE_INTERFACE(ArnTriangleMesh)
 #import "ArnShape.h"
 #import "ArnVertexSet.h"
 
+#if EMBREE_INSTALLED
+#import "ArEmbree.h"
+#endif
+
 @interface ArnTriangleMesh
         : ArnShape
         < ArpConcreteClass, ArpCoding, ArpExtremalPoints, ArpShape, ArpSetupNodeData >
