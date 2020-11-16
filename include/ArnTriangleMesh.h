@@ -80,5 +80,11 @@ ArNode  * arntrianglemesh_from_ply(
         const char       * pathToPlyFile
         );
 
+ArNode * embreeGeometry_from_ply(
+        ART_GV           * art_gv,
+        ArShapeGeometry    newGeometry,
+        const char       * pathToPlyFile
+        );
+
 
 // ===========================================================================
