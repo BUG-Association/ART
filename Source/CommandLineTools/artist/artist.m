@@ -116,7 +116,7 @@ int artist(
         ART_GV   * art_gv
         )
 {
-    
+
 // =============================   PHASE 1   =================================
 //
 //                  Definition of the command line options.
@@ -202,6 +202,16 @@ int artist(
             :   "normal shaded geometry preview"
             ] withDefaultIntegerValue: 1 ];
 
+    // [Sebastian] flag for enabling embree support
+    // this is convenient now for me, but I will
+    // engineer it back, once I get it to work
+    id embreeOpt =
+            [ FLAG_OPTION
+                    :   "embree"
+                    :   "e"
+                    :   "enable embree support"
+            ];
+
 // =============================   PHASE 2   =================================
 //
 //             Printing the banner, and parsing the command line.
@@ -245,12 +255,18 @@ int artist(
     if ( [ monoOpt hasBeenSpecified ] )
         art_set_hero_samples_to_splat( art_gv, 1 );
 
+    // [Sebastian] TODO remove this block, once embree parsing works
+    if ( [ embreeOpt hasBeenSpecified ])
+        art_gv_enable_embree( art_gv, true);
+    else
+        art_gv_enable_embree( art_gv, false);
+    printf("embree enabled: %s", art_gv->embree_enabed ? "true\n" : "false\n");
+
 // =============================   PHASE 4   =================================
 //
 //         Parsing the input files, and assembly of the scene graph.
 //
 // ===========================================================================
-
 
 
     //   Start of the overall, top-level input parsing action

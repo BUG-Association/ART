@@ -24,38 +24,7 @@
 
 =========================================================================== */
 
-#include "ART_GV.h"
-#include <stddef.h>
+#ifndef ART_ARNEMBREEHANDLER_H
+#define ART_ARNEMBREEHANDLER_H
 
-void art_gv_initialise(
-        ART_GV  * art_gv
-        )
-{
-    //   currently, there are 67 struct pointers
-    //   10 NULL per line, plus one zero in the beginning
-    //   ( for the verbosity int )
-
-    *art_gv =
-        ((ART_GV)
-        { 0,
-          NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-          NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-          NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-          NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-          NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-          NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-          NULL, NULL, NULL, NULL, NULL, NULL, NULL
-        });
-}
-
-
-/* ======================================================================== */
-
-// [Sebastian TODO] remove this, when not needed anymore
-void art_gv_enable_embree(
-        ART_GV  * art_gv,
-        BOOL enabled
-        )
-{
-    art_gv->embree_enabed = enabled;
-}
+#endif //ART_ARNEMBREEHANDLER_H
