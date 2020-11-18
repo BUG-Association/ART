@@ -30,6 +30,7 @@
 ART_MODULE_INTERFACE(ArfOpenEXR)
 
 #ifdef ART_WITH_OPENEXR
+#define WRITE_RGB_VERSION
 
 #import "ArfRasterImage.h"
 
@@ -39,30 +40,27 @@ ART_MODULE_INTERFACE(ArfOpenEXR)
 @interface ArfOpenEXR
            : ArfRasterImage
 {
+    ArnImageInfo              * _imageInfo;
     IVec2D                      _size;
     ArDataType                  _dataType;
-    
     int                         _spectralChannels;
-    int                         _bufferChannels;
-    
     BOOL                        _isSpectral;
     BOOL                        _containsPolarisationData;
     
+    float                      * _bufferRGBA;
+
     float                      * _bufferS0;
     float                      * _bufferS1;
     float                      * _bufferS2;
     float                      * _bufferS3;
-    
+
     ArReferenceFrame             _referenceFrame;
     
     ArLightAlpha              ** _scanline; // More convenient to have a single allocation
-
-    struct ArfOpenEXR_members  * _exr_cpp_vars; // Opaque struct to hide C++ member vars
 }
 
 @end
 
 
 #endif // ART_WITH_OPENEXR
-
 // ===========================================================================

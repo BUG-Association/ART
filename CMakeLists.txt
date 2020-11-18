@@ -294,6 +294,7 @@ endforeach( header ${art_header_files} )
 file ( GLOB_RECURSE art_foundation_c_sources "${CMAKE_CURRENT_SOURCE_DIR}/Source/Foundation/*.c" )
 file ( GLOB_RECURSE art_foundation_m_sources "${CMAKE_CURRENT_SOURCE_DIR}/Source/Foundation/*.m" )
 file ( GLOB_RECURSE art_library_c_sources "${CMAKE_CURRENT_SOURCE_DIR}/Source/ClassLibraries/*.c" )
+file ( GLOB_RECURSE art_library_cpp_sources "${CMAKE_CURRENT_SOURCE_DIR}/Source/ClassLibraries/*.cpp" )
 file ( GLOB_RECURSE art_library_m_sources "${CMAKE_CURRENT_SOURCE_DIR}/Source/ClassLibraries/*.m" )
 file ( GLOB_RECURSE art_library_mm_sources "${CMAKE_CURRENT_SOURCE_DIR}/Source/ClassLibraries/*.mm" )
 
@@ -304,11 +305,11 @@ set (
 	${art_foundation_c_sources} 
 	${art_foundation_m_sources} 
 	${art_library_c_sources}
+	${art_library_cpp_sources}
 	${art_library_m_sources}
 	${art_library_mm_sources}
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/AdvancedRenderingToolkit.m
 	)
-
 
 # Next major thing: tell CMake what external libraries we will be linking against:
 
@@ -342,7 +343,7 @@ else ( APPLE )
 		art_other_link_libraries 
 		${GNUSTEP-BASE_LIBRARY}
 		${TIFF_LIBRARY}
-                ${JPEG_LIBRARY}
+    ${JPEG_LIBRARY}
 		${LCMS2_LIBRARY}
 		objc
 		m
@@ -405,7 +406,8 @@ add_subdirectory (Source/ClassLibraries)
 file (
     GLOB
     library_sources
-    "*.[h|c|m|mm]"
+		"*.[h|c|m|mm]"
+		"*.cpp"
     )
 
 file( APPEND ${source_group_file} "source_group(\n" )
