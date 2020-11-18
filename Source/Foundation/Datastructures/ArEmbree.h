@@ -39,15 +39,15 @@ enum EmbreeState {
 
 typedef struct ArEmbreeStruct // I need to come up with a better name -.-
 {
-    enum EmbreeState state;
     RTCDevice device;
     RTCScene scene;
     RTCGeometry geometry;
+    enum EmbreeState state;
 }
 ArEmbreeStruct;
 
 
-ArEmbreeStruct * initEmbree();
+ArEmbreeStruct * initEmbree(ArEmbreeStruct * embreeStruct);
 void addGeometryToScene(RTCGeometry * geom, RTCScene * scene);
 
 void errorFunction(void* userPtr, enum RTCError error, const char* str);

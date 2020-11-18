@@ -1,6 +1,6 @@
 ARM_MAIN_FUNCTION(plyScene) {
 
-    id bunny = PLY_MESH("bunny.ply");
+    id bunny = PLY_MESH("ply_bunny.ply");
 
     id scene_geometry = 
         [ bunny

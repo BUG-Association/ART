@@ -127,6 +127,7 @@
 
 
 #include <objc/objc.h> // [Sebastian TODO] remove this, when not needed anymore
+#// include "ArEmbree.h" // [Sebastian] just for now
 
 typedef struct ART_GV
 {
@@ -217,9 +218,12 @@ typedef struct ART_GV
     struct ARM_ScenegraphActions_GV     * ar2m_scenegraphactions_gv;
     struct ApplicationSupport_GV        * application_support_gv;
 
-    // [Sebastian] added this bool for quick switching embree off/on
-    // will do it in a smarter way later
-    BOOL embree_enabed;
+    // [Sebastian] added this helper bool for quick switching embree off/on
+    BOOL                                embree_enabed;
+#if EMBREE_INSTALLED
+    struct ArEmbreeStruct               * art_gv_embree;
+#endif
+
 }
 ART_GV;
 

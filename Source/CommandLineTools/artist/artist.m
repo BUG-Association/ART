@@ -259,14 +259,16 @@ int artist(
     if ( [ embreeOpt hasBeenSpecified ]) {
 #if EMBREE_INSTALLED
         art_gv_enable_embree( art_gv, true);
-
+        initEmbree(art_gv->art_gv_embree);
 #else
         printf("error: embree support enabled without embree being installed...\n");
         exit(0);
 #endif
     }
-    else
-        art_gv_enable_embree( art_gv, false);
+    else {
+        art_gv_enable_embree( art_gv, false );
+        art_gv->art_gv_embree = NULL;
+    }
     printf("embree enabled: %s", art_gv->embree_enabed ? "true\n" : "false\n");
 
 

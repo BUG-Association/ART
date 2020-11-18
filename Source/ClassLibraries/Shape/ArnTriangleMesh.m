@@ -329,17 +329,17 @@ ArNode * arntrianglemesh_from_ply(
             ];
 }
 
-#if EMBREE_INSTALLED
+
 ArNode * embreeGeometry_from_ply(
         ART_GV           * art_gv,
         ArShapeGeometry    newGeometry,
-        const char       * pathToPlyFile
+        const char       * pathToPlyFile,
+        ArEmbreeStruct   * arEmbreeStruct
         )
 {
-    // pass
+    printf("hi\n");// pass
     return NULL; // for now
 }
-#endif // EMBREE_INSTALLED
 
 #define GREY8_SOURCE_BUFFER(_x,_y,_s) \
     (((ArnGrey8Image*)sourceImageBuffer)->data[(_y)*XC(_s)+(_x)])

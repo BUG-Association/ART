@@ -119,13 +119,13 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
 {
     ArNode  * newMesh;
 
-    if(art_gv->embree_enabed)
-        newMesh = embreeGeometry_from_ply(art_gv, arshape_solid, [ file name ] );
-    else
+    //if(!art_gv->embree_enabed)
         newMesh = arntrianglemesh_from_ply(art_gv, arshape_solid, [ file name ] );
+    //else
+        // newMesh = embreeGeometry_from_ply(art_gv, arshape_solid, [ file name ],  );
 
     if ( newMesh == NULL)
-        ART_ERRORHANDLING_FATAL_ERROR(
+            ART_ERRORHANDLING_FATAL_ERROR(
             "error when reading PLY mesh '%s'"
             ,   [ file name ]
             );

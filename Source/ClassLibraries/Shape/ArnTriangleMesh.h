@@ -31,9 +31,7 @@ ART_MODULE_INTERFACE(ArnTriangleMesh)
 #import "ArnShape.h"
 #import "ArnVertexSet.h"
 
-#if EMBREE_INSTALLED
-#import "ArEmbree.h"
-#endif
+#include "ArEmbree.h"
 
 @interface ArnTriangleMesh
         : ArnShape
@@ -83,7 +81,8 @@ ArNode  * arntrianglemesh_from_ply(
 ArNode * embreeGeometry_from_ply(
         ART_GV           * art_gv,
         ArShapeGeometry    newGeometry,
-        const char       * pathToPlyFile
+        const char       * pathToPlyFile,
+        ArEmbreeStruct   * arEmbreeStruct
         );
 
 
