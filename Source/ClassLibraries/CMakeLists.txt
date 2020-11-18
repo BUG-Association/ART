@@ -2,6 +2,7 @@ file (
     GLOB
     library_sources
     "*.[h|c|m|mm]"
+    "*.cpp"
     )
 
 string(REPLACE "/" ";" p2list "${CMAKE_CURRENT_SOURCE_DIR}")

@@ -2,7 +2,7 @@ file (
     GLOB
     library_sources
     "*.[h|c|m]"
-    "*.mm"
+    "*.cpp"
     )
 
 string(REPLACE "/" ";" p2list "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -15,7 +15,7 @@ file( APPEND ${source_group_file} "	\"${second}\\\\${first}\"\n")
 file( APPEND ${source_group_file} "	FILES\n")
 
 foreach( src_file ${library_sources} )
-#        message("added:       ${src_file}")
+    # message("added:       ${src_file}")
 	file( APPEND ${source_group_file} "	${src_file}\n")
 endforeach()
 
