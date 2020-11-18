@@ -47,7 +47,7 @@ typedef struct ArEmbreeStruct // I need to come up with a better name -.-
 ArEmbreeStruct;
 
 
-ArEmbreeStruct * initEmbree(ArEmbreeStruct * embreeStruct);
+ArEmbreeStruct * initEmbree(struct ART_GV * art_gv);
 void addGeometryToScene(RTCGeometry * geom, RTCScene * scene);
 
 void errorFunction(void* userPtr, enum RTCError error, const char* str);

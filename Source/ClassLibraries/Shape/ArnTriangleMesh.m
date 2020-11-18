@@ -330,11 +330,10 @@ ArNode * arntrianglemesh_from_ply(
 }
 
 
-ArNode * embreeGeometry_from_ply(
+ArNode * embreegeometry_from_ply(
         ART_GV           * art_gv,
         ArShapeGeometry    newGeometry,
-        const char       * pathToPlyFile,
-        ArEmbreeStruct   * arEmbreeStruct
+        const char       * pathToPlyFile
         )
 {
     printf("hi\n");// pass

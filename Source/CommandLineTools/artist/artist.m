@@ -259,7 +259,7 @@ int artist(
     if ( [ embreeOpt hasBeenSpecified ]) {
 #if EMBREE_INSTALLED
         art_gv_enable_embree( art_gv, true);
-        initEmbree(art_gv->art_gv_embree);
+        art_gv->art_gv_embree = initEmbree(art_gv);
 #else
         printf("error: embree support enabled without embree being installed...\n");
         exit(0);
@@ -270,7 +270,8 @@ int artist(
         art_gv->art_gv_embree = NULL;
     }
     printf("embree enabled: %s", art_gv->embree_enabed ? "true\n" : "false\n");
-
+    if(!art_gv->art_gv_embree) printf("art_gv_embree is null ... \n");
+    // END -- [Sebastian] TODO remove this block, once embree parsing works
 
 // =============================   PHASE 4   =================================
 //

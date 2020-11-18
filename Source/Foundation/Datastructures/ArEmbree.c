@@ -4,8 +4,8 @@
 
 #include "ArEmbree.h"
 
-ArEmbreeStruct * initEmbree(struct ArEmbreeStruct * arEmbree) {
-    if( arEmbree == NULL ) {
+ArEmbreeStruct * initEmbree(struct ART_GV * art_gv) {
+    if( art_gv->art_gv_embree == NULL ) {
         // initialize embree device
         RTCDevice thisDevice = rtcNewDevice(NULL);
         if (!thisDevice)
@@ -20,15 +20,17 @@ ArEmbreeStruct * initEmbree(struct ArEmbreeStruct * arEmbree) {
         // nulling embree geometries
         RTCGeometry  thisGeometry = NULL;
 
+        printf("debug: here, art_gv_embree is NOT null ... \n");
+
         // pass info to embree struct
         struct ArEmbreeStruct thisEmbreeStruct = { .device = thisDevice,
                 .scene = thisScene, .geometry = thisGeometry, .state = Scene_Initialized};
-        arEmbree = &thisEmbreeStruct;
+        art_gv->art_gv_embree = &thisEmbreeStruct;
     }
     else {
         printf("tried to initialize embree, but it was already initialized...\n");
     }
-    return arEmbree;
+    return art_gv->art_gv_embree;
 }
 
 // for now single geom
