@@ -1,0 +1,25 @@
+stages:   
+    - build
+
+before_script:
+    - apt-get update
+    - apt-get -y install
+        cmake
+        gobjc
+        gobjc++
+        libtiff-dev
+        liblcms2-dev
+        libgnustep-base-dev
+        libgsl-dev
+        libopenexr-dev
+
+linux:
+    stage: build
+    script:
+        - mkdir build
+        - cd build
+        - cmake ..
+        - make
+    artifacts:
+    tags: 
+        - linux
