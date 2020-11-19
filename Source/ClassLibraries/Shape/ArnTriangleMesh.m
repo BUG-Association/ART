@@ -77,6 +77,18 @@ typedef struct ArFaceCbData
 }
 ArFaceCbData;
 
+/*
+    This is the callback structure for the embree geometry entity.
+*/
+
+typedef struct ArEmbreeGeometryCbData
+{
+    RTCGeometry    geometry;
+    float        * vertices;
+    unsigned     * indices;
+}
+ArEmbreeGeometryCbData;
+
 //   When the data for a vertex is read from the ply file this function
 //   gets called.
 
@@ -149,7 +161,7 @@ static int face_cb(
         p_ply_argument  argument
         )
 {
-    // for some reason need to filter out the first value for face becouse
+    // for some reason need to filter out the first value for face because
     // that is just the length of the list. This we assume to be 3.
     
     long length, value_index;
@@ -174,7 +186,46 @@ static int face_cb(
     return 1;
 }
 
+// EMBREE STUFF
+#if EMBREE_INSTALLED
+//To put the values into the right place we need this data structures
+//to be passed to the callbacks.
+// declared static in order to set its properties in the callback function
+static ArEmbreeGeometryCbData embreeGeometryCbData;
 
+static int vertex_cb_embree(
+        p_ply_argument  argument
+)
+{
+    static int count = 0;
+
+    if(embreeGeometryCbData.vertices) {
+        embreeGeometryCbData.vertices[count++] = (float) ply_get_argument_value(argument);
+    }
+    else printf("vertex_cb_embree: vertex buffer is null ...\n");
+
+    return 1;
+}
+
+static int face_cb_embree(
+        p_ply_argument  argument
+)
+{
+    static int count = 0;
+    long length, value_index;
+
+    ply_get_argument_property(argument, NULL, &length, &value_index);
+
+    if(value_index < 0) return 1;
+
+    if(embreeGeometryCbData.indices) {
+        embreeGeometryCbData.indices[count++] = (unsigned) ply_get_argument_value(argument);
+    }
+    else printf("vertex_cb_embree: index buffer is null ...\n");
+
+    return 1;
+}
+#endif // EMBREE_INSTALLED
 //-------------------------------------------------------------------------------
 
 ArNode * arntrianglemesh_from_ply(
@@ -199,6 +250,7 @@ ArNode * arntrianglemesh_from_ply(
     numberOfVertices = ply_set_read_cb(ply, "vertex", "x", vertex_cb, (void*)&vertexCbData, 0);
     numberOfVertices = ply_set_read_cb(ply, "vertex", "y", vertex_cb, (void*)&vertexCbData, 1);
     numberOfVertices = ply_set_read_cb(ply, "vertex", "z", vertex_cb, (void*)&vertexCbData, 2);
+
 
     //Declare the target data structures. Here we collect the data from the PLY file.
 
@@ -264,7 +316,7 @@ ArNode * arntrianglemesh_from_ply(
 
     ArLongArray  faces = arlongarray_init( numberOfFaces * 3 );
 
-    //Initial setup of the calback data data.
+    //Initial setup of the callback data data.
 
     vertexCbData.vertices = vertices;
     vertexCbData.normals = normals;
@@ -336,8 +388,86 @@ ArNode * embreegeometry_from_ply(
         const char       * pathToPlyFile
         )
 {
-    printf("hi\n");// pass
-    return NULL; // for now
+    //Open the ply file.
+    p_ply ply = ply_open(pathToPlyFile, NULL, 0, NULL);
+    ply_read_header(ply);
+
+    //Set the callback functions. Also obtain the number of elements we will get.
+    long numberOfVertices, numberOfFaces;
+    // long numberOfNormals = 0;
+
+    // # vertices
+    numberOfVertices = ply_set_read_cb(ply, "vertex", "x", vertex_cb_embree, (void*)&embreeGeometryCbData.vertices, 0);
+    numberOfVertices = ply_set_read_cb(ply, "vertex", "y", vertex_cb_embree, (void*)&embreeGeometryCbData.vertices, 1);
+    numberOfVertices = ply_set_read_cb(ply, "vertex", "z", vertex_cb_embree, (void*)&embreeGeometryCbData.vertices, 2);
+
+    // # faces
+    numberOfFaces =
+            ply_set_read_cb(
+                    ply,
+                    "face",
+                    "vertex_indices",
+                    face_cb_embree,
+                    (void*) & embreeGeometryCbData.indices,
+                    0
+            );
+
+    // debugging
+    // printf("number of vertices: %ld\n", numberOfVertices);
+    // printf("number of faces: %ld\n", numberOfFaces);
+
+    // START DOING EMBREE RELATED STUFF
+    // sanity check
+    if(!art_gv->art_gv_embree) {
+        printf("error: art_gv_embree null ...\n");
+        return NULL;
+    } else if(!art_gv->art_gv_embree->device) {
+        printf("error: art_gv_embree device null ...\n");
+        return NULL;
+    }
+
+    // initialize embree geometry buffers
+    if(embreeGeometryCbData.geometry == NULL)
+        embreeGeometryCbData.geometry = rtcNewGeometry(art_gv->art_gv_embree->device, RTC_GEOMETRY_TYPE_TRIANGLE);
+
+    // [Sebastian] I am assuming for now that the shape of the faces are triangles.
+    // In the future I would like to check if the face is e.g. a triangle or quad
+    // to match the corresponding embree shape
+
+    if(embreeGeometryCbData.vertices == NULL)
+        embreeGeometryCbData.vertices = (float*) rtcSetNewGeometryBuffer(embreeGeometryCbData.geometry,
+                                                       RTC_BUFFER_TYPE_VERTEX,
+                                                       0,
+                                                       RTC_FORMAT_FLOAT3,
+                                                       3*sizeof(float),
+                                                       numberOfVertices);
+    if(embreeGeometryCbData.indices == NULL)
+        embreeGeometryCbData.indices = (unsigned*) rtcSetNewGeometryBuffer(embreeGeometryCbData.geometry,
+                                                            RTC_BUFFER_TYPE_INDEX,
+                                                            0,
+                                                            RTC_FORMAT_UINT3,
+                                                            3*sizeof(unsigned),
+                                                            numberOfFaces);
+
+    // more sanity checks
+    if (!embreeGeometryCbData.vertices && !embreeGeometryCbData.indices) {
+        printf("error: embree geometry buffers are null...\n");
+        return NULL;
+    }
+    size_t embreeVerticesSize = sizeof(embreeGeometryCbData.vertices)/sizeof(embreeGeometryCbData.vertices[0]);
+    size_t embreeIndicesSize = sizeof(embreeGeometryCbData.indices)/sizeof(embreeGeometryCbData.indices[0]);
+    assert(embreeVerticesSize == numberOfVertices && embreeIndicesSize == numberOfFaces);
+
+    //Read ply file. Here the callbacks will be executed somewhere.
+    ply_read(ply);
+
+    //Now we are done with ply file so close it.
+    ply_close(ply);
+
+    // pass embree geometry to the embree struct of art_gv
+    art_gv->art_gv_embree->geometry = embreeGeometryCbData.geometry;
+
+    return NULL; // [Sebastian] still need to figure out what to return ...
 }
 
 #define GREY8_SOURCE_BUFFER(_x,_y,_s) \

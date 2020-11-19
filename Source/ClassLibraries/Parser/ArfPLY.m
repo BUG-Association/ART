@@ -118,7 +118,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
         : (ArList *) externals
 {
     ArNode  * newMesh;
-    const char * filename;
+    const char * filename = [ file name ];
 
     if(art_gv->embree_enabed && art_gv->art_gv_embree)
         newMesh = embreegeometry_from_ply(art_gv, arshape_solid, filename );
