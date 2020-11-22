@@ -53,12 +53,6 @@ static const char * arfexr_extension[] =
     0
 };
 
-#define G8_DATA         ((Grey8 *)dataLine)
-#define C32_DATA        ((Colour32 *)dataLine)
-
-#define G8_DATA_NC      dataLine
-#define C32_DATA_NC     dataLine
-
 @class ArfOpenEXR;
 
 @implementation ArfOpenEXR
@@ -69,17 +63,12 @@ ARPFILE_DEFAULT_IMPLEMENTATION(
     arfiletypecapabilites_write
     )
 
-ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
+// TODO: This shall be less "static"
+// But, we have to say we have an RGBA file for now to ensure
+// compatibity with ImageMap
+// ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
+ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
 
-
-- (void) parseFile
-        : (ArNode **) objectPtr
-{
-    [ self parseFileGetExternals
-        :   objectPtr
-        :   0
-        ];
-}
 
 - (void) parseFileGetExternals
         : (ArNode **) objectPtr
@@ -89,6 +78,16 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
         [ ALLOC_INIT_OBJECT(ArnFileImage)
             :   [ file name ]
             ];
+}
+
+
+- (void) parseFile
+        : (ArNode **) objectPtr
+{
+    [ self parseFileGetExternals
+        :   objectPtr
+        :   0
+        ];
 }
 
 
@@ -102,12 +101,14 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
 
 - (ArnImageInfo *) open
 {
+    _writtingMode = NO;
     _spectralChannels = 0;
 
     _isSpectral = NO;
     _containsPolarisationData = NO;
     
     _bufferRGBA = NULL;
+    _bufferGrey = NULL;
 
     _bufferS0 = NULL;
     _bufferS1 = NULL;
@@ -123,16 +124,21 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
     int width, height;
     int isPolarised;
     
-    readEXR(
+    const int read_error = readEXR(
          [ self->file name ],
         & width, 
         & height,
         & _bufferRGBA,
+        & _bufferGrey,
         spectral_buffers,
         & wavelengths_nm,
         & _spectralChannels,
         & isPolarised
     );
+
+    if (read_error != 0) {
+        ART_ERRORHANDLING_FATAL_ERROR("Could not read EXR file");
+    }
 
     if (isPolarised) {
         _containsPolarisationData = YES;
@@ -154,12 +160,20 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
 
     switch ( _spectralChannels )
     {
-        case 0:   _dataType = ardt_rgba; break;
+        case 0:
+            if ( _bufferRGBA != NULL ) {
+                _dataType = ardt_rgba;
+            } else if (_bufferGrey != NULL) {
+                _dataType = ardt_grey;
+            } else {
+                ART_ERRORHANDLING_FATAL_ERROR("This image does not provide usable color information");
+            }
+            break;
         case 8:   _dataType = ardt_spectrum8; break;
         case 11:  _dataType = ardt_spectrum11; break;
         case 18:  _dataType = ardt_spectrum18; break;
         case 46:  _dataType = ardt_spectrum46; break;
-        // default:  ART_ERRORHANDLING_FATAL_ERROR;
+        default:  ART_ERRORHANDLING_FATAL_ERROR("Unrecognised spectrum type");
     }
 
     /* ------------------------------------------------------------------
@@ -189,21 +203,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
             :   resolution
             ];
 
-    // This is allocated by the readEXR function
-    // if (_spectralChannels > 0) {
-    //     _bufferS0 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _spectralChannels);
-        
-    //     if (    LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE
-    //         && _containsPolarisationData ) {
-    //         _bufferS1 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _spectralChannels);
-    //         _bufferS2 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _spectralChannels);
-    //         _bufferS3 = ALLOC_ARRAY(float, XC(_size) * YC(_size) * _spectralChannels);
-    //     }
-    // }
-
-    // _bufferRGBA = ALLOC_ARRAY(float, XC(_size) * YC(_size) * 4);
-
-    _scanline = ALLOC_ARRAY( ArLightAlpha *, XC(_size) );
+    _scanline = ALLOC_ARRAY( ArLightAlpha* , XC(_size) );
 
     for ( unsigned int i = 0; i < XC(_size); i++ ) {
         _scanline[i] =
@@ -215,6 +215,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
     
     return _imageInfo;
 }
+
 
 - (void) _convertPixelToCol
         : (float *)          vals
@@ -280,16 +281,48 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
 - (void) getPlainImage
         : (IPnt2D) start
         : (ArnPlainImage *) image
-{
-    ArSpectrum *colBufS0 = spc_d_alloc_init( art_gv, 0.0 );
-    ArSpectrum *colBufS1 = spc_d_alloc_init( art_gv, 0.0 );
-    ArSpectrum *colBufS2 = spc_d_alloc_init( art_gv, 0.0 );
-    ArSpectrum *colBufS3 = spc_d_alloc_init( art_gv, 0.0 );
-        
+{     
 
-    for ( long y = 0; y < YC(image->size); y++ ) {
-        for ( long x = 0; x < XC(image->size); x++ ) {
-            if (_spectralChannels > 0) {
+    // TODO:
+    // =====
+    // Note, this piece of code shall be beter handled in the future.
+    // Now, we are using this hack to allow retro compatibility with 
+    // IMAGE_MAP feature.
+    // Uplifting shall be done here instead of within IMAGE_MAP
+    // Now, keeping the old behaviour to not break anything.
+    // rgb_to_spc(
+    //     art_gv,
+    //     & rgb,
+    //     colBufS0
+    //     ) ;
+
+    // arlight_s_init_unpolarised_l(
+    //         art_gv,
+    //         colBufS0,
+    //         ARLIGHTALPHA_LIGHT( *_scanline[x] )
+    //         );
+
+    // [ ((ArnLightAlphaImage*)image) setLightAlphaRegion
+    //     :   IPNT2D(0, y)
+    //     :   IVEC2D(XC(image->size), 1)
+    //     :   _scanline
+    //     :   0
+    //     ];
+
+    // [ (ArNode <ArpSetRGBARegion> *)image setRGBARegion
+    //     :   IPNT2D(0, y)
+    //     :   IVEC2D(XC(image->size), 1)
+    //     :   _scanline
+    //     :   0 ];
+
+    if (_spectralChannels > 0) {
+        ArSpectrum *colBufS0 = spc_d_alloc_init( art_gv, 0.0 );
+        ArSpectrum *colBufS1 = spc_d_alloc_init( art_gv, 0.0 );
+        ArSpectrum *colBufS2 = spc_d_alloc_init( art_gv, 0.0 );
+        ArSpectrum *colBufS3 = spc_d_alloc_init( art_gv, 0.0 );
+
+        for ( long y = 0; y < YC(image->size); y++ ) {
+            for ( long x = 0; x < XC(image->size); x++ ) {
                 [ self _convertPixelToCol
                     :   &_bufferS0[_spectralChannels * (y * XC(image->size) + x)]
                     :   colBufS0
@@ -335,48 +368,68 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
                         ARLIGHTALPHA_LIGHT( *_scanline[x] )
                         );
                 }
-            } else {
-                ArRGB  rgb = ARRGB(
-                    _bufferRGBA[4 * (y * XC(image->size) + x) + 0],
-                    _bufferRGBA[4 * (y * XC(image->size) + x) + 1],
-                    _bufferRGBA[4 * (y * XC(image->size) + x) + 2]
-                );
-
-                rgb_to_spc(
-                    art_gv,
-                    & rgb,
-                    colBufS0
-                    ) ;
-
-                arlight_s_init_unpolarised_l(
-                        art_gv,
-                        colBufS0,
-                        ARLIGHTALPHA_LIGHT( *_scanline[x] )
-                        );
+                
+                ARLIGHTALPHA_ALPHA( *_scanline[x] ) = 1.0;
             }
             
-            ARLIGHTALPHA_ALPHA( *_scanline[x] ) = 1.0;
-        }
-        
-        
-        /* ------------------------------------------------------------------
-             Final step: the ArLight scanline is inserted into the
-             image. The cast is justified since only ArnArLightImages get
-             to interoperate with ArfARTRAW.
-        ------------------------------------------------------------------ */
+            
+            /* ------------------------------------------------------------------
+                Final step: the ArLight scanline is inserted into the
+                image. The cast is justified since only ArnArLightImages get
+                to interoperate with ArfARTRAW.
+            ------------------------------------------------------------------ */
 
-        [ ((ArnLightAlphaImage*)image) setLightAlphaRegion
-            :   IPNT2D(0, y)
-            :   IVEC2D(XC(image->size), 1)
-            :   _scanline
-            :   0
-            ];
+            [ ((ArnLightAlphaImage*)image) setLightAlphaRegion
+                :   IPNT2D(0, y)
+                :   IVEC2D(XC(image->size), 1)
+                :   _scanline
+                :   0
+                ];
+        }
+
+        spc_free(art_gv, colBufS0);
+        spc_free(art_gv, colBufS1);
+        spc_free(art_gv, colBufS2);
+        spc_free(art_gv, colBufS3);
+    } else if (_dataType == ardt_rgba) {
+        printf("Read RGBA Region\n");
+        ArRGBA * scanline = ALLOC_ARRAY(ArRGBA, XC(image->size));
+
+        for ( long y = 0; y < YC(image->size); y++ ) {
+            for ( long x = 0; x < XC(image->size); x++ ) {
+                ARRGBA_R(scanline[x]) = _bufferRGBA[4 * (y * XC(_size) + x) + 0];
+                ARRGBA_G(scanline[x]) = _bufferRGBA[4 * (y * XC(_size) + x) + 1];
+                ARRGBA_B(scanline[x]) = _bufferRGBA[4 * (y * XC(_size) + x) + 2];
+                ARRGBA_A(scanline[x]) = _bufferRGBA[4 * (y * XC(_size) + x) + 3];
+            }
+
+            [ image setRGBARegion 
+                :   IPNT2D(0, y)
+                :   IVEC2D(XC(image->size), 1)
+                :   scanline
+                :   0
+                ];
+        }
+
+        FREE_ARRAY(scanline);
+    } else if (_dataType == ardt_grey) {
+        ArGrey * scanline = ALLOC_ARRAY(ArGrey, XC(image->size));
+
+        for ( long y = 0; y < YC(image->size); y++ ) {
+            for ( long x = 0; x < XC(image->size); x++ ) {
+                ARGREY_G(scanline[x]) = _bufferGrey[(y * XC(_size) + x)];
+            }
+
+            [ image setGreyRegion 
+                :   IPNT2D(0, y)
+                :   IVEC2D(XC(image->size), 1)
+                :   scanline
+                :   0
+                ];
+        }
+
+        FREE_ARRAY(scanline);
     }
-    
-    spc_free(art_gv, colBufS0);
-    spc_free(art_gv, colBufS1);
-    spc_free(art_gv, colBufS2);
-    spc_free(art_gv, colBufS3);
 }
 
 /* ----------------------------------------------------------------------
@@ -390,6 +443,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
 - (void) open
         : (ArnImageInfo *) imageInfo
 {
+    _writtingMode = YES;
     _imageInfo = [imageInfo retain];
 
     _size = [ _imageInfo size ];
@@ -415,24 +469,10 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
         _isSpectral = NO;
         _containsPolarisationData = NO;
         _bufferRGBA = ALLOC_ARRAY(float, 4 * width * height);
-
-        // ArColourSpace  const * cs = DEFAULT_RGB_SPACE_REF;
-        
-        // //   Rec. 709 a.k.a. sRGB is assumed in OpenEXRs if the
-        // //   primaries are not specified in the header
-        
-        // if ( DEFAULT_RGB_SPACE_REF != ARCSR_sRGB )
-        // {
-        //     Imf::Chromaticities exrChr = Imf::Chromaticities
-        //         (Imath::V2f (XC(ARCSR_R(cs)), YC(ARCSR_R(cs))),
-        //          Imath::V2f (XC(ARCSR_G(cs)), YC(ARCSR_G(cs))),
-        //          Imath::V2f (XC(ARCSR_B(cs)), YC(ARCSR_B(cs))),
-        //          Imath::V2f (XC(ARCSR_W(cs)), YC(ARCSR_W(cs))));
-
-        //     addChromaticities (exrHeader, exrChr);
-        //     addAdoptedNeutral (exrHeader, exrChr.white);
-        // }
-
+    } else if (_dataType == ardt_grey) {
+        _isSpectral = NO;
+        _containsPolarisationData = NO;
+        _bufferGrey = ALLOC_ARRAY(float, width * height);
     } else {
         _isSpectral = YES;
         _containsPolarisationData = (LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE) ? YES : NO;
@@ -605,110 +645,133 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
 
 - (void) close
 {
-    // Gather metadata
-    const IVec2D size = [ _imageInfo size ];
-    const int width = XC(size);
-    const int height = YC(size);
-        
-    char * createdByString = NULL;
-    char * creationDateStr = NULL;
+    if (_writtingMode) {
+        // Gather metadata
+        const IVec2D size = [ _imageInfo size ];
+        const int width = XC(size);
+        const int height = YC(size);
+            
+        char * createdByString = NULL;
+        char * creationDateStr = NULL;
 
-    const char * creationPlatform = ART_APPLICATION_PLATFORM_DESCRIPTION;
-    const char * creationCommandLine = ART_APPLICATION_ENTIRE_COMMANDLINE;
-    const char * renderTime = [ _imageInfo rendertimeString ];
-    const char * samplesPerPixels = [ _imageInfo samplecountString ];
+        const char * creationPlatform = ART_APPLICATION_PLATFORM_DESCRIPTION;
+        const char * creationCommandLine = ART_APPLICATION_ENTIRE_COMMANDLINE;
+        const char * renderTime = [ _imageInfo rendertimeString ];
+        const char * samplesPerPixels = [ _imageInfo samplecountString ];
 
 
-    time_t timer = time(NULL); //gets time of day
-    struct tm *tblock = localtime(&timer); //converts date/time to a structure
-    //   File creation information
-    asprintf(
-        & createdByString,
-          "%s, ART %s",
-          ART_APPLICATION_NAME,
-          art_version_string
-        );
+        time_t timer = time(NULL); //gets time of day
+        struct tm *tblock = localtime(&timer); //converts date/time to a structure
+        //   File creation information
+        asprintf(
+            & createdByString,
+            "%s, ART %s",
+            ART_APPLICATION_NAME,
+            art_version_string
+            );
 
-    asprintf(
-         & creationDateStr,
-           "%.2d.%.2d.%d %.2d:%.2d\n",
-           tblock->tm_mday,
-           tblock->tm_mon + 1,
-           tblock->tm_year + 1900,
-           tblock->tm_hour,
-           tblock->tm_min);
+        asprintf(
+            & creationDateStr,
+            "%.2d.%.2d.%d %.2d:%.2d\n",
+            tblock->tm_mday,
+            tblock->tm_mon + 1,
+            tblock->tm_year + 1900,
+            tblock->tm_hour,
+            tblock->tm_min);
 
-    const char* metadata_keys[6] = {
-        "File created by",
-        "Platform",
-        "Command line",
-        "Creation date",
-        "Render time",
-        "Samples per pixel"
-    };
+        const char* metadata_keys[6] = {
+            "File created by",
+            "Platform",
+            "Command line",
+            "Creation date",
+            "Render time",
+            "Samples per pixel"
+        };
 
-    const char* metadata_values[6] = {
-        createdByString,
-        creationPlatform,
-        creationCommandLine,
-        creationDateStr,
-        renderTime,
-        samplesPerPixels
-    };
+        const char* metadata_values[6] = {
+            createdByString,
+            creationPlatform,
+            creationCommandLine,
+            creationDateStr,
+            renderTime,
+            samplesPerPixels
+        };
 
-    // Retrieve wavelengths
-    double * wavelengths = ALLOC_ARRAY(double, _spectralChannels);
+        // Retrieve wavelengths
+        double * wavelengths = ALLOC_ARRAY(double, _spectralChannels);
 
-    for (int i = 0; i < _spectralChannels; i++) {
-        float central = 0.F;
-        
-        switch(_spectralChannels) {
-            case 8:
-                central = s8_channel_center( art_gv, i );
-                break;
-            case 11:
-                central = s11_channel_center( art_gv, i );
-                break;
-            case 18:
-                central = s18_channel_center( art_gv, i );
-                break;
-            case 46:
-                central = s46_channel_center( art_gv, i );
-                break;
-            default:
-                ART_ERRORHANDLING_FATAL_ERROR(
-                        "Unrecognised number of spectral channels %d requested",
-                        _spectralChannels
-                );
+        for (int i = 0; i < _spectralChannels; i++) {
+            float central = 0.F;
+            
+            switch(_spectralChannels) {
+                case 8:
+                    central = s8_channel_center( art_gv, i );
+                    break;
+                case 11:
+                    central = s11_channel_center( art_gv, i );
+                    break;
+                case 18:
+                    central = s18_channel_center( art_gv, i );
+                    break;
+                case 46:
+                    central = s46_channel_center( art_gv, i );
+                    break;
+                default:
+                    ART_ERRORHANDLING_FATAL_ERROR(
+                            "Unrecognised number of spectral channels %d requested",
+                            _spectralChannels
+                    );
+            }
+
+            wavelengths[i] = central * 1e9;
         }
 
-        wavelengths[i] = central * 1e9;
+        const float* spectralBuffers[] = {
+            _bufferS0, _bufferS1, _bufferS2, _bufferS3
+        };
+
+        //   Rec. 709 a.k.a. sRGB is assumed in OpenEXRs if the
+        //   primaries are not specified in the header
+        float *chromaticities = NULL;
+
+        if ( DEFAULT_RGB_SPACE_REF != ARCSR_sRGB )
+        {
+            ArColourSpace  const * cs = DEFAULT_RGB_SPACE_REF;
+            chromaticities = ALLOC_ARRAY(float, 8);
+
+            chromaticities[0] = XC(ARCSR_R(cs)); chromaticities[1] = YC(ARCSR_R(cs));
+            chromaticities[2] = XC(ARCSR_G(cs)); chromaticities[3] = YC(ARCSR_G(cs));
+            chromaticities[4] = XC(ARCSR_B(cs)); chromaticities[5] = YC(ARCSR_B(cs));
+            chromaticities[6] = XC(ARCSR_W(cs)); chromaticities[7] = YC(ARCSR_W(cs));
+        }
+
+        saveEXR(
+            [file name], 
+            XC(_size), YC(_size), 
+            _bufferRGBA, 
+            chromaticities,
+            _bufferGrey,
+            spectralBuffers,
+            wavelengths,
+            _spectralChannels,
+            metadata_keys,
+            metadata_values,
+            6
+            );
+
+        FREE(createdByString);
+        FREE(creationDateStr);
+        FREE_ARRAY(wavelengths);
+        FREE_ARRAY(chromaticities);
     }
-
-    const float* spectralBuffers[] = {
-        _bufferS0, _bufferS1, _bufferS2, _bufferS3
-    };
-
-    saveEXR(
-        [file name], 
-        XC(_size), YC(_size), 
-        _bufferRGBA, 
-        spectralBuffers,
-        wavelengths,
-        _spectralChannels,
-        metadata_keys,
-        metadata_values,
-        6
-        );
-
-    FREE(createdByString);
-    FREE(creationDateStr);
-    FREE_ARRAY(wavelengths);
 }
+
 
 - (void) dealloc
 {
     FREE_ARRAY(_bufferRGBA);
+    FREE_ARRAY(_bufferGrey);
+
     FREE_ARRAY(_bufferS0);
     FREE_ARRAY(_bufferS1);
     FREE_ARRAY(_bufferS2);
@@ -719,16 +782,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
     }
     
     FREE_ARRAY(_scanline);
+
     [_imageInfo release];
-
-    
-    // if ( _exr_cpp_vars ) {
-    //     if (_exr_cpp_vars->exrfile_out) {
-    //         delete _exr_cpp_vars->exrfile_out;
-    //     }
-    //     FREE(_exr_cpp_vars);
-    // }
-
     [ super dealloc ];
 }
 

@@ -40,6 +40,7 @@ ART_MODULE_INTERFACE(ArfOpenEXR)
 @interface ArfOpenEXR
            : ArfRasterImage
 {
+    BOOL                        _writtingMode;
     ArnImageInfo              * _imageInfo;
     IVec2D                      _size;
     ArDataType                  _dataType;
@@ -48,6 +49,7 @@ ART_MODULE_INTERFACE(ArfOpenEXR)
     BOOL                        _containsPolarisationData;
     
     float                      * _bufferRGBA;
+    float                      * _bufferGrey;
 
     float                      * _bufferS0;
     float                      * _bufferS1;
