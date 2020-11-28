@@ -26,13 +26,14 @@
 
 #include "ArfOpenEXRWrapper.h"
 
+#ifdef ART_WITH_OPENEXR
+
 #include <algorithm>
 #include <cassert>
 #include <map>
 #include <regex>
 #include <string>
-
-#ifdef ART_WITH_OPENEXR
+#include <array>
 
 #include <OpenEXR/ImathBox.h>
 #include <OpenEXR/ImathHalfLimits.h>

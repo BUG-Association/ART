@@ -18,6 +18,8 @@ if ( APPLE )
 set(CMAKE_MACOSX_RPATH 1)
 endif ( APPLE )
 
+set(CMAKE_CXX_STANDARD 11)
+
 # configure a header file to pass some of the CMake settings
 # to the source code
 
@@ -343,7 +345,7 @@ else ( APPLE )
 		art_other_link_libraries 
 		${GNUSTEP-BASE_LIBRARY}
 		${TIFF_LIBRARY}
-    ${JPEG_LIBRARY}
+        ${JPEG_LIBRARY}
 		${LCMS2_LIBRARY}
 		objc
 		m
