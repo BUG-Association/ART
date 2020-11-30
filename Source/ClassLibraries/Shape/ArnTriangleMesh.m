@@ -225,6 +225,65 @@ static int face_cb_embree(
 
     return 1;
 }
+/*
+ * Cast a single ray with origin (ox, oy, oz) and direction
+ * (dx, dy, dz).
+ */
+void castRay(RTCScene scene,
+             float ox, float oy, float oz,
+             float dx, float dy, float dz)
+{
+    /*
+     * The intersect context can be used to set intersection
+     * filters or flags, and it also contains the instance ID stack
+     * used in multi-level instancing.
+     */
+    struct RTCIntersectContext context;
+    rtcInitIntersectContext(&context);
+
+    /*
+     * The ray hit structure holds both the ray and the hit.
+     * The user must initialize it properly -- see API documentation
+     * for rtcIntersect1() for details.
+     */
+    struct RTCRayHit rayhit;
+    rayhit.ray.org_x = ox;
+    rayhit.ray.org_y = oy;
+    rayhit.ray.org_z = oz;
+    rayhit.ray.dir_x = dx;
+    rayhit.ray.dir_y = dy;
+    rayhit.ray.dir_z = dz;
+    rayhit.ray.tnear = 0;
+    rayhit.ray.tfar = 100000000; // infinity
+    rayhit.ray.mask = -1;
+    rayhit.ray.flags = 0;
+    rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+    rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
+
+    /*
+     * There are multiple variants of rtcIntersect. This one
+     * intersects a single ray with the scene.
+     */
+    rtcIntersect1(scene, &context, &rayhit);
+
+    printf("%f, %f, %f: ", ox, oy, oz);
+    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID)
+    {
+        /* Note how geomID and primID identify the geometry we just hit.
+         * We could use them here to interpolate geometry information,
+         * compute shading, etc.
+         * Since there is only a single triangle in this scene, we will
+         * get geomID=0 / primID=0 for all hits.
+         * There is also instID, used for instancing. See
+         * the instancing tutorials for more information */
+        printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
+               rayhit.hit.geomID,
+               rayhit.hit.primID,
+               rayhit.ray.tfar);
+    }
+    else
+        printf("Did not find any intersection.\n");
+}
 #endif // EMBREE_INSTALLED
 //-------------------------------------------------------------------------------
 
@@ -412,10 +471,6 @@ ArNode * embreegeometry_from_ply(
                     0
             );
 
-    // debugging
-    // printf("number of vertices: %ld\n", numberOfVertices);
-    // printf("number of faces: %ld\n", numberOfFaces);
-
     // START DOING EMBREE RELATED STUFF
     // sanity check
     if(!art_gv->art_gv_embree) {
@@ -465,9 +520,21 @@ ArNode * embreegeometry_from_ply(
     ply_close(ply);
 
     // pass embree geometry to the embree struct of art_gv
+    rtcCommitGeometry(embreeGeometryCbData.geometry);
     art_gv->art_gv_embree->geometry = embreeGeometryCbData.geometry;
 
-    return NULL; // [Sebastian] still need to figure out what to return ...
+    // some debugging
+    rtcAttachGeometry(art_gv->art_gv_embree->scene,  art_gv->art_gv_embree->geometry);
+    rtcReleaseGeometry(art_gv->art_gv_embree->geometry);
+    rtcCommitScene(art_gv->art_gv_embree->scene);
+    art_gv->art_gv_embree->state = Scene_Commited;
+
+    castRay(art_gv->art_gv_embree->scene, 0, 0, -1, 0, 0, 1);
+    castRay(art_gv->art_gv_embree->scene, 1, 1, -1, 0, 0, 1);
+    castRay(art_gv->art_gv_embree->scene, 0, 0, 0, 0, 1, 1); // here is a hit
+
+    // return NULL; // [Sebastian] still need to figure out what to return ...
+    return [ ALLOC_INIT_OBJECT(ArEmbreeStruct)];
 }
 
 #define GREY8_SOURCE_BUFFER(_x,_y,_s) \
