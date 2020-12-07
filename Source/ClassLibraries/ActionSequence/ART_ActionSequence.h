@@ -33,5 +33,6 @@ ART_LIBRARY_INTERFACE(ART_ActionSequence)
 #import "ArnNodeAction.h"
 #import "ArnNodeStack.h"
 #import "ScenegraphActions.h"
+#import "ArnEmbreeUtils.h"
 
 // ===========================================================================

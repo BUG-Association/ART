@@ -25,14 +25,58 @@
 =========================================================================== */
 
 #include "ART_Foundation.h"
+#include "ArpEmbree.h"
+#include <embree3/rtcore.h>
 
-ART_LIBRARY_INTERFACE(ART_ActionSequence)
+ART_MODULE_INTERFACE(ArnEmbreeUtils)
 
-#import "ArnScene.h"
-#import "ArnActionSequence.h"
-#import "ArnNodeAction.h"
-#import "ArnNodeStack.h"
-#import "ScenegraphActions.h"
-#import "ArnEmbreeUtils.h"
+#import "ART_Scenegraph.h"
+
+@interface ArnEmbreeSceneGraphNode
+        : ArNode
+        < ArpEmbree >
+{
+}
+@end
+
+typedef enum Embree_state {
+    Embree_Initialized,
+    Scene_Initialized,
+    Scene_Commited,
+    Embree_Released
+} Embree_state;
+
+
+@interface ArnEmbreeUtils : ArcObject {
+    RTCDevice * device;
+    RTCScene * scene; // for now just one scene, later an array!
+    RTCGeometry * geometry; // one for now
+    Embree_state state;
+}
+
+- (id) init;
+
+- (void) setDevice: (RTCDevice *) newDevice;
+- (void) setScene: (RTCScene *) newScenee;
+- (void) setGeometry: (RTCGeometry *) newGeometry;
+- (void) setState: (Embree_state) newState;
+
+- (RTCDevice *) getDevice;
+- (RTCScene *) getScene;
+- (RTCGeometry *) getGeometry;
+- (Embree_state) getState;
+
+- (ArNode *) embreegeometry_from_ply:
+        (ART_GV *) art_gv
+         embree: (ArnEmbreeUtils *) embreeUtils
+        path: (const char *) pathToPlyFile
+;
+
+- (void) addGeometryToScene: (RTCGeometry *) geom andScene:(RTCScene *) scene;
+
+- (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str;
+- (void) cleanUpEmbree;
+
+@end
 
 // ===========================================================================

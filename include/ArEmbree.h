@@ -31,6 +31,7 @@
 #include "ART_Foundation_System.h"
 #include <embree3/rtcore.h>
 
+/*
 enum EmbreeState {
     Scene_Initialized,
     Scene_Commited,
@@ -52,6 +53,8 @@ void addGeometryToScene(RTCGeometry * geom, RTCScene * scene);
 
 void errorFunction(void* userPtr, enum RTCError error, const char* str);
 void cleanUpEmbree(ART_GV * art_gv);
+
+ */
 
 #endif // EMBREE_INSTALLED
 #endif //ART_AREMBREE_H

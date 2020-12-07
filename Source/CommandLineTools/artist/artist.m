@@ -28,6 +28,7 @@
 #import "_ArLight_GV.h"
 #import "FoundationAssertionMacros.h"
 
+// #import "ArnEmbreeUtils.h" // added by [Sebastian] for now. TODO delete when not needed anymore
 
 /* ===========================================================================
 
@@ -258,8 +259,7 @@ int artist(
     // [Sebastian] TODO remove this block, once embree parsing works
     if ( [ embreeOpt hasBeenSpecified ]) {
 #if EMBREE_INSTALLED
-        art_gv_enable_embree( art_gv, true);
-        art_gv->art_gv_embree = initEmbree(art_gv);
+        art_gv_enable_embree(art_gv, true);
 #else
         printf("error: embree support enabled without embree being installed...\n");
         exit(0);
@@ -267,11 +267,10 @@ int artist(
     }
     else {
         art_gv_enable_embree( art_gv, false );
-        art_gv->art_gv_embree = NULL;
     }
     printf("embree enabled: %s", art_gv->embree_enabed ? "true\n" : "false\n");
-    if(!art_gv->art_gv_embree->device) printf("art_gv_embree device is null ... \n");
     // END -- [Sebastian] TODO remove this block, once embree parsing works
+
 
 // =============================   PHASE 4   =================================
 //
@@ -323,8 +322,8 @@ int artist(
 //    Optional debug feature: uncomment the following line to see what artist
 //    has actually parsed. Useful if you suspect the parser is delivering
 //    defective information.
-
-//    arcobjccoder_write_file( art_gv, & contentOfMainFile, "artist_read_file.art" );
+// TODO uncomment when not needed anymore
+    arcobjccoder_write_file( art_gv, & contentOfMainFile, "artist_read_file.art" );
 
     artime_now( & parsingSubtaskFinished );
 

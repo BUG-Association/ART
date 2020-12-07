@@ -4,6 +4,7 @@
 
 #include "ArEmbree.h"
 
+/*
 ArEmbreeStruct * initEmbree(ART_GV * art_gv) {
     if( art_gv->art_gv_embree == NULL ) {
         // initialize embree device
@@ -66,3 +67,5 @@ void cleanUpEmbree(ART_GV * art_gv) {
 void errorFunction(void* userPtr, enum RTCError error, const char* str) {
     printf("error %d: %s\n", error, str);
 }
+
+ */

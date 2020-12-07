@@ -127,7 +127,6 @@
 
 
 #include <objc/objc.h> // [Sebastian TODO] remove this, when not needed anymore
-#// include "ArEmbree.h" // [Sebastian] just for now
 
 typedef struct ART_GV
 {
@@ -220,10 +219,6 @@ typedef struct ART_GV
 
     // [Sebastian] added this helper bool for quick switching embree off/on
     BOOL                                embree_enabed;
-#if EMBREE_INSTALLED
-    struct ArEmbreeStruct               * art_gv_embree;
-#endif
-
 }
 ART_GV;
 

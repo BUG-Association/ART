@@ -31,8 +31,6 @@ ART_MODULE_INTERFACE(ArnTriangleMesh)
 #import "ArnShape.h"
 #import "ArnVertexSet.h"
 
-#include "ArEmbree.h"
-
 @interface ArnTriangleMesh
         : ArnShape
         < ArpConcreteClass, ArpCoding, ArpExtremalPoints, ArpShape, ArpSetupNodeData >
@@ -73,12 +71,6 @@ ArNode  * arntrianglemesh_heightfield_from_image(
         );
 
 ArNode  * arntrianglemesh_from_ply(
-        ART_GV           * art_gv,
-        ArShapeGeometry    newGeometry,
-        const char       * pathToPlyFile
-        );
-
-ArNode * embreegeometry_from_ply(
         ART_GV           * art_gv,
         ArShapeGeometry    newGeometry,
         const char       * pathToPlyFile
