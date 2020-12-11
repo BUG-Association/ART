@@ -44,11 +44,7 @@ ArEmbreeGeometryCbData;
 @implementation ArnEmbreeSceneGraphNode
 - init
 {
-    self =
-            [ super init
-            ];
-
-    return self;
+    // TODO
 }
 @end
 
@@ -156,14 +152,15 @@ void castRay(RTCScene scene,
 
 - (id) init
 {
-    ArnEmbreeUtils * embreeUtils = [[ArnEmbreeUtils alloc] init ];
+    // ArnEmbreeUtils * embreeUtils = [[ArnEmbreeUtils alloc] init ];
+    self = [super init];
 
     // initialize embree device
     RTCDevice newDevice = rtcNewDevice(NULL);
     if(!newDevice)
         printf("error %d: cannot create embree device\n", rtcGetDeviceError(NULL));
     // rtcSetDeviceErrorFunction(device, errorFunction, NULL); // TODO figure out why this is needed
-    [embreeUtils setDevice: newDevice];
+    [self setDevice: newDevice];
 
     // initialize embree scene
     RTCScene newScene = rtcNewScene(newDevice);
@@ -171,9 +168,9 @@ void castRay(RTCScene scene,
         printf("error %d: cannot create embree scene on device\n", rtcGetDeviceError(NULL));
     rtcSetSceneFlags(newScene,RTC_SCENE_FLAG_NONE); // for now a bit pointless but change later
     rtcSetSceneBuildQuality(newScene,RTC_BUILD_QUALITY_LOW); // for now using lowest build quality
-    [embreeUtils setScene: newScene];
+    [self setScene: newScene];
 
-    return embreeUtils;
+    return self;
 }
 
 - (void) setDevice: (RTCDevice *) newDevice {
@@ -182,9 +179,36 @@ void castRay(RTCScene scene,
 - (void) setScene: (RTCScene *) newScene {
     scene = newScene;
 }
-- (void) setGeometry: (RTCGeometry *) newGeometry {
-    geometry = newGeometry;
+- (void) addGeometry: (RTCGeometry *) newGeometry {
+    ArEmbreeGeometry geometryNode = {.geom = newGeometry, .next = NULL};
+    if(!geometry_list_head) {
+        geometry_list_head = &geometryNode;
+        return;
+    }
+    ArEmbreeGeometry * temporaryNode = geometry_list_head;
+    while(temporaryNode != NULL)
+        temporaryNode = temporaryNode->next;
+    temporaryNode->next = &geometryNode;
 }
+
+- (void) commitScene {
+    // commit all embree geometries
+    if(geometry_list_head) {
+        rtcCommitGeometry(geometry_list_head->geom);
+        rtcAttachGeometry(scene, geometry_list_head->geom);
+        rtcReleaseGeometry(geometry_list_head->geom);
+        ArEmbreeGeometry * temporaryNode = geometry_list_head;
+        while(temporaryNode->next != NULL) {
+            temporaryNode = temporaryNode->next;
+            rtcCommitGeometry(temporaryNode->geom);
+            rtcAttachGeometry(scene, temporaryNode->geom);
+            rtcReleaseGeometry(temporaryNode->geom);
+        }
+    }
+    // commit scene
+    rtcCommitScene(scene);
+}
+
 - (void) setState: (Embree_state) newState {
     state = newState;
 }
@@ -195,16 +219,12 @@ void castRay(RTCScene scene,
 - (RTCScene *) getScene {
     return scene;
 }
-- (RTCGeometry *) getGeometry {
-    return geometry;
-}
 - (Embree_state) getState {
     return state;
 }
 
 - (ArNode *) embreegeometry_from_ply:
         (ART_GV *) art_gv
-        embree: (ArnEmbreeUtils *) embreeUtils
           path: (const char *) pathToPlyFile
 {
     // Check if embree obj is allocated
@@ -214,11 +234,11 @@ void castRay(RTCScene scene,
     }
 
     // sanity check
-    if(![embreeUtils getDevice]) {
+    if(![self getDevice]) {
         printf("error: parsing PLY geometry to embree but embree device is null...\n");
         return NULL;
     }
-    if(![embreeUtils getScene]) {
+    if(![self getScene]) {
         printf("error: parsing PLY geometry to embree but embree scene is null...\n");
         return NULL;
     }
@@ -252,7 +272,7 @@ void castRay(RTCScene scene,
 
 
     // initialize embree geometry buffers
-    RTCGeometry plyGeomertry = rtcNewGeometry([embreeUtils getDevice], RTC_GEOMETRY_TYPE_TRIANGLE);
+    RTCGeometry plyGeomertry = rtcNewGeometry([self getDevice], RTC_GEOMETRY_TYPE_TRIANGLE);
     // just triangle geometry for now // TODO generalize later
 
     if (embreeGeometryCbData.vertices == NULL)
@@ -286,20 +306,22 @@ void castRay(RTCScene scene,
     ply_close(ply);
 
     // commit geometry
-    rtcCommitGeometry(plyGeomertry);
-    rtcAttachGeometry([embreeUtils getScene], plyGeomertry);
-    rtcReleaseGeometry(plyGeomertry);
-    rtcCommitScene([embreeUtils getScene]);
-    [embreeUtils setState: Scene_Commited];
+    [self addGeometry:plyGeomertry];
 
-    castRay([embreeUtils getScene], 0, 0, -1, 0, 0, 1);
-    castRay([embreeUtils getScene], 1, 1, -1, 0, 0, 1);
-    castRay([embreeUtils getScene], 0, 0, 0, 0, 1, 1); // here is a hit
+    //debug
+    [self commitScene];
+    [self setState: Scene_Commited];
+    castRay([self getScene], 0, 0, -1, 0, 0, 1);
+    castRay([self getScene], 1, 1, -1, 0, 0, 1);
+    castRay([self getScene], 0, 0, 0, 0, 1, 1); // here is a hit
 
     // return an ArNode that acts like a flag to let the renderer know that
+    /*
     return
             [ ALLOC_INIT_OBJECT(ArnEmbreeSceneGraphNode)
             ];
+            */
+    return NULL;
 }
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str {

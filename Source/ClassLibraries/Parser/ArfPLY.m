@@ -125,8 +125,8 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
 
     // [Sebastian] TODO replace the condition with a macro later
     if(art_gv->embree_enabed) {
-        // ArnEmbreeUtils * embreeUtils = [[ArnEmbreeUtils alloc] init];
-        newMesh = NULL;
+        ArnEmbreeUtils * embreeUtils = [[ArnEmbreeUtils alloc] init];
+        newMesh = [embreeUtils embreegeometry_from_ply: art_gv path: filename];
     }
     else
         newMesh = arntrianglemesh_from_ply(art_gv, arshape_solid, filename );

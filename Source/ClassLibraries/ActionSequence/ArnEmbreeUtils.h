@@ -32,12 +32,19 @@ ART_MODULE_INTERFACE(ArnEmbreeUtils)
 
 #import "ART_Scenegraph.h"
 
-@interface ArnEmbreeSceneGraphNode
+// placeholder class that serves as falg
+@interface ArEmbreeSceneGraphNode
         : ArNode
         < ArpEmbree >
 {
 }
 @end
+
+// array of embree geometries
+typedef struct ArEmbreeGeometry {
+    RTCGeometry geom;
+    struct ArEmbreeGeometry * next;
+} ArEmbreeGeometry;
 
 typedef enum Embree_state {
     Embree_Initialized,
@@ -46,11 +53,10 @@ typedef enum Embree_state {
     Embree_Released
 } Embree_state;
 
-
 @interface ArnEmbreeUtils : ArcObject {
     RTCDevice * device;
-    RTCScene * scene; // for now just one scene, later an array!
-    RTCGeometry * geometry; // one for now
+    RTCScene * scene;
+    ArEmbreeGeometry * geometry_list_head; // linked list of multiple embree geometries
     Embree_state state;
 }
 
@@ -58,12 +64,13 @@ typedef enum Embree_state {
 
 - (void) setDevice: (RTCDevice *) newDevice;
 - (void) setScene: (RTCScene *) newScenee;
-- (void) setGeometry: (RTCGeometry *) newGeometry;
+- (void) addGeometry: (RTCGeometry *) newGeometry;
+- (void) commitScene;
 - (void) setState: (Embree_state) newState;
 
 - (RTCDevice *) getDevice;
 - (RTCScene *) getScene;
-- (RTCGeometry *) getGeometry;
+// - (RTCGeometry *) getGeometry;
 - (Embree_state) getState;
 
 - (ArNode *) embreegeometry_from_ply:
