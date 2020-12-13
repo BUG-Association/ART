@@ -41,10 +41,11 @@ typedef struct ArEmbreeGeometryCbData
 ArEmbreeGeometryCbData;
 
 
-@implementation ArnEmbreeSceneGraphNode
+@implementation ArEmbreeSceneGraphNode
 - init
 {
-    // TODO
+    self = [super init];
+    return self;
 }
 @end
 
@@ -176,37 +177,59 @@ void castRay(RTCScene scene,
 - (void) setDevice: (RTCDevice *) newDevice {
     device = newDevice;
 }
+
 - (void) setScene: (RTCScene *) newScene {
     scene = newScene;
 }
+
+- (void) setGeometryListHead: (ArEmbreeGeometryNode *) geometry {
+    geometry_list_head = geometry;
+}
+
 - (void) addGeometry: (RTCGeometry *) newGeometry {
-    ArEmbreeGeometry geometryNode = {.geom = newGeometry, .next = NULL};
+    ArEmbreeGeometryNode * geometryNode = (ArEmbreeGeometryNode *)malloc(sizeof(ArEmbreeGeometryNode));
+    geometryNode->geom = newGeometry;
+    geometryNode->next = NULL;
     if(!geometry_list_head) {
-        geometry_list_head = &geometryNode;
+        [self setGeometryListHead:geometryNode];
         return;
     }
-    ArEmbreeGeometry * temporaryNode = geometry_list_head;
-    while(temporaryNode != NULL)
+    ArEmbreeGeometryNode * temporaryNode = [self getGeometryListHead];
+    while(temporaryNode->next != NULL)
         temporaryNode = temporaryNode->next;
-    temporaryNode->next = &geometryNode;
+    temporaryNode->next = geometryNode;
 }
 
 - (void) commitScene {
     // commit all embree geometries
     if(geometry_list_head) {
-        rtcCommitGeometry(geometry_list_head->geom);
-        rtcAttachGeometry(scene, geometry_list_head->geom);
-        rtcReleaseGeometry(geometry_list_head->geom);
-        ArEmbreeGeometry * temporaryNode = geometry_list_head;
-        while(temporaryNode->next != NULL) {
-            temporaryNode = temporaryNode->next;
-            rtcCommitGeometry(temporaryNode->geom);
-            rtcAttachGeometry(scene, temporaryNode->geom);
-            rtcReleaseGeometry(temporaryNode->geom);
+        ArEmbreeGeometryNode * temporaryNode = [self getGeometryListHead];
+
+        // commit geometry of list head
+        RTCGeometry thisGeom = temporaryNode->geom;
+        rtcCommitGeometry(thisGeom);
+        rtcAttachGeometry(scene, thisGeom);
+        rtcReleaseGeometry(thisGeom);
+        // commit geometry of following list nodes
+        if(!temporaryNode->next) {
+            free(temporaryNode);
+        }
+        else {
+            ArEmbreeGeometryNode * prevTemporaryNode;
+            while(temporaryNode->next != NULL) {
+                prevTemporaryNode = temporaryNode;
+                temporaryNode = temporaryNode->next;
+                thisGeom = temporaryNode->geom;
+                rtcCommitGeometry(thisGeom);
+                rtcAttachGeometry(scene, thisGeom);
+                rtcReleaseGeometry(thisGeom);
+                free(prevTemporaryNode);
+            }
         }
     }
     // commit scene
     rtcCommitScene(scene);
+    [self setState: Scene_Commited];
 }
 
 - (void) setState: (Embree_state) newState {
@@ -221,6 +244,10 @@ void castRay(RTCScene scene,
 }
 - (Embree_state) getState {
     return state;
+}
+
+- (RTCGeometry *) getGeometryListHead {
+    return geometry_list_head;
 }
 
 - (ArNode *) embreegeometry_from_ply:
@@ -272,7 +299,7 @@ void castRay(RTCScene scene,
 
 
     // initialize embree geometry buffers
-    RTCGeometry plyGeomertry = rtcNewGeometry([self getDevice], RTC_GEOMETRY_TYPE_TRIANGLE);
+    RTCGeometry plyGeomertry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
     // just triangle geometry for now // TODO generalize later
 
     if (embreeGeometryCbData.vertices == NULL)
@@ -309,19 +336,23 @@ void castRay(RTCScene scene,
     [self addGeometry:plyGeomertry];
 
     //debug
+    RTCGeometry testGeom2 = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
+    RTCGeometry testGeom3 = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
+    RTCGeometry testGeom4 = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
+    RTCGeometry testGeom5 = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
+    [self addGeometry:testGeom2];
+    [self addGeometry:testGeom3];
+    [self addGeometry:testGeom4];
+    [self addGeometry:testGeom5];
     [self commitScene];
-    [self setState: Scene_Commited];
     castRay([self getScene], 0, 0, -1, 0, 0, 1);
     castRay([self getScene], 1, 1, -1, 0, 0, 1);
     castRay([self getScene], 0, 0, 0, 0, 1, 1); // here is a hit
 
     // return an ArNode that acts like a flag to let the renderer know that
-    /*
     return
-            [ ALLOC_INIT_OBJECT(ArnEmbreeSceneGraphNode)
-            ];
-            */
-    return NULL;
+            [ ALLOC_INIT_OBJECT(ArEmbreeSceneGraphNode) ];
+
 }
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str {

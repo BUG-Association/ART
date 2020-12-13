@@ -38,13 +38,16 @@ ART_MODULE_INTERFACE(ArnEmbreeUtils)
         < ArpEmbree >
 {
 }
+
+- init;
+
 @end
 
 // array of embree geometries
-typedef struct ArEmbreeGeometry {
+typedef struct ArEmbreeGeometryNode {
     RTCGeometry geom;
-    struct ArEmbreeGeometry * next;
-} ArEmbreeGeometry;
+    struct ArEmbreeGeometryNode * next;
+} ArEmbreeGeometryNode;
 
 typedef enum Embree_state {
     Embree_Initialized,
@@ -56,7 +59,7 @@ typedef enum Embree_state {
 @interface ArnEmbreeUtils : ArcObject {
     RTCDevice * device;
     RTCScene * scene;
-    ArEmbreeGeometry * geometry_list_head; // linked list of multiple embree geometries
+    ArEmbreeGeometryNode * geometry_list_head; // linked list of multiple embree geometries
     Embree_state state;
 }
 
@@ -64,12 +67,14 @@ typedef enum Embree_state {
 
 - (void) setDevice: (RTCDevice *) newDevice;
 - (void) setScene: (RTCScene *) newScenee;
+- (void) setGeometryListHead: (ArEmbreeGeometryNode *) geometry;
 - (void) addGeometry: (RTCGeometry *) newGeometry;
 - (void) commitScene;
 - (void) setState: (Embree_state) newState;
 
 - (RTCDevice *) getDevice;
 - (RTCScene *) getScene;
+- (ArEmbreeGeometryNode *) getGeometryListHead;
 // - (RTCGeometry *) getGeometry;
 - (Embree_state) getState;
 
