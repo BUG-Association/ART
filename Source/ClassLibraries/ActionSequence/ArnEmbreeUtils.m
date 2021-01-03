@@ -210,6 +210,7 @@ void castRay(RTCScene scene,
         rtcCommitGeometry(thisGeom);
         rtcAttachGeometry(scene, thisGeom);
         rtcReleaseGeometry(thisGeom);
+
         // commit geometry of following list nodes
         if(!temporaryNode->next) {
             free(temporaryNode);
@@ -229,6 +230,7 @@ void castRay(RTCScene scene,
     }
     // commit scene
     rtcCommitScene(scene);
+    rtcSetSceneFlags(scene, RTC_SCENE_FLAG_NONE); // TODO change later
     [self setState: Scene_Commited];
 }
 
@@ -299,7 +301,7 @@ void castRay(RTCScene scene,
 
 
     // initialize embree geometry buffers
-    RTCGeometry plyGeomertry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
+    RTCGeometry plyGeomertry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_USER);
     // just triangle geometry for now // TODO generalize later
 
     if (embreeGeometryCbData.vertices == NULL)
