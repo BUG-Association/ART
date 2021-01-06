@@ -244,6 +244,8 @@ void saveEXR(
         }
     }
 
+    exrHeader.insert("Polarisation handedness", Imf::StringAttribute("right"));
+
     if (chromaticities != NULL) {
         Imf::Chromaticities exrChr = Imf::Chromaticities(
             Imath::V2f(chromaticities[0], chromaticities[1]),
@@ -320,6 +322,8 @@ int readEXR(
 {
     // We ignore the reflective part for now since ART does not support it for
     // now.
+
+    // TODO: Check for polarisation handedness
 
     Imf::InputFile exrIn(filename);
     const Imf::Header& exrHeader = exrIn.header();
