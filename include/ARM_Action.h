@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2019 The ART Development Team
+    Copyright (c) 1996-2020 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -324,6 +324,14 @@ ART_MODULE_INTERFACE(ARM_Action)
                 ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_ARTGSC_To_GreyCSV)
 
         #ifdef ART_WITH_OPENEXR
+            /**
+             * @def IMAGECONVERSION_ARTRAW_TO_SPECTRAL_EXR
+             * @brief ARTCSP to EXR
+             * Converts an ARTCSP image from the stack to an EXR file.
+             */
+            #define IMAGECONVERSION_ARTRAW_TO_SPECTRAL_EXR \
+                    ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_ARTRAW_To_Spectral_EXR)
+
             /**
              * @def IMAGECONVERSION_ARTCSP_TO_EXR
              * @brief ARTCSP to EXR

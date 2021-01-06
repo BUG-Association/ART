@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2019 The ART Development Team
+    Copyright (c) 1996-2020 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -119,6 +119,18 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 @end
 
 #ifdef ART_WITH_OPENEXR
+
+/* ===========================================================================
+    'ArnImageConverter_ARTRAW_To_SPECTRAL_EXR'
+=========================================================================== */
+
+@interface ArnImageConverter_ARTRAW_To_Spectral_EXR
+        : ArnSingleImageManipulationAction
+        < ArpConcreteClass, ArpAction >
+{
+}
+
+@end
 
 /* ===========================================================================
     'ArnImageConverter_ARTCSP_To_EXR'

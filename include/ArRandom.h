@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2019 The ART Development Team
+    Copyright (c) 1996-2020 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -149,12 +149,16 @@ double arrandom_nr2_double(
 
 ------------------------------------------------------------------------aw- */
 
-void arrandom_global_set_seed(
-        ART_GV  * art_gv,
-        int       seed
+double arrandom_global(
+        ART_GV  * agv
         );
 
-double arrandom_global(
+void arrandom_global_set_seed(
+        ART_GV  * art_gv,
+        long      seed
+        );
+
+long arrandom_global_seed(
         ART_GV  * agv
         );
 

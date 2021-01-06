@@ -26,7 +26,7 @@
 
 #define ART_VERSION_MAJOR       "2"
 #define ART_VERSION_MINOR       "0"
-#define ART_VERSION_PATCH       "3"
-#define ART_VERSION_DEVTAG      ""
-#define ART_VERSION_STRING      "2.0.3"
+#define ART_VERSION_PATCH       "4"
+#define ART_VERSION_DEVTAG      "-dev"
+#define ART_VERSION_STRING      "2.0.4-dev"
 

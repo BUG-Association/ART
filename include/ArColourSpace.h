@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2019 The ART Development Team
+    Copyright (c) 1996-2020 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -393,7 +393,11 @@ ArColourSpace const * arcolourspace_wRGB(
         const ART_GV  * art_gv
         );
 
-ArColourSpace const * arcolourspace_acesRGB(
+ArColourSpace const * arcolourspace_ap0RGB(
+        const ART_GV  * art_gv
+        );
+
+ArColourSpace const * arcolourspace_ap1RGB(
         const ART_GV  * art_gv
         );
 
@@ -405,18 +409,22 @@ ArColourSpace const * arcolourspace_acesRGB(
 #define ARCOLOURSPACEREF_sRGB       arcolourspace_sRGB(art_gv)
 #define ARCOLOURSPACEREF_aRGB       arcolourspace_aRGB(art_gv)
 #define ARCOLOURSPACEREF_wRGB       arcolourspace_wRGB(art_gv)
-#define ARCOLOURSPACEREF_acesRGB    arcolourspace_acesRGB(art_gv)
+#define ARCOLOURSPACEREF_ap0RGB     arcolourspace_ap0RGB(art_gv)
+#define ARCOLOURSPACEREF_ap1RGB     arcolourspace_ap1RGB(art_gv)
+#define ARCOLOURSPACEREF_acesRGB    arcolourspace_ap0RGB(art_gv)
 
 //   shorthand for the previous variables
 
-#define ARCSR_CIEXYZ              ARCOLOURSPACEREF_CIEXYZ
-#define ARCSR_CIExyY              ARCOLOURSPACEREF_CIExyY
-#define ARCSR_CIELab              ARCOLOURSPACEREF_CIELab
-#define ARCSR_CIELuv              ARCOLOURSPACEREF_CIELuv
-#define ARCSR_sRGB                ARCOLOURSPACEREF_sRGB
-#define ARCSR_aRGB                ARCOLOURSPACEREF_aRGB
-#define ARCSR_wRGB                ARCOLOURSPACEREF_wRGB
-#define ARCSR_acesRGB             ARCOLOURSPACEREF_acesRGB
+#define ARCSR_CIEXYZ                ARCOLOURSPACEREF_CIEXYZ
+#define ARCSR_CIExyY                ARCOLOURSPACEREF_CIExyY
+#define ARCSR_CIELab                ARCOLOURSPACEREF_CIELab
+#define ARCSR_CIELuv                ARCOLOURSPACEREF_CIELuv
+#define ARCSR_sRGB                  ARCOLOURSPACEREF_sRGB
+#define ARCSR_aRGB                  ARCOLOURSPACEREF_aRGB
+#define ARCSR_wRGB                  ARCOLOURSPACEREF_wRGB
+#define ARCSR_acesRGB               ARCOLOURSPACEREF_acesRGB
+#define ARCSR_ap0RGB                ARCOLOURSPACEREF_ap0RGB
+#define ARCSR_ap1RGB                ARCOLOURSPACEREF_ap1RGB
 
 ArColourSpaceRef register_arcolourspace(
         ART_GV         * art_gv,

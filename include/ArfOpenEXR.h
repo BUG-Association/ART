@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2019 The ART Development Team
+    Copyright (c) 1996-2020 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -27,26 +27,42 @@
 #include "ART_Foundation.h"
 #include <OpenEXRSettings.h>
 
-// temporarily moved to the library file for ObjC/C++ crosslinking reasons
-//ART_MODULE_INTERFACE(ArfOpenEXR)
+ART_MODULE_INTERFACE(ArfOpenEXR)
 
 #ifdef ART_WITH_OPENEXR
+#define WRITE_RGB_VERSION
 
 #import "ArfRasterImage.h"
 
 #define ARFOPENEXR_EXTENSION     "exr"
 
-/// Member vars are in an opaque struct to hide C++ member vars
 
 @interface ArfOpenEXR
            : ArfRasterImage
 {
-    struct ArfOpenEXR_members  * member_vars;
+    BOOL                        _writtingMode;
+    ArnImageInfo              * _imageInfo;
+    IVec2D                      _size;
+    ArDataType                  _dataType;
+    int                         _spectralChannels;
+    BOOL                        _isSpectral;
+    BOOL                        _containsPolarisationData;
+    
+    float                      * _bufferRGBA;
+    float                      * _bufferGrey;
+
+    float                      * _bufferS0;
+    float                      * _bufferS1;
+    float                      * _bufferS2;
+    float                      * _bufferS3;
+
+    ArReferenceFrame             _referenceFrame;
+    
+    ArLightAlpha              ** _scanline; // More convenient to have a single allocation
 }
 
 @end
 
 
 #endif // ART_WITH_OPENEXR
-
 // ===========================================================================
