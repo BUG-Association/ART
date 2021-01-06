@@ -50,3 +50,12 @@ void art_gv_initialise(
 
 
 /* ======================================================================== */
+
+// [Sebastian TODO] remove this, when not needed anymore
+void art_gv_enable_embree(
+        ART_GV  * art_gv,
+        BOOL enabled
+        )
+{
+    art_gv->embree_enabed = enabled;
+}

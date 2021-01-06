@@ -28,6 +28,8 @@
 #import "_ArLight_GV.h"
 #import "FoundationAssertionMacros.h"
 
+// #import "ArnEmbreeUtils.h" // added by [Sebastian] for now. TODO delete when not needed anymore
+
 /* ===========================================================================
 
     'artist' comand line rendering tool
@@ -201,6 +203,16 @@ int artist(
             :   "normal shaded geometry preview"
             ] withDefaultIntegerValue: 1 ];
 
+    // [Sebastian] flag for enabling embree support
+    // this is convenient now for me, but I will
+    // engineer it back, once I get it to work
+    id embreeOpt =
+            [ FLAG_OPTION
+                    :   "embree"
+                    :   "e"
+                    :   "enable embree support"
+            ];
+
 // =============================   PHASE 2   =================================
 //
 //             Printing the banner, and parsing the command line.
@@ -243,6 +255,22 @@ int artist(
     
     if ( [ monoOpt hasBeenSpecified ] )
         art_set_hero_samples_to_splat( art_gv, 1 );
+
+    // [Sebastian] TODO remove this block, once embree parsing works
+    if ( [ embreeOpt hasBeenSpecified ]) {
+#if EMBREE_INSTALLED
+        art_gv_enable_embree(art_gv, true);
+#else
+        printf("error: embree support enabled without embree being installed...\n");
+        exit(0);
+#endif
+    }
+    else {
+        art_gv_enable_embree( art_gv, false );
+    }
+    printf("embree enabled: %s", art_gv->embree_enabed ? "true\n" : "false\n");
+    // END -- [Sebastian] TODO remove this block, once embree parsing works
+
 
 // =============================   PHASE 4   =================================
 //
@@ -294,8 +322,8 @@ int artist(
 //    Optional debug feature: uncomment the following line to see what artist
 //    has actually parsed. Useful if you suspect the parser is delivering
 //    defective information.
-
-//    arcobjccoder_write_file( art_gv, & contentOfMainFile, "artist_read_file.art" );
+// TODO uncomment when not needed anymore
+    arcobjccoder_write_file( art_gv, & contentOfMainFile, "artist_read_file.art" );
 
     artime_now( & parsingSubtaskFinished );
 

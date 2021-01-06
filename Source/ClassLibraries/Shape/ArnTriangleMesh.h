@@ -36,7 +36,7 @@ ART_MODULE_INTERFACE(ArnTriangleMesh)
         < ArpConcreteClass, ArpCoding, ArpExtremalPoints, ArpShape, ArpSetupNodeData >
 {
 @private
-    //   The indices of face vertices. Allways assuming groups of 3.
+    //   The indices of face vertices. Always assuming groups of 3.
 
     ArLongArray  faces;
 

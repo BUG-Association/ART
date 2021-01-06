@@ -149,7 +149,7 @@ static int face_cb(
         p_ply_argument  argument
         )
 {
-    // for some reason need to filter out the first value for face becouse
+    // for some reason need to filter out the first value for face because
     // that is just the length of the list. This we assume to be 3.
     
     long length, value_index;
@@ -173,7 +173,6 @@ static int face_cb(
 
     return 1;
 }
-
 
 //-------------------------------------------------------------------------------
 
@@ -199,6 +198,7 @@ ArNode * arntrianglemesh_from_ply(
     numberOfVertices = ply_set_read_cb(ply, "vertex", "x", vertex_cb, (void*)&vertexCbData, 0);
     numberOfVertices = ply_set_read_cb(ply, "vertex", "y", vertex_cb, (void*)&vertexCbData, 1);
     numberOfVertices = ply_set_read_cb(ply, "vertex", "z", vertex_cb, (void*)&vertexCbData, 2);
+
 
     //Declare the target data structures. Here we collect the data from the PLY file.
 
@@ -264,7 +264,7 @@ ArNode * arntrianglemesh_from_ply(
 
     ArLongArray  faces = arlongarray_init( numberOfFaces * 3 );
 
-    //Initial setup of the calback data data.
+    //Initial setup of the callback data data.
 
     vertexCbData.vertices = vertices;
     vertexCbData.normals = normals;
@@ -328,7 +328,6 @@ ArNode * arntrianglemesh_from_ply(
             :   HARD_NODE_REFERENCE(vertexSet)
             ];
 }
-
 
 #define GREY8_SOURCE_BUFFER(_x,_y,_s) \
     (((ArnGrey8Image*)sourceImageBuffer)->data[(_y)*XC(_s)+(_x)])

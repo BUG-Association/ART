@@ -1,0 +1,57 @@
+ARM_MAIN_FUNCTION(plyScene) {
+
+    id bunny  = PLY_MESH("ply_bunny.ply");
+
+    id scene_geometry = 
+        [ bunny
+            apply
+                : LAMBERT_EMITTER(ARNGREY_100, 1.0)
+                : USCALE(12.0)
+                : ROT_Z( 90 DEGREES )
+                : TRANSLATION(1, 0, 0)
+            ];
+
+    id camera = 
+        [ CAMERA 
+            imageSize:  IVEC2D(250, 250)
+            ray:        RAY3D( PNT3D( 0.0, 0.0, -5.0), VEC3D(0.0, 0.0, 1.0 ))
+            zoom:       1
+            ];
+
+    id actionsquence = 
+        ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+            
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ SIMPLE_PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+                        maximalRecursion: 8
+                        ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       20
+                randomValueGeneration: RANDOM_SEQUENCE
+                ],
+
+            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                removeSource : NO
+                ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource :   YES
+                bitsPerChannel : 8
+                ],
+            
+            ACTION_SEQUENCE_END 
+            );
+
+
+    return
+        [ SCENE
+            sceneGeometry:  scene_geometry
+            camera:         camera
+            actionSequence: actionsquence
+            ]; 
+}

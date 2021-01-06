@@ -125,6 +125,9 @@
 //   have canonical names: the type should be <module name>_GV, and the
 //   entry <module name in lowercase>_gv
 
+
+#include <objc/objc.h> // [Sebastian TODO] remove this, when not needed anymore
+
 typedef struct ART_GV
 {
     unsigned int                          moduleManagementVerbosity;
@@ -213,11 +216,20 @@ typedef struct ART_GV
     struct ARM_RayCasting_GV            * ar2m_raycasting_gv;
     struct ARM_ScenegraphActions_GV     * ar2m_scenegraphactions_gv;
     struct ApplicationSupport_GV        * application_support_gv;
+
+    // [Sebastian] added this helper bool for quick switching embree off/on
+    BOOL                                embree_enabed;
 }
 ART_GV;
 
 void art_gv_initialise(
         ART_GV  * art_gv
+        );
+
+// [Sebastian TODO] remove this, when not needed anymore
+void art_gv_enable_embree(
+        ART_GV  * art_gv,
+        BOOL enabled
         );
 
 #endif /* _ART_FOUNDATION_SYSTEM_GLOBAL_VARIABLES_H_ */

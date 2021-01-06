@@ -30,6 +30,9 @@
 
 #import "ArnTriangleMesh.h"
 
+
+#import "ArnEmbreeUtils.h" // TODO: remove later
+
 static const char * arfply_magic_string =
                     "ply";
 static const char * arfply_short_class_name =
@@ -118,11 +121,18 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
         : (ArList *) externals
 {
     ArNode  * newMesh;
+    const char * filename = [ file name ];
 
-    newMesh = arntrianglemesh_from_ply(art_gv, arshape_solid, [ file name ] );
+    // [Sebastian] TODO replace the condition with a macro later
+    if(art_gv->embree_enabed) {
+        ArnEmbreeUtils * embreeUtils = [[ArnEmbreeUtils alloc] init];
+        newMesh = [embreeUtils embreegeometry_from_ply: art_gv path: filename];
+    }
+    else
+        newMesh = arntrianglemesh_from_ply(art_gv, arshape_solid, filename );
 
-    if ( newMesh == NULL)
-        ART_ERRORHANDLING_FATAL_ERROR(
+    if ( newMesh == NULL )
+            ART_ERRORHANDLING_FATAL_ERROR(
             "error when reading PLY mesh '%s'"
             ,   [ file name ]
             );
