@@ -114,7 +114,8 @@ static ArnEmbree * embreeManager;
 
         // set up embree scene
         if(![embreeManager getDevice]) {
-            RTCScene newScene = rtcNewScene([embreeManager getDevice]);
+            RTCDevice device = [embreeManager getDevice];
+            RTCScene newScene = rtcNewScene(device);
             if(!newScene)
                 printf("error %d: cannot create embree scene on device\n", rtcGetDeviceError(NULL));
             rtcSetSceneFlags(newScene,RTC_SCENE_FLAG_NONE); // for now a bit pointless but change later
@@ -144,23 +145,19 @@ static ArnEmbree * embreeManager;
     [super dealloc];
 }
 
-- (void) setDevice: (RTCDevice *) newDevice {
+- (void) setDevice: (RTCDevice) newDevice {
     device = newDevice;
 }
 
-- (void) setScene: (RTCScene *) newScene {
+- (void) setScene: (RTCScene) newScene {
     scene = newScene;
 }
 
-- (void) setGeometryListHead: (ArEmbreeGeometryNode *) geometry {
-    // geometry_list_head = geometry;
-}
-
 - (void) addGeometry: (RTCGeometry *) newGeometry {
+    /*
     ArEmbreeGeometryNode * geometryNode = (ArEmbreeGeometryNode *)malloc(sizeof(ArEmbreeGeometryNode));
     geometryNode->geom = newGeometry;
     geometryNode->next = NULL;
-    /*
     if(!geometry_list_head) {
         [self setGeometryListHead:geometryNode];
         return;
@@ -212,10 +209,10 @@ static ArnEmbree * embreeManager;
     state = newState;
 }
 
-- (RTCDevice *) getDevice {
+- (RTCDevice) getDevice {
     return device;
 }
-- (RTCScene *) getScene {
+- (RTCScene) getScene {
     return scene;
 }
 - (Embree_state) getState {
@@ -226,11 +223,12 @@ static ArnEmbree * embreeManager;
     // return geometry_list_head;
 }
 
+/*
 - (ArNode *) embreegeometry_from_ply:
         (ART_GV *) art_gv
                                 path: (const char *) pathToPlyFile
 {
-    /*
+
     // Check if embree obj is allocated
     if (!art_gv->embree_enabed) {
         printf("error: somehow got into 'embreegeometry_from_ply()' without embree being enabled\n");
@@ -329,13 +327,19 @@ static ArnEmbree * embreeManager;
     // return an ArNode that acts like a flag to let the renderer know that
     return
             [ ALLOC_INIT_OBJECT(ArEmbreeSceneGraphNode) ];
-    */
-
 }
+ */
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str {
     printf("error %d: %s\n", error, str);
 }
 
+- (void) addGeometryToScene: (RTCGeometry *) geom addScene:(RTCScene *) scene {
+    
+}
+
+- (void) cleanUpEmbree {
+
+}
 
 @end

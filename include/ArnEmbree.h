@@ -30,25 +30,6 @@
 
 ART_MODULE_INTERFACE(ArnEmbree)
 
-#import "ART_Scenegraph.h"
-
-// placeholder class that serves as falg
-@interface ArEmbreeSceneGraphNode
-        : ArNode
-        < ArpEmbree >
-{
-}
-
-- init;
-
-@end
-
-// array of embree geometries
-typedef struct ArEmbreeGeometryNode {
-    RTCGeometry geom;
-    struct ArEmbreeGeometryNode * next;
-} ArEmbreeGeometryNode;
-
 typedef enum Embree_state {
     Embree_Initialized,
     Scene_Initialized,
@@ -57,8 +38,8 @@ typedef enum Embree_state {
 } Embree_state;
 
 @interface ArnEmbree : ArcObject {
-    RTCDevice * device;
-    RTCScene * scene;
+    RTCDevice device;
+    RTCScene scene;
     // ArEmbreeGeometryNode * geometry_list_head; // linked list of multiple embree geometries
     Embree_state state;
 }
@@ -66,26 +47,20 @@ typedef enum Embree_state {
 + (ArnEmbree *) embreeManager;
 + (void) deallocate;
 
-- (void) setDevice: (RTCDevice *) newDevice;
-- (void) setScene: (RTCScene *) newScenee;
-- (void) setGeometryListHead: (ArEmbreeGeometryNode *) geometry;
+- (void) setDevice: (RTCDevice) newDevice;
+- (void) setScene: (RTCScene) newScene;
 - (void) addGeometry: (RTCGeometry *) newGeometry;
 - (void) commitScene;
 - (void) setState: (Embree_state) newState;
 
-+ (RTCDevice *) getDevice;
-+ (RTCScene *) getScene;
-- (ArEmbreeGeometryNode *) getGeometryListHead;
+- (RTCDevice) getDevice;
+- (RTCScene) getScene;
 // - (RTCGeometry *) getGeometry;
 - (Embree_state) getState;
 
-- (ArNode *) embreegeometry_from_ply:
-        (ART_GV *) art_gv
-                              embree: (ArnEmbree *) embreeUtils
-                                path: (const char *) pathToPlyFile
 ;
 
-- (void) addGeometryToScene: (RTCGeometry *) geom andScene:(RTCScene *) scene;
+- (void) addGeometryToScene: (RTCGeometry *) geom addScene:(RTCScene *) scene;
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str;
 - (void) cleanUpEmbree;
