@@ -28,7 +28,7 @@
 #include "ArpEmbree.h"
 #include <embree3/rtcore.h>
 
-ART_MODULE_INTERFACE(ArnEmbreeUtils)
+ART_MODULE_INTERFACE(ArnEmbree)
 
 #import "ART_Scenegraph.h"
 
@@ -56,14 +56,15 @@ typedef enum Embree_state {
     Embree_Released
 } Embree_state;
 
-@interface ArnEmbreeUtils : ArcObject {
+@interface ArnEmbree : ArcObject {
     RTCDevice * device;
     RTCScene * scene;
-    ArEmbreeGeometryNode * geometry_list_head; // linked list of multiple embree geometries
+    // ArEmbreeGeometryNode * geometry_list_head; // linked list of multiple embree geometries
     Embree_state state;
 }
 
-- (id) init;
++ (ArnEmbree *) embreeManager;
++ (void) deallocate;
 
 - (void) setDevice: (RTCDevice *) newDevice;
 - (void) setScene: (RTCScene *) newScenee;
@@ -72,16 +73,16 @@ typedef enum Embree_state {
 - (void) commitScene;
 - (void) setState: (Embree_state) newState;
 
-- (RTCDevice *) getDevice;
-- (RTCScene *) getScene;
++ (RTCDevice *) getDevice;
++ (RTCScene *) getScene;
 - (ArEmbreeGeometryNode *) getGeometryListHead;
 // - (RTCGeometry *) getGeometry;
 - (Embree_state) getState;
 
 - (ArNode *) embreegeometry_from_ply:
         (ART_GV *) art_gv
-         embree: (ArnEmbreeUtils *) embreeUtils
-        path: (const char *) pathToPlyFile
+                              embree: (ArnEmbree *) embreeUtils
+                                path: (const char *) pathToPlyFile
 ;
 
 - (void) addGeometryToScene: (RTCGeometry *) geom andScene:(RTCScene *) scene;

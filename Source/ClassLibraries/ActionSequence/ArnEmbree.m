@@ -24,10 +24,13 @@
 
 =========================================================================== */
 
-#define ART_MODULE_NAME     ArnEmbreeUtils
+#define ART_MODULE_NAME     ArnEmbree
 
 #import <rply.h>
-#import "ArnEmbreeUtils.h"
+#import "ArnEmbree.h"
+
+ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
+ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 /*
     This is the callback structure for the embree geometry entity.
@@ -38,16 +41,9 @@ typedef struct ArEmbreeGeometryCbData
     float        * vertices;
     unsigned     * indices;
 }
-ArEmbreeGeometryCbData;
+        ArEmbreeGeometryCbData;
 
 
-@implementation ArEmbreeSceneGraphNode
-- init
-{
-    self = [super init];
-    return self;
-}
-@end
 
 // EMBREE STUFF
 #if EMBREE_INSTALLED
@@ -88,90 +84,64 @@ static int face_cb_embree(
 
     return 1;
 }
-/*
- * Cast a single ray with origin (ox, oy, oz) and direction
- * (dx, dy, dz).
- */
-void castRay(RTCScene scene,
-             float ox, float oy, float oz,
-             float dx, float dy, float dz)
-{
-    /*
-     * The intersect context can be used to set intersection
-     * filters or flags, and it also contains the instance ID stack
-     * used in multi-level instancing.
-     */
-    struct RTCIntersectContext context;
-    rtcInitIntersectContext(&context);
 
-    /*
-     * The ray hit structure holds both the ray and the hit.
-     * The user must initialize it properly -- see API documentation
-     * for rtcIntersect1() for details.
-     */
-    struct RTCRayHit rayhit;
-    rayhit.ray.org_x = ox;
-    rayhit.ray.org_y = oy;
-    rayhit.ray.org_z = oz;
-    rayhit.ray.dir_x = dx;
-    rayhit.ray.dir_y = dy;
-    rayhit.ray.dir_z = dz;
-    rayhit.ray.tnear = 0;
-    rayhit.ray.tfar = 100000000; // infinity
-    rayhit.ray.mask = -1;
-    rayhit.ray.flags = 0;
-    rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
-    rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
-
-    /*
-     * There are multiple variants of rtcIntersect. This one
-     * intersects a single ray with the scene.
-     */
-    rtcIntersect1(scene, &context, &rayhit);
-
-    printf("%f, %f, %f: ", ox, oy, oz);
-    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID)
-    {
-        /* Note how geomID and primID identify the geometry we just hit.
-         * We could use them here to interpolate geometry information,
-         * compute shading, etc.
-         * Since there is only a single triangle in this scene, we will
-         * get geomID=0 / primID=0 for all hits.
-         * There is also instID, used for instancing. See
-         * the instancing tutorials for more information */
-        printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
-               rayhit.hit.geomID,
-               rayhit.hit.primID,
-               rayhit.ray.tfar);
-    }
-    else
-        printf("Did not find any intersection.\n");
-}
 #endif // EMBREE_INSTALLED
 
-@implementation ArnEmbreeUtils
+@implementation ArnEmbree
 
-- (id) init
-{
-    // ArnEmbreeUtils * embreeUtils = [[ArnEmbreeUtils alloc] init ];
-    self = [super init];
+static BOOL EMBREE_ENABLED;
 
-    // initialize embree device
-    RTCDevice newDevice = rtcNewDevice(NULL);
-    if(!newDevice)
-        printf("error %d: cannot create embree device\n", rtcGetDeviceError(NULL));
-    // rtcSetDeviceErrorFunction(device, errorFunction, NULL); // TODO figure out why this is needed
-    [self setDevice: newDevice];
+static ArnEmbree * embreeManager;
 
-    // initialize embree scene
-    RTCScene newScene = rtcNewScene(newDevice);
-    if(!newScene)
-        printf("error %d: cannot create embree scene on device\n", rtcGetDeviceError(NULL));
-    rtcSetSceneFlags(newScene,RTC_SCENE_FLAG_NONE); // for now a bit pointless but change later
-    rtcSetSceneBuildQuality(newScene,RTC_BUILD_QUALITY_LOW); // for now using lowest build quality
-    [self setScene: newScene];
+// initialize singleton ArnEmbree object
++ (void) initialize {
+    if(!EMBREE_ENABLED)
+        return;
 
-    return self;
+    static BOOL isInitialized = NO;
+    if(!isInitialized) {
+        // create singleton object
+        embreeManager = [[ArnEmbree alloc] init];
+
+        // set up embree device
+        if(![embreeManager getDevice]) {
+            RTCDevice newDevice = rtcNewDevice(NULL);
+            if(!newDevice)
+                printf("error %d: cannot create embree device\n", rtcGetDeviceError(NULL));
+            // rtcSetDeviceErrorFunction(device, errorFunction, NULL); // TODO figure out why this is needed
+            [embreeManager setDevice: newDevice];
+        }
+
+        // set up embree scene
+        if(![embreeManager getDevice]) {
+            RTCScene newScene = rtcNewScene([embreeManager getDevice]);
+            if(!newScene)
+                printf("error %d: cannot create embree scene on device\n", rtcGetDeviceError(NULL));
+            rtcSetSceneFlags(newScene,RTC_SCENE_FLAG_NONE); // for now a bit pointless but change later
+            rtcSetSceneBuildQuality(newScene,RTC_BUILD_QUALITY_LOW); // for now using lowest build quality
+            [embreeManager setScene: newScene];
+        }
+
+        isInitialized = YES;
+        EMBREE_ENABLED = YES;
+    }
+}
+
++ (void) enableEmbree: (BOOL) enabled {
+    EMBREE_ENABLED = enabled;
+}
+
++ (BOOL) embreeEnabled {
+    return EMBREE_ENABLED;
+}
+
++ (ArnEmbree *) embreeManager {
+    return embreeManager;
+}
+
++ (void) deallocate {
+    [ArnEmbree release];
+    [super dealloc];
 }
 
 - (void) setDevice: (RTCDevice *) newDevice {
@@ -183,13 +153,14 @@ void castRay(RTCScene scene,
 }
 
 - (void) setGeometryListHead: (ArEmbreeGeometryNode *) geometry {
-    geometry_list_head = geometry;
+    // geometry_list_head = geometry;
 }
 
 - (void) addGeometry: (RTCGeometry *) newGeometry {
     ArEmbreeGeometryNode * geometryNode = (ArEmbreeGeometryNode *)malloc(sizeof(ArEmbreeGeometryNode));
     geometryNode->geom = newGeometry;
     geometryNode->next = NULL;
+    /*
     if(!geometry_list_head) {
         [self setGeometryListHead:geometryNode];
         return;
@@ -198,9 +169,11 @@ void castRay(RTCScene scene,
     while(temporaryNode->next != NULL)
         temporaryNode = temporaryNode->next;
     temporaryNode->next = geometryNode;
+     */
 }
 
 - (void) commitScene {
+    /*
     // commit all embree geometries
     if(geometry_list_head) {
         ArEmbreeGeometryNode * temporaryNode = [self getGeometryListHead];
@@ -232,6 +205,7 @@ void castRay(RTCScene scene,
     rtcCommitScene(scene);
     rtcSetSceneFlags(scene, RTC_SCENE_FLAG_NONE); // TODO change later
     [self setState: Scene_Commited];
+     */
 }
 
 - (void) setState: (Embree_state) newState {
@@ -249,13 +223,14 @@ void castRay(RTCScene scene,
 }
 
 - (RTCGeometry *) getGeometryListHead {
-    return geometry_list_head;
+    // return geometry_list_head;
 }
 
 - (ArNode *) embreegeometry_from_ply:
         (ART_GV *) art_gv
-          path: (const char *) pathToPlyFile
+                                path: (const char *) pathToPlyFile
 {
+    /*
     // Check if embree obj is allocated
     if (!art_gv->embree_enabed) {
         printf("error: somehow got into 'embreegeometry_from_ply()' without embree being enabled\n");
@@ -354,6 +329,7 @@ void castRay(RTCScene scene,
     // return an ArNode that acts like a flag to let the renderer know that
     return
             [ ALLOC_INIT_OBJECT(ArEmbreeSceneGraphNode) ];
+    */
 
 }
 

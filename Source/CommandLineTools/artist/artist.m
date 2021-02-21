@@ -28,7 +28,7 @@
 #import "_ArLight_GV.h"
 #import "FoundationAssertionMacros.h"
 
-// #import "ArnEmbreeUtils.h" // added by [Sebastian] for now. TODO delete when not needed anymore
+// #import "ArnEmbree.h" // added by [Sebastian] for now. TODO delete when not needed anymore
 
 /* ===========================================================================
 
@@ -259,16 +259,16 @@ int artist(
     // [Sebastian] TODO remove this block, once embree parsing works
     if ( [ embreeOpt hasBeenSpecified ]) {
 #if EMBREE_INSTALLED
-        art_gv_enable_embree(art_gv, true);
+        [ArnEmbree initialize];
 #else
         printf("error: embree support enabled without embree being installed...\n");
         exit(0);
 #endif
     }
     else {
-        art_gv_enable_embree( art_gv, false );
+        [ArnEmbree enableEmbree: false];
     }
-    printf("embree enabled: %s", art_gv->embree_enabed ? "true\n" : "false\n");
+    printf("embree enabled: %s", [ArnEmbree embreeEnabled]? "true\n" : "false\n");
     // END -- [Sebastian] TODO remove this block, once embree parsing works
 
 
