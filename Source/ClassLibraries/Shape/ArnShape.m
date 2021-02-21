@@ -37,6 +37,20 @@ ART_MODULE_INITIALISATION_FUNCTION
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
+/* ===========================================================================
+    C callback functions for the convertion to an embree geometry
+=========================================================================== */
+void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
+    // TODO
+}
+
+void embree_intersect(const struct RTCBoundsFunctionArguments* args) {
+    // TODO
+}
+
+void embree_occluded(const struct RTCBoundsFunctionArguments* args) {
+    // TODO
+}
 
 /* ===========================================================================
     'ArnShape'
@@ -265,6 +279,22 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         : (ArMappingCriteria) criteria
 {
     return 0;
+}
+
+- (RTCGeometry) convertShapeToEmbreeGeometry {
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+
+    assert([embree getDevice] && [embree getScene]);
+
+    RTCGeometry geom = rtcNewGeometry([embree getDevice], RTC_GEOMETRY_TYPE_USER);
+    rtcSetGeometryUserPrimitiveCount(geom, 1);
+    rtcSetGeometryUserData(geom, (void *) self);
+    rtcSetGeometryBoundsFunction(geom, embree_bbox, NULL);
+    rtcSetGeometryIntersectFunction(geom, embree_intersect);
+    rtcSetGeometryOccludedFunction(geom, embree_occluded);
+    rtcCommitGeometry(geom);
+
+    return geom;
 }
 
 @end

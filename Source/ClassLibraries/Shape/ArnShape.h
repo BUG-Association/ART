@@ -72,6 +72,8 @@ ART_MODULE_INTERFACE(ArnShape)
         : (double) newParameter
         ;
 
+- (RTCGeometry) convertShapeToEmbreeGeometry;
+
 @end
 
 // ===========================================================================

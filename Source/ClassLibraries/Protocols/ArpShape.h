@@ -27,6 +27,7 @@
 #ifndef _ARPSHAPE_H_
 #define _ARPSHAPE_H_
 
+#import <ArnEmbree.h>
 #include "ART_Foundation.h"
 
 ART_MODULE_INTERFACE(ArpShape)
@@ -94,6 +95,9 @@ ArShapeGeometry;
 
 - (ArNode <ArpMapping> *) createMappingFor
         : (ArMappingCriteria) criteria
+        ;
+
+- (RTCGeometry) convertShapeToEmbreeGeometry
         ;
 
 @end

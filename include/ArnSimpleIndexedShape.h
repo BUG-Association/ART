@@ -44,6 +44,8 @@ ART_MODULE_INTERFACE(ArnSimpleIndexedShape)
         : (ArLongArray) newIndexTable
         ;
 
+- (RTCGeometry) convertShapeToEmbreeGeometry;
+
 @end
 
 // ===========================================================================

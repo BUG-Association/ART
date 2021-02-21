@@ -179,6 +179,22 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             ];
 }
 
+- (RTCGeometry) convertShapeToEmbreeGeometry {
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+
+    assert([embree getDevice] && [embree getScene]);
+
+    RTCGeometry geom = rtcNewGeometry([embree getDevice], RTC_GEOMETRY_TYPE_USER);
+    rtcSetGeometryUserPrimitiveCount(geom, 1);
+    rtcSetGeometryUserData(geom, (void *) self);
+    // rtcSetGeometryBoundsFunction(geom, embree_bbox, NULL);
+    // rtcSetGeometryIntersectFunction(geom, embree_intersect);
+    // rtcSetGeometryOccludedFunction(geom, embree_occluded);
+    rtcCommitGeometry(geom);
+
+    return geom;
+}
+
 @end
 
 // ===========================================================================

@@ -33,6 +33,8 @@
 #import <string.h>
 #import <objc/Protocol.h>
 
+#import <ArnEmbree.h> // [Sebastian] TODO: delete when not needed anymore
+
 #import "ArcObjCCoder.h"
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
@@ -41,7 +43,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 
 //#define WRITING_DEBUG_PRINTF
-//#define OBJC_READING_CODER_DEBUGPRINTF
+#define OBJC_READING_CODER_DEBUGPRINTF
 
 
 #define ARCOBJCCODER_FIXED_PREFIX               " :"
@@ -1566,6 +1568,16 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
                 init_ART_GV
                 :   art_gv
                 ];
+
+        // [Sebastian] TODO
+        if([ node conformsToProtocol: ARPROTOCOL(ArpShape)] && [ArnEmbree embreeEnabled]) {
+            printf(
+                    "\n!!!This node is of protocol ArpShape and its name is %s!!!\n"
+                    ,   className
+            );
+            ArnEmbree * embree = [ArnEmbree embreeManager];
+            [embree addGeometry: [ node convertShapeToEmbreeGeometry ]];
+        }
 
 #ifdef OBJC_READING_CODER_DEBUGPRINTF
         printf(

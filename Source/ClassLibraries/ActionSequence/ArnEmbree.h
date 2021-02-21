@@ -47,9 +47,12 @@ typedef enum Embree_state {
 + (ArnEmbree *) embreeManager;
 + (void) deallocate;
 
++ (BOOL) embreeEnabled;
++ (void) enableEmbree: (BOOL) enabled;
+
 - (void) setDevice: (RTCDevice) newDevice;
 - (void) setScene: (RTCScene) newScene;
-- (void) addGeometry: (RTCGeometry *) newGeometry;
+- (void) addGeometry: (RTCGeometry) newGeometry;
 - (void) commitScene;
 - (void) setState: (Embree_state) newState;
 

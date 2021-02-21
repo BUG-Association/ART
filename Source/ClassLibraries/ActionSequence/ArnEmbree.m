@@ -153,7 +153,7 @@ static ArnEmbree * embreeManager;
     scene = newScene;
 }
 
-- (void) addGeometry: (RTCGeometry *) newGeometry {
+- (void) addGeometry: (RTCGeometry) newGeometry {
     /*
     ArEmbreeGeometryNode * geometryNode = (ArEmbreeGeometryNode *)malloc(sizeof(ArEmbreeGeometryNode));
     geometryNode->geom = newGeometry;
@@ -334,12 +334,27 @@ static ArnEmbree * embreeManager;
     printf("error %d: %s\n", error, str);
 }
 
-- (void) addGeometryToScene: (RTCGeometry *) geom addScene:(RTCScene *) scene {
-    
+- (void) addGeometryToEmbree: (RTCGeometry *) geometry {
+    if(!device) {
+        printf("attemting to add geometry to embree but no device initialized...\n");
+        return;
+    }
+
+    if(!scene) {
+        printf("attemting to add geometry to embree but no scene initialized...\n");
+        return;
+    }
+
+    if(geometry) {
+        rtcCommitGeometry(geometry);
+        rtcAttachGeometry(scene, geometry);
+        rtcReleaseGeometry(geometry);
+    }
 }
 
 - (void) cleanUpEmbree {
-
+    rtcReleaseScene(scene);
+    rtcReleaseDevice(device);
 }
 
 @end
