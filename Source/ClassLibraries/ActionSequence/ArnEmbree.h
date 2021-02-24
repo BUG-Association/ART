@@ -37,11 +37,17 @@ typedef enum Embree_state {
     Embree_Released
 } Embree_state;
 
+typedef struct Embree_Geometry {
+    unsigned int geomID;
+    Box3D * boundingBox;
+};
+
 @interface ArnEmbree : ArcObject {
     RTCDevice device;
     RTCScene scene;
     // ArEmbreeGeometryNode * geometry_list_head; // linked list of multiple embree geometries
     Embree_state state;
+    NSMutableArray * sceneGeometry;
 }
 
 + (ArnEmbree *) embreeManager;
@@ -52,18 +58,17 @@ typedef enum Embree_state {
 
 - (void) setDevice: (RTCDevice) newDevice;
 - (void) setScene: (RTCScene) newScene;
-- (void) addGeometry: (RTCGeometry) newGeometry;
+- (void) addGeometry: (RTCGeometry) newGeometry : (char *) className;
 - (void) commitScene;
 - (void) setState: (Embree_state) newState;
+
+- (void) initSceneGeomArray;
 
 - (RTCDevice) getDevice;
 - (RTCScene) getScene;
 // - (RTCGeometry *) getGeometry;
 - (Embree_state) getState;
 
-;
-
-- (void) addGeometryToScene: (RTCGeometry *) geom addScene:(RTCScene *) scene;
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str;
 - (void) cleanUpEmbree;

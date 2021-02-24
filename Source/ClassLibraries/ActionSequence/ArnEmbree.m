@@ -113,7 +113,7 @@ static ArnEmbree * embreeManager;
         }
 
         // set up embree scene
-        if(![embreeManager getDevice]) {
+        if(![embreeManager getScene]) {
             RTCDevice device = [embreeManager getDevice];
             RTCScene newScene = rtcNewScene(device);
             if(!newScene)
@@ -122,6 +122,9 @@ static ArnEmbree * embreeManager;
             rtcSetSceneBuildQuality(newScene,RTC_BUILD_QUALITY_LOW); // for now using lowest build quality
             [embreeManager setScene: newScene];
         }
+
+        // init scene geometry id array
+        [embreeManager initSceneGeomArray];
 
         isInitialized = YES;
         EMBREE_ENABLED = YES;
@@ -153,56 +156,31 @@ static ArnEmbree * embreeManager;
     scene = newScene;
 }
 
-- (void) addGeometry: (RTCGeometry) newGeometry {
-    /*
-    ArEmbreeGeometryNode * geometryNode = (ArEmbreeGeometryNode *)malloc(sizeof(ArEmbreeGeometryNode));
-    geometryNode->geom = newGeometry;
-    geometryNode->next = NULL;
-    if(!geometry_list_head) {
-        [self setGeometryListHead:geometryNode];
-        return;
-    }
-    ArEmbreeGeometryNode * temporaryNode = [self getGeometryListHead];
-    while(temporaryNode->next != NULL)
-        temporaryNode = temporaryNode->next;
-    temporaryNode->next = geometryNode;
-     */
+- (void) initSceneGeomArray {
+    sceneGeometry = [[NSMutableArray alloc] init];
+}
+
+#define EMBREE_DEBUG_PRINTF
+
+- (void) addGeometry: (RTCGeometry) newGeometry : (char *) className {
+#ifdef EMBREE_DEBUG_PRINTF
+    printf(
+            "\nObjC coder read: adding instance of class %s to embree\n"
+            ,   className
+            );
+#endif
+    rtcCommitGeometry(newGeometry);
+    unsigned int geomID = rtcAttachGeometry(scene, newGeometry);
+    NSNumber * nsGeomID = [NSNumber numberWithInt: geomID];
+    [sceneGeometry insertObject: nsGeomID atIndex: geomID];
+    rtcReleaseGeometry(newGeometry);
 }
 
 - (void) commitScene {
-    /*
-    // commit all embree geometries
-    if(geometry_list_head) {
-        ArEmbreeGeometryNode * temporaryNode = [self getGeometryListHead];
-
-        // commit geometry of list head
-        RTCGeometry thisGeom = temporaryNode->geom;
-        rtcCommitGeometry(thisGeom);
-        rtcAttachGeometry(scene, thisGeom);
-        rtcReleaseGeometry(thisGeom);
-
-        // commit geometry of following list nodes
-        if(!temporaryNode->next) {
-            free(temporaryNode);
-        }
-        else {
-            ArEmbreeGeometryNode * prevTemporaryNode;
-            while(temporaryNode->next != NULL) {
-                prevTemporaryNode = temporaryNode;
-                temporaryNode = temporaryNode->next;
-                thisGeom = temporaryNode->geom;
-                rtcCommitGeometry(thisGeom);
-                rtcAttachGeometry(scene, thisGeom);
-                rtcReleaseGeometry(thisGeom);
-                free(prevTemporaryNode);
-            }
-        }
-    }
     // commit scene
     rtcCommitScene(scene);
     rtcSetSceneFlags(scene, RTC_SCENE_FLAG_NONE); // TODO change later
     [self setState: Scene_Commited];
-     */
 }
 
 - (void) setState: (Embree_state) newState {
@@ -332,24 +310,6 @@ static ArnEmbree * embreeManager;
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str {
     printf("error %d: %s\n", error, str);
-}
-
-- (void) addGeometryToEmbree: (RTCGeometry *) geometry {
-    if(!device) {
-        printf("attemting to add geometry to embree but no device initialized...\n");
-        return;
-    }
-
-    if(!scene) {
-        printf("attemting to add geometry to embree but no scene initialized...\n");
-        return;
-    }
-
-    if(geometry) {
-        rtcCommitGeometry(geometry);
-        rtcAttachGeometry(scene, geometry);
-        rtcReleaseGeometry(geometry);
-    }
 }
 
 - (void) cleanUpEmbree {

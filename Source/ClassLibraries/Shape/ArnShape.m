@@ -155,6 +155,13 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
 {
     if (outBBox)
         [self getBBoxObjectspace : traversal :outBBox];
+
+    if([ArnEmbree embreeEnabled]) {
+        Box3D * worldBB;
+        [self getBBoxWorldspace: traversal :worldBB];
+
+        Box3D * test = worldBB;
+    }
 }
 
 #define ACTIVE_TRAFO        (ArNode <ArpTrafo3D> *)ARNTRAVERSAL_TRAFO(traversal)
@@ -290,9 +297,9 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     rtcSetGeometryUserPrimitiveCount(geom, 1);
     rtcSetGeometryUserData(geom, (void *) self);
     rtcSetGeometryBoundsFunction(geom, embree_bbox, NULL);
-    rtcSetGeometryIntersectFunction(geom, embree_intersect);
-    rtcSetGeometryOccludedFunction(geom, embree_occluded);
-    rtcCommitGeometry(geom);
+    // rtcSetGeometryIntersectFunction(geom, embree_intersect);
+    // rtcSetGeometryOccludedFunction(geom, embree_occluded);
+    // rtcCommitGeometry(geom);
 
     return geom;
 }

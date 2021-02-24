@@ -43,7 +43,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 
 //#define WRITING_DEBUG_PRINTF
-#define OBJC_READING_CODER_DEBUGPRINTF
+//#define OBJC_READING_CODER_DEBUGPRINTF
 
 
 #define ARCOBJCCODER_FIXED_PREFIX               " :"
@@ -1428,6 +1428,13 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
         : (ArNode **) objectPtr
         : (ArList *) externalList
 {
+    // init ArnEmbree singleton
+    ArnEmbree * embree;
+    if([ArnEmbree embreeEnabled])
+        embree = [ArnEmbree embreeManager];
+    else
+        embree = NULL;
+
     [ stream scans
         :   ARCOBJCCODER_CODING_STRING
         ];
@@ -1534,9 +1541,17 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
                 );
 #endif
 
+            // check if this singleton is a shape, and if so, add it to embree
+            id singleton_of_name = arsingleton_of_name(art_gv, arsymbol(art_gv, masterName) );
+            if([ singleton_of_name conformsToProtocol: ARPROTOCOL(ArpShape)] && [ArnEmbree embreeEnabled]) {
+                RTCGeometry geometry = [ singleton_of_name convertShapeToEmbreeGeometry ];
+                [embree addGeometry: geometry
+                        : masterName];
+            }
+
             arnoderefdynarray_push(
                 & nodeArray,
-                  HARD_NODE_REFERENCE(arsingleton_of_name(art_gv, arsymbol(art_gv, masterName) ))
+                  HARD_NODE_REFERENCE(singleton_of_name)
                   );
 
             continue;
@@ -1575,8 +1590,9 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
                     "\n!!!This node is of protocol ArpShape and its name is %s!!!\n"
                     ,   className
             );
-            ArnEmbree * embree = [ArnEmbree embreeManager];
-            [embree addGeometry: [ node convertShapeToEmbreeGeometry ]];
+            RTCGeometry geometry = [ node convertShapeToEmbreeGeometry ];
+            [embree addGeometry: geometry
+                               : className];
         }
 
 #ifdef OBJC_READING_CODER_DEBUGPRINTF
