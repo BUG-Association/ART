@@ -41,6 +41,8 @@ ART_MODULE_INTERFACE(ArnShape)
                   ArpInsertAndRemoveBBoxes,
           ArpAttributeConcatenation, ArpCoding, ArpHull, ArpShape >
 {
+@private
+    Box3D * worldBox;
 @public
     ArShapeGeometry  shapeGeometry;
 }

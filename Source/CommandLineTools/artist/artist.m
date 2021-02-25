@@ -324,7 +324,7 @@ int artist(
 //    has actually parsed. Useful if you suspect the parser is delivering
 //    defective information.
 // TODO uncomment when not needed anymore
-    arcobjccoder_write_file( art_gv, & contentOfMainFile, "artist_read_file.art" );
+    // arcobjccoder_write_file( art_gv, & contentOfMainFile, "artist_read_file.art" );
 
     artime_now( & parsingSubtaskFinished );
 

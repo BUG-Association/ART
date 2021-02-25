@@ -36,6 +36,8 @@ ART_MODULE_INTERFACE(ArnSimpleIndexedShape)
         < ArpCoding, ArpActivateAndGetBBoxes, ArpAttributeConcatenation,
           ArpInsertAndRemoveBBoxes >
 {
+@private
+    Box3D * worldBox;
 @public
     ArLongArray indexTable;
 }
@@ -44,7 +46,11 @@ ART_MODULE_INTERFACE(ArnSimpleIndexedShape)
         : (ArLongArray) newIndexTable
         ;
 
-- (RTCGeometry) convertShapeToEmbreeGeometry;
+- (RTCGeometry) convertShapeToEmbreeGeometry
+        ;
+
+- (Box3D *) getWorldSpaceBBox
+        ;
 
 @end
 

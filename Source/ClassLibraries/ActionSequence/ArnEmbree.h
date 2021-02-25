@@ -37,10 +37,6 @@ typedef enum Embree_state {
     Embree_Released
 } Embree_state;
 
-typedef struct Embree_Geometry {
-    unsigned int geomID;
-    Box3D * boundingBox;
-};
 
 @interface ArnEmbree : ArcObject {
     RTCDevice device;

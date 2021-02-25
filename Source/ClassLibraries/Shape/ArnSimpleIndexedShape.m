@@ -220,6 +220,14 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             ];
 }
 
+- (void) setWorldBBox : (Box3D) box {
+    worldBox = &box;
+}
+
+- (Box3D *) getWorldBBox {
+    return worldBox;
+}
+
 void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* args) {
     if(!args->geometryUserPtr)
         return;

@@ -189,6 +189,11 @@ ARPBBOXES_ARABBOX_INSERT_IMPLEMENTATION
         : (Box3D *) outBBoxWorldspace
         ;
 
+
+// test
+- (void) setWorldBBox : (Box3D) box;
+- (Box3D *) getWorldBBox;
+
 @end
 
 #define ARPBBOX_DEFAULT_GET_IMPLEMENTATION \

@@ -2260,6 +2260,9 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
         : (ArnGraphTraversal *) traversal
         : (Box3D *) outBBox
 {
+    // should both be null
+    Box3D worldBox = *outBBox;
+
     ArNodeRef  trafo_store = ARNGT_TRAFO_REF(traversal);
 
     ARNGT_TRAFO_REF(traversal) = ARNODEREF_NONE;
@@ -2293,6 +2296,18 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
             :   traversal
             :   outBBox
             ];
+
+        // TODO check if this works
+        if([ArnEmbree embreeEnabled]) {
+            [ ARNUNARY_SUBNODE getBBoxWorldspace
+                    :   traversal
+                    :   &worldBox
+            ];
+            [ ARNUNARY_SUBNODE setWorldBBox: worldBox];
+            ArnEmbree * embree = [ArnEmbree embreeManager];
+            [embree commitScene];
+
+        }
 
         if ( COMBINED_VERTICES_ATTRIBUTE )
             [ traversal popVertices
