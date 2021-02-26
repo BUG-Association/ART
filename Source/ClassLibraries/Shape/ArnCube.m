@@ -210,6 +210,10 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         art_gv->arncube_gv->mapping_singleton;
 }
 
+- (RTCGeometry) convertShapeToRTCGeometryAndAddToEmbree {
+    return [super  convertShapeToRTCGeometryAndAddToEmbree];
+}
+
 @end
 
 //   This #import #defines the IN_3D_..., OUT_3D_..., etc. macros used

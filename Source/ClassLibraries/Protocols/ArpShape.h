@@ -97,7 +97,7 @@ ArShapeGeometry;
         : (ArMappingCriteria) criteria
         ;
 
-- (RTCGeometry) convertShapeToEmbreeGeometry
+- (RTCGeometry) convertShapeToRTCGeometryAndAddToEmbree
         ;
 
 @end

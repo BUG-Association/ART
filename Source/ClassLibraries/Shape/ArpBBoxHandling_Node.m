@@ -159,6 +159,12 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     //   bbox collection only happen for specialised nodes.
 }
 
+// geting rid of some warnings
+- (void) setWorldBBox : (Box3D) box {
+}
+- (Box3D *) getWorldSpaceBBox {
+}
+
 @end
 
 /* ===========================================================================

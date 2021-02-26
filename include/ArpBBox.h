@@ -192,7 +192,7 @@ ARPBBOXES_ARABBOX_INSERT_IMPLEMENTATION
 
 // test
 - (void) setWorldBBox : (Box3D) box;
-- (Box3D *) getWorldBBox;
+- (Box3D *) getWorldSpaceBBox;
 
 @end
 

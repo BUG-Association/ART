@@ -38,19 +38,6 @@ ART_MODULE_INITIALISATION_FUNCTION
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 /* ===========================================================================
-    C callback functions for the convertion to an embree geometry
-=========================================================================== */
-
-
-void embree_intersect(const struct RTCBoundsFunctionArguments* args) {
-    // TODO
-}
-
-void embree_occluded(const struct RTCBoundsFunctionArguments* args) {
-    // TODO
-}
-
-/* ===========================================================================
     'ArnShape'
 =========================================================================== */
 
@@ -153,29 +140,6 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
 {
     if (outBBox)
         [self getBBoxObjectspace : traversal :outBBox];
-
-    /*
-    Box3D * worldSpace;
-    [self getBBoxWorldspace: traversal :worldSpace];
-
-    if(worldSpace) {
-        printf("bounding box in object space - min x: %f\n", outBBox->min.c.x[0]);
-        printf("bounding box in object space - min y: %f\n", outBBox->min.c.x[1]);
-        printf("bounding box in object space - min z: %f\n", outBBox->min.c.x[2]);
-        printf("bounding box in object space - max x: %f\n", outBBox->max.c.x[0]);
-        printf("bounding box in object space - max y: %f\n", outBBox->max.c.x[1]);
-        printf("bounding box in object space - max z: %f\n", outBBox->max.c.x[2]);
-
-        printf("\n");
-
-        printf("bounding box in world space - min x: %f\n", worldSpace->min.c.x[0]);
-        printf("bounding box in world space - min y: %f\n", worldSpace->min.c.x[1]);
-        printf("bounding box in world space - min z: %f\n", worldSpace->min.c.x[2]);
-        printf("bounding box in world space - max x: %f\n", worldSpace->max.c.x[0]);
-        printf("bounding box in world space - max y: %f\n", worldSpace->max.c.x[1]);
-        printf("bounding box in world space - max z: %f\n", worldSpace->max.c.x[2]);
-    }
-     */
 }
 
 #define ACTIVE_TRAFO        (ArNode <ArpTrafo3D> *)ARNTRAVERSAL_TRAFO(traversal)
@@ -318,7 +282,11 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
     Box3D * boxWorldspace = [shape getWorldBBox];
     struct RTCBounds * bounds_o = args->bounds_o;
 
+    NSString * className = NSStringFromClass([shape class]);
+
     if(boxWorldspace) {
+        printf("shape '%s' has world box ...\n", [className UTF8String]);
+
         bounds_o->lower_x = boxWorldspace->min.c.x[0];
         bounds_o->lower_y = boxWorldspace->min.c.x[1];
         bounds_o->lower_z = boxWorldspace->min.c.x[2];
@@ -327,7 +295,7 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
         bounds_o->upper_z = boxWorldspace->max.c.x[2];
     }
     else {
-        printf("no world bounding box for shape ...\n");
+        printf("no world bounding box for shape '%s' ...\n", [className UTF8String]);
     }
 
     /*
@@ -338,7 +306,7 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
     */
 }
 
-- (RTCGeometry) convertShapeToEmbreeGeometry {
+- (RTCGeometry) convertShapeToRTCGeometryAndAddToEmbree {
     ArnEmbree * embree = [ArnEmbree embreeManager];
 
     assert([embree getDevice] && [embree getScene]);

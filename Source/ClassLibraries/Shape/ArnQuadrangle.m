@@ -282,6 +282,9 @@ ARPMAPPING_NO_ADJACENT_PATCHES
     return YES;
 }
 
+- (RTCGeometry) convertShapeToRTCGeometryAndAddToEmbree {
+    return [super  convertShapeToRTCGeometryAndAddToEmbree];
+}
 
 @end
 

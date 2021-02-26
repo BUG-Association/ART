@@ -224,7 +224,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     worldBox = &box;
 }
 
-- (Box3D *) getWorldBBox {
+- (Box3D *) getWorldSpaceBBox {
     return worldBox;
 }
 
@@ -234,53 +234,30 @@ void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* arg
 
     const ArnSimpleIndexedShape * shape = (const ArnSimpleIndexedShape *) args->geometryUserPtr;
 
-    Box3D * boxObjectspace;
-    ArnGraphTraversal  * traversal;
+    Box3D * boxWorldspace = [shape getWorldSpaceBBox];
     struct RTCBounds * bounds_o = args->bounds_o;
-    /*
-    [shape getBBoxWorldspace: traversal
-            : boxObjectspace];
 
-    printf("bounding box in world space - min x: %f\n", boxObjectspace->min.c.x[0]);
-    printf("bounding box in world space - min y: %f\n", boxObjectspace->min.c.x[1]);
-    printf("bounding box in world space - min z: %f\n", boxObjectspace->min.c.x[2]);
-    printf("bounding box in world space - max x: %f\n", boxObjectspace->max.c.x[0]);
-    printf("bounding box in world space - max y: %f\n", boxObjectspace->max.c.x[1]);
-    printf("bounding box in world space - max z: %f\n", boxObjectspace->max.c.x[2]);
+    NSString * className = NSStringFromClass([shape class]);
 
+    if(boxWorldspace) {
+        printf("simple indexed shape '%s' has world box ...\n", [className UTF8String]);
 
-    const Primitive * prim = (const Primitive*) args->geometryUserPtr;
-    const Shape * shape = prim->GetShape();
-    Bounds3f bbox = shape->WorldBound();
-    RTCBounds * bounds_o = args->bounds_o;
-    */
+        bounds_o->lower_x = boxWorldspace->min.c.x[0];
+        bounds_o->lower_y = boxWorldspace->min.c.x[1];
+        bounds_o->lower_z = boxWorldspace->min.c.x[2];
+        bounds_o->upper_x = boxWorldspace->max.c.x[0];
+        bounds_o->upper_y = boxWorldspace->max.c.x[1];
+        bounds_o->upper_z = boxWorldspace->max.c.x[2];
+    }
+    else {
+        printf("no world bounding box for simple indexed shape '%s' ...\n", [className UTF8String]);
+    }
 }
 
-// #define EMBREE_GEOM_DEBUG_PRINT
-
-- (RTCGeometry) convertShapeToEmbreeGeometry {
+- (RTCGeometry) convertShapeToRTCGeometryAndAddToEmbree {
 
     ArnEmbree * embree = [ArnEmbree embreeManager];
-
     assert([embree getDevice] && [embree getScene]);
-
-#ifdef EMBREE_GEOM_DEBUG_PRINT
-    Box3D * boxObjectspace;
-    ArnGraphTraversal  * traversal =
-            [ ALLOC_INIT_OBJECT(ArnGraphTraversal) ];
-
-    [self getBBoxWorldspace: traversal
-            : boxObjectspace];
-
-    printf("bounding box in world space - min x: %f\n", boxObjectspace->min.c.x[0]);
-    printf("bounding box in world space - min y: %f\n", boxObjectspace->min.c.x[1]);
-    printf("bounding box in world space - min z: %f\n", boxObjectspace->min.c.x[2]);
-    printf("bounding box in world space - max x: %f\n", boxObjectspace->max.c.x[0]);
-    printf("bounding box in world space - max y: %f\n", boxObjectspace->max.c.x[1]);
-    printf("bounding box in world space - max z: %f\n", boxObjectspace->max.c.x[2]);
-
-    RELEASE_OBJECT(traversal);
-#endif
 
     RTCGeometry geom = rtcNewGeometry([embree getDevice], RTC_GEOMETRY_TYPE_USER);
     rtcSetGeometryUserPrimitiveCount(geom, 1);

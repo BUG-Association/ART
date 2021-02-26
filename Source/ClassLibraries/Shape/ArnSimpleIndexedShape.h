@@ -46,12 +46,6 @@ ART_MODULE_INTERFACE(ArnSimpleIndexedShape)
         : (ArLongArray) newIndexTable
         ;
 
-- (RTCGeometry) convertShapeToEmbreeGeometry
-        ;
-
-- (Box3D *) getWorldSpaceBBox
-        ;
-
 @end
 
 // ===========================================================================

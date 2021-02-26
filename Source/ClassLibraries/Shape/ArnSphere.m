@@ -219,6 +219,10 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
     return ARNSPHERE_QUADRANGULAR_MAPPING_SINGLETON;
 }
 
+- (RTCGeometry) convertShapeToRTCGeometryAndAddToEmbree {
+    return [super  convertShapeToRTCGeometryAndAddToEmbree];
+}
+
 @end
 
 //   This #import #defines the IN_3D_..., OUT_3D_..., etc. macros used

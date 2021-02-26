@@ -39,7 +39,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
-    [ ArnTriangleMesh registerWithRuntime ];
+        [ ArnTriangleMesh registerWithRuntime ];
 )
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
@@ -60,7 +60,7 @@ typedef struct ArVertexCbData
     long      indexIntoVertexArray;
     BOOL      normalsPresent;
 }
-ArVertexCbData;
+        ArVertexCbData;
 
 
 /*
@@ -75,14 +75,14 @@ typedef struct ArFaceCbData
     ArLongArray  * indices;
     long           indexIntoIndecesArray;
 }
-ArFaceCbData;
+        ArFaceCbData;
 
 //   When the data for a vertex is read from the ply file this function
 //   gets called.
 
 static int vertex_cb(
         p_ply_argument  argument
-        )
+)
 {
     ArVertexCbData  * vertexCbData = 0;
     long dim;
@@ -90,15 +90,15 @@ static int vertex_cb(
     //  Get the user data.
 
     ply_get_argument_user_data(
-          argument,
-(void*) & vertexCbData,
-        & dim
-        );
+            argument,
+            (void*) & vertexCbData,
+            & dim
+    );
 
     //   Write the vertex data into the place defined by the user data.
 
     vertexCbData->vertices[vertexCbData->indexIntoVertexArray].c.x[dim] =
-        ply_get_argument_value(argument);
+            ply_get_argument_value(argument);
 
     //   We work under the assumption that the data for a single vertex is read
     //   sequentially. Thus when, we have read the data for dimension Z (2), we
@@ -113,7 +113,7 @@ static int vertex_cb(
 
 static int normal_cb(
         p_ply_argument  argument
-        )
+)
 {
     ArVertexCbData  * vertexCbData = 0;
     long dim;
@@ -121,15 +121,15 @@ static int normal_cb(
     //  Get the user data.
 
     ply_get_argument_user_data(
-          argument,
-(void*) & vertexCbData,
-        & dim
-        );
+            argument,
+            (void*) & vertexCbData,
+            & dim
+    );
 
     //   Write the vertex data into the place defined by the user data.
 
     vertexCbData->normals[vertexCbData->indexIntoVertexArray].c.x[dim] =
-        ply_get_argument_value(argument);
+            ply_get_argument_value(argument);
 
     //   We work under the assumption that the data for a single vertex is read
     //   sequentially. Thus when, we have read the data for dimension Z (2), we
@@ -147,11 +147,11 @@ static int normal_cb(
 
 static int face_cb(
         p_ply_argument  argument
-        )
+)
 {
     // for some reason need to filter out the first value for face because
     // that is just the length of the list. This we assume to be 3.
-    
+
     long length, value_index;
 
     ply_get_argument_property(argument, NULL, &length, &value_index);
@@ -165,7 +165,7 @@ static int face_cb(
 
     //write the index data into the array
     ARARRAY_I(*faceCbData->indices, faceCbData->indexIntoIndecesArray) =
-    ply_get_argument_value(argument);
+            ply_get_argument_value(argument);
 
     //since the storage for the indeces of faces is a simple long array we need to icrease
     //the index into it every time we write into it.
@@ -180,7 +180,7 @@ ArNode * arntrianglemesh_from_ply(
         ART_GV           * art_gv,
         ArShapeGeometry    newGeometry,
         const char       * pathToPlyFile
-        )
+)
 {
     //To put the values into the right place we need this data structures
     //to be passed to the callbacks.
@@ -209,33 +209,33 @@ ArNode * arntrianglemesh_from_ply(
     long numberOfNormals = 0;
 
     numberOfNormals =
-        ply_set_read_cb(
-              ply,
-              "vertex",
-              "nx",
-              normal_cb,
-    (void*) & vertexCbData,
-              0
+            ply_set_read_cb(
+                    ply,
+                    "vertex",
+                    "nx",
+                    normal_cb,
+                    (void*) & vertexCbData,
+                    0
             );
 
     numberOfNormals =
-        ply_set_read_cb(
-              ply,
-              "vertex",
-              "ny",
-              normal_cb,
-    (void*) & vertexCbData,
-              1
+            ply_set_read_cb(
+                    ply,
+                    "vertex",
+                    "ny",
+                    normal_cb,
+                    (void*) & vertexCbData,
+                    1
             );
 
     numberOfNormals =
-        ply_set_read_cb(
-              ply,
-              "vertex",
-              "nz",
-              normal_cb,
-    (void*) & vertexCbData,
-              2
+            ply_set_read_cb(
+                    ply,
+                    "vertex",
+                    "nz",
+                    normal_cb,
+                    (void*) & vertexCbData,
+                    2
             );
 
     FVec3D* normals = NULL;
@@ -243,23 +243,23 @@ ArNode * arntrianglemesh_from_ply(
     if ( numberOfNormals > 0 )
     {
         normals = ALLOC_ARRAY( FVec3D, numberOfNormals + 1 );
-        
+
         normals[numberOfNormals] =
-            FVEC3D(MATH_HUGE_FLOAT,MATH_HUGE_FLOAT,MATH_HUGE_FLOAT);
-        
+                FVEC3D(MATH_HUGE_FLOAT,MATH_HUGE_FLOAT,MATH_HUGE_FLOAT);
+
         vertexCbData.normalsPresent = YES;
     }
     else
         vertexCbData.normalsPresent = NO;
 
     long numberOfFaces =
-        ply_set_read_cb(
-              ply,
-              "face",
-              "vertex_indices",
-              face_cb,
-    (void*) & faceCbData,
-              0
+            ply_set_read_cb(
+                    ply,
+                    "face",
+                    "vertex_indices",
+                    face_cb,
+                    (void*) & faceCbData,
+                    0
             );
 
     ArLongArray  faces = arlongarray_init( numberOfFaces * 3 );
@@ -283,22 +283,22 @@ ArNode * arntrianglemesh_from_ply(
     id vertexSet = 0;
 
     vertexSet =
-        arnvertexset(
-            art_gv,
-            vertices,
-            NULL,
-            NULL,
-            NULL,
-            normals
+            arnvertexset(
+                    art_gv,
+                    vertices,
+                    NULL,
+                    NULL,
+                    NULL,
+                    normals
             );
 
     //  Find the Extremal points.
 
     Pnt3D  minPoint =
-        PNT3D( MATH_HUGE_DOUBLE,MATH_HUGE_DOUBLE,MATH_HUGE_DOUBLE);
+            PNT3D( MATH_HUGE_DOUBLE,MATH_HUGE_DOUBLE,MATH_HUGE_DOUBLE);
 
     Pnt3D  maxPoint =
-        PNT3D( MATH_TINY_DOUBLE,MATH_TINY_DOUBLE,MATH_TINY_DOUBLE);
+            PNT3D( MATH_TINY_DOUBLE,MATH_TINY_DOUBLE,MATH_TINY_DOUBLE);
 
     for( int i = 0; i < numberOfVertices; ++i )
     {
@@ -312,20 +312,20 @@ ArNode * arntrianglemesh_from_ply(
     //   Create the actual triangle mesh.
 
     ArnTriangleMesh* thisMesh =
-        [ ALLOC_INIT_OBJECT(ArnTriangleMesh)
-            :   newGeometry
-            :   faces
-            :   minPoint
-            :   maxPoint
+            [ ALLOC_INIT_OBJECT(ArnTriangleMesh)
+                    :   newGeometry
+                    :   faces
+                    :   minPoint
+                    :   maxPoint
             ];
 
     //   Before we return the triangle mesh we need to apply the vertex set
     //   on it.
 
     return
-        [ ALLOC_INIT_OBJECT(AraVertices)
-            :   HARD_NODE_REFERENCE(thisMesh)
-            :   HARD_NODE_REFERENCE(vertexSet)
+            [ ALLOC_INIT_OBJECT(AraVertices)
+                    :   HARD_NODE_REFERENCE(thisMesh)
+                    :   HARD_NODE_REFERENCE(vertexSet)
             ];
 }
 
@@ -340,68 +340,68 @@ ArNode  * arntrianglemesh_heightfield_from_image(
         ART_GV                 * art_gv,
         ArShapeGeometry          newGeometry,
         ArNode <ArpImageFile>  * imageFile
-        )
+)
 {
-    
+
     ArnImageInfo  * imageInfo = [ imageFile open ];
-    
+
     IVec2D  imageSize = [ imageInfo size ];
-    
+
     Class  sourceImageBufferClass =
-        [ imageFile nativeContentClass ];
+            [ imageFile nativeContentClass ];
 
     ArNode  * sourceImageBuffer =
-        (ArNode *)
-        [ ALLOC_OBJECT_BY_CLASS(
-            sourceImageBufferClass,
-            ArpPlainImageSimpleMemory
-            )
-            initWithSize
-            :   imageSize
-            ];
+            (ArNode *)
+                    [ ALLOC_OBJECT_BY_CLASS(
+                            sourceImageBufferClass,
+                            ArpPlainImageSimpleMemory
+                    )
+                            initWithSize
+                            :   imageSize
+                    ];
 
     [ imageFile getPlainImage
-        :   IPNT2D( 0, 0 )
-        :   ((ArnPlainImage *)sourceImageBuffer)
-        ];
-    
+            :   IPNT2D( 0, 0 )
+            :   ((ArnPlainImage *)sourceImageBuffer)
+    ];
+
     switch ( imageInfo.fileDataType )
     {
         case ardt_grey8:
-            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey8 image found.\n")
+        debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey8 image found.\n")
             break;
-    
+
         case ardt_grey16:
-            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey16 image found.\n")
+        debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey16 image found.\n")
             break;
 
         default:
-            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Please provide an image of type arcolour_grey8 or arcolour_grey16.\n")
+        debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Please provide an image of type arcolour_grey8 or arcolour_grey16.\n")
             ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
             break;
     }
 
     // Set the number of vertices to the image dimensions.
     long numberOfVertices = XC(imageSize) * YC(imageSize);
-    
+
     //Declare the target data structures. Here we collect the data from the greyscale image.
-    
+
     Pnt3D* vertices = ALLOC_ARRAY(Pnt3D, numberOfVertices + 1);
-    
+
     vertices[numberOfVertices] = PNT3D_HUGE;
-    
+
     // Read in the vertices from the image file and scale them into the unit cube spanned by the unit vectors along x, y, and z.
     Pnt3D vertex = PNT3D_ZERO;
     for ( int y = 0; y < YC(imageSize); y++)
     {
         // y coordinate
         PNT3D_I(vertex,1) = y / ((float)YC(imageSize) - 1);
-        
+
         for (int x = 0; x < XC(imageSize); x++)
         {
             // x coordinate
             PNT3D_I(vertex,0) = x / ((float)XC(imageSize) - 1);
-            
+
             // z coordinate
             switch ( imageInfo.fileDataType )
             {
@@ -413,18 +413,18 @@ ArNode  * arntrianglemesh_heightfield_from_image(
                     PNT3D_I(vertex, 2) = GREY16_SOURCE_BUFFER(x, y, imageSize);
                     PNT3D_I(vertex, 2) = PNT3D_I(vertex, 2) / 65535.0f;
                     break;
-                
+
                 default:
-                    debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Please provide an arcolour_grey8 or arcolour_grey16 type image.\n")
+                debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Please provide an arcolour_grey8 or arcolour_grey16 type image.\n")
                     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
                     break;
             }
-            
+
             vertices[ y*XC(imageSize) + x ] = vertex;
         }
-        
+
     }
-    
+
     // The number of faces is (imagewidth-1) * (imageheight-1) * 2
     long numberOfFaces = (XC(imageSize)-1) * (YC(imageSize)-1) * 2;
     ArLongArray faces = arlongarray_init( numberOfFaces * 3 );
@@ -436,71 +436,71 @@ ArNode  * arntrianglemesh_heightfield_from_image(
     for ( int y = 1; y < YC(imageSize); y++)
     {
         baseIndex = y * XC(imageSize);
-        
+
         for ( int x = 1; x < XC(imageSize); x++)
         {
-                // alternate diagonal direction of the quad subdivision
-                if( (y % 2) == 1)
-                {
-                    
-                    // set indices for the first triangle
-                    ARARRAY_I(faces, faceIndex)   = baseIndex + x - XC(imageSize);
-                    ARARRAY_I(faces, faceIndex+1) = baseIndex + x - XC(imageSize) - 1;
-                    ARARRAY_I(faces, faceIndex+2) = baseIndex + x;
-                    
-                    faceIndex = faceIndex + 3;
-                    
-                    // set the indices for the second triangle
-                    ARARRAY_I(faces, faceIndex)   = baseIndex + x - 1;
-                    ARARRAY_I(faces, faceIndex+1) = baseIndex + x;
-                    ARARRAY_I(faces, faceIndex+2) = baseIndex + x - XC(imageSize) - 1;
+            // alternate diagonal direction of the quad subdivision
+            if( (y % 2) == 1)
+            {
 
-                    faceIndex = faceIndex + 3;
-                    
-                }
-                else
-                {
-                    // set the indices for the first triangle
-                    ARARRAY_I(faces, faceIndex)   = baseIndex + x;
-                    ARARRAY_I(faces, faceIndex+1) = baseIndex + x - XC(imageSize);
-                    ARARRAY_I(faces, faceIndex+2) = baseIndex + x - 1;
-                    
-                    faceIndex = faceIndex + 3;
-                    
-                    // set the indices for the second triangle
-                    ARARRAY_I(faces, faceIndex)   = baseIndex + x - XC(imageSize) - 1;
-                    ARARRAY_I(faces, faceIndex+1) = baseIndex + x - 1;
-                    ARARRAY_I(faces, faceIndex+2) = baseIndex + x - XC(imageSize);
-                    
-                    faceIndex = faceIndex + 3;
-                    
-                }
+                // set indices for the first triangle
+                ARARRAY_I(faces, faceIndex)   = baseIndex + x - XC(imageSize);
+                ARARRAY_I(faces, faceIndex+1) = baseIndex + x - XC(imageSize) - 1;
+                ARARRAY_I(faces, faceIndex+2) = baseIndex + x;
+
+                faceIndex = faceIndex + 3;
+
+                // set the indices for the second triangle
+                ARARRAY_I(faces, faceIndex)   = baseIndex + x - 1;
+                ARARRAY_I(faces, faceIndex+1) = baseIndex + x;
+                ARARRAY_I(faces, faceIndex+2) = baseIndex + x - XC(imageSize) - 1;
+
+                faceIndex = faceIndex + 3;
+
+            }
+            else
+            {
+                // set the indices for the first triangle
+                ARARRAY_I(faces, faceIndex)   = baseIndex + x;
+                ARARRAY_I(faces, faceIndex+1) = baseIndex + x - XC(imageSize);
+                ARARRAY_I(faces, faceIndex+2) = baseIndex + x - 1;
+
+                faceIndex = faceIndex + 3;
+
+                // set the indices for the second triangle
+                ARARRAY_I(faces, faceIndex)   = baseIndex + x - XC(imageSize) - 1;
+                ARARRAY_I(faces, faceIndex+1) = baseIndex + x - 1;
+                ARARRAY_I(faces, faceIndex+2) = baseIndex + x - XC(imageSize);
+
+                faceIndex = faceIndex + 3;
+
+            }
         }
-            
+
     }
-    
+
     //Create the vertex set that will be assigned to the mesh.
 
     id vertexSet = 0;
-    
+
     vertexSet =
-        arnvertexset(
-          art_gv,
-          vertices,
-          NULL,
-          NULL,
-          NULL,
-          NULL
-        );
-    
+            arnvertexset(
+                    art_gv,
+                    vertices,
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL
+            );
+
     //  Find the Extremal points.
-    
+
     Pnt3D  minPoint =
-        PNT3D( MATH_HUGE_DOUBLE,MATH_HUGE_DOUBLE,MATH_HUGE_DOUBLE);
-    
+            PNT3D( MATH_HUGE_DOUBLE,MATH_HUGE_DOUBLE,MATH_HUGE_DOUBLE);
+
     Pnt3D  maxPoint =
-        PNT3D( MATH_TINY_DOUBLE,MATH_TINY_DOUBLE,MATH_TINY_DOUBLE);
-    
+            PNT3D( MATH_TINY_DOUBLE,MATH_TINY_DOUBLE,MATH_TINY_DOUBLE);
+
     for( int i = 0; i < numberOfVertices; ++i )
     {
         for (int j = 0; j < 3; ++j)
@@ -509,24 +509,24 @@ ArNode  * arntrianglemesh_heightfield_from_image(
             PNT3D_I( maxPoint, j ) = MAX(vertices[i].c.x[j], maxPoint.c.x[j]);
         }
     }
-    
+
     //   Create the actual triangle mesh.
-    
+
     ArnTriangleMesh* thisMesh =
-        [ ALLOC_INIT_OBJECT(ArnTriangleMesh)
-            :   newGeometry
-            :   faces
-            :   minPoint
-            :   maxPoint
+            [ ALLOC_INIT_OBJECT(ArnTriangleMesh)
+                    :   newGeometry
+                    :   faces
+                    :   minPoint
+                    :   maxPoint
             ];
-    
+
     //   Before we return the triangle mesh we need to apply the vertex set
     //   on it.
-    
+
     return
-        [ ALLOC_INIT_OBJECT(AraVertices)
-            :   HARD_NODE_REFERENCE(thisMesh)
-            :   HARD_NODE_REFERENCE(vertexSet)
+            [ ALLOC_INIT_OBJECT(AraVertices)
+                    :   HARD_NODE_REFERENCE(thisMesh)
+                    :   HARD_NODE_REFERENCE(vertexSet)
             ];
 }
 
@@ -554,7 +554,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
         internalMeshTree = 0;
     }
-    
+
     return self;
 }
 
@@ -586,7 +586,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         : (ArnGraphTraversal *) traversal
 {
     ArnTriangleMesh  * copiedInstance =
-        [ super deepSemanticCopy
+            [ super deepSemanticCopy
             :   traversal
             ];
 
@@ -677,17 +677,24 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
     ArNodeRefDynArray  array = arnoderefdynarray_init( numberOfFaces );
 
+    if([ArnEmbree embreeEnabled]) printf("Adding triangle mesh to embree\n");
     for( long i = 0; i < numberOfFaces; ++i )
     {
         //   Create a triange for each face.
 
         ArnTriangle  * triangle =
-            arntriangle(
-                art_gv,
-                ARARRAY_I(faces, i*3+0),
-                ARARRAY_I(faces, i*3+1),
-                ARARRAY_I(faces, i*3+2)
+                arntriangle(
+                        art_gv,
+                        ARARRAY_I(faces, i*3+0),
+                        ARARRAY_I(faces, i*3+1),
+                        ARARRAY_I(faces, i*3+2)
                 );
+
+        // If embree is enabled, add triangle to embree geometries
+        if([ArnEmbree embreeEnabled]) {
+            // printf("Adding triangle to embree\n");
+            [triangle convertShapeToRTCGeometryAndAddToEmbree];
+        }
 
         //   Triangle setup.
 
@@ -696,16 +703,16 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         //   Push the triangle into the dyn array.
 
         arnoderefdynarray_push(& array, HARD_NODE_REFERENCE(triangle));
-        
-        //debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Created triangle %li with vertex indices (%li,%li,%li)\n", i, ARARRAY_I(triangle->indexTable, 0), ARARRAY_I(triangle->indexTable, 1), ARARRAY_I(triangle->indexTable, 2))
+
+        // debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Created triangle %li with vertex indices (%li,%li,%li)\n", i, ARARRAY_I(triangle->indexTable, 0), ARARRAY_I(triangle->indexTable, 1), ARARRAY_I(triangle->indexTable, 2))
     }
 
     //   Set the internal tree to the union of the triangles.
 
     internalMeshTree =
-        [ ALLOC_INIT_OBJECT(ArnUnion)
-            : & array
-            :   arunion_group | arunion_use_bboxes
+            [ ALLOC_INIT_OBJECT(ArnUnion)
+                    : & array
+                    :   arunion_group | arunion_use_bboxes
             ];
 
     arnoderefdynarray_free_contents( & array );
@@ -713,60 +720,60 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
     //   Insert BBoxes for the triangles in the mesh.
 
     internalMeshTree =
-        [ (id <ArpBBoxHandling>)internalMeshTree allocBBoxes ];
+            [ (id <ArpBBoxHandling>)internalMeshTree allocBBoxes ];
 
     //   Initialise the BBoxes
 
     ArnGraphTraversal  * traversal =
-        [ ALLOC_INIT_OBJECT(ArnGraphTraversal) ];
+            [ ALLOC_INIT_OBJECT(ArnGraphTraversal) ];
 
     [ traversal setReporter: ART_GLOBAL_REPORTER ];
 
     ArNodeRef verticesStore;
 
     [ traversal pushVerticesRef
-        :   ARTS_VERTICES_REF(*traversalState)
-        : & verticesStore
-        ];
+            :   ARTS_VERTICES_REF(*traversalState)
+            : & verticesStore
+    ];
 
     Box3D  box;
 
     [ (id <ArpBBoxHandling>)internalMeshTree initBBoxes
-        :   traversal
-        : & box
-        ];
+            :   traversal
+            : & box
+    ];
 
     Vec3D  epsilonVec = VEC3D( 0.0001, 0.0001, 0.0001 );
 
     [ (id <ArpBBoxHandling>)internalMeshTree enlargeBBoxes
-        : & epsilonVec
-        ];
+    : & epsilonVec
+    ];
 
     RELEASE_OBJECT(traversal);
 
     //   Collect the BBoxes for the leaves.
 
     ArnLeafNodeBBoxCollection *leafBBoxes =
-        [ ALLOC_INIT_OBJECT(ArnLeafNodeBBoxCollection) ];
+            [ ALLOC_INIT_OBJECT(ArnLeafNodeBBoxCollection) ];
 
     ArnGraphTraversal  *traversal1 =
-        [ ALLOC_INIT_OBJECT(ArnGraphTraversal) ];
+            [ ALLOC_INIT_OBJECT(ArnGraphTraversal) ];
 
     [ (id <ArpBBoxHandling>)internalMeshTree collectLeafBBoxes
-        :   traversal1
-        :   leafBBoxes
-        :   0
-        ];
+            :   traversal1
+            :   leafBBoxes
+            :   0
+    ];
 
     RELEASE_OBJECT(traversal1);
 
     //   Insert the bsp-tree
 
     internalMeshTree =
-        [ ALLOC_INIT_OBJECT(ArnBSPTree)
-            :   HARD_NODE_REFERENCE(internalMeshTree)
-            :   leafBBoxes
-            :   NULL
+            [ ALLOC_INIT_OBJECT(ArnBSPTree)
+                    :   HARD_NODE_REFERENCE(internalMeshTree)
+                    :   leafBBoxes
+                    :   NULL
             ];
 
     //   Since the leafBBoxes node gets copied into the internal tree by
@@ -782,3 +789,4 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 @end
 
 // ===========================================================================
+
