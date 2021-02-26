@@ -349,7 +349,10 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
     rtcSetGeometryBoundsFunction(geom, embree_bbox, NULL);
     // rtcSetGeometryIntersectFunction(geom, embree_intersect);
     // rtcSetGeometryOccludedFunction(geom, embree_occluded);
-    // rtcCommitGeometry(geom);
+
+    rtcCommitGeometry(geom);
+    rtcAttachGeometry([embree getScene], geom);
+    rtcReleaseGeometry(geom);
 
     return geom;
 }

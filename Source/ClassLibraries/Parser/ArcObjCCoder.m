@@ -1586,13 +1586,10 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
 
         // [Sebastian] TODO
         if([ node conformsToProtocol: ARPROTOCOL(ArpShape)] && [ArnEmbree embreeEnabled]) {
-            printf(
-                    "\n!!!This node is of protocol ArpShape and its name is %s!!!\n"
-                    ,   className
-            );
-            RTCGeometry geometry = [ node convertShapeToEmbreeGeometry ];
-            [embree addGeometry: geometry
-                               : className];
+            [ node convertShapeToEmbreeGeometry ];
+            // RTCGeometry geometry = [ node convertShapeToEmbreeGeometry ];
+            // [embree addGeometry: geometry
+                            //   : className];
         }
 
 #ifdef OBJC_READING_CODER_DEBUGPRINTF

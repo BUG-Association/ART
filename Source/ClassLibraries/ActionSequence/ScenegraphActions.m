@@ -496,6 +496,14 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
 - (void) performOn
         : (ArNode <ArpNodeStack> *) nodeStack
 {
+    // by commiting an embree scene, the internal
+    // structures get build automatically
+    // if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        [embree commitScene];
+        // return;
+    // }
+
     ArNodeRef  node_Ref_Scene  = [ nodeStack pop ];
 
     ART_ERRORHANDLING_MANDATORY_ARPROTOCOL_CHECK(

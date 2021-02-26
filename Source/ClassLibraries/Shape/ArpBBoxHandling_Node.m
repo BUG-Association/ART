@@ -2304,9 +2304,6 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
                     :   &worldBox
             ];
             [ ARNUNARY_SUBNODE setWorldBBox: worldBox];
-            ArnEmbree * embree = [ArnEmbree embreeManager];
-            [embree commitScene];
-
         }
 
         if ( COMBINED_VERTICES_ATTRIBUTE )

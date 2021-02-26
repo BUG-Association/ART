@@ -1425,7 +1425,8 @@ void bspTree_debugprintf(
             :   HARD_NODE_REFERENCE(leafNodeBBoxes)
             :   HARD_NODE_REFERENCE(operationTree)
             ];
-    
+
+
     if ( self )
     {
         //   Fail if we are not given something that we could

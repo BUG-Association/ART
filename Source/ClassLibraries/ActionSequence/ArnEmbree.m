@@ -123,8 +123,7 @@ static ArnEmbree * embreeManager;
             [embreeManager setScene: newScene];
         }
 
-        // init scene geometry id array
-        [embreeManager initSceneGeomArray];
+        [embreeManager initGeometryArray];
 
         isInitialized = YES;
         EMBREE_ENABLED = YES;
@@ -156,8 +155,8 @@ static ArnEmbree * embreeManager;
     scene = newScene;
 }
 
-- (void) initSceneGeomArray {
-    sceneGeometry = [[NSMutableArray alloc] init];
+- (void) initGeometryArray {
+    embreeGeometries = [[NSMutableArray alloc]init];
 }
 
 #define EMBREE_DEBUG_PRINTF
@@ -170,9 +169,7 @@ static ArnEmbree * embreeManager;
             );
 #endif
     rtcCommitGeometry(newGeometry);
-    unsigned int geomID = rtcAttachGeometry(scene, newGeometry);
-    NSNumber * nsGeomID = [NSNumber numberWithInt: geomID];
-    [sceneGeometry insertObject: nsGeomID atIndex: geomID];
+    rtcAttachGeometry(scene, newGeometry);
     rtcReleaseGeometry(newGeometry);
 }
 

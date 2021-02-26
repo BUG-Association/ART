@@ -41,9 +41,8 @@ typedef enum Embree_state {
 @interface ArnEmbree : ArcObject {
     RTCDevice device;
     RTCScene scene;
-    // ArEmbreeGeometryNode * geometry_list_head; // linked list of multiple embree geometries
     Embree_state state;
-    NSMutableArray * sceneGeometry;
+    NSMutableArray * embreeGeometries;
 }
 
 + (ArnEmbree *) embreeManager;
@@ -57,8 +56,7 @@ typedef enum Embree_state {
 - (void) addGeometry: (RTCGeometry) newGeometry : (char *) className;
 - (void) commitScene;
 - (void) setState: (Embree_state) newState;
-
-- (void) initSceneGeomArray;
+- (void) initGeometryArray;
 
 - (RTCDevice) getDevice;
 - (RTCScene) getScene;

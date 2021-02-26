@@ -285,10 +285,14 @@ void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* arg
     RTCGeometry geom = rtcNewGeometry([embree getDevice], RTC_GEOMETRY_TYPE_USER);
     rtcSetGeometryUserPrimitiveCount(geom, 1);
     rtcSetGeometryUserData(geom, (void *) self);
-    // rtcSetGeometryBoundsFunction(geom, embree_bbox_simpleIndexedShape, NULL);
+    rtcSetGeometryBoundsFunction(geom, embree_bbox_simpleIndexedShape, NULL);
     // rtcSetGeometryIntersectFunction(geom, embree_intersect_simpleIndexedShape);
     // rtcSetGeometryOccludedFunction(geom, embree_occluded_simpleIndexedShape);
     // rtcCommitGeometry(geom);
+
+    rtcCommitGeometry(geom);
+    rtcAttachGeometry([embree getScene], geom);
+    rtcReleaseGeometry(geom);
 
     return geom;
 }
