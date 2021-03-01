@@ -498,11 +498,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
 {
     // by commiting an embree scene, the internal
     // structures get build automatically
-    // if([ArnEmbree embreeEnabled]) {
+    if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
         [embree commitScene];
         // return;
-    // }
+    }
 
     ArNodeRef  node_Ref_Scene  = [ nodeStack pop ];
 

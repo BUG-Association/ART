@@ -159,12 +159,6 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     //   bbox collection only happen for specialised nodes.
 }
 
-// geting rid of some warnings
-- (void) setWorldBBox : (Box3D) box {
-}
-- (Box3D *) getWorldSpaceBBox {
-}
-
 @end
 
 /* ===========================================================================
@@ -2266,8 +2260,8 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
         : (ArnGraphTraversal *) traversal
         : (Box3D *) outBBox
 {
-    // should both be null
-    Box3D worldBox = *outBBox;
+    // should both be the same at this point
+    Box3D * worldBox = outBBox;
 
     ArNodeRef  trafo_store = ARNGT_TRAFO_REF(traversal);
 
@@ -2307,7 +2301,7 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
         if([ArnEmbree embreeEnabled]) {
             [ ARNUNARY_SUBNODE getBBoxWorldspace
                     :   traversal
-                    :   &worldBox
+                    :   worldBox
             ];
             [ ARNUNARY_SUBNODE setWorldBBox: worldBox];
         }

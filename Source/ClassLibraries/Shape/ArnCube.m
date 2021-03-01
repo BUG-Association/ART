@@ -210,9 +210,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         art_gv->arncube_gv->mapping_singleton;
 }
 
-- (RTCGeometry) convertShapeToRTCGeometryAndAddToEmbree {
-    return [super  convertShapeToRTCGeometryAndAddToEmbree];
-}
 
 @end
 

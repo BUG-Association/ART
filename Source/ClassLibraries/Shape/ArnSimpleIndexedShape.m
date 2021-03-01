@@ -38,47 +38,6 @@ ART_MODULE_INITIALISATION_FUNCTION
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-/* ===========================================================================
-    C functions that are send to Embree as callback functions
-=========================================================================== */
-/*
-void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* args) {
-    if(!args->geometryUserPtr)
-        return;
-
-    const ArnSimpleIndexedShape * shape = (const ArnSimpleIndexedShape *) args->geometryUserPtr;
-
-    Box3D * outBoxObjectspace;
-    // ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION;
-
-    struct RTCBounds * bounds_o = args->bounds_o;
-    /*
-    const Primitive * prim = (const Primitive*) args->geometryUserPtr;
-    const Shape * shape = prim->GetShape();
-    Bounds3f bbox = shape->WorldBound();
-    RTCBounds * bounds_o = args->bounds_o;
-    bounds_o->lower_x = bbox.pMin.x;
-    bounds_o->lower_y = bbox.pMin.y;
-    bounds_o->lower_z = bbox.pMin.z;
-    bounds_o->upper_x = bbox.pMax.x;
-    bounds_o->upper_y = bbox.pMax.y;
-    bounds_o->upper_z = bbox.pMax.z;
-
-}
-*/
-
-void embree_intersect_simpleIndexedShape(const struct RTCIntersectFunctionNArguments* args) {
-
-}
-
-void embree_occluded_simpleIndexedShape(const struct RTCOccludedFunctionNArguments* args) {
-
-}
-/* ===========================================================================
-    C functions - End
-=========================================================================== */
-
-
 
 @implementation ArnSimpleIndexedShape
 
@@ -220,13 +179,18 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             ];
 }
 
-- (void) setWorldBBox : (Box3D) box {
-    worldBox = &box;
+- (void) setWorldBBox : (Box3D *) box {
+    worldBox = box;
+    if(worldBox) {
+        printf("world box set\n");
+    }
 }
 
-- (Box3D *) getWorldSpaceBBox {
+- (Box3D *) getWorldBBox {
     return worldBox;
 }
+
+#define EMBREE_DEBUG_PRINT
 
 void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* args) {
     if(!args->geometryUserPtr)
@@ -234,13 +198,10 @@ void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* arg
 
     const ArnSimpleIndexedShape * shape = (const ArnSimpleIndexedShape *) args->geometryUserPtr;
 
-    Box3D * boxWorldspace = [shape getWorldSpaceBBox];
+    Box3D * boxWorldspace = [shape getWorldBBox];
     struct RTCBounds * bounds_o = args->bounds_o;
 
-    NSString * className = NSStringFromClass([shape class]);
-
     if(boxWorldspace) {
-        printf("simple indexed shape '%s' has world box ...\n", [className UTF8String]);
 
         bounds_o->lower_x = boxWorldspace->min.c.x[0];
         bounds_o->lower_y = boxWorldspace->min.c.x[1];
@@ -248,12 +209,37 @@ void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* arg
         bounds_o->upper_x = boxWorldspace->max.c.x[0];
         bounds_o->upper_y = boxWorldspace->max.c.x[1];
         bounds_o->upper_z = boxWorldspace->max.c.x[2];
+
+#ifdef EMBREE_DEBUG_PRINT
+        NSString * className = NSStringFromClass([shape class]);
+        printf("shape '%s' has world box ...\n", [className UTF8String]);
+
+        printf("world box - min x: %f\n", boxWorldspace->min.c.x[0]);
+        printf("world box - min y: %f\n", boxWorldspace->min.c.x[1]);
+        printf("world box - min z: %f\n", boxWorldspace->min.c.x[2]);
+        printf("world box - max x: %f\n", boxWorldspace->max.c.x[0]);
+        printf("world box - max y: %f\n", boxWorldspace->max.c.x[1]);
+        printf("world box - max z: %f\n", boxWorldspace->max.c.x[2]);
+
+#endif
     }
+#ifdef EMBREE_DEBUG_PRINT
     else {
-        printf("no world bounding box for simple indexed shape '%s' ...\n", [className UTF8String]);
+        NSString * className = NSStringFromClass([shape class]);
+        printf("no world bounding box for shape '%s' ...\n", [className UTF8String]);
     }
+#endif
 }
 
+void embree_intersect_simpleIndexedShape(const struct RTCBoundsFunctionArguments* args) {
+    // TODO implement
+}
+
+void embree_occluded_simpleIndexedShape(const struct RTCBoundsFunctionArguments* args) {
+    // TODO implement
+}
+
+#define EMBREE_DEBUG_PRINTF
 - (RTCGeometry) convertShapeToRTCGeometryAndAddToEmbree {
 
     ArnEmbree * embree = [ArnEmbree embreeManager];
@@ -263,13 +249,21 @@ void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* arg
     rtcSetGeometryUserPrimitiveCount(geom, 1);
     rtcSetGeometryUserData(geom, (void *) self);
     rtcSetGeometryBoundsFunction(geom, embree_bbox_simpleIndexedShape, NULL);
-    // rtcSetGeometryIntersectFunction(geom, embree_intersect_simpleIndexedShape);
-    // rtcSetGeometryOccludedFunction(geom, embree_occluded_simpleIndexedShape);
-    // rtcCommitGeometry(geom);
+    rtcSetGeometryIntersectFunction(geom, embree_intersect_simpleIndexedShape);
+    rtcSetGeometryOccludedFunction(geom, embree_occluded_simpleIndexedShape);
 
     rtcCommitGeometry(geom);
     rtcAttachGeometry([embree getScene], geom);
     rtcReleaseGeometry(geom);
+
+
+#ifdef EMBREE_DEBUG_PRINTF
+    NSString * className = NSStringFromClass([self class]);
+        printf(
+                "ObjC coder read: adding instance of class %s to embree\n"
+                ,   [className UTF8String]
+        );
+#endif
 
     return geom;
 }
