@@ -501,6 +501,52 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
         [embree commitScene];
+
+        // debug
+        struct RTCIntersectContext context;
+        rtcInitIntersectContext(&context);
+        float ox = 0;
+        float oy = 0;
+        float oz = -1;
+        float dx = 0;
+        float dy = 0;
+        float dz = 1;
+
+        struct RTCRayHit rayhit;
+        rayhit.ray.org_x = ox;
+        rayhit.ray.org_y = oy;
+        rayhit.ray.org_z = oz;
+        rayhit.ray.dir_x = dx;
+        rayhit.ray.dir_y = dy;
+        rayhit.ray.dir_z = dz;
+        rayhit.ray.tnear = 0;
+        rayhit.ray.tfar = INFINITY;
+        rayhit.ray.mask = -1;
+        rayhit.ray.flags = 0;
+        rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+        rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
+
+        /*
+         * There are multiple variants of rtcIntersect. This one
+         * intersects a single ray with the scene.
+         */
+        // rtcIntersect1([embree getScene], &context, &rayhit);
+
+        printf("%f, %f, %f: ", ox, oy, oz);
+        if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
+            /* Note how geomID and primID identify the geometry we just hit.
+             * We could use them here to interpolate geometry information,
+             * compute shading, etc.
+             * Since there is only a single triangle in this scene, we will
+             * get geomID=0 / primID=0 for all hits.
+             * There is also instID, used for instancing. See
+             * the instancing tutorials for more information */
+            printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
+                   rayhit.hit.geomID,
+                   rayhit.hit.primID,
+                   rayhit.ray.tfar);
+        }
+
         // return;
     }
 

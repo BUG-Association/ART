@@ -26,6 +26,7 @@
 
 #define ART_MODULE_NAME     ArnShape
 
+
 #import "ArnShape.h"
 #import "ArpBBoxHandling_Node.h"
 
@@ -44,6 +45,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 @implementation ArnShape
 
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
+
+static Box3D * worldBox;
 
 - init
         : (ArShapeGeometry) newGeometry
@@ -265,6 +268,8 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     return 0;
 }
 
+static Box3D * worldBox;
+
 - (void) setWorldBBox : (Box3D *) box {
     worldBox = box;
 }
@@ -314,11 +319,28 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
 #endif
 }
 
-void embree_intersect(const struct RTCBoundsFunctionArguments* args) {
-    // TODO implement
+void embree_intersect(const struct RTCIntersectFunctionNArguments* args) {
+    struct RTCRayHit * rh = (struct RTCRayHit *) args->rayhit;
+    ArnRayCaster * rayCaster;
+    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
+    Range range_of_t = RANGE(0, MATH_HUGE_DOUBLE); // debug, just for now
+    ArcIntersection * intersection = 0;
+    Ray3D ray;
+
+    const ArnShape * shape = (const ArnShape *) args->geometryUserPtr;
+
+    /*
+    intersection =
+            [ shape firstRayObjectIntersection
+                    :   shape
+                    :   rayOriginPoint
+                    : & ray
+                    :   MATH_HUGE_DOUBLE
+            ];
+    */
 }
 
-void embree_occluded(const struct RTCBoundsFunctionArguments* args) {
+void embree_occluded(const struct RTCIntersectFunctionNArguments* args) {
     // TODO implement
 }
 
@@ -333,7 +355,7 @@ void embree_occluded(const struct RTCBoundsFunctionArguments* args) {
     rtcSetGeometryUserData(geom, (void *) self);
     rtcSetGeometryBoundsFunction(geom, embree_bbox, NULL);
     rtcSetGeometryIntersectFunction(geom, embree_intersect);
-    rtcSetGeometryOccludedFunction(geom, embree_occluded);
+//    rtcSetGeometryOccludedFunction(geom, embree_occluded);
 
     rtcCommitGeometry(geom);
     rtcAttachGeometry([embree getScene], geom);

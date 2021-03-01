@@ -179,6 +179,8 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             ];
 }
 
+static Box3D * worldBox;
+
 - (void) setWorldBBox : (Box3D *) box {
     worldBox = box;
     if(worldBox) {
@@ -231,11 +233,11 @@ void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* arg
 #endif
 }
 
-void embree_intersect_simpleIndexedShape(const struct RTCBoundsFunctionArguments* args) {
+void embree_intersect_simpleIndexedShape(const struct RTCIntersectFunctionNArguments* args) {
     // TODO implement
 }
 
-void embree_occluded_simpleIndexedShape(const struct RTCBoundsFunctionArguments* args) {
+void embree_occluded_simpleIndexedShape(const struct RTCIntersectFunctionNArguments* args) {
     // TODO implement
 }
 

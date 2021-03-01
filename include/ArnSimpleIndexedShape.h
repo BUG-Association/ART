@@ -36,9 +36,10 @@ ART_MODULE_INTERFACE(ArnSimpleIndexedShape)
         < ArpCoding, ArpActivateAndGetBBoxes, ArpAttributeConcatenation,
           ArpInsertAndRemoveBBoxes >
 {
+@private
+    // Box3D * worldBox;
 @public
     ArLongArray indexTable;
-    Box3D * worldBox;
 }
 
 - init

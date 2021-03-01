@@ -56,7 +56,7 @@ ART_MODULE_INTERFACE(ArpRayCasting_Categories)
 
 ------------------------------------------------------------------------aw- */
 
-//#define ART_WITH_RAYCASTING_DEBUG_OUTPUT
+// #define ART_WITH_RAYCASTING_DEBUG_OUTPUT
 
 @interface AraBBox                  ( RayCasting ) < ArpRayCasting > @end
 @interface AraVolumeMaterial              ( RayCasting ) < ArpRayCasting > @end

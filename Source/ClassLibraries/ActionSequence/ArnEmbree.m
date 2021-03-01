@@ -27,6 +27,7 @@
 #define ART_MODULE_NAME     ArnEmbree
 
 #import <rply.h>
+#import <ArnRayCaster.h>
 #import "ArnEmbree.h"
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
@@ -198,112 +199,13 @@ static ArnEmbree * embreeManager;
     // return geometry_list_head;
 }
 
-/*
-- (ArNode *) embreegeometry_from_ply:
-        (ART_GV *) art_gv
-                                path: (const char *) pathToPlyFile
+- (void) getEmbreeGeometryIntersectionList
+        : (ArnRayCaster *) rayCaster
+        : (Range) range_of_t
+        : (struct ArIntersectionList *) intersectionList
 {
 
-    // Check if embree obj is allocated
-    if (!art_gv->embree_enabed) {
-        printf("error: somehow got into 'embreegeometry_from_ply()' without embree being enabled\n");
-        return NULL;
-    }
-
-    // sanity check
-    if(![self getDevice]) {
-        printf("error: parsing PLY geometry to embree but embree device is null...\n");
-        return NULL;
-    }
-    if(![self getScene]) {
-        printf("error: parsing PLY geometry to embree but embree scene is null...\n");
-        return NULL;
-    }
-
-    //Open the ply file.
-    p_ply ply = ply_open(pathToPlyFile, NULL, 0, NULL);
-    ply_read_header(ply);
-
-    //Set the callback functions. Also obtain the number of elements we will get.
-    long numberOfVertices, numberOfFaces;
-    // long numberOfNormals = 0;
-
-    // # vertices
-    numberOfVertices = ply_set_read_cb(ply, "vertex", "x", vertex_cb_embree, (void *) &embreeGeometryCbData.vertices,
-                                       0);
-    numberOfVertices = ply_set_read_cb(ply, "vertex", "y", vertex_cb_embree, (void *) &embreeGeometryCbData.vertices,
-                                       1);
-    numberOfVertices = ply_set_read_cb(ply, "vertex", "z", vertex_cb_embree, (void *) &embreeGeometryCbData.vertices,
-                                       2);
-
-    // # faces
-    numberOfFaces =
-            ply_set_read_cb(
-                    ply,
-                    "face",
-                    "vertex_indices",
-                    face_cb_embree,
-                    (void *) &embreeGeometryCbData.indices,
-                    0
-            );
-
-
-    // initialize embree geometry buffers
-    RTCGeometry plyGeomertry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_USER);
-    // just triangle geometry for now // TODO generalize later
-
-    if (embreeGeometryCbData.vertices == NULL)
-        embreeGeometryCbData.vertices = (float *) rtcSetNewGeometryBuffer(plyGeomertry,
-                                                                          RTC_BUFFER_TYPE_VERTEX,
-                                                                          0,
-                                                                          RTC_FORMAT_FLOAT3,
-                                                                          3 * sizeof(float),
-                                                                          numberOfVertices);
-    if (embreeGeometryCbData.indices == NULL)
-        embreeGeometryCbData.indices = (unsigned *) rtcSetNewGeometryBuffer(plyGeomertry,
-                                                                            RTC_BUFFER_TYPE_INDEX,
-                                                                            0,
-                                                                            RTC_FORMAT_UINT3,
-                                                                            3 * sizeof(unsigned),
-                                                                            numberOfFaces);
-
-    // more sanity checks
-    if (!embreeGeometryCbData.vertices && !embreeGeometryCbData.indices) {
-        printf("error: embree geometry buffers are null...\n");
-        return NULL;
-    }
-    size_t embreeVerticesSize = sizeof(embreeGeometryCbData.vertices) / sizeof(embreeGeometryCbData.vertices[0]);
-    size_t embreeIndicesSize = sizeof(embreeGeometryCbData.indices) / sizeof(embreeGeometryCbData.indices[0]);
-    assert(embreeVerticesSize == numberOfVertices && embreeIndicesSize == numberOfFaces);
-
-    //Read ply file. Here the callbacks will be executed somewhere.
-    ply_read(ply);
-
-    //Now we are done with ply file so close it.
-    ply_close(ply);
-
-    // commit geometry
-    [self addGeometry:plyGeomertry];
-
-    //debug
-    RTCGeometry testGeom2 = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
-    RTCGeometry testGeom3 = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
-    RTCGeometry testGeom4 = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
-    RTCGeometry testGeom5 = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
-    [self addGeometry:testGeom2];
-    [self addGeometry:testGeom3];
-    [self addGeometry:testGeom4];
-    [self addGeometry:testGeom5];
-    [self commitScene];
-    castRay([self getScene], 0, 0, -1, 0, 0, 1);
-    castRay([self getScene], 1, 1, -1, 0, 0, 1);
-    castRay([self getScene], 0, 0, 0, 0, 1, 1); // here is a hit
-
-    // return an ArNode that acts like a flag to let the renderer know that
-    return
-            [ ALLOC_INIT_OBJECT(ArEmbreeSceneGraphNode) ];
 }
- */
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str {
     printf("error %d: %s\n", error, str);
