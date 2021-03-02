@@ -42,7 +42,10 @@ ART_MODULE_INTERFACE(ArnShape)
           ArpAttributeConcatenation, ArpCoding, ArpHull, ArpShape >
 {
 @private
-  //   Box3D * worldBox;
+// 'worldBoxForEmbree' is holding the AABB for the shape in question.
+// it is needed in a callback function in order to submit it to embree
+// to build its own ray acceleration structures
+    Box3D * worldBoxForEmbree;
 @public
     ArShapeGeometry  shapeGeometry;
 }
@@ -50,6 +53,9 @@ ART_MODULE_INTERFACE(ArnShape)
 - init
         : (ArShapeGeometry) newGeometry
         ;
+
+- (void) setWorldBBox : (Box3D *) box;
+- (Box3D *) getWorldBBox;
 
 @end
 

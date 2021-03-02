@@ -23,6 +23,7 @@
     along with ART.  If not, see <http://www.gnu.org/licenses/>.
 
 =========================================================================== */
+#ifdef EMBREE_INSTALLED
 
 #include "ART_Foundation.h"
 #include "ArpEmbree.h"
@@ -44,7 +45,6 @@ typedef enum Embree_state {
     RTCDevice device;
     RTCScene scene;
     Embree_state state;
-    NSMutableArray * embreeGeometries;
 }
 
 + (ArnEmbree *) embreeManager;
@@ -58,12 +58,13 @@ typedef enum Embree_state {
 - (void) addGeometry: (RTCGeometry) newGeometry : (char *) className;
 - (void) commitScene;
 - (void) setState: (Embree_state) newState;
-- (void) initGeometryArray;
+
 
 - (RTCDevice) getDevice;
 - (RTCScene) getScene;
-// - (RTCGeometry *) getGeometry;
 - (Embree_state) getState;
+
+
 
 // intersection stuff
 - (void) getEmbreeGeometryIntersectionList
@@ -77,5 +78,7 @@ typedef enum Embree_state {
 - (void) cleanUpEmbree;
 
 @end
+
+#endif
 
 // ===========================================================================

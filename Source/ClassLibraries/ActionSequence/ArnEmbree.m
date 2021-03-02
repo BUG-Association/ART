@@ -124,8 +124,6 @@ static ArnEmbree * embreeManager;
             [embreeManager setScene: newScene];
         }
 
-        [embreeManager initGeometryArray];
-
         isInitialized = YES;
         EMBREE_ENABLED = YES;
     }
@@ -156,14 +154,10 @@ static ArnEmbree * embreeManager;
     scene = newScene;
 }
 
-- (void) initGeometryArray {
-    embreeGeometries = [[NSMutableArray alloc]init];
-}
-
-#define EMBREE_DEBUG_PRINTF
+#define EMBREE_DEBUG_PRINT
 
 - (void) addGeometry: (RTCGeometry) newGeometry : (char *) className {
-#ifdef EMBREE_DEBUG_PRINTF
+#ifdef EMBREE_DEBUG_PRINT
     printf(
             "\nObjC coder read: adding instance of class %s to embree\n"
             ,   className
@@ -172,6 +166,40 @@ static ArnEmbree * embreeManager;
     rtcCommitGeometry(newGeometry);
     rtcAttachGeometry(scene, newGeometry);
     rtcReleaseGeometry(newGeometry);
+}
+
+- (void) passWorldBBoxToEmbree
+                    : (Box3D *) boxWorldspace
+                    : (struct RTCBounds *) bounds_o
+                    : (NSString *) className
+{
+        if(boxWorldspace) {
+
+        bounds_o->lower_x = boxWorldspace->min.c.x[0];
+        bounds_o->lower_y = boxWorldspace->min.c.x[1];
+        bounds_o->lower_z = boxWorldspace->min.c.x[2];
+        bounds_o->upper_x = boxWorldspace->max.c.x[0];
+        bounds_o->upper_y = boxWorldspace->max.c.x[1];
+        bounds_o->upper_z = boxWorldspace->max.c.x[2];
+
+#ifdef EMBREE_DEBUG_PRINT
+        printf("shape '%s' has world box ...\n", [className UTF8String]);
+
+        printf("world box - min x: %f\n", boxWorldspace->min.c.x[0]);
+        printf("world box - min y: %f\n", boxWorldspace->min.c.x[1]);
+        printf("world box - min z: %f\n", boxWorldspace->min.c.x[2]);
+        printf("world box - max x: %f\n", boxWorldspace->max.c.x[0]);
+        printf("world box - max y: %f\n", boxWorldspace->max.c.x[1]);
+        printf("world box - max z: %f\n", boxWorldspace->max.c.x[2]);
+
+#endif
+    }
+#ifdef EMBREE_DEBUG_PRINT
+    else {
+
+        printf("no world bounding box for shape '%s' ...\n", [className UTF8String]);
+    }
+#endif
 }
 
 - (void) commitScene {

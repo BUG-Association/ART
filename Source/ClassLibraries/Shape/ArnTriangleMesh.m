@@ -677,7 +677,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
     ArNodeRefDynArray  array = arnoderefdynarray_init( numberOfFaces );
 
-    if([ArnEmbree embreeEnabled]) printf("Adding triangle mesh to embree\n");
     for( long i = 0; i < numberOfFaces; ++i )
     {
         //   Create a triange for each face.
@@ -692,7 +691,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
         // If embree is enabled, add triangle to embree geometries
         if([ArnEmbree embreeEnabled]) {
-            // printf("Adding triangle to embree\n");
             [triangle convertShapeToRTCGeometryAndAddToEmbree];
         }
 

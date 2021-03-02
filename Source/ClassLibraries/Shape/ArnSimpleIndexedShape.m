@@ -179,21 +179,35 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             ];
 }
 
-static Box3D * worldBox;
+#define EMBREE_DEBUG_PRINT
 
 - (void) setWorldBBox : (Box3D *) box {
-    worldBox = box;
-    if(worldBox) {
-        printf("world box set\n");
+    NSString * className = NSStringFromClass([self class]);
+    printf("inserting bounding box for shape '%s' ...\n", [className UTF8String]);
+    // [worldBoxForEmbree release];
+    // [box retain];
+    worldBoxForEmbree = box;
+
+#ifdef EMBREE_DEBUG_PRINT
+    if(worldBoxForEmbree) {
+
+        printf("inserted shape '%s' has world box ...\n", [className UTF8String]);
+
+        printf("world box - min x: %f\n", worldBoxForEmbree->min.c.x[0]);
+        printf("world box - min y: %f\n", worldBoxForEmbree->min.c.x[1]);
+        printf("world box - min z: %f\n", worldBoxForEmbree->min.c.x[2]);
+        printf("world box - max x: %f\n", worldBoxForEmbree->max.c.x[0]);
+        printf("world box - max y: %f\n", worldBoxForEmbree->max.c.x[1]);
+        printf("world box - max z: %f\n", worldBoxForEmbree->max.c.x[2]);
     }
+#endif
 }
 
 - (Box3D *) getWorldBBox {
-    return worldBox;
+    return worldBoxForEmbree;
 }
 
-#define EMBREE_DEBUG_PRINT
-
+#if EMBREE_INSTALLED
 void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* args) {
     if(!args->geometryUserPtr)
         return;
@@ -202,35 +216,10 @@ void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* arg
 
     Box3D * boxWorldspace = [shape getWorldBBox];
     struct RTCBounds * bounds_o = args->bounds_o;
+    NSString * className = NSStringFromClass([shape class]);
 
-    if(boxWorldspace) {
-
-        bounds_o->lower_x = boxWorldspace->min.c.x[0];
-        bounds_o->lower_y = boxWorldspace->min.c.x[1];
-        bounds_o->lower_z = boxWorldspace->min.c.x[2];
-        bounds_o->upper_x = boxWorldspace->max.c.x[0];
-        bounds_o->upper_y = boxWorldspace->max.c.x[1];
-        bounds_o->upper_z = boxWorldspace->max.c.x[2];
-
-#ifdef EMBREE_DEBUG_PRINT
-        NSString * className = NSStringFromClass([shape class]);
-        printf("shape '%s' has world box ...\n", [className UTF8String]);
-
-        printf("world box - min x: %f\n", boxWorldspace->min.c.x[0]);
-        printf("world box - min y: %f\n", boxWorldspace->min.c.x[1]);
-        printf("world box - min z: %f\n", boxWorldspace->min.c.x[2]);
-        printf("world box - max x: %f\n", boxWorldspace->max.c.x[0]);
-        printf("world box - max y: %f\n", boxWorldspace->max.c.x[1]);
-        printf("world box - max z: %f\n", boxWorldspace->max.c.x[2]);
-
-#endif
-    }
-#ifdef EMBREE_DEBUG_PRINT
-    else {
-        NSString * className = NSStringFromClass([shape class]);
-        printf("no world bounding box for shape '%s' ...\n", [className UTF8String]);
-    }
-#endif
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+    [embree passWorldBBoxToEmbree : boxWorldspace : bounds_o : className];
 }
 
 void embree_intersect_simpleIndexedShape(const struct RTCIntersectFunctionNArguments* args) {
@@ -269,6 +258,7 @@ void embree_occluded_simpleIndexedShape(const struct RTCIntersectFunctionNArgume
 
     return geom;
 }
+#endif // EMBREE_INSTALLED
 
 @end
 
