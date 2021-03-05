@@ -119,10 +119,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(0,0,3)
             ];
 }
 
-- (RTCGeometry) convertShapeToRTCGeometryAndAddToEmbree {
-    return [super  convertShapeToRTCGeometryAndAddToEmbree];
-}
-
 @end
 
 #define PARAMETER \

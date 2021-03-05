@@ -1544,7 +1544,7 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
             // check if this singleton is a shape, and if so, add it to embree
             id singleton_of_name = arsingleton_of_name(art_gv, arsymbol(art_gv, masterName) );
             if([ singleton_of_name conformsToProtocol: ARPROTOCOL(ArpShape)] && [ArnEmbree embreeEnabled]) {
-                [ singleton_of_name convertShapeToRTCGeometryAndAddToEmbree ];
+                // [ singleton_of_name convertShapeToRTCGeometryAndAddToEmbree ];
                 // RTCGeometry geometry = [ singleton_of_name convertShapeToRTCGeometryAndAddToEmbree ];
                 // [embree addGeometry: geometry
                     //    : masterName];
@@ -1587,7 +1587,7 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
 
         // [Sebastian] TODO
         if([ node conformsToProtocol: ARPROTOCOL(ArpShape)] && [ArnEmbree embreeEnabled]) {
-            [ node convertShapeToRTCGeometryAndAddToEmbree ];
+            // [ node convertShapeToRTCGeometryAndAddToEmbree ];
             // RTCGeometry geometry = [ node convertShapeToRTCGeometryAndAddToEmbree ];
             // [embree addGeometry: geometry
                //                : className];

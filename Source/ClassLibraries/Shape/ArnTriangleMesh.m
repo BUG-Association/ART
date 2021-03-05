@@ -309,6 +309,44 @@ ArNode * arntrianglemesh_from_ply(
         }
     }
 
+    //   If embree is enabled, create a trinangle mesh and pass it to embree
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        RTCGeometry embreeMesh = rtcNewGeometry([embree getDevice], RTC_GEOMETRY_TYPE_TRIANGLE);
+
+        // first set up geometry buffers for vertices and indeces
+        float* embreeMeshVertices = (float*) rtcSetNewGeometryBuffer(embreeMesh,
+                                                           RTC_BUFFER_TYPE_VERTEX,
+                                                           0,
+                                                           RTC_FORMAT_FLOAT3,
+                                                           3 * sizeof(float),
+                                                           numberOfVertices);
+        unsigned* embreeMeshIndices = (unsigned*) rtcSetNewGeometryBuffer(embreeMesh,
+                                                                RTC_BUFFER_TYPE_INDEX,
+                                                                0,
+                                                                RTC_FORMAT_UINT3,
+                                                                3*sizeof(unsigned),
+                                                                (size_t) numberOfFaces);
+
+        if( embreeMeshVertices && embreeMeshIndices ) {
+            // fill up embree vertex buffer
+            for( int i = 0; i < numberOfVertices; ++i ) {
+                for (int j = 0; j < 3; ++j) {
+                    embreeMeshVertices[i + j] = vertices[i].c.x[j];
+                }
+            }
+
+            // fill up embree index buffer
+            for( int i = 0; i < (numberOfFaces * 3); ++i ) {
+                embreeMeshIndices[i] = faces.content->array[i];
+            }
+
+            rtcSetGeometryVertexAttributeCount(embreeMesh,1);
+            [embree addGeometry: embreeMesh];
+        }
+
+    }
+
     //   Create the actual triangle mesh.
 
     ArnTriangleMesh* thisMesh =
@@ -689,10 +727,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
                         ARARRAY_I(faces, i*3+2)
                 );
 
-        // If embree is enabled, add triangle to embree geometries
-        if([ArnEmbree embreeEnabled]) {
-            [triangle convertShapeToRTCGeometryAndAddToEmbree];
-        }
 
         //   Triangle setup.
 

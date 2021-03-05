@@ -55,7 +55,7 @@ typedef enum Embree_state {
 
 - (void) setDevice: (RTCDevice) newDevice;
 - (void) setScene: (RTCScene) newScene;
-- (void) addGeometry: (RTCGeometry) newGeometry : (char *) className;
+- (void) addGeometry: (RTCGeometry) newGeometry;
 - (void) commitScene;
 - (void) setState: (Embree_state) newState;
 

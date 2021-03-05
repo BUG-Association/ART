@@ -532,7 +532,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
          */
         // rtcIntersect1([embree getScene], &context, &rayhit);
 
-        printf("%f, %f, %f: ", ox, oy, oz);
+        printf("Geometry test hit at: %f, %f, %f: \n", ox, oy, oz);
         if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
             /* Note how geomID and primID identify the geometry we just hit.
              * We could use them here to interpolate geometry information,

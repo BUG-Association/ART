@@ -156,13 +156,7 @@ static ArnEmbree * embreeManager;
 
 #define EMBREE_DEBUG_PRINT
 
-- (void) addGeometry: (RTCGeometry) newGeometry : (char *) className {
-#ifdef EMBREE_DEBUG_PRINT
-    printf(
-            "\nObjC coder read: adding instance of class %s to embree\n"
-            ,   className
-            );
-#endif
+- (void) addGeometry: (RTCGeometry) newGeometry  {
     rtcCommitGeometry(newGeometry);
     rtcAttachGeometry(scene, newGeometry);
     rtcReleaseGeometry(newGeometry);
