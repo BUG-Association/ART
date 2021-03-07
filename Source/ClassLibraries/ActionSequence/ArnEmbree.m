@@ -221,12 +221,35 @@ static ArnEmbree * embreeManager;
     // return geometry_list_head;
 }
 
-- (void) getEmbreeGeometryIntersectionList
-        : (ArnRayCaster *) rayCaster
-        : (Range) range_of_t
-        : (struct ArIntersectionList *) intersectionList
-{
+- (ArcIntersection *) intersect : (Ray3D *) ray {
+    struct RTCIntersectContext context;
+    rtcInitIntersectContext(&context);
 
+    struct RTCRayHit rayhit;
+    rayhit.ray.org_x = ray->point.c.x[0];
+    rayhit.ray.org_y = ray->point.c.x[1];
+    rayhit.ray.org_z = ray->point.c.x[2];
+    rayhit.ray.dir_x = ray->vector.c.x[0];
+    rayhit.ray.dir_y = ray->vector.c.x[1];
+    rayhit.ray.dir_z = ray->vector.c.x[2];
+    rayhit.ray.tnear = 0;
+    rayhit.ray.tfar = INFINITY;
+    rayhit.ray.mask = -1;
+    rayhit.ray.flags = 0;
+    rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+    // rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
+
+    rtcIntersect1(scene, &context, &rayhit);
+
+    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID)
+    {
+        printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
+               rayhit.hit.geomID,
+               rayhit.hit.primID,
+               rayhit.ray.tfar);
+    }
+
+    return NULL; // for now
 }
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str {

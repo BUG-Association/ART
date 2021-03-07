@@ -279,6 +279,48 @@ ArNode * arntrianglemesh_from_ply(
     //Now we are done with ply file so close it.
     ply_close(ply);
 
+    // If embree is enabled, create a trinangle mesh and pass it to embree
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        RTCGeometry embreeMesh = rtcNewGeometry([embree getDevice], RTC_GEOMETRY_TYPE_TRIANGLE);
+
+        // first set up geometry buffers for vertices and indeces
+        float* embreeMeshVertices = (float*) rtcSetNewGeometryBuffer(embreeMesh,
+                                                                     RTC_BUFFER_TYPE_VERTEX,
+                                                                     0,
+                                                                     RTC_FORMAT_FLOAT3,
+                                                                     3 * sizeof(float),
+                                                                     numberOfVertices);
+        unsigned* embreeMeshIndices = (unsigned*) rtcSetNewGeometryBuffer(embreeMesh,
+                                                                          RTC_BUFFER_TYPE_INDEX,
+                                                                          0,
+                                                                          RTC_FORMAT_UINT3,
+                                                                          3*sizeof(unsigned),
+                                                                          (size_t) numberOfFaces);
+
+        if( embreeMeshVertices && embreeMeshIndices ) {
+            // fill up embree vertex buffer
+            int index = 0;
+            for( int i = 0; i < numberOfVertices; ++i ) {
+                for (int j = 0; j < 3; ++j) {
+                    embreeMeshVertices[index] = vertices[i].c.x[j];
+                    index++;
+                }
+            }
+
+            // fill up embree index buffer
+            for( int i = 0; i < (numberOfFaces * 3); ++i ) {
+                embreeMeshIndices[i] = faces.content->array[i];
+            }
+
+            // rtcSetGeometryVertexAttributeCount(embreeMesh,1);
+            [embree addGeometry: embreeMesh];
+            [embree commitScene]; // for now
+
+            // return NULL;
+        }
+    }
+
     //Create the vertex set that will be assigned to the mesh.
     id vertexSet = 0;
 
@@ -307,44 +349,6 @@ ArNode * arntrianglemesh_from_ply(
             PNT3D_I( minPoint, j ) = MIN(vertices[i].c.x[j], minPoint.c.x[j]);
             PNT3D_I( maxPoint, j ) = MAX(vertices[i].c.x[j], maxPoint.c.x[j]);
         }
-    }
-
-    //   If embree is enabled, create a trinangle mesh and pass it to embree
-    if([ArnEmbree embreeEnabled]) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry embreeMesh = rtcNewGeometry([embree getDevice], RTC_GEOMETRY_TYPE_TRIANGLE);
-
-        // first set up geometry buffers for vertices and indeces
-        float* embreeMeshVertices = (float*) rtcSetNewGeometryBuffer(embreeMesh,
-                                                           RTC_BUFFER_TYPE_VERTEX,
-                                                           0,
-                                                           RTC_FORMAT_FLOAT3,
-                                                           3 * sizeof(float),
-                                                           numberOfVertices);
-        unsigned* embreeMeshIndices = (unsigned*) rtcSetNewGeometryBuffer(embreeMesh,
-                                                                RTC_BUFFER_TYPE_INDEX,
-                                                                0,
-                                                                RTC_FORMAT_UINT3,
-                                                                3*sizeof(unsigned),
-                                                                (size_t) numberOfFaces);
-
-        if( embreeMeshVertices && embreeMeshIndices ) {
-            // fill up embree vertex buffer
-            for( int i = 0; i < numberOfVertices; ++i ) {
-                for (int j = 0; j < 3; ++j) {
-                    embreeMeshVertices[i + j] = vertices[i].c.x[j];
-                }
-            }
-
-            // fill up embree index buffer
-            for( int i = 0; i < (numberOfFaces * 3); ++i ) {
-                embreeMeshIndices[i] = faces.content->array[i];
-            }
-
-            rtcSetGeometryVertexAttributeCount(embreeMesh,1);
-            [embree addGeometry: embreeMesh];
-        }
-
     }
 
     //   Create the actual triangle mesh.

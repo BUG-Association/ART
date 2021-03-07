@@ -2297,6 +2297,7 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
             :   outBBox
             ];
 
+        /*
         // if embree is installed, we additionally calculate the
         // bounding box in world space of the shape in question
         // and we store it in its 'worldBBoxEmbree' member
@@ -2307,8 +2308,8 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
             ];
             // throws "may not respond to" warning - need to do smth about this
             [ ARNUNARY_SUBNODE setWorldBBox: worldBox];
-
         }
+         */
 
         if ( COMBINED_VERTICES_ATTRIBUTE )
             [ traversal popVertices

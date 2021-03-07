@@ -933,6 +933,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     
     int lastNonzeroIndex = -1;
     nonzeroContributions[0] = 0;
+
+    // embree stuff
+    ArcIntersection * embreeIntersection = 0;
     
     for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     {
@@ -949,7 +952,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
                  : & ray
                  :   MATH_HUGE_DOUBLE
                  ];
-        
+
+        // embree
+        if([ArnEmbree embreeEnabled]) {
+            ArnEmbree * embree = [ArnEmbree embreeManager];
+            embreeIntersection = [embree intersect: &ray];
+        }
+
         // media attenuation and extinction
         ArSpectralSample mediumReflectivity; // to store the reflectivity divided by their respective pdfs
         ArPDFValue distanceProbability, volumeProbability;
