@@ -933,9 +933,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     
     int lastNonzeroIndex = -1;
     nonzeroContributions[0] = 0;
-
-    // embree stuff
-    ArcIntersection * embreeIntersection = 0;
     
     for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     {
@@ -944,19 +941,23 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
         int mediaAttenuationIndex = pathLength; // returned from media, first initialized here
         int attenuationIndex = pathLength; // to be multiplied with media attenuation, first initilazed here
         int contributionIndex = pathLength + 1; // to be multiplied with media attenuation, first initialized here
-    
-        intersection =
-            [ RAYCASTER firstRayObjectIntersection
-                 :   entireScene
-                 :   rayOriginPoint
-                 : & ray
-                 :   MATH_HUGE_DOUBLE
-                 ];
 
         // embree
         if([ArnEmbree embreeEnabled]) {
             ArnEmbree * embree = [ArnEmbree embreeManager];
-            embreeIntersection = [embree intersect: &ray];
+            intersection = [embree intersect
+                                    : RAYCASTER
+                                    : &ray
+                           ];
+        }
+        else {
+            intersection =
+                    [ RAYCASTER firstRayObjectIntersection
+                            :   entireScene
+                            :   rayOriginPoint
+                            : & ray
+                            :   MATH_HUGE_DOUBLE
+                    ];
         }
 
         // media attenuation and extinction

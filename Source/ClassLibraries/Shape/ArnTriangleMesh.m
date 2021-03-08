@@ -296,7 +296,7 @@ ArNode * arntrianglemesh_from_ply(
                                                                           0,
                                                                           RTC_FORMAT_UINT3,
                                                                           3*sizeof(unsigned),
-                                                                          (size_t) numberOfFaces);
+                                                                          numberOfFaces);
 
         if( embreeMeshVertices && embreeMeshIndices ) {
             // fill up embree vertex buffer

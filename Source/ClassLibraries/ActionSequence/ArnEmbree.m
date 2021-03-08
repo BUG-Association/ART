@@ -23,70 +23,18 @@
     along with ART.  If not, see <http://www.gnu.org/licenses/>.
 
 =========================================================================== */
+#if EMBREE_INSTALLED
 
 #define ART_MODULE_NAME     ArnEmbree
 
-#import <rply.h>
 #import <ArnRayCaster.h>
+#import <RayCastingCommonMacros.h>
+#import <ARM_RayCasting.h>
 #import "ArnEmbree.h"
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-/*
-    This is the callback structure for the embree geometry entity.
-*/
-
-typedef struct ArEmbreeGeometryCbData
-{
-    float        * vertices;
-    unsigned     * indices;
-}
-        ArEmbreeGeometryCbData;
-
-
-
-// EMBREE STUFF
-#if EMBREE_INSTALLED
-//To put the values into the right place we need this data structures
-//to be passed to the callbacks.
-// declared static in order to set its properties in the callback function
-static ArEmbreeGeometryCbData embreeGeometryCbData;
-
-static int vertex_cb_embree(
-        p_ply_argument  argument
-)
-{
-    static int count = 0;
-
-    if(embreeGeometryCbData.vertices) {
-        embreeGeometryCbData.vertices[count++] = (float) ply_get_argument_value(argument);
-    }
-    else printf("vertex_cb_embree: vertex buffer is null ...\n");
-
-    return 1;
-}
-
-static int face_cb_embree(
-        p_ply_argument  argument
-)
-{
-    static int count = 0;
-    long length, value_index;
-
-    ply_get_argument_property(argument, NULL, &length, &value_index);
-
-    if(value_index < 0) return 1;
-
-    if(embreeGeometryCbData.indices) {
-        embreeGeometryCbData.indices[count++] = (unsigned) ply_get_argument_value(argument);
-    }
-    else printf("vertex_cb_embree: index buffer is null ...\n");
-
-    return 1;
-}
-
-#endif // EMBREE_INSTALLED
 
 @implementation ArnEmbree
 
@@ -221,11 +169,17 @@ static ArnEmbree * embreeManager;
     // return geometry_list_head;
 }
 
-- (ArcIntersection *) intersect : (Ray3D *) ray {
+- (ArcIntersection *) intersect
+        : (ArnRayCaster *) rayCaster
+        : (Ray3D *) ray
+{
+
+    // set up embree intersection context
     struct RTCIntersectContext context;
     rtcInitIntersectContext(&context);
-
     struct RTCRayHit rayhit;
+
+    // convert Ray3D to embree ray
     rayhit.ray.org_x = ray->point.c.x[0];
     rayhit.ray.org_y = ray->point.c.x[1];
     rayhit.ray.org_z = ray->point.c.x[2];
@@ -239,17 +193,40 @@ static ArnEmbree * embreeManager;
     rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
     // rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
 
+    // do the intersection
     rtcIntersect1(scene, &context, &rayhit);
 
-    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID)
-    {
-        printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
-               rayhit.hit.geomID,
-               rayhit.hit.primID,
-               rayhit.ray.tfar);
-    }
+    // if we did not hit anything, we are done here
+    if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
+        return NULL;
 
-    return NULL; // for now
+    // else:
+    // store intersection information in an
+    // ArcIntersection and return it
+    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
+
+    // I just asume this since triangles have planar faces
+    ArFaceOnShapeType  face_type = arface_on_shape_is_planar;
+
+    double  t = rayhit.ray.tfar;
+    Pnt2D   intersectionTextureCoordinates = PNT2D(rayhit.hit.u, rayhit.hit.v);
+
+    arintersectionlist_init_1(
+            &intersectionList,
+            t,
+            0,
+            face_type,
+            NULL, // what shall I do with this?
+            rayCaster
+    );
+
+    ArcIntersection  * intersection =
+            INTERSECTIONLIST_HEAD(intersectionList);
+
+    TEXTURE_COORDS(intersection) = intersectionTextureCoordinates;
+    FLAG_TEXTURE_COORDS_AS_VALID(intersection);
+
+    return intersection;
 }
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str {
@@ -262,3 +239,5 @@ static ArnEmbree * embreeManager;
 }
 
 @end
+
+#endif // EMBREE_INSTALLED

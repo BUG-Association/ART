@@ -30,6 +30,7 @@
 #include <embree3/rtcore.h>
 
 @class ArcIntersection;
+@class ArnRayCaster;
 
 ART_MODULE_INTERFACE(ArnEmbree)
 
@@ -67,7 +68,10 @@ typedef enum Embree_state {
 
 
 // intersection stuff
-- (ArcIntersection *) intersect : (Ray3D *) ray;
+- (ArcIntersection *) intersect
+        : (ArnRayCaster *) rayCaster
+        : (Ray3D *) ray
+        ;
 
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str;
