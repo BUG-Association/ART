@@ -41,13 +41,10 @@ ART_MODULE_INTERFACE(ArnShape)
                   ArpInsertAndRemoveBBoxes,
           ArpAttributeConcatenation, ArpCoding, ArpHull, ArpShape >
 {
-@private
-// 'worldBoxForEmbree' is holding the AABB for the shape in question.
-// it is needed in a callback function in order to submit it to embree
-// to build its own ray acceleration structures
-    Box3D * worldBoxForEmbree;
 @public
     ArShapeGeometry  shapeGeometry;
+
+    unsigned int embreeGeomID;
 }
 
 - init

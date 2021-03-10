@@ -36,11 +36,7 @@ ART_MODULE_INTERFACE(ArnSimpleIndexedShape)
         < ArpCoding, ArpActivateAndGetBBoxes, ArpAttributeConcatenation,
           ArpInsertAndRemoveBBoxes >
 {
-@private
-    // 'worldBoxForEmbree' is holding the AABB for the shape in question.
-    // it is needed in a callback function in order to submit it to embree
-    // to build its own ray acceleration structures
-    Box3D * worldBoxForEmbree;
+
 @public
     ArLongArray indexTable;
 
@@ -49,9 +45,6 @@ ART_MODULE_INTERFACE(ArnSimpleIndexedShape)
 - init
         : (ArLongArray) newIndexTable
         ;
-
-- (void) setWorldBBox : (Box3D *) box;
-- (Box3D *) getWorldBBox;
 
 @end
 

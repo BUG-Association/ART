@@ -58,6 +58,7 @@ ART_MODULE_INTERFACE(ArnTriangleMesh)
         : (ArLongArray) faces_
         : (Pnt3D) minPoint_
         : (Pnt3D) maxPoint_
+        : (unsigned int) embreeGeomID_
         ;
 
 @end

@@ -31,6 +31,8 @@
 
 @class ArcIntersection;
 @class ArnRayCaster;
+@class ArnShape;
+@class AraCombinedAttributes;
 
 ART_MODULE_INTERFACE(ArnEmbree)
 
@@ -41,11 +43,29 @@ typedef enum Embree_state {
     Embree_Released
 } Embree_state;
 
+@interface ArnEmbreeGeometry : ArcObject {
+@public
+    unsigned int _geometryID;
+    ArnShape * _shape;
+    AraCombinedAttributes * _attributes;
+}
+
+- (void) setGeometryID : (unsigned int) geometryID;
+- (unsigned int) getGeometryID;
+
+- (void) setShape : (ArnShape *) shape;
+- (ArnShape *) getShape;
+
+- (void) setCombinedAttributes : (AraCombinedAttributes *) attributes;
+- (AraCombinedAttributes *) getCombinedAttributes;
+
+@end
 
 @interface ArnEmbree : ArcObject {
     RTCDevice device;
     RTCScene scene;
     Embree_state state;
+    NSMutableArray * geometries;
 }
 
 + (ArnEmbree *) embreeManager;
@@ -56,7 +76,7 @@ typedef enum Embree_state {
 
 - (void) setDevice: (RTCDevice) newDevice;
 - (void) setScene: (RTCScene) newScene;
-- (void) addGeometry: (RTCGeometry) newGeometry;
+- (unsigned int) addGeometry: (RTCGeometry) newGeometry;
 - (void) commitScene;
 - (void) setState: (Embree_state) newState;
 
@@ -64,7 +84,16 @@ typedef enum Embree_state {
 - (RTCDevice) getDevice;
 - (RTCScene) getScene;
 - (Embree_state) getState;
+- (void) initGeometryArray;
 
+- (void) addEmbreeGeometryToArray
+        : (ArnEmbreeGeometry *) geometry
+        : (unsigned int) index
+        ;
+
+- (ArnEmbreeGeometry *) getGeometryFromArrayAtIndex
+        : (unsigned int) index
+        ;
 
 
 // intersection stuff

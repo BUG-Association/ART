@@ -30,10 +30,40 @@
 #import <ArnRayCaster.h>
 #import <RayCastingCommonMacros.h>
 #import <ARM_RayCasting.h>
+#import <ArnShape.h>
+#import <AraCombinedAttributes.h>
 #import "ArnEmbree.h"
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
+
+@implementation ArnEmbreeGeometry
+
+- (void) setGeometryID : (unsigned int) geometryID {
+    _geometryID = geometryID;
+}
+
+- (unsigned int) getGeometryID {
+    return _geometryID;
+}
+
+- (void) setShape : (ArnShape *) shape {
+    _shape = shape;
+}
+
+- (ArnShape *) getShape {
+    return _shape;
+}
+
+- (void) setCombinedAttributes : (AraCombinedAttributes *) attributes {
+    _attributes = attributes;
+}
+
+- (AraCombinedAttributes *) getCombinedAttributes {
+    return _attributes;
+}
+
+@end // ArnEmbreeGeometry
 
 
 @implementation ArnEmbree
@@ -72,6 +102,9 @@ static ArnEmbree * embreeManager;
             [embreeManager setScene: newScene];
         }
 
+        // init geometry array
+        [embreeManager initGeometryArray];
+
         isInitialized = YES;
         EMBREE_ENABLED = YES;
     }
@@ -104,10 +137,18 @@ static ArnEmbree * embreeManager;
 
 #define EMBREE_DEBUG_PRINT
 
-- (void) addGeometry: (RTCGeometry) newGeometry  {
+- (unsigned int) addGeometry: (RTCGeometry) newGeometry  {
     rtcCommitGeometry(newGeometry);
-    rtcAttachGeometry(scene, newGeometry);
+    unsigned int geomID = rtcAttachGeometry(scene, newGeometry);
     rtcReleaseGeometry(newGeometry);
+
+    // create new geometry class
+    ArnEmbreeGeometry * thisGeometry = [[ArnEmbreeGeometry alloc] init]; // TODO release
+    [thisGeometry setGeometryID: geomID];
+    [self addEmbreeGeometryToArray : thisGeometry : geomID];
+
+    // [thisGeometry release];
+    return geomID;
 }
 
 - (void) passWorldBBoxToEmbree
@@ -165,6 +206,23 @@ static ArnEmbree * embreeManager;
     return state;
 }
 
+- (void) initGeometryArray {
+    geometries = [[NSMutableArray alloc]init];
+}
+
+- (void) addEmbreeGeometryToArray
+        : (ArnEmbreeGeometry *) geometry
+        : (unsigned int) index
+{
+    [geometries insertObject: geometry atIndex: index];
+}
+
+- (ArnEmbreeGeometry *) getGeometryFromArrayAtIndex
+        : (unsigned int) index
+{
+    return [geometries objectAtIndex: index];
+}
+
 - (RTCGeometry *) getGeometryListHead {
     // return geometry_list_head;
 }
@@ -173,22 +231,21 @@ static ArnEmbree * embreeManager;
         : (ArnRayCaster *) rayCaster
         : (Ray3D *) ray
 {
-
     // set up embree intersection context
     struct RTCIntersectContext context;
     rtcInitIntersectContext(&context);
     struct RTCRayHit rayhit;
 
     // convert Ray3D to embree ray
-    rayhit.ray.org_x = ray->point.c.x[0];
-    rayhit.ray.org_y = ray->point.c.x[1];
-    rayhit.ray.org_z = ray->point.c.x[2];
-    rayhit.ray.dir_x = ray->vector.c.x[0];
-    rayhit.ray.dir_y = ray->vector.c.x[1];
-    rayhit.ray.dir_z = ray->vector.c.x[2];
+    rayhit.ray.org_x = (float) ray->point.c.x[0];
+    rayhit.ray.org_y = (float) ray->point.c.x[1];
+    rayhit.ray.org_z = (float) ray->point.c.x[2];
+    rayhit.ray.dir_x = (float) ray->vector.c.x[0];
+    rayhit.ray.dir_y = (float) ray->vector.c.x[1];
+    rayhit.ray.dir_z = (float) ray->vector.c.x[2];
     rayhit.ray.tnear = 0;
     rayhit.ray.tfar = INFINITY;
-    rayhit.ray.mask = -1;
+    rayhit.ray.mask = (unsigned int) -1;
     rayhit.ray.flags = 0;
     rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
     // rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
@@ -203,13 +260,18 @@ static ArnEmbree * embreeManager;
     // else:
     // store intersection information in an
     // ArcIntersection and return it
-    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
     // I just asume this since triangles have planar faces
-    ArFaceOnShapeType  face_type = arface_on_shape_is_planar;
+    ArFaceOnShapeType  face_type = arface_on_shape_default;
 
     double  t = rayhit.ray.tfar;
     Pnt2D   intersectionTextureCoordinates = PNT2D(rayhit.hit.u, rayhit.hit.v);
+
+    ArnEmbreeGeometry * geometry = [self getGeometryFromArrayAtIndex: rayhit.hit.geomID];
+    if(!geometry)
+        printf("Error, no geometry found....\n");
+
+    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
     arintersectionlist_init_1(
             &intersectionList,
@@ -234,10 +296,13 @@ static ArnEmbree * embreeManager;
 }
 
 - (void) cleanUpEmbree {
+
+    
+
     rtcReleaseScene(scene);
     rtcReleaseDevice(device);
 }
 
-@end
+@end // ArnEmbree
 
 #endif // EMBREE_INSTALLED

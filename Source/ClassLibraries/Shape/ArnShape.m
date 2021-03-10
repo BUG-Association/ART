@@ -224,6 +224,19 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
+    // debug
+    if([ArnEmbree embreeEnabled]) {
+        NSString * className = NSStringFromClass([self class]);
+        printf("\nInitializing AraCombinedAttributes for shape: %s\n",  [className UTF8String]);
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        ArnEmbreeGeometry * geometry = [embree getGeometryFromArrayAtIndex: self->embreeGeomID];
+        if(geometry) {
+            [geometry setCombinedAttributes: result];
+        }
+
+        [embree commitScene]; // for now
+    }
+
     return result;
 }
 
@@ -270,29 +283,6 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
 #define EMBREE_DEBUG_PRINT
 
-- (void) setWorldBBox : (Box3D *) box {
-    NSString * className = NSStringFromClass([self class]);
-    printf("inserting bounding box for shape '%s' ...\n", [className UTF8String]);
-    worldBoxForEmbree = box;
-
-#ifdef EMBREE_DEBUG_PRINT
-    if(worldBoxForEmbree) {
-
-        printf("inserted shape '%s' has world box ...\n", [className UTF8String]);
-
-        printf("world box - min x: %f\n", worldBoxForEmbree->min.c.x[0]);
-        printf("world box - min y: %f\n", worldBoxForEmbree->min.c.x[1]);
-        printf("world box - min z: %f\n", worldBoxForEmbree->min.c.x[2]);
-        printf("world box - max x: %f\n", worldBoxForEmbree->max.c.x[0]);
-        printf("world box - max y: %f\n", worldBoxForEmbree->max.c.x[1]);
-        printf("world box - max z: %f\n", worldBoxForEmbree->max.c.x[2]);
-    }
-#endif
-}
-
-- (Box3D *) getWorldBBox {
-    return worldBoxForEmbree;
-}
 
 #if EMBREE_INSTALLED
 void embree_bbox(const struct RTCBoundsFunctionArguments* args) {

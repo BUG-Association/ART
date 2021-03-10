@@ -182,33 +182,18 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 #define EMBREE_DEBUG_PRINT
 
 - (void) setWorldBBox : (Box3D *) box {
-    NSString * className = NSStringFromClass([self class]);
-    printf("inserting bounding box for shape '%s' ...\n", [className UTF8String]);
-    // [worldBoxForEmbree release];
-    // [box retain];
-    worldBoxForEmbree = box;
 
-#ifdef EMBREE_DEBUG_PRINT
-    if(worldBoxForEmbree) {
-
-        printf("inserted shape '%s' has world box ...\n", [className UTF8String]);
-
-        printf("world box - min x: %f\n", worldBoxForEmbree->min.c.x[0]);
-        printf("world box - min y: %f\n", worldBoxForEmbree->min.c.x[1]);
-        printf("world box - min z: %f\n", worldBoxForEmbree->min.c.x[2]);
-        printf("world box - max x: %f\n", worldBoxForEmbree->max.c.x[0]);
-        printf("world box - max y: %f\n", worldBoxForEmbree->max.c.x[1]);
-        printf("world box - max z: %f\n", worldBoxForEmbree->max.c.x[2]);
-    }
-#endif
 }
 
 - (Box3D *) getWorldBBox {
-    return worldBoxForEmbree;
+    return NULL;
 }
 
 #if EMBREE_INSTALLED
 void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* args) {
+
+    printf("calling 'embree_bbox_simpleIndexedShape()'\n");
+
     if(!args->geometryUserPtr)
         return;
 
@@ -223,10 +208,12 @@ void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* arg
 }
 
 void embree_intersect_simpleIndexedShape(const struct RTCIntersectFunctionNArguments* args) {
+    printf("calling 'embree_intersect_simpleIndexedShape()'\n");
     // TODO implement
 }
 
 void embree_occluded_simpleIndexedShape(const struct RTCIntersectFunctionNArguments* args) {
+    printf("calling 'embree_occluded_simpleIndexedShape()'\n");
     // TODO implement
 }
 

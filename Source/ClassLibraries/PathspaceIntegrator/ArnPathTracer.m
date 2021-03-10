@@ -933,6 +933,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     
     int lastNonzeroIndex = -1;
     nonzeroContributions[0] = 0;
+
+    ArnEmbree * embree = [ArnEmbree embreeManager];
     
     for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     {
@@ -944,7 +946,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
 
         // embree
         if([ArnEmbree embreeEnabled]) {
-            ArnEmbree * embree = [ArnEmbree embreeManager];
+
             intersection = [embree intersect
                                     : RAYCASTER
                                     : &ray
