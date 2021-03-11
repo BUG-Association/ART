@@ -37,6 +37,11 @@
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
+#define VOLUME_MATERIAL_SLOT 0
+#define SURFACE_MATERIAL_SLOT 1
+#define ENVIRONMENT_MATERIAL_SLOT 2
+
+
 @implementation ArnEmbreeGeometry
 
 - (void) setGeometryID : (unsigned int) geometryID {
@@ -228,8 +233,8 @@ static ArnEmbree * embreeManager;
 }
 
 - (ArcIntersection *) intersect
-        : (ArnRayCaster *) rayCaster
         : (Ray3D *) ray
+        : (ArcSurfacePoint *) eyePoint
 {
     // set up embree intersection context
     struct RTCIntersectContext context;
@@ -258,35 +263,29 @@ static ArnEmbree * embreeManager;
         return NULL;
 
     // else:
-    // store intersection information in an
+    // retrieve further information about the intersected shape ...
+    ArnEmbreeGeometry * intersectedGeometry = [self getGeometryFromArrayAtIndex: rayhit.hit.geomID];
+    ArnShape * intersectedGeometryShape = [intersectedGeometry getShape];
+    AraCombinedAttributes * intersectedGeometryCombinedAttributes = [intersectedGeometry getCombinedAttributes];
+    ArNodeRefDynArray attributeRefArray = intersectedGeometryCombinedAttributes->attributeRefArray;
+
+    // arnoderefdynarray_debugprintf(&attributeRefArray);
+
+    // ... and store intersection information in an
     // ArcIntersection and return it
+    ArcIntersection * intersection = [[ArcIntersection alloc] init];
+    intersection->t = rayhit.ray.tfar;;
+    intersection->texture_coordinates = PNT2D(rayhit.hit.u, rayhit.hit.v);
+    intersection->objectspace_normal = VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
 
-    // I just asume this since triangles have planar faces
-    ArFaceOnShapeType  face_type = arface_on_shape_default;
+    // fetch material information
+    intersection->materialInsideRef = WEAK_NODE_REFERENCE(attributeRefArray.stackArray[VOLUME_MATERIAL_SLOT].reference);
 
-    double  t = rayhit.ray.tfar;
-    Pnt2D   intersectionTextureCoordinates = PNT2D(rayhit.hit.u, rayhit.hit.v);
-
-    ArnEmbreeGeometry * geometry = [self getGeometryFromArrayAtIndex: rayhit.hit.geomID];
-    if(!geometry)
-        printf("Error, no geometry found....\n");
-
-    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
-
-    arintersectionlist_init_1(
-            &intersectionList,
-            t,
-            0,
-            face_type,
-            NULL, // what shall I do with this?
-            rayCaster
-    );
-
-    ArcIntersection  * intersection =
-            INTERSECTIONLIST_HEAD(intersectionList);
-
-    TEXTURE_COORDS(intersection) = intersectionTextureCoordinates;
-    FLAG_TEXTURE_COORDS_AS_VALID(intersection);
+    // this is a bit of a hack, but I have not found a smarter way
+    // to get the outside material
+    ArNode<ArpVolumeMaterial> * volumeMaterial =
+            ARCSURFACEPOINT_VOLUME_MATERIAL_INSIDE(eyePoint);
+    intersection->materialOutsideRef = WEAK_NODE_REFERENCE(volumeMaterial);
 
     return intersection;
 }

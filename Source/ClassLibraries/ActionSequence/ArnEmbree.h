@@ -33,6 +33,7 @@
 @class ArnRayCaster;
 @class ArnShape;
 @class AraCombinedAttributes;
+@class ArcSurfacePoint;
 
 ART_MODULE_INTERFACE(ArnEmbree)
 
@@ -98,10 +99,9 @@ typedef enum Embree_state {
 
 // intersection stuff
 - (ArcIntersection *) intersect
-        : (ArnRayCaster *) rayCaster
         : (Ray3D *) ray
+        : (ArcSurfacePoint *) eyePoint
         ;
-
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str;
 - (void) cleanUpEmbree;

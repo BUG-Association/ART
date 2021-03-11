@@ -935,6 +935,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     nonzeroContributions[0] = 0;
 
     ArnEmbree * embree = [ArnEmbree embreeManager];
+    [embree commitScene];
     
     for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     {
@@ -944,15 +945,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
         int attenuationIndex = pathLength; // to be multiplied with media attenuation, first initilazed here
         int contributionIndex = pathLength + 1; // to be multiplied with media attenuation, first initialized here
 
-        // embree
-        if([ArnEmbree embreeEnabled]) {
-
-            intersection = [embree intersect
-                                    : RAYCASTER
-                                    : &ray
-                           ];
-        }
-        else {
+        // intersection
+        if([ArnEmbree embreeEnabled])
+            intersection = [embree intersect : &ray : eyePoint];
+        else
             intersection =
                     [ RAYCASTER firstRayObjectIntersection
                             :   entireScene
@@ -960,7 +956,41 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
                             : & ray
                             :   MATH_HUGE_DOUBLE
                     ];
+
+        /*
+        // debugs
+        if(intersection) {
+            printf("intersection->materialInsideRef.reference : %p\n", intersection->materialInsideRef.reference);
+            printf("intersection->materialOutsideRef.reference : %p\n", intersection->materialOutsideRef.reference);
         }
+         */
+
+        /*
+        ArcIntersection * embreeIntersection = 0;
+        if([ArnEmbree embreeEnabled]) {
+            embreeIntersection = [embree intersect : &ray ];
+
+        }
+
+        if(embreeIntersection) printf("embreeIntersection->materialInsideRef.reference BEFORE : %p\n", embreeIntersection->materialInsideRef.reference);
+        intersection =
+                    [ RAYCASTER firstRayObjectIntersection
+                            :   entireScene
+                            :   rayOriginPoint
+                            : & ray
+                            :   MATH_HUGE_DOUBLE
+                    ];
+        if(embreeIntersection) printf("embreeIntersection->materialInsideRef.reference AFTER : %p\n", embreeIntersection->materialInsideRef.reference);
+
+        if([ArnEmbree embreeEnabled]) {
+            /*
+            if((intersection && !embreeIntersection) || (!intersection && embreeIntersection))
+                printf("One of the two instersections is wrong\n");
+            else
+                printf("Both intersections are fine\n");
+
+        }
+         */
 
         // media attenuation and extinction
         ArSpectralSample mediumReflectivity; // to store the reflectivity divided by their respective pdfs
@@ -1044,7 +1074,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
             break;
         }
         
-        [ currentPoint prepareForUse: PHASE_INTERFACE_CACHE ];
+       [ currentPoint prepareForUse: PHASE_INTERFACE_CACHE ];
         
         if( !scatteringEvent ) // scattering events are not emitters
         {
@@ -1238,6 +1268,11 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     #endif
     
     ASSERT_VALID_LIGHTALPHA_SAMPLE(lightalpha_r)
+
+    // if embree is enabled, release allocated intersection
+    if([ArnEmbree embreeEnabled]) {
+        [intersection release];
+    }
 }
 
 - (void) calculateLightSamples

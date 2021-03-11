@@ -224,17 +224,13 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
-    // debug
+    // feed to embree
     if([ArnEmbree embreeEnabled]) {
-        NSString * className = NSStringFromClass([self class]);
-        printf("\nInitializing AraCombinedAttributes for shape: %s\n",  [className UTF8String]);
         ArnEmbree * embree = [ArnEmbree embreeManager];
         ArnEmbreeGeometry * geometry = [embree getGeometryFromArrayAtIndex: self->embreeGeomID];
         if(geometry) {
             [geometry setCombinedAttributes: result];
         }
-
-        [embree commitScene]; // for now
     }
 
     return result;

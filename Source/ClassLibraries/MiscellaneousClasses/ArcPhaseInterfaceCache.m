@@ -307,9 +307,10 @@ void artable_add_phase_interface_with_key2(
 //   which get created. As each rendering thread has its own cache, run
 //   artist -j1 to see meaningful output
 
+//#define PHASEINTERFACE_DEBUG_OUTPUT
 #ifdef PHASEINTERFACE_DEBUG_OUTPUT
         double  fromIOR, intoIOR;
-        
+
         [ (( ArNode <ArpSpectrum> *) [fromMaterial subnodeWithIndex : 0])
             getSpectrum
             :   0
