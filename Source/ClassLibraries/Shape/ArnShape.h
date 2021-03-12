@@ -43,16 +43,11 @@ ART_MODULE_INTERFACE(ArnShape)
 {
 @public
     ArShapeGeometry  shapeGeometry;
-
-    unsigned int embreeGeomID;
 }
 
 - init
         : (ArShapeGeometry) newGeometry
         ;
-
-- (void) setWorldBBox : (Box3D *) box;
-- (Box3D *) getWorldBBox;
 
 @end
 

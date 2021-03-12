@@ -279,47 +279,6 @@ ArNode * arntrianglemesh_from_ply(
     //Now we are done with ply file so close it.
     ply_close(ply);
 
-    // If embree is enabled, create a trinangle mesh and pass it to embree
-    unsigned int embreeMeshGeomID;
-    if([ArnEmbree embreeEnabled]) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry embreeMesh = rtcNewGeometry([embree getDevice], RTC_GEOMETRY_TYPE_TRIANGLE);
-
-        // first set up geometry buffers for vertices and indeces
-        float * embreeMeshVertices = (float *) rtcSetNewGeometryBuffer(embreeMesh,
-                                                                      RTC_BUFFER_TYPE_VERTEX,
-                                                                      0,
-                                                                      RTC_FORMAT_FLOAT3,
-                                                                      3 * sizeof(float),
-                                                                      numberOfVertices);
-        unsigned * embreeMeshIndices = (unsigned *) rtcSetNewGeometryBuffer(embreeMesh,
-                                                                           RTC_BUFFER_TYPE_INDEX,
-                                                                           0,
-                                                                           RTC_FORMAT_UINT3,
-                                                                           3 * sizeof(unsigned),
-                                                                           numberOfFaces);
-
-        if (embreeMeshVertices && embreeMeshIndices) {
-            // fill up embree vertex buffer
-            int index = 0;
-            for (int i = 0; i < numberOfVertices; ++i) {
-                for (int j = 0; j < 3; ++j) {
-                    embreeMeshVertices[index] = (float) vertices[i].c.x[j];
-                    index++;
-                }
-            }
-
-            // fill up embree index buffer
-            for (int i = 0; i < (numberOfFaces * 3); ++i) {
-                embreeMeshIndices[i] = (unsigned int) faces.content->array[i];
-            }
-
-            // rtcSetGeometryVertexAttributeCount(embreeMesh,1);
-            embreeMeshGeomID = [embree addGeometry:embreeMesh];
-            // return NULL;
-        }
-    }
-
     //Create the vertex set that will be assigned to the mesh.
     id vertexSet = 0;
 
@@ -358,14 +317,49 @@ ArNode * arntrianglemesh_from_ply(
                     :   faces
                     :   minPoint
                     :   maxPoint
-                    :   embreeMeshGeomID
             ];
 
+    // If embree is enabled, create a trinangle mesh and pass it to embree
+    unsigned int embreeMeshGeomID;
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
+        RTCGeometry embreeMesh = rtcNewGeometry([embree getDevice], RTC_GEOMETRY_TYPE_TRIANGLE);
+
+        // first set up geometry buffers for vertices and indeces
+        float * embreeMeshVertices = (float *) rtcSetNewGeometryBuffer(embreeMesh,
+                                                                       RTC_BUFFER_TYPE_VERTEX,
+                                                                       0,
+                                                                       RTC_FORMAT_FLOAT3,
+                                                                       3 * sizeof(float),
+                                                                       numberOfVertices);
+        unsigned * embreeMeshIndices = (unsigned *) rtcSetNewGeometryBuffer(embreeMesh,
+                                                                            RTC_BUFFER_TYPE_INDEX,
+                                                                            0,
+                                                                            RTC_FORMAT_UINT3,
+                                                                            3 * sizeof(unsigned),
+                                                                            numberOfFaces);
+
+        // fill up embree vertex buffer
+        int index = 0;
+        for (int i = 0; i < numberOfVertices; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                embreeMeshVertices[index] = (float) vertices[i].c.x[j];
+                index++;
+            }
+        }
+
+        // fill up embree index buffer
+        for (int i = 0; i < (numberOfFaces * 3); ++i) {
+            embreeMeshIndices[i] = (unsigned int) faces.content->array[i];
+        }
+
+        rtcSetGeometryUserData(embreeMesh, (void*)thisMesh);
+        embreeMeshGeomID = [embree addGeometry:embreeMesh];
+
+
         ArnEmbreeGeometry * thisGeometry = [embree getGeometryFromArrayAtIndex: embreeMeshGeomID];
         [thisGeometry setShape: thisMesh];
-        // [embree commitScene]; // for now
+        thisMesh->embreeGeomID = embreeMeshGeomID;
     }
 
     //   Before we return the triangle mesh we need to apply the vertex set
@@ -592,7 +586,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         : (ArLongArray) faces_
         : (Pnt3D) minPoint_
         : (Pnt3D) maxPoint_
-        : (unsigned int) embreeGeomID_
 {
     self = [ super init: newGeometry ];
 
@@ -604,7 +597,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
         internalMeshTree = 0;
 
-        embreeGeomID = embreeGeomID_;
     }
 
     return self;
@@ -749,6 +741,11 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         //   Push the triangle into the dyn array.
 
         arnoderefdynarray_push(& array, HARD_NODE_REFERENCE(triangle));
+
+        if([ArnEmbree embreeEnabled]) {
+            ArnEmbree * embree = [ArnEmbree embreeManager];
+
+        }
 
         // debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Created triangle %li with vertex indices (%li,%li,%li)\n", i, ARARRAY_I(triangle->indexTable, 0), ARARRAY_I(triangle->indexTable, 1), ARARRAY_I(triangle->indexTable, 2))
     }

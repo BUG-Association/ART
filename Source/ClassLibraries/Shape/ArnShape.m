@@ -227,10 +227,10 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     // feed to embree
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        ArnEmbreeGeometry * geometry = [embree getGeometryFromArrayAtIndex: self->embreeGeomID];
-        if(geometry) {
-            [geometry setCombinedAttributes: result];
-        }
+//        ArnEmbreeGeometry * geometry = [embree getGeometryFromArrayAtIndex: self->embreeGeomID];
+  //      if(geometry) {
+    //        [geometry setCombinedAttributes:result];
+      //  }
     }
 
     return result;
@@ -287,6 +287,7 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
 
     const ArnShape * shape = (const ArnShape *) args->geometryUserPtr;
 
+    /*
     Box3D * boxWorldspace = [shape getWorldBBox];
     struct RTCBounds * bounds_o = args->bounds_o;
 
@@ -294,6 +295,7 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
 
     ArnEmbree * embree = [ArnEmbree embreeManager];
     [embree passWorldBBoxToEmbree : boxWorldspace : bounds_o : className];
+     */
 }
 
 void embree_intersect(const struct RTCIntersectFunctionNArguments* args) {

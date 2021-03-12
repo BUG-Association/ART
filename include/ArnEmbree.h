@@ -49,6 +49,7 @@ typedef enum Embree_state {
     unsigned int _geometryID;
     ArnShape * _shape;
     AraCombinedAttributes * _attributes;
+//     ArNodeRef containedShapes;
 }
 
 - (void) setGeometryID : (unsigned int) geometryID;
@@ -59,6 +60,8 @@ typedef enum Embree_state {
 
 - (void) setCombinedAttributes : (AraCombinedAttributes *) attributes;
 - (AraCombinedAttributes *) getCombinedAttributes;
+
+// - (ArNodeRef *) getSubShapeAtIndex : (unsigned int ) index;
 
 @end
 

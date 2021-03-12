@@ -68,6 +68,12 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return _attributes;
 }
 
+/*
+- (ArNodeRef *) getSubShapeAtIndex : (unsigned int ) index {
+
+}
+ */
+
 @end // ArnEmbreeGeometry
 
 
@@ -152,7 +158,7 @@ static ArnEmbree * embreeManager;
     [thisGeometry setGeometryID: geomID];
     [self addEmbreeGeometryToArray : thisGeometry : geomID];
 
-    // [thisGeometry release];
+    //[thisGeometry release];
     return geomID;
 }
 
@@ -262,14 +268,37 @@ static ArnEmbree * embreeManager;
     if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
         return NULL;
 
+    // debug
+    else
+        printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
+               rayhit.hit.geomID,
+               rayhit.hit.primID,
+               rayhit.ray.tfar);
+
+
     // else:
     // retrieve further information about the intersected shape ...
-    ArnEmbreeGeometry * intersectedGeometry = [self getGeometryFromArrayAtIndex: rayhit.hit.geomID];
-    ArnShape * intersectedGeometryShape = [intersectedGeometry getShape];
-    AraCombinedAttributes * intersectedGeometryCombinedAttributes = [intersectedGeometry getCombinedAttributes];
+    RTCGeometry intersectedGeometry = rtcGetGeometry(scene, rayhit.hit.geomID);
+    ArnShape * intersectedGeometryShape = rtcGetGeometryUserData(intersectedGeometry);
+
+
+
+    /*
+    if(intersectedGeometryShape) {
+        NSString * className = NSStringFromClass([intersectedGeometryShape class]);
+        printf(
+                "Instersected shape is of class %s\n"
+                ,   [className UTF8String]
+        );
+    }
+
+
+    ArnEmbreeGeometry * intersectedArnEmbreeGeometry = [self getGeometryFromArrayAtIndex: rayhit.hit.geomID];
+    AraCombinedAttributes * intersectedGeometryCombinedAttributes = [intersectedArnEmbreeGeometry getCombinedAttributes];
     ArNodeRefDynArray attributeRefArray = intersectedGeometryCombinedAttributes->attributeRefArray;
 
     // arnoderefdynarray_debugprintf(&attributeRefArray);
+
 
     // ... and store intersection information in an
     // ArcIntersection and return it
@@ -277,6 +306,7 @@ static ArnEmbree * embreeManager;
     intersection->t = rayhit.ray.tfar;;
     intersection->texture_coordinates = PNT2D(rayhit.hit.u, rayhit.hit.v);
     intersection->objectspace_normal = VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
+    // intersection->shape = intersectedGeometryShape;
 
     // fetch material information
     intersection->materialInsideRef = WEAK_NODE_REFERENCE(attributeRefArray.stackArray[VOLUME_MATERIAL_SLOT].reference);
@@ -284,10 +314,13 @@ static ArnEmbree * embreeManager;
     // this is a bit of a hack, but I have not found a smarter way
     // to get the outside material
     ArNode<ArpVolumeMaterial> * volumeMaterial =
-            ARCSURFACEPOINT_VOLUME_MATERIAL_INSIDE(eyePoint);
+           ARCSURFACEPOINT_VOLUME_MATERIAL_INSIDE(eyePoint);
     intersection->materialOutsideRef = WEAK_NODE_REFERENCE(volumeMaterial);
 
+
     return intersection;
+     */
+    return NULL;
 }
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str {
