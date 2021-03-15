@@ -46,8 +46,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
 
-static Box3D * worldBox;
-
 - init
         : (ArShapeGeometry) newGeometry
 {
@@ -227,10 +225,10 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     // feed to embree
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-//        ArnEmbreeGeometry * geometry = [embree getGeometryFromArrayAtIndex: self->embreeGeomID];
-  //      if(geometry) {
-    //        [geometry setCombinedAttributes:result];
-      //  }
+        ArnEmbreeGeometry * geometry = [embree getGeometryFromArrayAtIndex: self->embreeGeomID];
+        if(geometry) {
+            [geometry setCombinedAttributes:result];
+        }
     }
 
     return result;

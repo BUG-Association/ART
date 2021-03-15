@@ -309,15 +309,9 @@ ArNode * arntrianglemesh_from_ply(
         }
     }
 
+#define EMBREE_GEOM_ID_UNINITIALIZED -1
     //   Create the actual triangle mesh.
-
-    ArnTriangleMesh* thisMesh =
-            [ ALLOC_INIT_OBJECT(ArnTriangleMesh)
-                    :   newGeometry
-                    :   faces
-                    :   minPoint
-                    :   maxPoint
-            ];
+    ArnTriangleMesh* thisMesh;
 
     // If embree is enabled, create a trinangle mesh and pass it to embree
     unsigned int embreeMeshGeomID;
@@ -353,13 +347,31 @@ ArNode * arntrianglemesh_from_ply(
             embreeMeshIndices[i] = (unsigned int) faces.content->array[i];
         }
 
-        rtcSetGeometryUserData(embreeMesh, (void*)thisMesh);
+        thisMesh =
+                [ ALLOC_INIT_OBJECT(ArnTriangleMesh)
+                        :   newGeometry
+                        :   faces
+                        :   minPoint
+                        :   maxPoint
+                        :   embreeMeshGeomID
+                ];
+
+        // rtcSetGeometryUserData(embreeMesh, (void*)thisMesh);
         embreeMeshGeomID = [embree addGeometry:embreeMesh];
-
-
         ArnEmbreeGeometry * thisGeometry = [embree getGeometryFromArrayAtIndex: embreeMeshGeomID];
         [thisGeometry setShape: thisMesh];
         thisMesh->embreeGeomID = embreeMeshGeomID;
+    }
+
+    else {
+        thisMesh =
+                [ ALLOC_INIT_OBJECT(ArnTriangleMesh)
+                        :   newGeometry
+                        :   faces
+                        :   minPoint
+                        :   maxPoint
+                        :   EMBREE_GEOM_ID_UNINITIALIZED
+                ];
     }
 
     //   Before we return the triangle mesh we need to apply the vertex set
@@ -561,6 +573,7 @@ ArNode  * arntrianglemesh_heightfield_from_image(
                     :   faces
                     :   minPoint
                     :   maxPoint
+                    :   EMBREE_GEOM_ID_UNINITIALIZED
             ];
 
     //   Before we return the triangle mesh we need to apply the vertex set
@@ -586,6 +599,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         : (ArLongArray) faces_
         : (Pnt3D) minPoint_
         : (Pnt3D) maxPoint_
+        : (int) embreeGeomID_
 {
     self = [ super init: newGeometry ];
 
@@ -597,6 +611,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
         internalMeshTree = 0;
 
+        embreeGeomID = embreeGeomID_;
     }
 
     return self;
@@ -721,33 +736,66 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
     ArNodeRefDynArray  array = arnoderefdynarray_init( numberOfFaces );
 
-    for( long i = 0; i < numberOfFaces; ++i )
-    {
-        //   Create a triange for each face.
+    // If Embree is enabled, pass the triangle array to the corresponding embree shape
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        ArnEmbreeGeometry * embreeGeometry = [embree getGeometryFromArrayAtIndex: self->embreeGeomID];
+        embreeGeometry->_traversalState = *traversalState;
 
-        ArnTriangle  * triangle =
-                arntriangle(
-                        art_gv,
-                        ARARRAY_I(faces, i*3+0),
-                        ARARRAY_I(faces, i*3+1),
-                        ARARRAY_I(faces, i*3+2)
-                );
+        embreeGeometry->containtedPrimitives = [[NSMutableArray alloc] init];
+
+        for( long i = 0; i < numberOfFaces; ++i )
+        {
+            //   Create a triange for each face.
+
+            ArnTriangle  * triangle =
+                    arntriangle(
+                            art_gv,
+                            ARARRAY_I(faces, i*3+0),
+                            ARARRAY_I(faces, i*3+1),
+                            ARARRAY_I(faces, i*3+2)
+                    );
 
 
-        //   Triangle setup.
+            //   Triangle setup.
 
-        [ triangle setupNodeData: traversalState ];
+            [ triangle setupNodeData: traversalState ];
 
-        //   Push the triangle into the dyn array.
+            // push the single triangle to embree
+            [embreeGeometry->containtedPrimitives insertObject:triangle atIndex:(NSUInteger) i];
 
-        arnoderefdynarray_push(& array, HARD_NODE_REFERENCE(triangle));
+            //   Push the triangle into the dyn array.
 
-        if([ArnEmbree embreeEnabled]) {
-            ArnEmbree * embree = [ArnEmbree embreeManager];
+            arnoderefdynarray_push(& array, HARD_NODE_REFERENCE(triangle));
 
+            // debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Created triangle %li with vertex indices (%li,%li,%li)\n", i, ARARRAY_I(triangle->indexTable, 0), ARARRAY_I(triangle->indexTable, 1), ARARRAY_I(triangle->indexTable, 2))
         }
 
-        // debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Created triangle %li with vertex indices (%li,%li,%li)\n", i, ARARRAY_I(triangle->indexTable, 0), ARARRAY_I(triangle->indexTable, 1), ARARRAY_I(triangle->indexTable, 2))
+    }
+    else {
+        for( long i = 0; i < numberOfFaces; ++i )
+        {
+            //   Create a triange for each face.
+
+            ArnTriangle  * triangle =
+                    arntriangle(
+                            art_gv,
+                            ARARRAY_I(faces, i*3+0),
+                            ARARRAY_I(faces, i*3+1),
+                            ARARRAY_I(faces, i*3+2)
+                    );
+
+
+            //   Triangle setup.
+
+            [ triangle setupNodeData: traversalState ];
+
+            //   Push the triangle into the dyn array.
+
+            arnoderefdynarray_push(& array, HARD_NODE_REFERENCE(triangle));
+
+            // debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Created triangle %li with vertex indices (%li,%li,%li)\n", i, ARARRAY_I(triangle->indexTable, 0), ARARRAY_I(triangle->indexTable, 1), ARARRAY_I(triangle->indexTable, 2))
+        }
     }
 
 

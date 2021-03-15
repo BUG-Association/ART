@@ -28,6 +28,7 @@
 #include "ART_Foundation.h"
 #include "ArpEmbree.h"
 #include <embree3/rtcore.h>
+#include "ArNode.h"
 
 @class ArcIntersection;
 @class ArnRayCaster;
@@ -45,11 +46,13 @@ typedef enum Embree_state {
 } Embree_state;
 
 @interface ArnEmbreeGeometry : ArcObject {
-@public
+@private
     unsigned int _geometryID;
     ArnShape * _shape;
     AraCombinedAttributes * _attributes;
-//     ArNodeRef containedShapes;
+@public
+    NSMutableArray * containtedPrimitives;
+    ArTraversalState _traversalState;
 }
 
 - (void) setGeometryID : (unsigned int) geometryID;
@@ -60,8 +63,6 @@ typedef enum Embree_state {
 
 - (void) setCombinedAttributes : (AraCombinedAttributes *) attributes;
 - (AraCombinedAttributes *) getCombinedAttributes;
-
-// - (ArNodeRef *) getSubShapeAtIndex : (unsigned int ) index;
 
 @end
 
@@ -96,7 +97,7 @@ typedef enum Embree_state {
         ;
 
 - (ArnEmbreeGeometry *) getGeometryFromArrayAtIndex
-        : (unsigned int) index
+        : (int) index
         ;
 
 
@@ -104,6 +105,7 @@ typedef enum Embree_state {
 - (ArcIntersection *) intersect
         : (Ray3D *) ray
         : (ArcSurfacePoint *) eyePoint
+        : (ArnRayCaster *) raycaster
         ;
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str;

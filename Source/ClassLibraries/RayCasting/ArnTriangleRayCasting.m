@@ -63,6 +63,7 @@ ARPRAYCASTING_SINGULAR_SHAPE_IMPLEMENTATION
 
     const Pnt3D * point_array = [ARNRAYCASTER_VERTICES(rayCaster) pointArray];
 
+
     unsigned int  result =
         triangledata_hit(
               triangleData,
@@ -88,7 +89,6 @@ ARPRAYCASTING_SINGULAR_SHAPE_IMPLEMENTATION
               arface_on_shape_reverse | arface_on_shape_is_planar
             );
 
-
         arintersectionlist_init_1(
               intersectionList,
               t,
@@ -98,10 +98,13 @@ ARPRAYCASTING_SINGULAR_SHAPE_IMPLEMENTATION
               rayCaster
             );
 
+
         ArcIntersection  * intersection =
             INTERSECTIONLIST_HEAD(*intersectionList);
 
+
         SET_OBJECTSPACE_POINT(intersection, intersectionLocalPoint);
+
         
         const FVec3D  * normal_array =
             [ ARNRAYCASTER_VERTICES(rayCaster) normalArray ];

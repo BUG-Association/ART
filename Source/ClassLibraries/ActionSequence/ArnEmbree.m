@@ -229,7 +229,7 @@ static ArnEmbree * embreeManager;
 }
 
 - (ArnEmbreeGeometry *) getGeometryFromArrayAtIndex
-        : (unsigned int) index
+        : (int) index
 {
     return [geometries objectAtIndex: index];
 }
@@ -268,59 +268,68 @@ static ArnEmbree * embreeManager;
     if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
         return NULL;
 
-    // debug
+    /*
+    // debugprintf
     else
         printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
                rayhit.hit.geomID,
                rayhit.hit.primID,
                rayhit.ray.tfar);
-
+    */
 
     // else:
     // retrieve further information about the intersected shape ...
-    RTCGeometry intersectedGeometry = rtcGetGeometry(scene, rayhit.hit.geomID);
-    ArnShape * intersectedGeometryShape = rtcGetGeometryUserData(intersectedGeometry);
-
-
-
-    /*
-    if(intersectedGeometryShape) {
-        NSString * className = NSStringFromClass([intersectedGeometryShape class]);
-        printf(
-                "Instersected shape is of class %s\n"
-                ,   [className UTF8String]
-        );
-    }
-
-
-    ArnEmbreeGeometry * intersectedArnEmbreeGeometry = [self getGeometryFromArrayAtIndex: rayhit.hit.geomID];
-    AraCombinedAttributes * intersectedGeometryCombinedAttributes = [intersectedArnEmbreeGeometry getCombinedAttributes];
-    ArNodeRefDynArray attributeRefArray = intersectedGeometryCombinedAttributes->attributeRefArray;
-
-    // arnoderefdynarray_debugprintf(&attributeRefArray);
-
+    unsigned int geomID = rayhit.hit.geomID;
+    ArnEmbreeGeometry * intersectedEmbreeGeometry = [self getGeometryFromArrayAtIndex:geomID];
+    // ArnShape * intersectedPrimitive = [intersectedEmbreeGeometry->containtedPrimitives objectAtIndex:primID];
+    ArTraversalState state = intersectedEmbreeGeometry->_traversalState;
 
     // ... and store intersection information in an
     // ArcIntersection and return it
-    ArcIntersection * intersection = [[ArcIntersection alloc] init];
-    intersection->t = rayhit.ray.tfar;;
+    ArcIntersection  *  intersection = [[ArcIntersection alloc] init];
+         //   [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
+
+    // artraversalstate_debugprintf(&state);
+
+    ARCINTERSECTION_T(intersection) = rayhit.ray.tfar;;
+    // ARCINTERSECTION_SHAPE(intersection) = intersectedPrimitive;
+    ARCINTERSECTION_TRAVERSALSTATE(intersection) = state;
+    // ARCINTERSECTION_OBJECTSPACE_INCOMING_RAY(intersection) =
+       //     ARNRAYCASTER_OBJECTSPACE_RAY(raycaster);
+
+    /*
+    ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) =
+            ARNRAYCASTER_WORLDSPACE_RAY(raycaster);
+            */
+
+    ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = *ray;
+
+    SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
+    TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
+
+
+    /*
+    intersection->t = t;
     intersection->texture_coordinates = PNT2D(rayhit.hit.u, rayhit.hit.v);
     intersection->objectspace_normal = VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
-    // intersection->shape = intersectedGeometryShape;
+    intersection->shape = intersectedPrimitive;
 
     // fetch material information
-    intersection->materialInsideRef = WEAK_NODE_REFERENCE(attributeRefArray.stackArray[VOLUME_MATERIAL_SLOT].reference);
+    // intersection->materialInsideRef = WEAK_NODE_REFERENCE(intersectedAttributes.stackArray[VOLUME_MATERIAL_SLOT].reference);
+    intersection->materialInsideRef = WEAK_NODE_REFERENCE(intersectedAttributes->attributeRefArray.stackArray[VOLUME_MATERIAL_SLOT].reference);
 
-    // this is a bit of a hack, but I have not found a smarter way
-    // to get the outside material
+*/
+    // [Sebastian] This works but I have absolutely no idea how and why...
+    // I need to find a way to reference to the environment material
+    // a little bit smarter (and this should be possible, just haven't
+    // found out)
+    // If I omit this, the program crashes when calculating the phase
+    // function...
     ArNode<ArpVolumeMaterial> * volumeMaterial =
            ARCSURFACEPOINT_VOLUME_MATERIAL_INSIDE(eyePoint);
     intersection->materialOutsideRef = WEAK_NODE_REFERENCE(volumeMaterial);
 
-
     return intersection;
-     */
-    return NULL;
 }
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str {
@@ -328,9 +337,6 @@ static ArnEmbree * embreeManager;
 }
 
 - (void) cleanUpEmbree {
-
-    
-
     rtcReleaseScene(scene);
     rtcReleaseDevice(device);
 }

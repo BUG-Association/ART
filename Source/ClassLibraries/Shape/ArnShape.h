@@ -43,7 +43,10 @@ ART_MODULE_INTERFACE(ArnShape)
 {
 @public
     ArShapeGeometry  shapeGeometry;
+
+    int embreeGeomID;
 }
+
 
 - init
         : (ArShapeGeometry) newGeometry

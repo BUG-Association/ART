@@ -192,6 +192,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 #if EMBREE_INSTALLED
 void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* args) {
 
+    /*
     printf("calling 'embree_bbox_simpleIndexedShape()'\n");
 
     if(!args->geometryUserPtr)
@@ -205,6 +206,7 @@ void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* arg
 
     ArnEmbree * embree = [ArnEmbree embreeManager];
     [embree passWorldBBoxToEmbree : boxWorldspace : bounds_o : className];
+     */
 }
 
 void embree_intersect_simpleIndexedShape(const struct RTCIntersectFunctionNArguments* args) {

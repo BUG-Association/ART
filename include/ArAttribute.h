@@ -126,7 +126,7 @@ ART_MODULE_INTERFACE(ArAttribute)
 @interface AraMultiple
         : ArnUnary
 {
-@public // TODO remove later
+@public // TODO remove '@public' later
     ArNodeRefDynArray  attributeRefArray;
 }
 
