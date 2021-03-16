@@ -239,8 +239,8 @@ static ArnEmbree * embreeManager;
 }
 
 - (ArcIntersection *) intersect
-        : (Ray3D *) ray
-        : (ArcSurfacePoint *) eyePoint
+        : (const Ray3D *) ray
+        : (const ArcSurfacePoint *) eyePoint
 {
     // set up embree intersection context
     struct RTCIntersectContext context;
@@ -281,7 +281,6 @@ static ArnEmbree * embreeManager;
     // retrieve further information about the intersected shape ...
     unsigned int geomID = rayhit.hit.geomID;
     ArnEmbreeGeometry * intersectedEmbreeGeometry = [self getGeometryFromArrayAtIndex:geomID];
-    // ArnShape * intersectedPrimitive = [intersectedEmbreeGeometry->containtedPrimitives objectAtIndex:primID];
     ArTraversalState state = intersectedEmbreeGeometry->_traversalState;
 
     // ... and store intersection information in an
@@ -289,36 +288,13 @@ static ArnEmbree * embreeManager;
     ArcIntersection  *  intersection = [[ArcIntersection alloc] init];
          //   [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
 
-    // artraversalstate_debugprintf(&state);
-
     ARCINTERSECTION_T(intersection) = rayhit.ray.tfar;;
-    // ARCINTERSECTION_SHAPE(intersection) = intersectedPrimitive;
     ARCINTERSECTION_TRAVERSALSTATE(intersection) = state;
-    // ARCINTERSECTION_OBJECTSPACE_INCOMING_RAY(intersection) =
-       //     ARNRAYCASTER_OBJECTSPACE_RAY(raycaster);
-
-    /*
-    ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) =
-            ARNRAYCASTER_WORLDSPACE_RAY(raycaster);
-            */
-
     ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = *ray;
-
     SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
     TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
 
 
-    /*
-    intersection->t = t;
-    intersection->texture_coordinates = PNT2D(rayhit.hit.u, rayhit.hit.v);
-    intersection->objectspace_normal = VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
-    intersection->shape = intersectedPrimitive;
-
-    // fetch material information
-    // intersection->materialInsideRef = WEAK_NODE_REFERENCE(intersectedAttributes.stackArray[VOLUME_MATERIAL_SLOT].reference);
-    intersection->materialInsideRef = WEAK_NODE_REFERENCE(intersectedAttributes->attributeRefArray.stackArray[VOLUME_MATERIAL_SLOT].reference);
-
-*/
     // [Sebastian] This works but I have absolutely no idea how and why...
     // I need to find a way to reference to the environment material
     // a little bit smarter (and this should be possible, just haven't

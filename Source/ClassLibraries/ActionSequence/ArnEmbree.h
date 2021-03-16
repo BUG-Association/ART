@@ -103,8 +103,8 @@ typedef enum Embree_state {
 
 // intersection
 - (ArcIntersection *) intersect
-        : (Ray3D *) ray
-        : (ArcSurfacePoint *) eyePoint
+        : (const Ray3D *) ray
+        : (const ArcSurfacePoint *) eyePoint
         ;
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str;

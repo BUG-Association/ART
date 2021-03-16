@@ -377,6 +377,16 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         : (const Ray3D *) ray_worldCoordinates
         : (const double) range_end_t
 {
+    // if embree is enabled,
+    // find the intersection via embree and return
+    if([ArnEmbree embreeEnabled])
+    {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        return [embree intersect
+                         : ray_worldCoordinates
+                         : (ArcSurfacePoint *) startingPoint_worldCoordinates
+                        ];
+    }
 
     rayID++;
 

@@ -357,7 +357,7 @@ ArNode * arntrianglemesh_from_ply(
                 ];
 
         // rtcSetGeometryUserData(embreeMesh, (void*)thisMesh);
-        embreeMeshGeomID = [embree addGeometry:embreeMesh];
+        embreeMeshGeomID = [embree addGeometry: embreeMesh];
         ArnEmbreeGeometry * thisGeometry = [embree getGeometryFromArrayAtIndex: embreeMeshGeomID];
         [thisGeometry setShape: thisMesh];
         thisMesh->embreeGeomID = embreeMeshGeomID;

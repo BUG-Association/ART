@@ -933,10 +933,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     
     int lastNonzeroIndex = -1;
     nonzeroContributions[0] = 0;
-
-    // if embree is enabled, commit the embree scene
-    ArnEmbree * embree = [ArnEmbree embreeManager];
-    if(embree) [embree commitScene];
     
     for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     {
@@ -946,19 +942,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
         int attenuationIndex = pathLength; // to be multiplied with media attenuation, first initilazed here
         int contributionIndex = pathLength + 1; // to be multiplied with media attenuation, first initialized here
 
-        // do the intersection:
-        // if embree is enabled, do so with its help
-        // otherwise, proceed as usual
-        if([ArnEmbree embreeEnabled] && embree)
-            intersection = [embree intersect:&ray :eyePoint ];
-        else
-            intersection =
-                    [ RAYCASTER firstRayObjectIntersection
-                            :   entireScene
-                            :   rayOriginPoint
-                            : & ray
-                            :   MATH_HUGE_DOUBLE
-                    ];
+        intersection =
+                [ RAYCASTER firstRayObjectIntersection
+                        :   entireScene
+                        :   rayOriginPoint
+                        : & ray
+                        :   MATH_HUGE_DOUBLE
+                ];
 
         // media attenuation and extinction
         ArSpectralSample mediumReflectivity; // to store the reflectivity divided by their respective pdfs
