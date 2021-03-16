@@ -240,6 +240,7 @@ static ArnEmbree * embreeManager;
 
 - (ArcIntersection *) intersect
         : (const Ray3D *) ray
+        : (ArnRayCaster *) raycaster
         : (const ArcSurfacePoint *) eyePoint
 {
     // set up embree intersection context
@@ -281,29 +282,27 @@ static ArnEmbree * embreeManager;
     // retrieve further information about the intersected shape ...
     unsigned int geomID = rayhit.hit.geomID;
     ArnEmbreeGeometry * intersectedEmbreeGeometry = [self getGeometryFromArrayAtIndex:geomID];
-    ArTraversalState state = intersectedEmbreeGeometry->_traversalState;
+    ArTraversalState traversalState = intersectedEmbreeGeometry->_traversalState;
+
+    RTCGeometry intersectedRTCGeometry = rtcGetGeometry(scene, geomID);
+    id userData = rtcGetGeometryUserData(intersectedRTCGeometry);
+    // ArTraversalState * traversalState = (ArTraversalState *) userData;
+
 
     // ... and store intersection information in an
     // ArcIntersection and return it
-    ArcIntersection  *  intersection = [[ArcIntersection alloc] init];
-         //   [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
+    ArcIntersection  *  intersection =
+                    [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
 
     ARCINTERSECTION_T(intersection) = rayhit.ray.tfar;;
-    ARCINTERSECTION_TRAVERSALSTATE(intersection) = state;
+    ARCINTERSECTION_TRAVERSALSTATE(intersection) = traversalState;
     ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = *ray;
     SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
     TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
 
-
-    // [Sebastian] This works but I have absolutely no idea how and why...
-    // I need to find a way to reference to the environment material
-    // a little bit smarter (and this should be possible, just haven't
-    // found out)
-    // If I omit this, the program crashes when calculating the phase
-    // function...
-    ArNode<ArpVolumeMaterial> * volumeMaterial =
-           ARCSURFACEPOINT_VOLUME_MATERIAL_INSIDE(eyePoint);
-    intersection->materialOutsideRef = WEAK_NODE_REFERENCE(volumeMaterial);
+    // manually setting environment material and volume material
+    intersection->materialOutsideRef = traversalState.volume_material_reference;
+    intersection->materialInsideRef = traversalState.environment_material_reference; // not sure of this
 
     return intersection;
 }
