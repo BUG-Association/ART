@@ -385,7 +385,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         return [embree intersect
                          : ray_worldCoordinates
                          : self
-                         : (ArcSurfacePoint *) startingPoint_worldCoordinates
                         ];
     }
 

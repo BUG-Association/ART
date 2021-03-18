@@ -40,6 +40,7 @@ ART_MODULE_INTERFACE(ArnSimpleIndexedShape)
 @public
     ArLongArray indexTable;
 
+    int embreeGeomID;
 }
 
 - init

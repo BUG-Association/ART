@@ -46,23 +46,14 @@ typedef enum Embree_state {
 } Embree_state;
 
 @interface ArnEmbreeGeometry : ArcObject {
-@private
-    unsigned int _geometryID;
-    ArnShape * _shape;
-    AraCombinedAttributes * _attributes;
 @public
-    NSMutableArray * containtedPrimitives;
+    ArNode<ArpShape> * _shape;
     ArTraversalState _traversalState;
 }
-
-- (void) setGeometryID : (unsigned int) geometryID;
-- (unsigned int) getGeometryID;
 
 - (void) setShape : (ArnShape *) shape;
 - (ArnShape *) getShape;
 
-- (void) setCombinedAttributes : (AraCombinedAttributes *) attributes;
-- (AraCombinedAttributes *) getCombinedAttributes;
 
 @end
 
@@ -81,7 +72,6 @@ typedef enum Embree_state {
 
 - (void) setDevice: (RTCDevice) newDevice;
 - (void) setScene: (RTCScene) newScene;
-- (unsigned int) addGeometry: (RTCGeometry) newGeometry;
 - (void) commitScene;
 - (void) setState: (Embree_state) newState;
 
@@ -89,23 +79,15 @@ typedef enum Embree_state {
 - (RTCDevice) getDevice;
 - (RTCScene) getScene;
 - (Embree_state) getState;
-- (void) initGeometryArray;
 
-- (void) addEmbreeGeometryToArray
-        : (ArnEmbreeGeometry *) geometry
-        : (unsigned int) index
-        ;
-
-- (ArnEmbreeGeometry *) getGeometryFromArrayAtIndex
-        : (int) index
-        ;
+- (unsigned int) addGeometry: (RTCGeometry) newGeometry;
+- (void) setGeometryUserData : (ArNode <ArpShape> *) shape : (ArTraversalState *) traversalState;
 
 
 // intersection
 - (ArcIntersection *) intersect
         : (const Ray3D *) ray
         : (ArnRayCaster *) raycaster
-        : (const ArcSurfacePoint *) eyePoint
         ;
 
 - (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str;

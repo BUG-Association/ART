@@ -353,14 +353,9 @@ ArNode * arntrianglemesh_from_ply(
                         :   faces
                         :   minPoint
                         :   maxPoint
-                        :   embreeMeshGeomID
                 ];
 
-        // rtcSetGeometryUserData(embreeMesh, (void*)thisMesh);
-        embreeMeshGeomID = [embree addGeometry: embreeMesh];
-        ArnEmbreeGeometry * thisGeometry = [embree getGeometryFromArrayAtIndex: embreeMeshGeomID];
-        [thisGeometry setShape: thisMesh];
-        thisMesh->embreeGeomID = embreeMeshGeomID;
+        thisMesh->embreeGeomID = (int)[embree addGeometry: embreeMesh];
     }
 
     else {
@@ -370,7 +365,6 @@ ArNode * arntrianglemesh_from_ply(
                         :   faces
                         :   minPoint
                         :   maxPoint
-                        :   EMBREE_GEOM_ID_UNINITIALIZED
                 ];
     }
 
@@ -573,7 +567,6 @@ ArNode  * arntrianglemesh_heightfield_from_image(
                     :   faces
                     :   minPoint
                     :   maxPoint
-                    :   EMBREE_GEOM_ID_UNINITIALIZED
             ];
 
     //   Before we return the triangle mesh we need to apply the vertex set
@@ -599,7 +592,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         : (ArLongArray) faces_
         : (Pnt3D) minPoint_
         : (Pnt3D) maxPoint_
-        : (int) embreeGeomID_
 {
     self = [ super init: newGeometry ];
 
@@ -611,7 +603,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
         internalMeshTree = 0;
 
-        embreeGeomID = embreeGeomID_;
+        embreeGeomID = EMBREE_GEOM_ID_UNINITIALIZED;
     }
 
     return self;
@@ -738,14 +730,8 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
     // If Embree is enabled, pass the triangle array to the corresponding embree shape
     if([ArnEmbree embreeEnabled]) {
-        ArnEmbree *embree = [ArnEmbree embreeManager];
-
-        // debug
-        ArnEmbreeGeometry *embreeGeometry = [embree getGeometryFromArrayAtIndex:self->embreeGeomID];
-        embreeGeometry->_traversalState = *traversalState;
-
-        RTCGeometry thisGeometry = rtcGetGeometry([embree getScene], (unsigned int) self->embreeGeomID);
-        rtcSetGeometryUserData(thisGeometry, (void *) traversalState);
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        [embree setGeometryUserData: self : traversalState];
     }
 
     for( long i = 0; i < numberOfFaces; ++i )

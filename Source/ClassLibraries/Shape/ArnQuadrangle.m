@@ -164,6 +164,8 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(1,1,1)
             & pointArray[ ARARRAY_I( indexTable, 3 ) ]
             );
     }
+
+
 }
 
 - (void) getLocalCentroid

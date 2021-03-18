@@ -44,14 +44,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnEmbreeGeometry
 
-- (void) setGeometryID : (unsigned int) geometryID {
-    _geometryID = geometryID;
-}
-
-- (unsigned int) getGeometryID {
-    return _geometryID;
-}
-
 - (void) setShape : (ArnShape *) shape {
     _shape = shape;
 }
@@ -59,20 +51,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 - (ArnShape *) getShape {
     return _shape;
 }
-
-- (void) setCombinedAttributes : (AraCombinedAttributes *) attributes {
-    _attributes = attributes;
-}
-
-- (AraCombinedAttributes *) getCombinedAttributes {
-    return _attributes;
-}
-
-/*
-- (ArNodeRef *) getSubShapeAtIndex : (unsigned int ) index {
-
-}
- */
 
 @end // ArnEmbreeGeometry
 
@@ -113,9 +91,6 @@ static ArnEmbree * embreeManager;
             [embreeManager setScene: newScene];
         }
 
-        // init geometry array
-        [embreeManager initGeometryArray];
-
         isInitialized = YES;
         EMBREE_ENABLED = YES;
     }
@@ -154,12 +129,34 @@ static ArnEmbree * embreeManager;
     rtcReleaseGeometry(newGeometry);
 
     // create new geometry class
-    ArnEmbreeGeometry * thisGeometry = [[ArnEmbreeGeometry alloc] init]; // TODO release
-    [thisGeometry setGeometryID: geomID];
-    [self addEmbreeGeometryToArray : thisGeometry : geomID];
+    // ArnEmbreeGeometry * thisGeometry = [[ArnEmbreeGeometry alloc] init]; // TODO release
+    // [thisGeometry setGeometryID: geomID];
+    // [self addEmbreeGeometryToArray : thisGeometry : geomID];
 
     //[thisGeometry release];
     return geomID;
+}
+
+- (void) setGeometryUserData : (ArNode <ArpShape> *) shape
+                             : (ArTraversalState *) traversalState
+{
+    RTCGeometry thisGeometry = NULL;
+    if([shape isKindOfClass: [ArnShape class]]) {
+        ArnShape * arnShape = (ArnShape *) shape;
+        thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
+    }
+
+    else if(([shape isKindOfClass: [ArnSimpleIndexedShape class]])) {
+        ArnSimpleIndexedShape * arnShape = (ArnSimpleIndexedShape *) shape;
+        thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
+    }
+
+    // ArnEmbreeGeometry * embreeGeometry = [[ArnEmbreeGeometry alloc] init];
+    ArnEmbreeGeometry * embreeGeometry = ALLOC_INIT_OBJECT(ArnEmbreeGeometry);
+    embreeGeometry->_shape = shape;
+    embreeGeometry->_traversalState = *traversalState;
+
+    rtcSetGeometryUserData(thisGeometry, (void *) embreeGeometry);
 }
 
 - (void) passWorldBBoxToEmbree
@@ -241,7 +238,6 @@ static ArnEmbree * embreeManager;
 - (ArcIntersection *) intersect
         : (const Ray3D *) ray
         : (ArnRayCaster *) raycaster
-        : (const ArcSurfacePoint *) eyePoint
 {
     // set up embree intersection context
     struct RTCIntersectContext context;
@@ -281,11 +277,14 @@ static ArnEmbree * embreeManager;
     // else:
     // retrieve further information about the intersected shape ...
     unsigned int geomID = rayhit.hit.geomID;
+
+    /*
     ArnEmbreeGeometry * intersectedEmbreeGeometry = [self getGeometryFromArrayAtIndex:geomID];
     ArTraversalState traversalState = intersectedEmbreeGeometry->_traversalState;
+     */
 
     RTCGeometry intersectedRTCGeometry = rtcGetGeometry(scene, geomID);
-    id userData = rtcGetGeometryUserData(intersectedRTCGeometry);
+    ArnEmbreeGeometry * userDataGeometry = (ArnEmbreeGeometry *) rtcGetGeometryUserData(intersectedRTCGeometry);
     // ArTraversalState * traversalState = (ArTraversalState *) userData;
 
 
@@ -295,14 +294,14 @@ static ArnEmbree * embreeManager;
                     [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
 
     ARCINTERSECTION_T(intersection) = rayhit.ray.tfar;;
-    ARCINTERSECTION_TRAVERSALSTATE(intersection) = traversalState;
+    ARCINTERSECTION_TRAVERSALSTATE(intersection) = userDataGeometry->_traversalState;
     ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = *ray;
     SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
     TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
 
     // manually setting environment material and volume material
-    intersection->materialOutsideRef = traversalState.volume_material_reference;
-    intersection->materialInsideRef = traversalState.environment_material_reference; // not sure of this
+    intersection->materialOutsideRef = userDataGeometry->_traversalState.volume_material_reference;
+    intersection->materialInsideRef = userDataGeometry->_traversalState.environment_material_reference; // not sure of this
 
     return intersection;
 }

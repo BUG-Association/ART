@@ -44,6 +44,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnSimpleIndexedShape)
 ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
+#define EMBREE_INVALID_GEOMETRY_ID -1
+
 - init
         : (ArLongArray) newIndexTable
 {
@@ -52,6 +54,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     if ( self )
     {
         indexTable = newIndexTable;
+        embreeGeomID = EMBREE_INVALID_GEOMETRY_ID;
     }
     
     return self;

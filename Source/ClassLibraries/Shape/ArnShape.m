@@ -223,6 +223,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
     // feed to embree
+    /*
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
         ArnEmbreeGeometry * geometry = [embree getGeometryFromArrayAtIndex: self->embreeGeomID];
@@ -230,6 +231,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             [geometry setCombinedAttributes:result];
         }
     }
+     */
 
     return result;
 }
