@@ -201,6 +201,13 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
     }
     else
         box3d_ca_add_b(extremalCrdTable, 6, outBoxObjectspace);
+
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        RTCGeometry embreeGeometry = rtcGetGeometry([embree getScene], (unsigned int) embreeGeomID);
+        EmbreeGeometryData * geometryData = (EmbreeGeometryData *)rtcGetGeometryUserData(embreeGeometry);
+        [geometryData setBoundigBox: outBoxObjectspace];
+    }
 }
 
 ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
@@ -221,17 +228,6 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             ];
 
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
-
-    // feed to embree
-    /*
-    if([ArnEmbree embreeEnabled]) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        ArnEmbreeGeometry * geometry = [embree getGeometryFromArrayAtIndex: self->embreeGeomID];
-        if(geometry) {
-            [geometry setCombinedAttributes:result];
-        }
-    }
-     */
 
     return result;
 }
@@ -277,40 +273,13 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     return 0;
 }
 
-
-#if EMBREE_INSTALLED
-
-
-#define EMBREE_DEBUG_PRINTF
-- (RTCGeometry) convertShapeToRTCGeometryAndAddToEmbree {
-    /*
-    ArnEmbree * embree = [ArnEmbree embreeManager];
-
-    assert([embree getDevice] && [embree getScene]);
-
-    RTCGeometry geom = rtcNewGeometry([embree getDevice], RTC_GEOMETRY_TYPE_USER);
-    rtcSetGeometryUserPrimitiveCount(geom, 1);
-    rtcSetGeometryUserData(geom, (void *) self);
-    rtcSetGeometryBoundsFunction(geom, embree_bbox, NULL);
-    rtcSetGeometryIntersectFunction(geom, embree_intersect);
-//    rtcSetGeometryOccludedFunction(geom, embree_occluded);
-
-    rtcCommitGeometry(geom);
-    rtcAttachGeometry([embree getScene], geom);
-    rtcReleaseGeometry(geom);
-
-#ifdef EMBREE_DEBUG_PRINTF
-    NSString * className = NSStringFromClass([self class]);
-        printf(
-                "ObjC coder read: adding instance of class %s to embree\n"
-                ,   [className UTF8String]
-        );
-#endif
-
-    return geom;
-     */
+- (void) getIntersectionList
+        : (ArnRayCaster *) rayCaster
+        : (Range) range_of_t
+        : (struct ArIntersectionList *) intersectionList
+{
+    // TODO do
 }
-#endif // EMBREE_INSTALLED
 
 @end
 

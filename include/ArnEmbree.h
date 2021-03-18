@@ -26,12 +26,12 @@
 #ifdef EMBREE_INSTALLED
 
 #include "ART_Foundation.h"
-#include "ArpEmbree.h"
-#include <embree3/rtcore.h>
 #include "ArNode.h"
+#include <embree3/rtcore.h>
+
+
 
 @class ArcIntersection;
-@class ArnRayCaster;
 @class ArnShape;
 @class AraCombinedAttributes;
 @class ArcSurfacePoint;
@@ -44,6 +44,7 @@ typedef enum Embree_state {
     Scene_Commited,
     Embree_Released
 } Embree_state;
+
 
 @interface EmbreeGeometryData : ArcObject {
 @public
@@ -75,6 +76,8 @@ typedef enum Embree_state {
 + (BOOL) embreeEnabled;
 + (void) enableEmbree: (BOOL) enabled;
 
++ (ArnRayCaster *) embreeRaycaster;
+
 - (void) setDevice: (RTCDevice) newDevice;
 - (void) setScene: (RTCScene) newScene;
 - (void) commitScene;
@@ -85,7 +88,7 @@ typedef enum Embree_state {
 - (RTCScene) getScene;
 - (Embree_state) getState;
 
-- (RTCGeometry) convertShapeToEmbreeGeometry : (ArNode<ArpShape> *) shape;
+- (RTCGeometry) initEmbreeGeometry;
 - (unsigned int) addGeometry: (RTCGeometry) newGeometry;
 - (void) setGeometryUserData : (ArNode <ArpShape> *) shape : (ArTraversalState *) traversalState;
 
@@ -101,6 +104,6 @@ typedef enum Embree_state {
 
 @end
 
-#endif
+#endif // EMBREE_INSTALLED
 
 // ===========================================================================

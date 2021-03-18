@@ -131,7 +131,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         outBBox->max.c.x[i] += FLT_EPSILON;
     }
 
-    if([ArnEmbree embreeEnabled]) {
+    if([ArnEmbree embreeEnabled] && embreeGeomID != EMBREE_INVALID_GEOMETRY_ID) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
         RTCGeometry embreeGeometry = rtcGetGeometry([embree getScene], (unsigned int) embreeGeomID);
         EmbreeGeometryData * geometryData = (EmbreeGeometryData *)rtcGetGeometryUserData(embreeGeometry);
@@ -188,6 +188,15 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             :  ARNGT_VERTICES(traversal)
             ];
 }
+
+- (void) getIntersectionList
+        : (ArnRayCaster *) rayCaster
+        : (Range) range_of_t
+        : (struct ArIntersectionList *) intersectionList
+{
+    // TODO do
+}
+
 
 @end
 
