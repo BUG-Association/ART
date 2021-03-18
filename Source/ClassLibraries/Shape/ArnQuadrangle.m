@@ -77,7 +77,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(1,1,1)
     {
         [self _setupQuadrangle];
     }
-    
+
     return self;
 }
 
@@ -165,6 +165,12 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(1,1,1)
             );
     }
 
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        RTCGeometry embreeGeometry = [embree convertShapeToEmbreeGeometry: self];
+        self->embreeGeomID = (int) [embree addGeometry: embreeGeometry];
+        [embree setGeometryUserData: self : traversalState];
+    }
 
 }
 

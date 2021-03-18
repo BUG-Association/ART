@@ -2260,9 +2260,6 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
         : (ArnGraphTraversal *) traversal
         : (Box3D *) outBBox
 {
-    // "worldBox" needed for storing the AABB in world space
-    Box3D * worldBox = outBBox;
-
     ArNodeRef  trafo_store = ARNGT_TRAFO_REF(traversal);
 
     ARNGT_TRAFO_REF(traversal) = ARNODEREF_NONE;
@@ -2296,20 +2293,6 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
             :   traversal
             :   outBBox
             ];
-
-        /*
-        // if embree is installed, we additionally calculate the
-        // bounding box in world space of the shape in question
-        // and we store it in its 'worldBBoxEmbree' member
-        if([ArnEmbree embreeEnabled]) {
-            [ ARNUNARY_SUBNODE getBBoxWorldspace
-                    :   traversal
-                    :   worldBox
-            ];
-            // throws "may not respond to" warning - need to do smth about this
-            [ ARNUNARY_SUBNODE setWorldBBox: worldBox];
-        }
-         */
 
         if ( COMBINED_VERTICES_ATTRIBUTE )
             [ traversal popVertices

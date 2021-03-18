@@ -56,7 +56,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         indexTable = newIndexTable;
         embreeGeomID = EMBREE_INVALID_GEOMETRY_ID;
     }
-    
+
     return self;
 }
 
@@ -130,6 +130,13 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         outBBox->min.c.x[i] -= FLT_EPSILON;
         outBBox->max.c.x[i] += FLT_EPSILON;
     }
+
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        RTCGeometry embreeGeometry = rtcGetGeometry([embree getScene], (unsigned int) embreeGeomID);
+        EmbreeGeometryData * geometryData = (EmbreeGeometryData *)rtcGetGeometryUserData(embreeGeometry);
+        [geometryData setBoundigBox: outBBox];
+    }
 }
 
 - (void) initBBoxes
@@ -181,76 +188,6 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             :  ARNGT_VERTICES(traversal)
             ];
 }
-
-#define EMBREE_DEBUG_PRINT
-
-- (void) setWorldBBox : (Box3D *) box {
-
-}
-
-- (Box3D *) getWorldBBox {
-    return NULL;
-}
-
-#if EMBREE_INSTALLED
-void embree_bbox_simpleIndexedShape(const struct RTCBoundsFunctionArguments* args) {
-
-    /*
-    printf("calling 'embree_bbox_simpleIndexedShape()'\n");
-
-    if(!args->geometryUserPtr)
-        return;
-
-    const ArnSimpleIndexedShape * shape = (const ArnSimpleIndexedShape *) args->geometryUserPtr;
-
-    Box3D * boxWorldspace = [shape getWorldBBox];
-    struct RTCBounds * bounds_o = args->bounds_o;
-    NSString * className = NSStringFromClass([shape class]);
-
-    ArnEmbree * embree = [ArnEmbree embreeManager];
-    [embree passWorldBBoxToEmbree : boxWorldspace : bounds_o : className];
-     */
-}
-
-void embree_intersect_simpleIndexedShape(const struct RTCIntersectFunctionNArguments* args) {
-    printf("calling 'embree_intersect_simpleIndexedShape()'\n");
-    // TODO implement
-}
-
-void embree_occluded_simpleIndexedShape(const struct RTCIntersectFunctionNArguments* args) {
-    printf("calling 'embree_occluded_simpleIndexedShape()'\n");
-    // TODO implement
-}
-
-#define EMBREE_DEBUG_PRINTF
-- (RTCGeometry) convertShapeToRTCGeometryAndAddToEmbree {
-
-    ArnEmbree * embree = [ArnEmbree embreeManager];
-    assert([embree getDevice] && [embree getScene]);
-
-    RTCGeometry geom = rtcNewGeometry([embree getDevice], RTC_GEOMETRY_TYPE_USER);
-    rtcSetGeometryUserPrimitiveCount(geom, 1);
-    rtcSetGeometryUserData(geom, (void *) self);
-    rtcSetGeometryBoundsFunction(geom, embree_bbox_simpleIndexedShape, NULL);
-    rtcSetGeometryIntersectFunction(geom, embree_intersect_simpleIndexedShape);
-    rtcSetGeometryOccludedFunction(geom, embree_occluded_simpleIndexedShape);
-
-    rtcCommitGeometry(geom);
-    rtcAttachGeometry([embree getScene], geom);
-    rtcReleaseGeometry(geom);
-
-
-#ifdef EMBREE_DEBUG_PRINTF
-    NSString * className = NSStringFromClass([self class]);
-        printf(
-                "ObjC coder read: adding instance of class %s to embree\n"
-                ,   [className UTF8String]
-        );
-#endif
-
-    return geom;
-}
-#endif // EMBREE_INSTALLED
 
 @end
 

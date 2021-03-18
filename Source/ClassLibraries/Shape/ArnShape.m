@@ -277,39 +277,13 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     return 0;
 }
 
-#define EMBREE_DEBUG_PRINT
-
 
 #if EMBREE_INSTALLED
-void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
-    if(!args->geometryUserPtr)
-        return;
 
-    const ArnShape * shape = (const ArnShape *) args->geometryUserPtr;
-
-    /*
-    Box3D * boxWorldspace = [shape getWorldBBox];
-    struct RTCBounds * bounds_o = args->bounds_o;
-
-    NSString * className = NSStringFromClass([shape class]);
-
-    ArnEmbree * embree = [ArnEmbree embreeManager];
-    [embree passWorldBBoxToEmbree : boxWorldspace : bounds_o : className];
-     */
-}
-
-void embree_intersect(const struct RTCIntersectFunctionNArguments* args) {
-
-    const ArnShape * shape = (const ArnShape *) args->geometryUserPtr;
-
-}
-
-void embree_occluded(const struct RTCIntersectFunctionNArguments* args) {
-    // TODO implement
-}
 
 #define EMBREE_DEBUG_PRINTF
 - (RTCGeometry) convertShapeToRTCGeometryAndAddToEmbree {
+    /*
     ArnEmbree * embree = [ArnEmbree embreeManager];
 
     assert([embree getDevice] && [embree getScene]);
@@ -334,6 +308,7 @@ void embree_occluded(const struct RTCIntersectFunctionNArguments* args) {
 #endif
 
     return geom;
+     */
 }
 #endif // EMBREE_INSTALLED
 

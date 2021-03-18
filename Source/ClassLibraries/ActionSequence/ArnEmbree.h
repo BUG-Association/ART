@@ -45,15 +45,20 @@ typedef enum Embree_state {
     Embree_Released
 } Embree_state;
 
-@interface ArnEmbreeGeometry : ArcObject {
+@interface EmbreeGeometryData : ArcObject {
 @public
     ArNode<ArpShape> * _shape;
     ArTraversalState _traversalState;
+    Box3D * _bbox_objectSpace;
 }
 
-- (void) setShape : (ArnShape *) shape;
-- (ArnShape *) getShape;
+- init
+        : (ArNode <ArpShape> *) shape
+        : (ArTraversalState) traversalState
+        : (Box3D *) bboxObjectSPace
+        ;
 
+- (void) setBoundigBox : (Box3D *) box;
 
 @end
 
@@ -80,6 +85,7 @@ typedef enum Embree_state {
 - (RTCScene) getScene;
 - (Embree_state) getState;
 
+- (RTCGeometry) convertShapeToEmbreeGeometry : (ArNode<ArpShape> *) shape;
 - (unsigned int) addGeometry: (RTCGeometry) newGeometry;
 - (void) setGeometryUserData : (ArNode <ArpShape> *) shape : (ArTraversalState *) traversalState;
 

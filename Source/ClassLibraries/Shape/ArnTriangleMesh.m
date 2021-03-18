@@ -355,6 +355,7 @@ ArNode * arntrianglemesh_from_ply(
                         :   maxPoint
                 ];
 
+        rtcSetGeometryUserPrimitiveCount(embreeMesh, 1);
         thisMesh->embreeGeomID = (int)[embree addGeometry: embreeMesh];
     }
 
