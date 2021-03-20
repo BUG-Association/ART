@@ -320,6 +320,7 @@ void intersect_leaf(
         & RAYCASTER_VIEWING_RAY3D
         );
 
+
     // Do the intersection.
     
     ARSGL_GET_INTERSECTION_LIST(

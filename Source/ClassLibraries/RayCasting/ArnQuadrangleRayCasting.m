@@ -62,7 +62,7 @@ ARPRAYCASTING_SINGULAR_SHAPE_IMPLEMENTATION
 
     unsigned int  result =
         quadrangledata_perform_intersection(
-              quadrangleData,
+                quadrangleData,
             & [ ARNRAYCASTER_VERTICES(rayCaster) pointArray ]
               [ ARARRAY_I( indexTable, 0 )],
             & OBJECTSPACE_RAY,
@@ -72,6 +72,7 @@ ARPRAYCASTING_SINGULAR_SHAPE_IMPLEMENTATION
             & intersectionLocalPoint,
             & intersectionTextureCoordinates
             );
+
 
     if ( result )
     {
@@ -92,6 +93,8 @@ ARPRAYCASTING_SINGULAR_SHAPE_IMPLEMENTATION
             self,
             rayCaster
             );
+
+
 
         ArcIntersection  * intersection =
             INTERSECTIONLIST_HEAD(*intersectionList);

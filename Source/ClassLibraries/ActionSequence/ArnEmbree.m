@@ -123,7 +123,7 @@ static ArnRayCaster * embreeRaycaster;
 }
 
 // #define EMBREE_DEBUG_PRINT
-void embree_intersect_geometry(int * valid,
+void embree_intersect_geometry(const int * valid,
                                void * geometryUserPtr,
                                unsigned int geomID,
                                unsigned int instID,
@@ -143,23 +143,37 @@ void embree_intersect_geometry(int * valid,
     ray.vector.c.x[0] = rtc_ray->dir_x;
     ray.vector.c.x[1] = rtc_ray->dir_y;
     ray.vector.c.x[2] = rtc_ray->dir_z;
-    float tnear = rtc_ray->tnear;
-    float tfar = rtc_ray->tfar;
     // float dist = rtc_ray->tfar;
     // float time  = rtc_ray->time;
 
-    embreeRaycaster->intersection_test_world_ray3d = ray;
-    Range  range = RANGE( tnear, tfar );
-    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
+    // debug
+    // printf("tnear: %f , tfar: %f\n", rtc_ray->tnear, rtc_ray-
 
-    [shape getIntersectionList: embreeRaycaster : range : &intersectionList];
+    if(rtc_hit) {
+        Ray3DE ray3De;
+        ray3de_init(&ray, &ray3De);
 
-    rtc_ray->tfar = (float) intersectionList.head->t;
-    rtc_hit->u = (float) intersectionList.head->texture_coordinates.c.x[0];
-    rtc_hit->v = (float) intersectionList.head->texture_coordinates.c.x[1];
-    rtc_hit->geomID = geomID;
-    rtc_hit->primID = 0;
-    // rtc_hit->instID[0] = instID;
+        embreeRaycaster->intersection_test_world_ray3d = ray;
+        embreeRaycaster->intersection_test_ray3de = ray3De;
+        embreeRaycaster->state = geometryData->_traversalState;
+        Range  range = RANGE( rtc_ray->tnear, rtc_ray->tfar );
+
+        ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
+
+        [shape getIntersectionList: embreeRaycaster : range : &intersectionList];
+
+        if(intersectionList.head) {
+            rtc_ray->tfar = (float) intersectionList.head->t;
+            rtc_hit->u = (float) intersectionList.head->texture_coordinates.c.x[0];
+            rtc_hit->v = (float) intersectionList.head->texture_coordinates.c.x[1];
+            rtc_hit->geomID = geomID;
+            rtc_hit->primID = 0;
+            // rtc_hit->instID[0] = instID;
+        }
+        else {
+            printf("no intersection list ....\n");
+        }
+    }
 }
 
 
@@ -289,6 +303,9 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
         : (const Ray3D *) ray
         : (ArnRayCaster *) raycaster
 {
+    // set raycaster to be called in callback functions
+    embreeRaycaster = raycaster;
+
     // set up embree intersection context
     struct RTCIntersectContext context;
     rtcInitIntersectContext(&context);
@@ -307,8 +324,6 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     rayhit.ray.flags = 0;
     rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
     // rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
-
-    embreeRaycaster = raycaster;
 
     // do the intersection
     rtcIntersect1(scene, &context, &rayhit);

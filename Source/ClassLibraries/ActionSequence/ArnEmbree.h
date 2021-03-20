@@ -76,7 +76,7 @@ typedef enum Embree_state {
 + (BOOL) embreeEnabled;
 + (void) enableEmbree: (BOOL) enabled;
 
-+ (ArnRayCaster *) embreeRaycaster;
+// + (ArnRayCaster *) embreeRaycaster;
 
 - (void) setDevice: (RTCDevice) newDevice;
 - (void) setScene: (RTCScene) newScene;

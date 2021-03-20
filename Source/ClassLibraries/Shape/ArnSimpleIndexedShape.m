@@ -197,7 +197,6 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     // TODO do
 }
 
-
 @end
 
 // ===========================================================================
