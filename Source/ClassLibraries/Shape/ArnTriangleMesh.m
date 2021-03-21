@@ -731,8 +731,12 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
     // If Embree is enabled, pass the triangle array to the corresponding embree shape
     if([ArnEmbree embreeEnabled]) {
+
         ArnEmbree * embree = [ArnEmbree embreeManager];
+
         [embree setGeometryUserData: self : traversalState];
+
+        return;
     }
 
     for( long i = 0; i < numberOfFaces; ++i )

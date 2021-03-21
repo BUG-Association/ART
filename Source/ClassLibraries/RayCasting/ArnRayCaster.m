@@ -377,17 +377,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         : (const Ray3D *) ray_worldCoordinates
         : (const double) range_end_t
 {
-    // if embree is enabled,
-    // find the intersection via embree and return
-    if([ArnEmbree embreeEnabled])
-    {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        return [embree intersect
-                         : ray_worldCoordinates
-                         : self
-                        ];
-    }
-
     rayID++;
 
     Range  range = RANGE( 0.0, range_end_t );
@@ -400,6 +389,17 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         );
 
     intersection_test_origin = startingPoint_worldCoordinates;
+
+    // if embree is enabled,
+    // find the intersection via embree and return
+    if([ArnEmbree embreeEnabled])
+    {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        return [embree intersect
+                : ray_worldCoordinates
+                : self
+        ];
+    }
 
     ArIntersectionList  intersectionList = ARINTERSECTIONLIST_EMPTY;
 
