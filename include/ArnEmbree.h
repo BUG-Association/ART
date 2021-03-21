@@ -95,7 +95,6 @@ typedef enum Embree_state {
 
 // intersection
 - (ArcIntersection *) intersect
-        : (const Ray3D *) ray
         : (ArnRayCaster *) raycaster
         ;
 

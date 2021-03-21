@@ -60,6 +60,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 static BOOL EMBREE_ENABLED;
 
 static ArnEmbree * embreeManager;
+
 static ArnRayCaster * embreeRaycaster;
 
 // initialize singleton ArnEmbree object
@@ -136,25 +137,14 @@ void embree_intersect_geometry(const int * valid,
     if(!valid[0])
         return;
 
-    Ray3D ray;
-    ray.point.c.x[0] = rtc_ray->org_x;
-    ray.point.c.x[1] = rtc_ray->org_y;
-    ray.point.c.x[2] = rtc_ray->org_z;
-    ray.vector.c.x[0] = rtc_ray->dir_x;
-    ray.vector.c.x[1] = rtc_ray->dir_y;
-    ray.vector.c.x[2] = rtc_ray->dir_z;
-    // float dist = rtc_ray->tfar;
-    // float time  = rtc_ray->time;
-
-    // debug
-    // printf("tnear: %f , tfar: %f\n", rtc_ray->tnear, rtc_ray-
-
     if(rtc_hit) {
+        /*
         Ray3DE ray3De;
         ray3de_init(&ray, &ray3De);
 
         embreeRaycaster->intersection_test_world_ray3d = ray;
         embreeRaycaster->intersection_test_ray3de = ray3De;
+         */
         embreeRaycaster->state = geometryData->_traversalState;
         Range  range = RANGE( rtc_ray->tnear, rtc_ray->tfar );
 
@@ -171,7 +161,7 @@ void embree_intersect_geometry(const int * valid,
             // rtc_hit->instID[0] = instID;
         }
         else {
-            printf("no intersection list ....\n");
+            // printf("no intersection list ....\n");
         }
     }
 }
@@ -300,7 +290,6 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 }
 
 - (ArcIntersection *) intersect
-        : (const Ray3D *) ray
         : (ArnRayCaster *) raycaster
 {
     // set raycaster to be called in callback functions
@@ -312,12 +301,12 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     struct RTCRayHit rayhit;
 
     // convert Ray3D to embree ray
-    rayhit.ray.org_x = (float) ray->point.c.x[0];
-    rayhit.ray.org_y = (float) ray->point.c.x[1];
-    rayhit.ray.org_z = (float) ray->point.c.x[2];
-    rayhit.ray.dir_x = (float) ray->vector.c.x[0];
-    rayhit.ray.dir_y = (float) ray->vector.c.x[1];
-    rayhit.ray.dir_z = (float) ray->vector.c.x[2];
+    rayhit.ray.org_x = (float) raycaster->intersection_test_world_ray3d.point.c.x[0];
+    rayhit.ray.org_y = (float) raycaster->intersection_test_world_ray3d.point.c.x[1];
+    rayhit.ray.org_z = (float) raycaster->intersection_test_world_ray3d.point.c.x[2];
+    rayhit.ray.dir_x = (float) raycaster->intersection_test_world_ray3d.vector.c.x[0];
+    rayhit.ray.dir_y = (float) raycaster->intersection_test_world_ray3d.vector.c.x[1];
+    rayhit.ray.dir_z = (float) raycaster->intersection_test_world_ray3d.vector.c.x[2];
     rayhit.ray.tnear = 0;
     rayhit.ray.tfar = INFINITY;
     rayhit.ray.mask = (unsigned int) -1;
@@ -344,16 +333,8 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     // else:
     // retrieve further information about the intersected shape ...
     unsigned int geomID = rayhit.hit.geomID;
-
-    /*
-    EmbreeGeometryData * intersectedEmbreeGeometry = [self getGeometryFromArrayAtIndex:geomID];
-    ArTraversalState traversalState = intersectedEmbreeGeometry->_traversalState;
-     */
-
     RTCGeometry intersectedRTCGeometry = rtcGetGeometry(scene, geomID);
     EmbreeGeometryData * userDataGeometry = (EmbreeGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
-    // ArTraversalState * traversalState = (ArTraversalState *) userData;
-
 
     // ... and store intersection information in an
     // ArcIntersection and return it
@@ -362,7 +343,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
     ARCINTERSECTION_T(intersection) = rayhit.ray.tfar;;
     ARCINTERSECTION_TRAVERSALSTATE(intersection) = userDataGeometry->_traversalState;
-    ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = *ray;
+    ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = raycaster->intersection_test_world_ray3d;
     SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
     TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
 

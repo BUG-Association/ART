@@ -2260,6 +2260,9 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
         : (ArnGraphTraversal *) traversal
         : (Box3D *) outBBox
 {
+    //debug
+    Box3D worldBox = *outBBox;
+
     ArNodeRef  trafo_store = ARNGT_TRAFO_REF(traversal);
 
     ARNGT_TRAFO_REF(traversal) = ARNODEREF_NONE;
@@ -2293,6 +2296,7 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
             :   traversal
             :   outBBox
             ];
+
 
         if ( COMBINED_VERTICES_ATTRIBUTE )
             [ traversal popVertices
