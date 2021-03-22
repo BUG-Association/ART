@@ -51,6 +51,10 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
 {
     self = [ super init ];
 
+    //debug
+    NSString * className = [self className];
+    printf("init %s\n", [className UTF8String]);
+
     if ( self )
     {
         shapeGeometry = newGeometry;

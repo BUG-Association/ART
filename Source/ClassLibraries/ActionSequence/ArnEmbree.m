@@ -33,6 +33,9 @@
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
+void errorFunction(void* userPtr, enum RTCError error, const char* str) {
+    printf("\nembree error %d: %s\n", error, str);
+}
 
 @implementation EmbreeGeometryData
 
@@ -63,42 +66,6 @@ static ArnEmbree * embreeManager;
 
 static ArnRayCaster * embreeRaycaster;
 
-// initialize singleton ArnEmbree object
-+ (void) initialize {
-    if(!EMBREE_ENABLED)
-        return;
-
-    static BOOL isInitialized = NO;
-    if(!isInitialized) {
-        // create singleton object
-        embreeManager = [[ArnEmbree alloc] init];
-
-        // set up embree device
-        if(![embreeManager getDevice]) {
-            RTCDevice newDevice = rtcNewDevice(NULL);
-            if(!newDevice)
-                printf("error %d: cannot create embree device\n", rtcGetDeviceError(NULL));
-            // rtcSetDeviceErrorFunction(device, errorFunction, NULL); // TODO figure out why this is needed
-            [embreeManager setDevice: newDevice];
-        }
-
-        // set up embree scene
-        if(![embreeManager getScene]) {
-            RTCDevice device = [embreeManager getDevice];
-            RTCScene newScene = rtcNewScene(device);
-            if(!newScene)
-                printf("error %d: cannot create embree scene on device\n", rtcGetDeviceError(NULL));
-            rtcSetSceneFlags(newScene,RTC_SCENE_FLAG_NONE); // for now a bit pointless but change later
-            rtcSetSceneBuildQuality(newScene,RTC_BUILD_QUALITY_LOW); // for now using lowest build quality
-            [embreeManager setScene: newScene];
-        }
-
-        [embreeManager initGeometryIDArray];
-
-        isInitialized = YES;
-        EMBREE_ENABLED = YES;
-    }
-}
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
@@ -110,11 +77,6 @@ static ArnRayCaster * embreeRaycaster;
 
 + (ArnEmbree *) embreeManager {
     return embreeManager;
-}
-
-+ (void) deallocate {
-    [ArnEmbree release];
-    [super release];
 }
 
 - (void) setDevice: (RTCDevice) newDevice {
@@ -155,6 +117,43 @@ static ArnRayCaster * embreeRaycaster;
     [embree release];
 }
 
+// initialize singleton ArnEmbree object
++ (void) initialize {
+    if(!EMBREE_ENABLED)
+        return;
+
+    static BOOL isInitialized = NO;
+    if(!isInitialized) {
+        // create singleton object
+        embreeManager = [[ArnEmbree alloc] init];
+
+        // set up embree device
+        if(![embreeManager getDevice]) {
+            RTCDevice newDevice = rtcNewDevice(NULL);
+            if(!newDevice)
+                printf("error %d: cannot create embree device\n", rtcGetDeviceError(NULL));
+            rtcSetDeviceErrorFunction([embreeManager getDevice], errorFunction, NULL);
+            [embreeManager setDevice: newDevice];
+        }
+
+        // set up embree scene
+        if(![embreeManager getScene]) {
+            RTCDevice device = [embreeManager getDevice];
+            RTCScene newScene = rtcNewScene(device);
+            if(!newScene)
+                printf("error %d: cannot create embree scene on device\n", rtcGetDeviceError(NULL));
+            rtcSetSceneFlags(newScene,RTC_SCENE_FLAG_NONE); // for now a bit pointless but change later
+            rtcSetSceneBuildQuality(newScene,RTC_BUILD_QUALITY_LOW); // for now using lowest build quality
+            [embreeManager setScene: newScene];
+        }
+
+        [embreeManager initGeometryIDArray];
+
+        isInitialized = YES;
+        EMBREE_ENABLED = YES;
+    }
+}
+
 #define EMBREE_DEBUG_PRINT
 void embree_intersect_geometry(const int * valid,
                                void * geometryUserPtr,
@@ -171,19 +170,22 @@ void embree_intersect_geometry(const int * valid,
 
     if(rtc_hit) {
         embreeRaycaster->state = geometryData->_traversalState;
-        Range  range = RANGE( 0.0, INFINITY );
+        Range  range = RANGE( rtc_ray->tnear, rtc_ray->tfar );
 
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
         [shape getIntersectionList: embreeRaycaster : range : &intersectionList];
 
         if(intersectionList.head) {
+            printf("embree instersection at tfar: %f\n", intersectionList.head->t);
+            /*
             rtc_ray->tfar = (float) intersectionList.head->t;
             rtc_hit->u = (float) intersectionList.head->texture_coordinates.c.x[0];
             rtc_hit->v = (float) intersectionList.head->texture_coordinates.c.x[1];
             rtc_hit->geomID = geomID;
             rtc_hit->primID = 0;
             // rtc_hit->instID[0] = instID;
+             */
         }
         else {
             // printf("no intersection list ....\n");
@@ -197,6 +199,7 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
     struct RTCBounds * bounds_o = args->bounds_o;
 
 #ifdef EMBREE_DEBUG_PRINT
+        printf("adding bounding box to embree\n");
         printf("object box - min x: %f\n", geometryData->_bbox_objectSpace->min.c.x[0]);
         printf("object box - min y: %f\n", geometryData->_bbox_objectSpace->min.c.x[1]);
         printf("object box - min z: %f\n", geometryData->_bbox_objectSpace->min.c.x[2]);
@@ -236,11 +239,11 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     rtcSetGeometryBoundsFunction(newGeometry, embree_bbox, NULL);
     rtcSetGeometryIntersectFunction(newGeometry, embree_intersect);
     rtcSetGeometryOccludedFunction(newGeometry, embree_occluded);
+    rtcSetGeometryUserPrimitiveCount(newGeometry, 1);
     return newGeometry;
 }
 
 - (unsigned int) addGeometry: (RTCGeometry) newGeometry  {
-    rtcSetGeometryUserPrimitiveCount(newGeometry, 1);
     rtcCommitGeometry(newGeometry);
     unsigned int geomID = rtcAttachGeometry(scene, newGeometry);
     rtcReleaseGeometry(newGeometry);
@@ -322,14 +325,13 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
         return NULL;
 
-    /*
+
     // debugprintf
     else
         printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
                rayhit.hit.geomID,
                rayhit.hit.primID,
                rayhit.ray.tfar);
-    */
 
     // else:
     // retrieve further information about the intersected shape ...
@@ -353,15 +355,6 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     intersection->materialInsideRef = userDataGeometry->_traversalState.environment_material_reference; // not sure of this
 
     return intersection;
-}
-
-- (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str {
-    printf("error %d: %s\n", error, str);
-}
-
-- (void) cleanUpEmbree {
-    rtcReleaseScene(scene);
-    rtcReleaseDevice(device);
 }
 
 @end // ArnEmbree
