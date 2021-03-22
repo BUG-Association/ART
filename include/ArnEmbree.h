@@ -29,8 +29,6 @@
 #include "ArNode.h"
 #include <embree3/rtcore.h>
 
-
-
 @class ArcIntersection;
 @class ArnShape;
 @class AraCombinedAttributes;
@@ -67,11 +65,10 @@ typedef enum Embree_state {
     RTCDevice device;
     RTCScene scene;
     Embree_state state;
-    NSMutableArray * geometries;
+    NSMutableArray * embreeGeometryIDArray;
 }
 
 + (ArnEmbree *) embreeManager;
-+ (void) deallocate;
 
 + (BOOL) embreeEnabled;
 + (void) enableEmbree: (BOOL) enabled;
@@ -83,6 +80,8 @@ typedef enum Embree_state {
 - (void) commitScene;
 - (void) setState: (Embree_state) newState;
 
+- (void) initGeometryIDArray;
+- (NSMutableArray *) getGeometryIDArray;
 
 - (RTCDevice) getDevice;
 - (RTCScene) getScene;
@@ -98,8 +97,7 @@ typedef enum Embree_state {
         : (ArnRayCaster *) raycaster
         ;
 
-- (void) errorFunction: (void *) userPtr errorEnum: (enum RTCError) error string: (const char *) str;
-- (void) cleanUpEmbree;
++ (void) cleanUp;
 
 @end
 

@@ -93,6 +93,8 @@ static ArnRayCaster * embreeRaycaster;
             [embreeManager setScene: newScene];
         }
 
+        [embreeManager initGeometryIDArray];
+
         isInitialized = YES;
         EMBREE_ENABLED = YES;
     }
@@ -123,7 +125,37 @@ static ArnRayCaster * embreeRaycaster;
     scene = newScene;
 }
 
-// #define EMBREE_DEBUG_PRINT
+- (void) initGeometryIDArray {
+    embreeGeometryIDArray = [[NSMutableArray alloc] init];
+}
+
+- (NSMutableArray *) getGeometryIDArray {
+    return embreeGeometryIDArray;
+}
+
++ (void) cleanUp {
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+
+    if(!embree)
+        return;
+
+    NSMutableArray * geomID_array = [embree getGeometryIDArray];
+
+    for (id geomID in geomID_array) {
+        int geomIDIntValue = [geomID intValue];
+        RTCGeometry rtcGeometry = rtcGetGeometry([embree getScene], (unsigned int) geomIDIntValue);
+        EmbreeGeometryData * geom_data = (EmbreeGeometryData *)rtcGetGeometryUserData(rtcGeometry);
+        if(geom_data)
+            [geom_data release];
+    }
+
+    rtcReleaseScene([embree getScene]);
+    rtcReleaseDevice([embree getDevice]);
+
+    [embree release];
+}
+
+#define EMBREE_DEBUG_PRINT
 void embree_intersect_geometry(const int * valid,
                                void * geometryUserPtr,
                                unsigned int geomID,
@@ -138,15 +170,8 @@ void embree_intersect_geometry(const int * valid,
         return;
 
     if(rtc_hit) {
-        /*
-        Ray3DE ray3De;
-        ray3de_init(&ray, &ray3De);
-
-        embreeRaycaster->intersection_test_world_ray3d = ray;
-        embreeRaycaster->intersection_test_ray3de = ray3De;
-         */
         embreeRaycaster->state = geometryData->_traversalState;
-        Range  range = RANGE( rtc_ray->tnear, rtc_ray->tfar );
+        Range  range = RANGE( 0.0, INFINITY );
 
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
@@ -208,12 +233,9 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
 - (RTCGeometry) initEmbreeGeometry {
     RTCGeometry newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_USER);
-    // rtcSetGeometryUserPrimitiveCount(newGeometry, 1);
-    // rtcSetGeometryUserData(newGeometry, (void *) this);
     rtcSetGeometryBoundsFunction(newGeometry, embree_bbox, NULL);
     rtcSetGeometryIntersectFunction(newGeometry, embree_intersect);
     rtcSetGeometryOccludedFunction(newGeometry, embree_occluded);
-    // rtcCommitGeometry(newGeometry);
     return newGeometry;
 }
 
@@ -266,27 +288,6 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     rtcCommitScene(scene);
     rtcSetSceneFlags(scene, RTC_SCENE_FLAG_NONE); // TODO change later
     [self setState: Scene_Commited];
-}
-
-- (void) initGeometryArray {
-    geometries = [[NSMutableArray alloc]init];
-}
-
-- (void) addEmbreeGeometryToArray
-        : (EmbreeGeometryData *) geometry
-        : (unsigned int) index
-{
-    [geometries insertObject: geometry atIndex: index];
-}
-
-- (EmbreeGeometryData *) getGeometryFromArrayAtIndex
-        : (int) index
-{
-    return [geometries objectAtIndex: index];
-}
-
-- (RTCGeometry *) getGeometryListHead {
-    // return geometry_list_head;
 }
 
 - (ArcIntersection *) intersect

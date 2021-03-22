@@ -133,7 +133,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
     if([ArnEmbree embreeEnabled] && embreeGeomID != EMBREE_INVALID_GEOMETRY_ID) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry embreeGeometry = rtcGetGeometry([embree getScene], (unsigned int) embreeGeomID);
+        RTCGeometry embreeGeometry = rtcGetGeometry([embree getScene], (unsigned int) self->embreeGeomID);
         EmbreeGeometryData * geometryData = (EmbreeGeometryData *)rtcGetGeometryUserData(embreeGeometry);
         [geometryData setBoundigBox: outBBox];
     }
@@ -178,6 +178,14 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 - (ArNode *) pushAttributesToLeafNodes
         : (ArnGraphTraversal *) traversal
 {
+    self->embreeGeomID = EMBREE_INVALID_GEOMETRY_ID;
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        RTCGeometry embreeGeometry = [embree initEmbreeGeometry];
+        self->embreeGeomID = (int) [embree addGeometry: embreeGeometry];
+        [embree setGeometryUserData: self : &traversal->state];
+    }
+
     return
         [ ALLOC_INIT_OBJECT(AraCombinedAttributes)
             :  self
