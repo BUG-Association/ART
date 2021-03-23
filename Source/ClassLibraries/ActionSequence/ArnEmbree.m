@@ -177,15 +177,14 @@ void embree_intersect_geometry(const int * valid,
         [shape getIntersectionList: embreeRaycaster : range : &intersectionList];
 
         if(intersectionList.head) {
-            printf("embree instersection at tfar: %f\n", intersectionList.head->t);
-            /*
+            printf("embree instersection at tfar=%f\n", intersectionList.head->t);
+
             rtc_ray->tfar = (float) intersectionList.head->t;
             rtc_hit->u = (float) intersectionList.head->texture_coordinates.c.x[0];
             rtc_hit->v = (float) intersectionList.head->texture_coordinates.c.x[1];
             rtc_hit->geomID = geomID;
             rtc_hit->primID = 0;
             // rtc_hit->instID[0] = instID;
-             */
         }
         else {
             // printf("no intersection list ....\n");
@@ -326,12 +325,17 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
         return NULL;
 
 
+    /*
     // debugprintf
     else
         printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
                rayhit.hit.geomID,
                rayhit.hit.primID,
                rayhit.ray.tfar);
+               */
+
+    // debug
+    printf("found  instersection at tfar=%f\n", rayhit.ray.tfar);
 
     // else:
     // retrieve further information about the intersected shape ...
