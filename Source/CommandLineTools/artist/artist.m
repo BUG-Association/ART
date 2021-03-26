@@ -1022,6 +1022,10 @@ int artist(
 //
 // ===========================================================================
 
+    if([ArnEmbree embreeEnabled]) {
+        [ArnEmbree cleanUp];
+    }
+
     FREE_ARRAY(imageFileName);
     RELEASE_OBJECT(camera);
     RELEASE_OBJECT(contentOfMainFile);

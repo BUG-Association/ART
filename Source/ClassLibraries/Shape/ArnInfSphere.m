@@ -60,6 +60,8 @@ ART_MODULE_INITIALISATION_FUNCTION
         );
 
     art_gv->arninfsphere_gv = arninfsphere_gv;
+
+    printf("going inside the weird infsphere func\n");
 )
 
 ART_MODULE_SHUTDOWN_FUNCTION
@@ -102,6 +104,22 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         : (Box3D *) outBoxObjectspace
 {
     (*outBoxObjectspace) = BOX3D_FULL;
+
+    if([ArnEmbree embreeEnabled] && embreeGeomID != EMBREE_INVALIDGEOMETRY_ID) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        RTCGeometry geometry = rtcGetGeometry([embree getScene], (unsigned int) embreeGeomID);
+        EmbreeGeometryData * geometryData = (EmbreeGeometryData *) rtcGetGeometryUserData(geometry);
+
+        // debug
+        outBoxObjectspace->min.c.x[0] = - 10000000000.0;
+        outBoxObjectspace->min.c.x[1] = - 10000000000.0;
+        outBoxObjectspace->min.c.x[2] = - 10000000000.0;
+        outBoxObjectspace->max.c.x[0] =   10000000000.0;
+        outBoxObjectspace->max.c.x[1] =   10000000000.0;
+        outBoxObjectspace->max.c.x[2] =   10000000000.0;
+        [geometryData setBoundigBox: outBoxObjectspace];
+
+    }
 }
 
 - (void) getLocalCentroid

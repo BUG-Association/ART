@@ -2260,9 +2260,6 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
         : (ArnGraphTraversal *) traversal
         : (Box3D *) outBBox
 {
-    //debug
-    Box3D worldBox = *outBBox;
-
     ArNodeRef  trafo_store = ARNGT_TRAFO_REF(traversal);
 
     ARNGT_TRAFO_REF(traversal) = ARNODEREF_NONE;

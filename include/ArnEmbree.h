@@ -95,6 +95,7 @@ typedef enum Embree_state {
 // intersection
 - (ArcIntersection *) intersect
         : (ArnRayCaster *) raycaster
+        : (ArNode <ArpRayCasting> *) araWorld
         ;
 
 + (void) cleanUp;

@@ -397,6 +397,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         ArnEmbree * embree = [ArnEmbree embreeManager];
         return [embree intersect
                 : self
+                : geometryToIntersectRayWith // this is AraWorld, needed for crafting arcintersection
         ];
     }
 
@@ -448,15 +449,12 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
             rayIntersectionFreelist
             );
     }
-
-
+    /*
     // debug
     if(intersection)
-        if(intersection->t != 57896044618658097711785492504343953926634992332820282019728792003956564819968.000000)
-            printf("normal intersection at tfar=%f\n",
+            printf("intersection at tfar=%f\n",
                             intersection->t);
-
-    
+*/
     return intersection;
 }
 

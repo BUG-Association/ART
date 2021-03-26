@@ -62,8 +62,8 @@ ArcIntersection  * arcintersection_alloc_init(
     ARCINTERSECTION_SHAPE(intersection) = shape;
     ARCINTERSECTION_FACE_ID(intersection) = face;
     ARCINTERSECTION_FACE_TYPE(intersection) = face_on_shape_type;
-    ARCINTERSECTION_TRAVERSALSTATE(intersection) =          // HERE, THE MATERIALS ARE SET
-        artraversalstate_copy( & ARNRAYCASTER_TRAVERSALSTATE(raycaster));
+    ARCINTERSECTION_TRAVERSALSTATE(intersection) =
+        artraversalstate_copy( & ARNRAYCASTER_TRAVERSALSTATE(raycaster)); // WORLD IS SET HERE
     ARCINTERSECTION_OBJECTSPACE_INCOMING_RAY(intersection) =
         ARNRAYCASTER_OBJECTSPACE_RAY(raycaster);
     ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) =

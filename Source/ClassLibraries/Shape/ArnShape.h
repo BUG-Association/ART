@@ -28,6 +28,8 @@
 
 ART_MODULE_INTERFACE(ArnShape)
 
+#define EMBREE_INVALIDGEOMETRY_ID -1
+
 #import "ART_Scenegraph.h"
 
 #import "AraBBox.h"

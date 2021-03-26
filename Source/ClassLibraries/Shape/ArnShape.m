@@ -30,6 +30,7 @@
 #import "ArnShape.h"
 #import "ArpBBoxHandling_Node.h"
 
+
 ART_MODULE_INITIALISATION_FUNCTION
 (
     [ ArnShape registerWithRuntime ];
@@ -37,6 +38,8 @@ ART_MODULE_INITIALISATION_FUNCTION
 )
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
+
+#define EMBREE_INVALID_GEMOETRY_ID -1
 
 /* ===========================================================================
     'ArnShape'
@@ -51,13 +54,16 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
 {
     self = [ super init ];
 
-    //debug
-    NSString * className = [self className];
-    printf("init %s\n", [className UTF8String]);
-
     if ( self )
     {
         shapeGeometry = newGeometry;
+        embreeGeomID = EMBREE_INVALID_GEMOETRY_ID;
+    }
+
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        RTCGeometry geometry = [embree initEmbreeGeometry];
+        embreeGeomID = (int) [embree addGeometry: geometry];
     }
     
     return self;
@@ -220,6 +226,13 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         : (ArnGraphTraversal *) traversal
 {
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
+
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        RTCGeometry geometry = [embree initEmbreeGeometry];
+        embreeGeomID = (int) [embree addGeometry: geometry];
+        [embree setGeometryUserData: self : &traversal->state];
+    }
 
     id  result =
         [ ALLOC_INIT_OBJECT(AraCombinedAttributes)

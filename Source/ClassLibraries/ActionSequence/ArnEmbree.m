@@ -170,14 +170,14 @@ void embree_intersect_geometry(const int * valid,
 
     if(rtc_hit) {
         embreeRaycaster->state = geometryData->_traversalState;
-        Range  range = RANGE( rtc_ray->tnear, rtc_ray->tfar );
+        Range  range = RANGE( 0.0, MATH_HUGE_DOUBLE);
 
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
         [shape getIntersectionList: embreeRaycaster : range : &intersectionList];
 
         if(intersectionList.head) {
-            printf("embree instersection at tfar=%f\n", intersectionList.head->t);
+            // printf("embree instersection at tfar=%f\n", intersectionList.head->t);
 
             rtc_ray->tfar = (float) intersectionList.head->t;
             rtc_hit->u = (float) intersectionList.head->texture_coordinates.c.x[0];
@@ -194,17 +194,21 @@ void embree_intersect_geometry(const int * valid,
 
 
 void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
+
+    if(!args->geometryUserPtr)
+        return;
+
     const EmbreeGeometryData * geometryData = (const EmbreeGeometryData *) args->geometryUserPtr;
     struct RTCBounds * bounds_o = args->bounds_o;
 
 #ifdef EMBREE_DEBUG_PRINT
-        printf("adding bounding box to embree\n");
-        printf("object box - min x: %f\n", geometryData->_bbox_objectSpace->min.c.x[0]);
-        printf("object box - min y: %f\n", geometryData->_bbox_objectSpace->min.c.x[1]);
-        printf("object box - min z: %f\n", geometryData->_bbox_objectSpace->min.c.x[2]);
-        printf("object box - max x: %f\n", geometryData->_bbox_objectSpace->max.c.x[0]);
-        printf("object box - max y: %f\n", geometryData->_bbox_objectSpace->max.c.x[1]);
-        printf("object box - max z: %f\n", geometryData->_bbox_objectSpace->max.c.x[2]);
+    printf("adding bounding box to embree\n");
+    printf("object box - min x: %f\n", geometryData->_bbox_objectSpace->min.c.x[0]);
+    printf("object box - min y: %f\n", geometryData->_bbox_objectSpace->min.c.x[1]);
+    printf("object box - min z: %f\n", geometryData->_bbox_objectSpace->min.c.x[2]);
+    printf("object box - max x: %f\n", geometryData->_bbox_objectSpace->max.c.x[0]);
+    printf("object box - max y: %f\n", geometryData->_bbox_objectSpace->max.c.x[1]);
+    printf("object box - max z: %f\n", geometryData->_bbox_objectSpace->max.c.x[2]);
 #endif
     if(geometryData->_bbox_objectSpace) {
         bounds_o->lower_x = (float) geometryData->_bbox_objectSpace->min.c.x[0];
@@ -250,7 +254,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 }
 
 - (void) setGeometryUserData : (ArNode <ArpShape> *) shape
-                             : (ArTraversalState *) traversalState
+        : (ArTraversalState *) traversalState
 {
     RTCGeometry thisGeometry = NULL;
     if([shape isKindOfClass: [ArnShape class]]) {
@@ -294,6 +298,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
 - (ArcIntersection *) intersect
         : (ArnRayCaster *) raycaster
+        : (ArNode <ArpRayCasting> *) araWorld
 {
     // set raycaster to be called in callback functions
     embreeRaycaster = raycaster;
@@ -304,12 +309,12 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     struct RTCRayHit rayhit;
 
     // convert Ray3D to embree ray
-    rayhit.ray.org_x = (float) raycaster->intersection_test_world_ray3d.point.c.x[0];
-    rayhit.ray.org_y = (float) raycaster->intersection_test_world_ray3d.point.c.x[1];
-    rayhit.ray.org_z = (float) raycaster->intersection_test_world_ray3d.point.c.x[2];
-    rayhit.ray.dir_x = (float) raycaster->intersection_test_world_ray3d.vector.c.x[0];
-    rayhit.ray.dir_y = (float) raycaster->intersection_test_world_ray3d.vector.c.x[1];
-    rayhit.ray.dir_z = (float) raycaster->intersection_test_world_ray3d.vector.c.x[2];
+    rayhit.ray.org_x = (float) embreeRaycaster->intersection_test_world_ray3d.point.c.x[0];
+    rayhit.ray.org_y = (float) embreeRaycaster->intersection_test_world_ray3d.point.c.x[1];
+    rayhit.ray.org_z = (float) embreeRaycaster->intersection_test_world_ray3d.point.c.x[2];
+    rayhit.ray.dir_x = (float) embreeRaycaster->intersection_test_world_ray3d.vector.c.x[0];
+    rayhit.ray.dir_y = (float) embreeRaycaster->intersection_test_world_ray3d.vector.c.x[1];
+    rayhit.ray.dir_z = (float) embreeRaycaster->intersection_test_world_ray3d.vector.c.x[2];
     rayhit.ray.tnear = 0;
     rayhit.ray.tfar = INFINITY;
     rayhit.ray.mask = (unsigned int) -1;
@@ -325,17 +330,17 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
         return NULL;
 
 
-    /*
+
     // debugprintf
     else
         printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
                rayhit.hit.geomID,
                rayhit.hit.primID,
                rayhit.ray.tfar);
-               */
+
 
     // debug
-    printf("found  instersection at tfar=%f\n", rayhit.ray.tfar);
+    // printf("found  instersection at tfar=%f\n", rayhit.ray.tfar);
 
     // else:
     // retrieve further information about the intersected shape ...
@@ -346,17 +351,27 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     // ... and store intersection information in an
     // ArcIntersection and return it
     ArcIntersection  *  intersection =
-                    [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
+            [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
 
     ARCINTERSECTION_T(intersection) = rayhit.ray.tfar;;
-    ARCINTERSECTION_TRAVERSALSTATE(intersection) = userDataGeometry->_traversalState;
+    ARCINTERSECTION_TRAVERSALSTATE(intersection) =  artraversalstate_copy( & ARNRAYCASTER_TRAVERSALSTATE(raycaster));
+    ARCINTERSECTION_SHAPE(intersection) = userDataGeometry->_shape;
     ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = raycaster->intersection_test_world_ray3d;
     SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
     TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
 
+    /*
     // manually setting environment material and volume material
     intersection->materialOutsideRef = userDataGeometry->_traversalState.volume_material_reference;
-    intersection->materialInsideRef = userDataGeometry->_traversalState.environment_material_reference; // not sure of this
+    intersection->materialInsideRef = userDataGeometry->_traversalState.volume_material_reference; // not sure of this
+     */
+
+    ARCINTERSECTION_VOLUME_MATERIAL_FROM_REF(intersection) = userDataGeometry->_traversalState.volume_material_reference;
+    ARCINTERSECTION_VOLUME_MATERIAL_INTO_REF(intersection) = userDataGeometry->_traversalState.volume_material_reference;
+
+    // debug
+    ARCINTERSECTION_OBJECTSPACE_INCOMING_RAY(intersection) = raycaster->intersection_test_world_ray3d;
+    raycaster->state.world = (AraWorld *) araWorld;
 
     return intersection;
 }
