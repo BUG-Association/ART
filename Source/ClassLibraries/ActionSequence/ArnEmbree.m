@@ -95,6 +95,11 @@ static ArnRayCaster * embreeRaycaster;
     return embreeGeometryIDArray;
 }
 
+- (void) addGeometryIDToGeometryIDArray : (unsigned int) id {
+    NSNumber * id_ns = [NSNumber numberWithInt: id];
+    [embreeGeometryIDArray addObject: id_ns];
+}
+
 + (void) cleanUp {
     ArnEmbree * embree = [ArnEmbree embreeManager];
 
@@ -107,8 +112,11 @@ static ArnRayCaster * embreeRaycaster;
         int geomIDIntValue = [geomID intValue];
         RTCGeometry rtcGeometry = rtcGetGeometry([embree getScene], (unsigned int) geomIDIntValue);
         EmbreeGeometryData * geom_data = (EmbreeGeometryData *)rtcGetGeometryUserData(rtcGeometry);
-        if(geom_data)
+        if(geom_data) {
+            // debug
+            printf("freeing memory of user data with address: %p\n", (void *) geom_data);
             [geom_data release];
+        }
     }
 
     rtcReleaseScene([embree getScene]);
@@ -260,11 +268,13 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     if([shape isKindOfClass: [ArnShape class]]) {
         ArnShape * arnShape = (ArnShape *) shape;
         thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
+        [self addGeometryIDToGeometryIDArray:(unsigned int) arnShape->embreeGeomID];
     }
 
     else if(([shape isKindOfClass: [ArnSimpleIndexedShape class]])) {
         ArnSimpleIndexedShape * arnShape = (ArnSimpleIndexedShape *) shape;
         thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
+        [self addGeometryIDToGeometryIDArray:(unsigned int) arnShape->embreeGeomID];
     }
 
     // TODO come up with a better way to do this
@@ -330,14 +340,14 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
         return NULL;
 
 
-
+    /*
     // debugprintf
     else
         printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
                rayhit.hit.geomID,
                rayhit.hit.primID,
                rayhit.ray.tfar);
-
+    */
 
     // debug
     // printf("found  instersection at tfar=%f\n", rayhit.ray.tfar);
@@ -370,8 +380,8 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     ARCINTERSECTION_VOLUME_MATERIAL_INTO_REF(intersection) = userDataGeometry->_traversalState.volume_material_reference;
 
     // debug
-    ARCINTERSECTION_OBJECTSPACE_INCOMING_RAY(intersection) = raycaster->intersection_test_world_ray3d;
-    raycaster->state.world = (AraWorld *) araWorld;
+    // printf("material of shape with id %d is: %s\n", geomID,
+       //    [[userDataGeometry->_traversalState.surface_material_reference.reference className]UTF8String]);
 
     return intersection;
 }

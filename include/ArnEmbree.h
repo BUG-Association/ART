@@ -82,6 +82,7 @@ typedef enum Embree_state {
 
 - (void) initGeometryIDArray;
 - (NSMutableArray *) getGeometryIDArray;
+- (void) addGeometryIDToGeometryIDArray : (unsigned int) id;
 
 - (RTCDevice) getDevice;
 - (RTCScene) getScene;
