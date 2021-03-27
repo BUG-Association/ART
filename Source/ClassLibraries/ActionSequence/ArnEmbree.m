@@ -182,7 +182,7 @@ void embree_intersect_geometry(const int * valid,
 
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
-        [shape getIntersectionList: embreeRaycaster : range : &intersectionList];
+        // [shape getIntersectionList: embreeRaycaster : range : &intersectionList];
 
         if(intersectionList.head) {
             // printf("embree instersection at tfar=%f\n", intersectionList.head->t);
@@ -283,6 +283,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     embreeGeometry->_traversalState = *traversalState;
 
     rtcSetGeometryUserData(thisGeometry, (void *) embreeGeometry);
+
 }
 
 

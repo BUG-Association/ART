@@ -785,6 +785,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
         :   image4cleanup
         :   numberOfResultImages4cleanup
         ];
+
+    // if embree is enabled, clean up embree too
+    if([ArnEmbree embreeEnabled]) {
+        [ArnEmbree cleanUp];
+    }
     
     for ( unsigned int i = 0; i < numberOfRenderThreads; i++ )
     {
