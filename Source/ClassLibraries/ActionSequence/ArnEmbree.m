@@ -39,16 +39,8 @@ void errorFunction(void* userPtr, enum RTCError error, const char* str) {
 
 @implementation EmbreeGeometryData
 
-- init
-        : (ArNode <ArpShape> *) shape
-        : (ArTraversalState) traversalState
-        : (Box3D *) bboxObjectSPace
-{
-    if(self) {
-        _shape = shape;
-        _traversalState = traversalState;
-        _bbox_objectSpace = bboxObjectSPace;
-    }
+- (id) init {
+    return nil;
 }
 
 - (void) setBoundigBox : (Box3D *) box {
@@ -113,9 +105,10 @@ static ArnRayCaster * embreeRaycaster;
         RTCGeometry rtcGeometry = rtcGetGeometry([embree getScene], (unsigned int) geomIDIntValue);
         EmbreeGeometryData * geom_data = (EmbreeGeometryData *)rtcGetGeometryUserData(rtcGeometry);
         if(geom_data) {
+            // [geom_data release];
+            RELEASE_OBJECT(geom_data);
             // debug
-            printf("freeing memory of user data with address: %p\n", (void *) geom_data);
-            [geom_data release];
+            printf("freed memory of user data with address: %p\n", (void *) geom_data);
         }
     }
 
@@ -182,20 +175,16 @@ void embree_intersect_geometry(const int * valid,
 
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
-        // [shape getIntersectionList: embreeRaycaster : range : &intersectionList];
+        // printf("shape about to be intersected: %s\n", [[shape className] UTF8String]);
+        [shape getIntersectionList: embreeRaycaster : range : &intersectionList];
 
         if(intersectionList.head) {
-            // printf("embree instersection at tfar=%f\n", intersectionList.head->t);
-
             rtc_ray->tfar = (float) intersectionList.head->t;
             rtc_hit->u = (float) intersectionList.head->texture_coordinates.c.x[0];
             rtc_hit->v = (float) intersectionList.head->texture_coordinates.c.x[1];
             rtc_hit->geomID = geomID;
             rtc_hit->primID = 0;
             // rtc_hit->instID[0] = instID;
-        }
-        else {
-            // printf("no intersection list ....\n");
         }
     }
 }
@@ -269,21 +258,25 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
         ArnShape * arnShape = (ArnShape *) shape;
         thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
         [self addGeometryIDToGeometryIDArray:(unsigned int) arnShape->embreeGeomID];
+
+        // debug
+        printf("Shape of type %s initialized with id %d\n", [[arnShape className] UTF8String], arnShape->embreeGeomID);
     }
 
     else if(([shape isKindOfClass: [ArnSimpleIndexedShape class]])) {
         ArnSimpleIndexedShape * arnShape = (ArnSimpleIndexedShape *) shape;
         thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
         [self addGeometryIDToGeometryIDArray:(unsigned int) arnShape->embreeGeomID];
+
+        // debug
+        printf("Shape of type %s initialized with id %d\n", [[arnShape className] UTF8String], arnShape->embreeGeomID);
     }
 
-    // TODO come up with a better way to do this
-    EmbreeGeometryData * embreeGeometry = [[EmbreeGeometryData alloc] init];
+    EmbreeGeometryData * embreeGeometry = ALLOC_OBJECT(EmbreeGeometryData);
     embreeGeometry->_shape = shape;
     embreeGeometry->_traversalState = *traversalState;
 
     rtcSetGeometryUserData(thisGeometry, (void *) embreeGeometry);
-
 }
 
 
@@ -340,49 +333,36 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
         return NULL;
 
-
-    /*
-    // debugprintf
-    else
-        printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
-               rayhit.hit.geomID,
-               rayhit.hit.primID,
-               rayhit.ray.tfar);
-    */
-
-    // debug
-    // printf("found  instersection at tfar=%f\n", rayhit.ray.tfar);
-
     // else:
     // retrieve further information about the intersected shape ...
     unsigned int geomID = rayhit.hit.geomID;
     RTCGeometry intersectedRTCGeometry = rtcGetGeometry(scene, geomID);
     EmbreeGeometryData * userDataGeometry = (EmbreeGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
 
+    /*
+    // debugprintf
+        printf("Found intersection on geometry %d of type %s, primitive %d at tfar=%f\n",
+               rayhit.hit.geomID,
+               [[userDataGeometry->_shape className] UTF8String],
+               rayhit.hit.primID,
+               rayhit.ray.tfar);
+    */
+
     // ... and store intersection information in an
     // ArcIntersection and return it
     ArcIntersection  *  intersection =
             [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
 
-    ARCINTERSECTION_T(intersection) = rayhit.ray.tfar;;
-    ARCINTERSECTION_TRAVERSALSTATE(intersection) =  artraversalstate_copy( & ARNRAYCASTER_TRAVERSALSTATE(raycaster));
+    ARCINTERSECTION_T(intersection) = rayhit.ray.tfar;
+    ARCINTERSECTION_TRAVERSALSTATE(intersection) =  userDataGeometry->_traversalState;
+
     ARCINTERSECTION_SHAPE(intersection) = userDataGeometry->_shape;
     ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = raycaster->intersection_test_world_ray3d;
     SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
     TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
 
-    /*
-    // manually setting environment material and volume material
-    intersection->materialOutsideRef = userDataGeometry->_traversalState.volume_material_reference;
-    intersection->materialInsideRef = userDataGeometry->_traversalState.volume_material_reference; // not sure of this
-     */
-
     ARCINTERSECTION_VOLUME_MATERIAL_FROM_REF(intersection) = userDataGeometry->_traversalState.volume_material_reference;
     ARCINTERSECTION_VOLUME_MATERIAL_INTO_REF(intersection) = userDataGeometry->_traversalState.volume_material_reference;
-
-    // debug
-    // printf("material of shape with id %d is: %s\n", geomID,
-       //    [[userDataGeometry->_traversalState.surface_material_reference.reference className]UTF8String]);
 
     return intersection;
 }

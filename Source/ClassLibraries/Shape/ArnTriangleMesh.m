@@ -355,7 +355,6 @@ ArNode * arntrianglemesh_from_ply(
                         :   maxPoint
                 ];
 
-        rtcSetGeometryUserPrimitiveCount(embreeMesh, 1);
         thisMesh->embreeGeomID = (int)[embree addGeometry: embreeMesh];
     }
 
@@ -603,8 +602,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         maxPoint = maxPoint_;
 
         internalMeshTree = 0;
-
-        embreeGeomID = EMBREE_GEOM_ID_UNINITIALIZED;
     }
 
     return self;
@@ -711,6 +708,17 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 - (void) setupNodeData
         : (ArTraversalState *) traversalState
 {
+    // If Embree is enabled, pass the triangle array to the corresponding embree shape
+    // and return
+    if([ArnEmbree embreeEnabled]) {
+
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+
+        [embree setGeometryUserData: self : traversalState];
+
+        return;
+    }
+
     //   If the internal tree is not null then the setup must have
     //   been done already.
 
@@ -728,16 +736,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
     //   Fill a dynamic array with the hard references to faces
 
     ArNodeRefDynArray  array = arnoderefdynarray_init( numberOfFaces );
-
-    // If Embree is enabled, pass the triangle array to the corresponding embree shape
-    if([ArnEmbree embreeEnabled]) {
-
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-
-        [embree setGeometryUserData: self : traversalState];
-
-        return;
-    }
 
     for( long i = 0; i < numberOfFaces; ++i )
     {

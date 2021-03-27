@@ -790,7 +790,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
     if([ArnEmbree embreeEnabled]) {
         [ArnEmbree cleanUp];
     }
-    
+
     for ( unsigned int i = 0; i < numberOfRenderThreads; i++ )
     {
         [ pathspaceIntegrator[i] cleanupAfterEstimation: ART_GLOBAL_REPORTER ];

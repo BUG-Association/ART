@@ -51,11 +51,7 @@ typedef enum Embree_state {
     Box3D * _bbox_objectSpace;
 }
 
-- init
-        : (ArNode <ArpShape> *) shape
-        : (ArTraversalState) traversalState
-        : (Box3D *) bboxObjectSPace
-        ;
+- init;
 
 - (void) setBoundigBox : (Box3D *) box;
 

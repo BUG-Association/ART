@@ -30,6 +30,8 @@
 #import "ArnShape.h"
 #import "ArpBBoxHandling_Node.h"
 
+#import "ArnTriangleMesh.h"
+
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
@@ -64,6 +66,8 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
         ArnEmbree * embree = [ArnEmbree embreeManager];
         RTCGeometry geometry = [embree initEmbreeGeometry];
         embreeGeomID = (int) [embree addGeometry: geometry];
+        // debug
+        printf("initialized shape %s with id %d\n", [[self className] UTF8String], embreeGeomID);
     }
     
     return self;
@@ -227,12 +231,14 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 {
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
-    if([ArnEmbree embreeEnabled]) {
+
+    if([ArnEmbree embreeEnabled] && ![self isKindOfClass: [ArnTriangleMesh class]]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
         RTCGeometry geometry = [embree initEmbreeGeometry];
         embreeGeomID = (int) [embree addGeometry: geometry];
         [embree setGeometryUserData: self : &traversal->state];
     }
+
 
     id  result =
         [ ALLOC_INIT_OBJECT(AraCombinedAttributes)

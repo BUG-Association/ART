@@ -60,8 +60,6 @@ ART_MODULE_INITIALISATION_FUNCTION
         );
 
     art_gv->arninfsphere_gv = arninfsphere_gv;
-
-    printf("going inside the weird infsphere func\n");
 )
 
 ART_MODULE_SHUTDOWN_FUNCTION

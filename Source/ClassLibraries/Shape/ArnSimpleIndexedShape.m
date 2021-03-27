@@ -51,10 +51,6 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 {
     self = [ super init ];
 
-    //debug
-    NSString * className = [self className];
-    printf("init %s\n", [className UTF8String]);
-
     if ( self )
     {
         indexTable = newIndexTable;
@@ -140,15 +136,6 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         RTCGeometry embreeGeometry = rtcGetGeometry([embree getScene], (unsigned int) self->embreeGeomID);
         EmbreeGeometryData * geometryData = (EmbreeGeometryData *)rtcGetGeometryUserData(embreeGeometry);
         [geometryData setBoundigBox: outBBox];
-    }
-    else {
-        printf("bounding box\n");
-        printf("object box - min x: %f\n", outBBox->min.c.x[0]);
-        printf("object box - min y: %f\n", outBBox->min.c.x[1]);
-        printf("object box - min z: %f\n", outBBox->min.c.x[2]);
-        printf("object box - max x: %f\n", outBBox->max.c.x[0]);
-        printf("object box - max y: %f\n", outBBox->max.c.x[1]);
-        printf("object box - max z: %f\n", outBBox->max.c.x[2]);
     }
 }
 
