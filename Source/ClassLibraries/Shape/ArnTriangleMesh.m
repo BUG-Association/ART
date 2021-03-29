@@ -354,7 +354,6 @@ ArNode * arntrianglemesh_from_ply(
                         :   minPoint
                         :   maxPoint
                 ];
-
         thisMesh->embreeGeomID = (int)[embree addGeometry: embreeMesh];
     }
 
@@ -714,7 +713,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
         ArnEmbree * embree = [ArnEmbree embreeManager];
 
-        [embree setGeometryUserData: self : traversalState];
+        // [embree setGeometryUserData: self : traversalState];
 
         return;
     }

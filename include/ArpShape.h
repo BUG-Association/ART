@@ -98,12 +98,6 @@ ArShapeGeometry;
         ;
 
 
-- (void) getIntersectionList
-        : (ArnRayCaster *) rayCaster
-        : (Range) range_of_t
-        : (struct ArIntersectionList *) intersectionList
-                ;
-
 @end
 
 /* ===========================================================================

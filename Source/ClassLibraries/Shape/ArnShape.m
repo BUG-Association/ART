@@ -64,10 +64,11 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
 
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry geometry = [embree initEmbreeGeometry];
-        embreeGeomID = (int) [embree addGeometry: geometry];
-        // debug
-        printf("initialized shape %s with id %d\n", [[self className] UTF8String], embreeGeomID);
+
+        if(![self isKindOfClass: [ArnTriangleMesh class]]) {
+            RTCGeometry geometry = [embree initEmbreeGeometry];
+            embreeGeomID = (int) [embree addGeometry: geometry];
+        }
     }
     
     return self;
@@ -241,10 +242,13 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             :  ARNGT_VERTICES(traversal)
             ];
 
-    if([ArnEmbree embreeEnabled] && ![self isKindOfClass: [ArnTriangleMesh class]]) {
+    if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry geometry = [embree initEmbreeGeometry];
-        embreeGeomID = (int) [embree addGeometry: geometry];
+
+        if(![self isKindOfClass: [ArnTriangleMesh class]]) {
+            RTCGeometry geometry = [embree initEmbreeGeometry];
+            embreeGeomID = (int) [embree addGeometry: geometry];
+        }
         // [embree setGeometryUserData: self : &traversal->state];
         [embree setGeometryUserData: self : &traversal->state : result];
     }

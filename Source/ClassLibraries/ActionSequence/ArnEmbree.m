@@ -155,7 +155,7 @@ static ArnRayCaster * embreeRaycaster;
     }
 }
 
-// #define EMBREE_DEBUG_PRINT
+#define EMBREE_DEBUG_PRINT
 void embree_intersect_geometry(const int * valid,
                                void * geometryUserPtr,
                                unsigned int geomID,
@@ -171,13 +171,10 @@ void embree_intersect_geometry(const int * valid,
         return;
 
     if(rtc_hit) {
-        // embreeRaycaster->state = geometryData->_traversalState;
         Range  range = RANGE( 0.0, MATH_HUGE_DOUBLE);
 
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
-        // printf("shape about to be intersected: %s\n", [[shape className] UTF8String]);
-        // [shape getIntersectionList: embreeRaycaster : range : &intersectionList];
         [attributes getIntersectionList: embreeRaycaster : range : &intersectionList];
 
         if(intersectionList.head) {
@@ -354,8 +351,10 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
     // ... and store intersection information in an
     // ArcIntersection and return it
-    ArcIntersection  *  intersection =
-                  [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
+
+    ArcIntersection * intersection = [[ArcIntersection alloc] init];
+    // ArcIntersection  *  intersection =
+       //           [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
 
     ARCINTERSECTION_T(intersection) = rayhit.ray.tfar;
     ARCINTERSECTION_TRAVERSALSTATE(intersection) =  userDataGeometry->_traversalState;

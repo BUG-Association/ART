@@ -1160,9 +1160,15 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     }
     if ( intersection )
     {
-        [ INTERSECTION_FREELIST releaseInstance
-             :   intersection
-             ];
+        if([ArnEmbree embreeEnabled]) {
+            [intersection release];
+        }
+        else {
+            [ INTERSECTION_FREELIST releaseInstance
+            :   intersection
+            ];
+        }
+
     }
     if ( rayOriginScatteringEvent )
     {
