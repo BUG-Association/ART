@@ -95,7 +95,6 @@ ARPRAYCASTING_SINGULAR_SHAPE_IMPLEMENTATION
             );
 
 
-
         ArcIntersection  * intersection =
             INTERSECTIONLIST_HEAD(*intersectionList);
 

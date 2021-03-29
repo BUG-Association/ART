@@ -178,15 +178,8 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 - (ArNode *) pushAttributesToLeafNodes
         : (ArnGraphTraversal *) traversal
 {
-    self->embreeGeomID = EMBREE_INVALID_GEOMETRY_ID;
-    if([ArnEmbree embreeEnabled]) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry embreeGeometry = [embree initEmbreeGeometry];
-        self->embreeGeomID = (int) [embree addGeometry: embreeGeometry];
-        [embree setGeometryUserData: self : &traversal->state];
-    }
 
-    return
+    id result =
         [ ALLOC_INIT_OBJECT(AraCombinedAttributes)
             :  self
             :  ARNGT_VOLUME_MATERIAL(traversal)
@@ -195,6 +188,15 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             :  ARNGT_TRAFO(traversal)
             :  ARNGT_VERTICES(traversal)
             ];
+
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        RTCGeometry embreeGeometry = [embree initEmbreeGeometry];
+        self->embreeGeomID = (int) [embree addGeometry: embreeGeometry];
+        [embree setGeometryUserData: self : &traversal->state : result];
+    }
+
+    return result;
 }
 
 - (void) getIntersectionList

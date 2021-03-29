@@ -397,7 +397,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         ArnEmbree * embree = [ArnEmbree embreeManager];
         return [embree intersect
                 : self
-                : geometryToIntersectRayWith // this is AraWorld, needed for crafting arcintersection
         ];
     }
 

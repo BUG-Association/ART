@@ -155,7 +155,7 @@ static ArnRayCaster * embreeRaycaster;
     }
 }
 
-#define EMBREE_DEBUG_PRINT
+// #define EMBREE_DEBUG_PRINT
 void embree_intersect_geometry(const int * valid,
                                void * geometryUserPtr,
                                unsigned int geomID,
@@ -165,18 +165,20 @@ void embree_intersect_geometry(const int * valid,
 {
     const EmbreeGeometryData * geometryData = (const EmbreeGeometryData *) geometryUserPtr;
     const ArNode<ArpShape> * shape = geometryData->_shape;
+    const AraCombinedAttributes * attributes = geometryData->_combinedAttributes;
 
     if(!valid[0])
         return;
 
     if(rtc_hit) {
-        embreeRaycaster->state = geometryData->_traversalState;
+        // embreeRaycaster->state = geometryData->_traversalState;
         Range  range = RANGE( 0.0, MATH_HUGE_DOUBLE);
 
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
         // printf("shape about to be intersected: %s\n", [[shape className] UTF8String]);
-        [shape getIntersectionList: embreeRaycaster : range : &intersectionList];
+        // [shape getIntersectionList: embreeRaycaster : range : &intersectionList];
+        [attributes getIntersectionList: embreeRaycaster : range : &intersectionList];
 
         if(intersectionList.head) {
             rtc_ray->tfar = (float) intersectionList.head->t;
@@ -250,8 +252,10 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     return geomID;
 }
 
-- (void) setGeometryUserData : (ArNode <ArpShape> *) shape
+- (void) setGeometryUserData
+        : (ArNode <ArpShape> *) shape
         : (ArTraversalState *) traversalState
+        : (AraCombinedAttributes *) combinedAttributes
 {
     RTCGeometry thisGeometry = NULL;
     if([shape isKindOfClass: [ArnShape class]]) {
@@ -275,6 +279,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     EmbreeGeometryData * embreeGeometry = ALLOC_OBJECT(EmbreeGeometryData);
     embreeGeometry->_shape = shape;
     embreeGeometry->_traversalState = *traversalState;
+    embreeGeometry->_combinedAttributes = combinedAttributes;
 
     rtcSetGeometryUserData(thisGeometry, (void *) embreeGeometry);
 }
@@ -302,7 +307,6 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
 - (ArcIntersection *) intersect
         : (ArnRayCaster *) raycaster
-        : (ArNode <ArpRayCasting> *) araWorld
 {
     // set raycaster to be called in callback functions
     embreeRaycaster = raycaster;
@@ -351,7 +355,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     // ... and store intersection information in an
     // ArcIntersection and return it
     ArcIntersection  *  intersection =
-            [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
+                  [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
 
     ARCINTERSECTION_T(intersection) = rayhit.ray.tfar;
     ARCINTERSECTION_TRAVERSALSTATE(intersection) =  userDataGeometry->_traversalState;
@@ -359,10 +363,13 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     ARCINTERSECTION_SHAPE(intersection) = userDataGeometry->_shape;
     ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = raycaster->intersection_test_world_ray3d;
     SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
+
     TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
 
     ARCINTERSECTION_VOLUME_MATERIAL_FROM_REF(intersection) = userDataGeometry->_traversalState.volume_material_reference;
     ARCINTERSECTION_VOLUME_MATERIAL_INTO_REF(intersection) = userDataGeometry->_traversalState.volume_material_reference;
+
+    // ARCINTERSECTION_VOLUME_MATERIAL_FROM_REF(intersection) = [userDataGeometry->_combinedAttributes unambigousSubnodeVolumeMaterial]
 
     return intersection;
 }

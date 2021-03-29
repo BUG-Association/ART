@@ -971,6 +971,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
                         allContributions[mediaContributionIndex])
                 : & volumeHasContribution
                 ];
+
         if( volumeHasContribution )
         {
             if(HERO_SAMPLES_TO_SPLAT > 1)
@@ -1093,6 +1094,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
                 }
                 ++nonzeroContributions[lastNonzeroIndex = contributionIndex];
             }
+
+            // printf("contributionIndex: %d\n", contributionIndex);
             
             // store the current wavelength so that we can replace the value
             previousWavelength = wavelength;
@@ -1178,9 +1181,14 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     {
         // accumulate contributions
         ArLightSample *accumulator = allContributions[lastNonzeroIndex]; // last actual contribution
+
+        // [Sebastian] TODO error lies here
         if(lastNonzeroIndex > 0 && nonclearMediaAttenuations[lastNonzeroIndex - 1])
             arlightsample_a_mul_l(art_gv, allMediaAttenuations[lastNonzeroIndex - 1], accumulator);
-        
+
+        // debug
+        // arlightsample_l_debugprintf(art_gv, accumulator);
+
         for(int i = lastNonzeroIndex - 1; i > 0; --i)
         {
             arlightsample_a_mul_l(art_gv, allAttenuations[i - 1], accumulator);
@@ -1191,7 +1199,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
                 arlightsample_a_mul_l(art_gv, allMediaAttenuations[i - 1], accumulator);
             }
         }
-        
+
         if(lastNonzeroIndex > 0 && nonzeroContributions[0])
         {
             // add the first contribution (which is a media contribution) and store the computed light sample in the result
@@ -1251,7 +1259,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
 
     ARPATHSPACERESULT_ALPHA(*result[0]) = traceAlpha;
 
-    ASSERT_VALID_GATHERING_RESULT(result[0])
+    ASSERT_VALID_GATHERING_RESULT(result[0)
 }
 
 - (void) code

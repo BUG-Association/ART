@@ -231,15 +231,6 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 {
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
-
-    if([ArnEmbree embreeEnabled] && ![self isKindOfClass: [ArnTriangleMesh class]]) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry geometry = [embree initEmbreeGeometry];
-        embreeGeomID = (int) [embree addGeometry: geometry];
-        [embree setGeometryUserData: self : &traversal->state];
-    }
-
-
     id  result =
         [ ALLOC_INIT_OBJECT(AraCombinedAttributes)
             :  self
@@ -249,6 +240,14 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             :  ARNGT_TRAFO(traversal)
             :  ARNGT_VERTICES(traversal)
             ];
+
+    if([ArnEmbree embreeEnabled] && ![self isKindOfClass: [ArnTriangleMesh class]]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        RTCGeometry geometry = [embree initEmbreeGeometry];
+        embreeGeomID = (int) [embree addGeometry: geometry];
+        // [embree setGeometryUserData: self : &traversal->state];
+        [embree setGeometryUserData: self : &traversal->state : result];
+    }
 
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 

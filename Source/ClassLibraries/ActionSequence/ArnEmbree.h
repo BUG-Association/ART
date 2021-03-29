@@ -48,6 +48,7 @@ typedef enum Embree_state {
 @public
     ArNode<ArpShape> * _shape;
     ArTraversalState _traversalState;
+    AraCombinedAttributes * _combinedAttributes;
     Box3D * _bbox_objectSpace;
 }
 
@@ -86,13 +87,16 @@ typedef enum Embree_state {
 
 - (RTCGeometry) initEmbreeGeometry;
 - (unsigned int) addGeometry: (RTCGeometry) newGeometry;
-- (void) setGeometryUserData : (ArNode <ArpShape> *) shape : (ArTraversalState *) traversalState;
+- (void) setGeometryUserData
+        : (ArNode <ArpShape> *) shape
+        : (ArTraversalState *) traversalState
+        : (AraCombinedAttributes *) combinedAttributes
+        ;
 
 
 // intersection
 - (ArcIntersection *) intersect
         : (ArnRayCaster *) raycaster
-        : (ArNode <ArpRayCasting> *) araWorld
         ;
 
 + (void) cleanUp;

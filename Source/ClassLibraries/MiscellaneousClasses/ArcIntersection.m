@@ -136,6 +136,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     // (this is the case where all is good), and invert the directions
     // otherwise.
 
+
     if ( ARCINTERSECTION_WORLDSPACE_COSINE(self) < 0.0 )
     {
         ARCINTERSECTION_WORLDSPACE_COSINE(self) =
