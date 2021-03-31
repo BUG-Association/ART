@@ -304,6 +304,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
 - (ArcIntersection *) intersect
         : (ArnRayCaster *) raycaster
+        : (ArNode <ArpRayCasting> *) araWorld
 {
     // set raycaster to be called in callback functions
     embreeRaycaster = raycaster;
@@ -352,23 +353,41 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     // ... and store intersection information in an
     // ArcIntersection and return it
 
-    ArcIntersection * intersection = [[ArcIntersection alloc] init];
+    raycaster->state = userDataGeometry->_traversalState;
+    raycaster->surfacepoint_test_shape = userDataGeometry->_shape;
+    ArIntersectionList intersectionList;
+    arintersectionlist_init_1(
+            &intersectionList,
+            rayhit.ray.tfar,
+            0,
+            arface_on_shape_is_planar, // TODO find out more about this
+            userDataGeometry->_shape,
+            raycaster
+    );
+    ArcIntersection  * intersection =
+            INTERSECTIONLIST_HEAD(intersectionList);
+    // ArcIntersection * intersection = [[ArcIntersection alloc] init];
     // ArcIntersection  *  intersection =
        //           [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
 
-    ARCINTERSECTION_T(intersection) = rayhit.ray.tfar;
+    // ARCINTERSECTION_T(intersection) = rayhit.ray.tfar;
     ARCINTERSECTION_TRAVERSALSTATE(intersection) =  userDataGeometry->_traversalState;
 
     ARCINTERSECTION_SHAPE(intersection) = userDataGeometry->_shape;
-    ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = raycaster->intersection_test_world_ray3d;
+    ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = embreeRaycaster->intersection_test_world_ray3d;
     SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
 
     TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
 
-    ARCINTERSECTION_VOLUME_MATERIAL_FROM_REF(intersection) = userDataGeometry->_traversalState.volume_material_reference;
-    ARCINTERSECTION_VOLUME_MATERIAL_INTO_REF(intersection) = userDataGeometry->_traversalState.volume_material_reference;
+    // ARCINTERSECTION_VOLUME_MATERIAL_FROM_REF(intersection) = userDataGeometry->_traversalState.volume_material_reference;
+    // ARCINTERSECTION_VOLUME_MATERIAL_INTO_REF(intersection) = userDataGeometry->_traversalState.volume_material_reference;
 
-    // ARCINTERSECTION_VOLUME_MATERIAL_FROM_REF(intersection) = [userDataGeometry->_combinedAttributes unambigousSubnodeVolumeMaterial]
+    Range range;
+    [ araWorld getIntersectionList
+            :   raycaster
+            :   range
+            : & intersectionList
+    ];
 
     return intersection;
 }
