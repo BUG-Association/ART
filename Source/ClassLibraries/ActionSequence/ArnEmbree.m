@@ -355,6 +355,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
     raycaster->state = userDataGeometry->_traversalState;
     raycaster->surfacepoint_test_shape = userDataGeometry->_shape;
+
     ArIntersectionList intersectionList;
     arintersectionlist_init_1(
             &intersectionList,
@@ -365,6 +366,10 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
             raycaster
     );
 
+    // this is some kind of hack: In order to process the individual materials
+    // correctly, the function 'getIntersectionList' of AraWorld offers the right
+    // functionality. Please don't be confused, no ray-tracing is done here,
+    // just the processing of the materials
     Range range;
     [ araWorld getIntersectionList
             :   raycaster
@@ -377,9 +382,8 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     // ARCINTERSECTION_TRAVERSALSTATE(intersection) =  userDataGeometry->_traversalState;
 
     // ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = embreeRaycaster->intersection_test_world_ray3d;
-    // SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
-
-    // TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
+    SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
+    TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
 
 
     return intersection;
