@@ -55,7 +55,6 @@ void errorFunction(void* userPtr, enum RTCError error, const char* str) {
 static BOOL EMBREE_ENABLED;
 
 static ArnEmbree * embreeManager;
-
 static ArnRayCaster * embreeRaycaster;
 
 
@@ -105,7 +104,6 @@ static ArnRayCaster * embreeRaycaster;
         RTCGeometry rtcGeometry = rtcGetGeometry([embree getScene], (unsigned int) geomIDIntValue);
         EmbreeGeometryData * geom_data = (EmbreeGeometryData *)rtcGetGeometryUserData(rtcGeometry);
         if(geom_data) {
-            // [geom_data release];
             RELEASE_OBJECT(geom_data);
             // debug
             printf("freed memory of user data with address: %p\n", (void *) geom_data);
@@ -155,7 +153,7 @@ static ArnRayCaster * embreeRaycaster;
     }
 }
 
-#define EMBREE_DEBUG_PRINT
+// #define EMBREE_DEBUG_PRINT
 void embree_intersect_geometry(const int * valid,
                                void * geometryUserPtr,
                                unsigned int geomID,
@@ -172,19 +170,25 @@ void embree_intersect_geometry(const int * valid,
 
     if(rtc_hit) {
         Range  range = RANGE( 0.0, MATH_HUGE_DOUBLE);
-
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
-
-        [attributes getIntersectionList: embreeRaycaster : range : &intersectionList];
-
-        if(intersectionList.head) {
-            rtc_ray->tfar = (float) intersectionList.head->t;
-            rtc_hit->u = (float) intersectionList.head->texture_coordinates.c.x[0];
-            rtc_hit->v = (float) intersectionList.head->texture_coordinates.c.x[1];
+        double  t;
+        Pnt2D   intersectionTextureCoordinates;
+        if( [shape getPrimarilyIntersectionList
+                                : embreeRaycaster
+                                : range
+                                : &intersectionList
+                                : &t
+                                : &intersectionTextureCoordinates
+        ] ) {
+            rtc_ray->tfar = (float) t;
+            rtc_hit->u = (float) intersectionTextureCoordinates.c.x[0];
+            rtc_hit->v = (float) intersectionTextureCoordinates.c.x[1];
             rtc_hit->geomID = geomID;
             rtc_hit->primID = 0;
-            // rtc_hit->instID[0] = instID;
+            rtc_hit->instID[0] = instID;
         }
+
+        // [attributes getIntersectionList: embreeRaycaster : range : &intersectionList];
     }
 }
 
@@ -355,8 +359,11 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
     raycaster->state = userDataGeometry->_traversalState;
     raycaster->surfacepoint_test_shape = userDataGeometry->_shape;
-
+    Range range = RANGE( 0.0, MATH_HUGE_DOUBLE);
     ArIntersectionList intersectionList;
+    // [userDataGeometry->_combinedAttributes getIntersectionList: raycaster :range : &intersectionList];
+
+    /*
     arintersectionlist_init_1(
             &intersectionList,
             rayhit.ray.tfar,
@@ -365,15 +372,19 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
             userDataGeometry->_shape,
             raycaster
     );
+     */
+
+    if(!intersectionList.head)
+        return NULL;
 
     // this is some kind of hack: In order to process the individual materials
     // correctly, the function 'getIntersectionList' of AraWorld offers the right
     // functionality. Please don't be confused, no ray-tracing is done here,
     // just the processing of the materials
-    Range range;
+
     [ araWorld getIntersectionList
             :   raycaster
-            :   range
+            :   range // serves as dummy here
             : & intersectionList
     ];
 

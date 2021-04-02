@@ -75,6 +75,14 @@ struct ArIntersectionList;
         : (struct ArIntersectionList *) intersectionList
         ;
 
+- (BOOL) getPrimarilyIntersectionList
+        : (ArnRayCaster *) rayCaster
+        : (Range) range_of_t
+        : (struct ArIntersectionList *) intersectionList
+        : (double *) t
+        : (Pnt2D *) intersectionTextureCoordinates
+        ;
+
 @end
 
 @protocol ArpShapeRayCasting < ArpRayCasting >
