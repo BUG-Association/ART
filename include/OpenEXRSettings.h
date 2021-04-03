@@ -24,7 +24,7 @@
 
 =========================================================================== */
 
-#define OPENEXR_FOUND   1
+#define OPENEXR_FOUND   0
 #if (OPENEXR_FOUND == 1)
 #define ART_WITH_OPENEXR
 #endif // OPENEXR_FOUND

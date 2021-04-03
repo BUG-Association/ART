@@ -175,7 +175,10 @@ void embree_intersect_geometry(const int * valid,
 
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
-        [attributes getIntersectionList: embreeRaycaster : range : &intersectionList];
+        // [attributes getIntersectionList: embreeRaycaster : range : &intersectionList];
+
+        // debug
+        rtc_hit->geomID = geomID;
 
         if(intersectionList.head) {
             rtc_ray->tfar = (float) intersectionList.head->t;
@@ -355,8 +358,12 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
     raycaster->state = userDataGeometry->_traversalState;
     raycaster->surfacepoint_test_shape = userDataGeometry->_shape;
-
+    Range  range = RANGE( 0.0, MATH_HUGE_DOUBLE);
     ArIntersectionList intersectionList;
+
+    [userDataGeometry->_combinedAttributes getIntersectionList: raycaster : range : &intersectionList];
+
+    /*
     arintersectionlist_init_1(
             &intersectionList,
             rayhit.ray.tfar,
@@ -365,12 +372,13 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
             userDataGeometry->_shape,
             raycaster
     );
+     */
 
     // this is some kind of hack: In order to process the individual materials
     // correctly, the function 'getIntersectionList' of AraWorld offers the right
     // functionality. Please don't be confused, no ray-tracing is done here,
     // just the processing of the materials
-    Range range;
+    // Range range;
     [ araWorld getIntersectionList
             :   raycaster
             :   range
