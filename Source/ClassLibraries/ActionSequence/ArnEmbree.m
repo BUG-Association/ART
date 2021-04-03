@@ -171,18 +171,16 @@ void embree_intersect_geometry(const int * valid,
     if(rtc_hit) {
         Range  range = RANGE( 0.0, MATH_HUGE_DOUBLE);
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
-        double  t;
-        Pnt2D   intersectionTextureCoordinates;
-        if( [shape getPrimarilyIntersectionList
-                                : embreeRaycaster
-                                : range
-                                : &intersectionList
-                                : &t
-                                : &intersectionTextureCoordinates
-        ] ) {
-            rtc_ray->tfar = (float) t;
-            rtc_hit->u = (float) intersectionTextureCoordinates.c.x[0];
-            rtc_hit->v = (float) intersectionTextureCoordinates.c.x[1];
+
+        // [attributes getIntersectionList: embreeRaycaster : range : &intersectionList];
+
+        // debug
+        rtc_hit->geomID = geomID;
+
+        if(intersectionList.head) {
+            rtc_ray->tfar = (float) intersectionList.head->t;
+            rtc_hit->u = (float) intersectionList.head->texture_coordinates.c.x[0];
+            rtc_hit->v = (float) intersectionList.head->texture_coordinates.c.x[1];
             rtc_hit->geomID = geomID;
             rtc_hit->primID = 0;
             rtc_hit->instID[0] = instID;
@@ -359,9 +357,11 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
     raycaster->state = userDataGeometry->_traversalState;
     raycaster->surfacepoint_test_shape = userDataGeometry->_shape;
-    Range range = RANGE( 0.0, MATH_HUGE_DOUBLE);
+    Range  range = RANGE( 0.0, MATH_HUGE_DOUBLE);
     ArIntersectionList intersectionList;
-    // [userDataGeometry->_combinedAttributes getIntersectionList: raycaster :range : &intersectionList];
+
+    [userDataGeometry->_combinedAttributes getIntersectionList: raycaster : range : &intersectionList];
+
 
     /*
     arintersectionlist_init_1(
@@ -374,14 +374,11 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     );
      */
 
-    if(!intersectionList.head)
-        return NULL;
-
     // this is some kind of hack: In order to process the individual materials
     // correctly, the function 'getIntersectionList' of AraWorld offers the right
     // functionality. Please don't be confused, no ray-tracing is done here,
     // just the processing of the materials
-
+    // Range range;
     [ araWorld getIntersectionList
             :   raycaster
             :   range // serves as dummy here
