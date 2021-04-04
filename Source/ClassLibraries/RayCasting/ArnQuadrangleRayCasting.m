@@ -109,32 +109,6 @@ ARPRAYCASTING_SINGULAR_SHAPE_IMPLEMENTATION
     }
 }
 
-- (BOOL) getPrimarilyIntersectionList
-        : (ArnRayCaster *) rayCaster
-        : (Range) range_of_t
-        : (struct ArIntersectionList *) intersectionList
-        : (double *) t
-        : (Pnt2D *) intersectionTextureCoordinates
-{
-    *intersectionList = ARINTERSECTIONLIST_EMPTY;
-
-    Pnt3D   intersectionLocalPoint;
-
-    unsigned int  result =
-            quadrangledata_perform_intersection(
-                    quadrangleData,
-                    & [ ARNRAYCASTER_VERTICES(rayCaster) pointArray ]
-                    [ ARARRAY_I( indexTable, 0 )],
-                    & OBJECTSPACE_RAY,
-                    & range_of_t,
-                    0, // rayCaster->unionOptions & arunion_backface_culling,
-                    t,
-                    & intersectionLocalPoint,
-                    intersectionTextureCoordinates
-            );
-
-    if( result ) return YES; else return NO;
-}
 
 - (void) calculateLocalNormalForIntersection
         : (ArcIntersection *) intersection

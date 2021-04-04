@@ -29,7 +29,6 @@
 #include "ArNode.h"
 #include <embree3/rtcore.h>
 
-@class ArcIntersection;
 @class ArnShape;
 @class AraCombinedAttributes;
 @class ArcSurfacePoint;
