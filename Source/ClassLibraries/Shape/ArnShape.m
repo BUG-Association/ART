@@ -66,8 +66,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
         ArnEmbree * embree = [ArnEmbree embreeManager];
 
         if(![self isKindOfClass: [ArnTriangleMesh class]]) {
-            RTCGeometry geometry = [embree initEmbreeGeometry];
-            embreeGeomID = (int) [embree addGeometry: geometry];
+            embreeGeomID = [embree initEmbreeUserGeometry];
         }
     }
     
@@ -246,8 +245,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         ArnEmbree * embree = [ArnEmbree embreeManager];
 
         if(![self isKindOfClass: [ArnTriangleMesh class]]) {
-            RTCGeometry geometry = [embree initEmbreeGeometry];
-            embreeGeomID = (int) [embree addGeometry: geometry];
+            embreeGeomID = [embree initEmbreeUserGeometry];
         }
         // [embree setGeometryUserData: self : &traversal->state];
         [embree setGeometryUserData: self : &traversal->state : result];

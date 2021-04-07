@@ -30,8 +30,10 @@
 #include <embree3/rtcore.h>
 
 @class ArnShape;
+@class ArnSimpleIndexedShape;
 @class AraCombinedAttributes;
 @class ArcSurfacePoint;
+@class ArnVertexSet;
 
 ART_MODULE_INTERFACE(ArnEmbree)
 
@@ -84,8 +86,9 @@ typedef enum Embree_state {
 - (RTCScene) getScene;
 - (Embree_state) getState;
 
-- (RTCGeometry) initEmbreeGeometry;
-- (unsigned int) addGeometry: (RTCGeometry) newGeometry;
+- (int) initEmbreeSimpleIndexedGeometry: (ArnSimpleIndexedShape *) shape : (ArnVertexSet *) vertexSet;
+- (int) initEmbreeUserGeometry;
+- (int) addGeometry: (RTCGeometry) newGeometry;
 - (void) setGeometryUserData
         : (ArNode <ArpShape> *) shape
         : (ArTraversalState *) traversalState

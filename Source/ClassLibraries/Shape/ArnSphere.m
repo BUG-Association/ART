@@ -128,25 +128,6 @@ ART_MODULE_INITIALISATION_FUNCTION_EXEC_ONLY_ONCE
         );
 
     art_gv->arnsphere_gv = arnsphere_gv;
-
-    /*
-    if([ArnEmbree embreeEnabled]) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry geometry = [embree initEmbreeGeometry];
-        arnsphere_gv->singleton->embreeGeomID = (int) [embree addGeometry: geometry];
-        Box3D boundingBox;
-        boundingBox.min.c.x[0] = - 1.0;
-        boundingBox.min.c.x[1] = - 1.0;
-        boundingBox.min.c.x[2] = - 1.0;
-        boundingBox.max.c.x[0] = 1.0;
-        boundingBox.max.c.x[1] = 1.0;
-        boundingBox.max.c.x[2] = 1.0;
-
-        [embree setGeometryUserData: arnsphere_gv->singleton : NULL];
-        EmbreeGeometryData * geometryData = (EmbreeGeometryData *) rtcGetGeometryUserData(geometry);
-        [geometryData setBoundigBox: &boundingBox];
-    }
-     */
 )
 
 ART_MODULE_SHUTDOWN_FUNCTION_EXEC_ONLY_ONCE

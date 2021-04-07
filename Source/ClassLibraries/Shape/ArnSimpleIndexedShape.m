@@ -191,8 +191,8 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry embreeGeometry = [embree initEmbreeGeometry];
-        self->embreeGeomID = (int) [embree addGeometry: embreeGeometry];
+        ArnVertexSet * vertices = (ArnVertexSet *) ARNGT_VERTICES(traversal);
+        self->embreeGeomID = [embree initEmbreeSimpleIndexedGeometry : self : vertices];
         [embree setGeometryUserData: self : &traversal->state : result];
     }
 

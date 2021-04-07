@@ -164,15 +164,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(1,1,1)
             & pointArray[ ARARRAY_I( indexTable, 3 ) ]
             );
     }
-
-    /*
-    if([ArnEmbree embreeEnabled]) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry embreeGeometry = [embree initEmbreeGeometry];
-        self->embreeGeomID = (int) [embree addGeometry: embreeGeometry];
-        [embree setGeometryUserData: self : traversalState];
-    }
-     */
 }
 
 - (void) getLocalCentroid
