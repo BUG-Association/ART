@@ -154,7 +154,7 @@ static ArIntersectionList embreeIntersectionList;
     }
 }
 
-// #define EMBREE_DEBUG_PRINT
+#define EMBREE_DEBUG_PRINT
 void embree_intersect_geometry(const int * valid,
                                void * geometryUserPtr,
                                unsigned int geomID,
@@ -170,11 +170,15 @@ void embree_intersect_geometry(const int * valid,
     if(!valid[0])
         return;
 
+    rtc_hit->geomID = geomID;
+
+    /*
     if(rtc_hit) {
         Range  range = RANGE( 0.0, MATH_HUGE_DOUBLE);
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
-        [attributes getIntersectionList: embreeRaycaster : range : &intersectionList];
+        // [attributes getIntersectionList: embreeRaycaster : range : &intersectionList];
+
 
         if(intersectionList.head) {
             // rtc_ray->tfar = (float) intersectionList.head->t;
@@ -186,6 +190,7 @@ void embree_intersect_geometry(const int * valid,
         }
         embreeIntersectionList = intersectionList;
     }
+     */
 }
 
 
@@ -220,10 +225,15 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
 
 void embree_intersect(const struct RTCIntersectFunctionNArguments* args) {
     struct RTCRayHit * rayHit = (struct RTCRayHit *) args->rayhit;
+    /*
     embree_intersect_geometry(
             args->valid, args->geometryUserPtr, args->geomID,
             args->context->instID[0], &rayHit->ray,
             &rayHit->hit);
+            */
+    // printf("geometry ID is: %d\n", args->geomID);
+
+    rayHit->hit.geomID = args->geomID;
 }
 
 void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
@@ -341,14 +351,6 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     RTCGeometry intersectedRTCGeometry = rtcGetGeometry(scene, geomID);
     EmbreeGeometryData * userDataGeometry = (EmbreeGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
 
-    /*
-    // debugprintf
-        printf("Found intersection on geometry %d of type %s, primitive %d at tfar=%f\n",
-               rayhit.hit.geomID,
-               [[userDataGeometry->_shape className] UTF8String],
-               rayhit.hit.primID,
-               rayhit.ray.tfar);
-    */
 
     // ... and store intersection information in an
     // ArcIntersection and return it
@@ -356,19 +358,32 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     raycaster->state = userDataGeometry->_traversalState;
     raycaster->surfacepoint_test_shape = userDataGeometry->_shape;
 
-    /*
-    arintersectionlist_init_1(
-            &intersectionList,
-            rayhit.ray.tfar,
-            0,
-            arface_on_shape_is_planar, // TODO find out more about this
-            userDataGeometry->_shape,
-            raycaster
-    );
-     */
+    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
+    Range range = RANGE( 0.0, MATH_HUGE_DOUBLE);
+    if([userDataGeometry->_shape isKindOfClass: [ArnTriangleMesh class]]) {
 
-    ArIntersectionList intersectionList = embreeIntersectionList;
-    Range range;
+        arintersectionlist_init_1(
+                &intersectionList,
+                rayhit.ray.tfar,
+                0,
+                arface_on_shape_is_planar, // TODO find out more about this
+                userDataGeometry->_shape,
+                raycaster
+        );
+    }
+    else {
+        [userDataGeometry->_combinedAttributes getIntersectionList: raycaster : range : &intersectionList];
+    }
+
+    /*
+    // debugprintf
+    if(intersectionList.head)
+        printf("Found intersection on geometry %d of type %s, primitive %d at tfar=%f\n",
+               rayhit.hit.geomID,
+               [[userDataGeometry->_shape className] UTF8String],
+               rayhit.hit.primID,
+               intersectionList.head->t);
+    */
 
     // this is some kind of hack: In order to process the individual materials
     // correctly, the function 'getIntersectionList' of AraWorld offers the right
@@ -385,9 +400,12 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
             INTERSECTIONLIST_HEAD(intersectionList);
     // ARCINTERSECTION_TRAVERSALSTATE(intersection) =  userDataGeometry->_traversalState;
 
+    if([userDataGeometry->_shape isKindOfClass: [ArnTriangleMesh class]]) {
+        SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
+        TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
+    }
     // ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = embreeRaycaster->intersection_test_world_ray3d;
-    SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
-    TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
+
 
 
     return intersection;
