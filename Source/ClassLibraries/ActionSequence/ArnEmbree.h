@@ -88,6 +88,13 @@ typedef enum Embree_state {
 
 - (int) initEmbreeSimpleIndexedGeometry: (ArnSimpleIndexedShape *) shape : (ArnVertexSet *) vertexSet;
 - (int) initEmbreeUserGeometry;
+- (int) initEmbreeTriangleMeshGeometry
+        : (ArnShape *) shape
+        : (Pnt3D *) vertices
+        : (long) numberOfVertices
+        : (ArLongArray *) faces
+        : (long) numberOfFaces
+        ;
 - (int) addGeometry: (RTCGeometry) newGeometry;
 - (void) setGeometryUserData
         : (ArNode <ArpShape> *) shape

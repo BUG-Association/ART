@@ -300,6 +300,51 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     return [self addGeometry: newGeometry];
 }
 
+- (int) initEmbreeTriangleMeshGeometry
+        : (ArnShape *) shape
+        : (Pnt3D *) vertices
+        : (long) numberOfVertices
+        : (ArLongArray *) faces
+        : (long) numberOfFaces
+{
+    RTCGeometry embreeMesh = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
+
+    // first set up geometry buffers for vertices and indeces
+    float * embreeMeshVertices = (float *) rtcSetNewGeometryBuffer(embreeMesh,
+                                                                   RTC_BUFFER_TYPE_VERTEX,
+                                                                   0,
+                                                                   RTC_FORMAT_FLOAT3,
+                                                                   3 * sizeof(float),
+                                                                   numberOfVertices);
+    unsigned * embreeMeshIndices = (unsigned *) rtcSetNewGeometryBuffer(embreeMesh,
+                                                                        RTC_BUFFER_TYPE_INDEX,
+                                                                        0,
+                                                                        RTC_FORMAT_UINT3,
+                                                                        3 * sizeof(unsigned),
+                                                                        numberOfFaces);
+
+    // fill up embree vertex buffer
+    int index = 0;
+    for (int i = 0; i < numberOfVertices; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            embreeMeshVertices[index] = (float) vertices[i].c.x[j];
+            index++;
+        }
+    }
+
+    // fill up embree index buffer
+    for (int i = 0; i < (numberOfFaces * 3); ++i) {
+        embreeMeshIndices[i] = (unsigned int) faces->content->array[i];
+    }
+
+    int geomID = [self addGeometry: embreeMesh];
+
+#ifdef EMBREE_DEBUG_PRINT
+    printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
+#endif
+    return geomID;
+}
+
 - (void) setGeometryUserData
         : (ArNode <ArpShape> *) shape
         : (ArTraversalState *) traversalState
@@ -386,13 +431,14 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     RTCGeometry intersectedRTCGeometry = rtcGetGeometry(scene, geomID);
     EmbreeGeometryData * userDataGeometry = (EmbreeGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
 
+    /*
     // debug
     printf("Found intersection on geometry of type %s with geometryID %d, primitiveID %d at tfar=%f\n",
            [[userDataGeometry->_shape className] UTF8String],
            rayhit.hit.geomID,
            rayhit.hit.primID,
            rayhit.ray.tfar);
-
+    */
 
     // ... and store intersection information in an
     // ArcIntersection and return it
