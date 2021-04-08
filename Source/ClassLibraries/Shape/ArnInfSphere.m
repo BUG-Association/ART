@@ -108,15 +108,16 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         RTCGeometry geometry = rtcGetGeometry([embree getScene], (unsigned int) embreeGeomID);
         EmbreeGeometryData * geometryData = (EmbreeGeometryData *) rtcGetGeometryUserData(geometry);
 
-        // debug
-        outBoxObjectspace->min.c.x[0] = - 10000000000.0;
-        outBoxObjectspace->min.c.x[1] = - 10000000000.0;
-        outBoxObjectspace->min.c.x[2] = - 10000000000.0;
-        outBoxObjectspace->max.c.x[0] =   10000000000.0;
-        outBoxObjectspace->max.c.x[1] =   10000000000.0;
-        outBoxObjectspace->max.c.x[2] =   10000000000.0;
-        [geometryData setBoundigBox: outBoxObjectspace];
+        //debug
+        outBoxObjectspace->min.c.x[0] = - MATH_HUGE_FLOAT;
+        outBoxObjectspace->min.c.x[1] = - MATH_HUGE_FLOAT;
+        outBoxObjectspace->min.c.x[2] = - MATH_HUGE_FLOAT;
+        outBoxObjectspace->max.c.x[0] = MATH_HUGE_FLOAT;
+        outBoxObjectspace->max.c.x[1] = MATH_HUGE_FLOAT;
+        outBoxObjectspace->max.c.x[2] = MATH_HUGE_FLOAT;
 
+        // set bounding box for embree
+        [geometryData setBoundigBox: outBoxObjectspace];
     }
 }
 

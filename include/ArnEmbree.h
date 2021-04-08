@@ -71,8 +71,6 @@ typedef enum Embree_state {
 + (BOOL) embreeEnabled;
 + (void) enableEmbree: (BOOL) enabled;
 
-// + (ArnRayCaster *) embreeRaycaster;
-
 - (void) setDevice: (RTCDevice) newDevice;
 - (void) setScene: (RTCScene) newScene;
 - (void) commitScene;
@@ -87,7 +85,7 @@ typedef enum Embree_state {
 - (Embree_state) getState;
 
 - (int) initEmbreeSimpleIndexedGeometry: (ArnSimpleIndexedShape *) shape : (ArnVertexSet *) vertexSet;
-- (int) initEmbreeUserGeometry;
+- (int) initEmbreeUserGeometry : (ArnShape *) shape;
 - (int) initEmbreeTriangleMeshGeometry
         : (ArnShape *) shape
         : (Pnt3D *) vertices

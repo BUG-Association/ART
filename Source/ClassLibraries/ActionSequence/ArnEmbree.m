@@ -58,7 +58,7 @@ static ArnEmbree * embreeManager;
 static ArnRayCaster * embreeRaycaster;
 static ArIntersectionList embreeIntersectionList;
 
-// #define EMBREE_DEBUG_PRINT
+#define EMBREE_DEBUG_PRINT
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
@@ -167,11 +167,16 @@ void embree_intersect_geometry(const int * valid,
     EmbreeGeometryData * geometryData = (EmbreeGeometryData *) geometryUserPtr;
     AraCombinedAttributes * attributes = geometryData->_combinedAttributes;
 
-
     if(!valid[0])
         return;
 
     if(rtc_hit) {
+
+        // TODO I need to come up with something better than this
+        if(rtc_ray->tfar < INFINITY) {
+            return;
+        }
+
         Range  range = RANGE( 0.0, MATH_HUGE_DOUBLE);
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
@@ -183,10 +188,7 @@ void embree_intersect_geometry(const int * valid,
             rtc_hit->v = (float) intersectionList.head->texture_coordinates.c.x[1];
             rtc_hit->geomID = geomID;
             rtc_hit->primID = 0;
-            rtc_hit->instID[0] = instID;
-        }
-        else {
-            rtc_ray->tfar = INFINITY;
+            // rtc_hit->instID[0] = instID;
         }
     }
 }
@@ -250,7 +252,33 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     RTCGeometry newGeometry;
 
     if([shape isKindOfClass: [ArnTriangle class]]) {
+        newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
+        float * vertices = (float *) rtcSetNewGeometryBuffer(newGeometry,
+                                                             RTC_BUFFER_TYPE_VERTEX,
+                                                             0,
+                                                             RTC_FORMAT_FLOAT3,
+                                                             3*sizeof(float),
+                                                             3);
 
+        unsigned * indices = (unsigned *) rtcSetNewGeometryBuffer(newGeometry,
+                                                                  RTC_BUFFER_TYPE_INDEX,
+                                                                  0,
+                                                                  RTC_FORMAT_UINT3,
+                                                                  3*sizeof(unsigned),
+                                                                  1);
+
+
+        int iterator = -1;
+        for(int i = 0; i < ARARRAY_SIZE(shape->indexTable); i++) {
+            long currentIndex = ARARRAY_I(shape->indexTable, i);
+            Pnt3D currentPoint = ARARRAY_I(vertexSet->pointTable, currentIndex);
+
+            vertices[++iterator] = (float) currentPoint.c.x[0];
+            vertices[++iterator] = (float) currentPoint.c.x[1];
+            vertices[++iterator] = (float) currentPoint.c.x[2];
+
+            indices[i] = (unsigned int) i;
+        }
     }
 
     else if([shape isKindOfClass: [ArnQuadrangle class]]) {
@@ -291,13 +319,18 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     return geomID;
 }
 
-- (int) initEmbreeUserGeometry {
+- (int) initEmbreeUserGeometry : (ArnShape *) shape {
     RTCGeometry newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_USER);
     rtcSetGeometryBoundsFunction(newGeometry, embree_bbox, NULL);
     rtcSetGeometryIntersectFunction(newGeometry, embree_intersect);
     rtcSetGeometryOccludedFunction(newGeometry, embree_occluded);
     rtcSetGeometryUserPrimitiveCount(newGeometry, 1);
-    return [self addGeometry: newGeometry];
+
+    int geomID = [self addGeometry: newGeometry];
+#ifdef EMBREE_DEBUG_PRINT
+    printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
+#endif
+    return geomID;
 }
 
 - (int) initEmbreeTriangleMeshGeometry
@@ -392,6 +425,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     [self setState: Scene_Commited];
 }
 
+
 - (ArcIntersection *) intersect
         : (ArnRayCaster *) raycaster
         : (ArNode <ArpRayCasting> *) araWorld
@@ -411,7 +445,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     rayhit.ray.dir_x = (float) embreeRaycaster->intersection_test_world_ray3d.vector.c.x[0];
     rayhit.ray.dir_y = (float) embreeRaycaster->intersection_test_world_ray3d.vector.c.x[1];
     rayhit.ray.dir_z = (float) embreeRaycaster->intersection_test_world_ray3d.vector.c.x[2];
-    rayhit.ray.tnear = 0;
+    rayhit.ray.tnear = 0.0f;
     rayhit.ray.tfar = INFINITY;
     rayhit.ray.mask = (unsigned int) -1;
     rayhit.ray.flags = 0;
@@ -447,22 +481,37 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     raycaster->surfacepoint_test_shape = userDataGeometry->_shape;
 
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
-    Range range = RANGE( 0.0, MATH_HUGE_DOUBLE);
-
-    arintersectionlist_init_1(
-            &intersectionList,
-            rayhit.ray.tfar,
-            0,
-            arface_on_shape_is_planar, // TODO find out more about this
-            userDataGeometry->_shape,
-            raycaster
-    );
+    if([userDataGeometry->_shape isKindOfClass: [ArnTriangle class]]
+            || [userDataGeometry->_shape isKindOfClass: [ArnTriangle class]]
+            || [userDataGeometry->_shape isKindOfClass: [ArnTriangle class]])
+    {
+        arintersectionlist_init_1(
+                &intersectionList,
+                rayhit.ray.tfar,
+                0,
+                arface_on_shape_is_planar, // TODO find out more about this
+                userDataGeometry->_shape,
+                raycaster
+        );
+    }
+    else {
+        // TODO this is until I come up with something better
+        arintersectionlist_init_1(
+                &intersectionList,
+                rayhit.ray.tfar,
+                0,
+                arface_on_shape_is_planar, // TODO find out more about this
+                userDataGeometry->_shape,
+                raycaster
+        );
+    }
 
     // this is some kind of hack: In order to process the individual materials
     // correctly, the function 'getIntersectionList' of AraWorld offers the right
     // functionality. Please don't be confused, no ray-tracing is done here,
     // just the processing of the materials
     // Range range;
+    Range range = RANGE( 0.0, MATH_HUGE_DOUBLE); // dummy
     [ araWorld getIntersectionList
             :   raycaster
             :   range // serves as dummy here
@@ -473,12 +522,10 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
             INTERSECTIONLIST_HEAD(intersectionList);
     // ARCINTERSECTION_TRAVERSALSTATE(intersection) =  userDataGeometry->_traversalState;
 
-    if([userDataGeometry->_shape isKindOfClass: [ArnTriangleMesh class]]) {
-        SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
-        TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
-    }
-    // ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = embreeRaycaster->intersection_test_world_ray3d;
 
+    // ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = embreeRaycaster->intersection_test_world_ray3d;
+    SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
+    TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
 
 
     return intersection;
