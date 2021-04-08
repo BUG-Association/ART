@@ -54,8 +54,14 @@ ArcIntersection  * arcintersection_alloc_init(
         ArnRayCaster           * raycaster
         )
 {
+    /*
     ArcIntersection  *  intersection =
         [ ARNRAYCASTER_INTERSECTION_FREELIST(raycaster) obtainInstance ];
+    */
+
+    // TODO this a "jurry rig" for reducing a memory leak when intersecting
+    // with embree but I need to eventually come up with something better
+    ArcIntersection * intersection = [[ArcIntersection alloc] init];
 
     ARCINTERSECTION_CHECK_FOR_NIL(intersection);
     ARCINTERSECTION_T(intersection) = t;

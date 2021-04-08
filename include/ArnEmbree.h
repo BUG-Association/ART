@@ -35,6 +35,7 @@
 @class ArcSurfacePoint;
 @class ArnVertexSet;
 
+
 ART_MODULE_INTERFACE(ArnEmbree)
 
 typedef enum Embree_state {

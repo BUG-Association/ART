@@ -70,8 +70,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
-static int counter1 = 0;
-static int counter2 = 0;
+
 - obtainInstance
 {
     id  objectFromFreelist;
@@ -80,23 +79,21 @@ static int counter2 = 0;
         objectFromFreelist =
                 [ [ [ classToInstantiate alloc ] init_ART_GV
                 : art_gv ] init ];
-       // printf("counter arlist_pop_id: %d\n", counter1++);
     }
-
 
     if ( instanceActivationMethod )
         [ objectFromFreelist
-            performSelector
+                performSelector
                 :   instanceActivationMethod
-                ];
+        ];
+
+
 
 //   uncomment this to see tons of debug output about which instances
 //   get requested from the freelist
 
 //debugprintf("obtain %s\n",[objectFromFreelist cStringClassName] )
 //debugprintf("o")
-
-    // printf("counter instanceActivationMethod: %d\n", counter2++);
 
     return objectFromFreelist;
 }

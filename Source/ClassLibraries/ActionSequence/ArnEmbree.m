@@ -58,7 +58,7 @@ static ArnEmbree * embreeManager;
 static ArnRayCaster * embreeRaycaster;
 static ArIntersectionList embreeIntersectionList;
 
-#define EMBREE_DEBUG_PRINT
+// #define EMBREE_DEBUG_PRINT
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
