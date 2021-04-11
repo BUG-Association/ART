@@ -137,13 +137,8 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnGraphTraversal)
 {
     artraversalstate_free_contents( & state );
 
-    // big TODO for [Sebastian] find out what's going wrong here
-    // if I don't have this if-statement here
-    // valgrind detects a memory leak
-    if(![ArnEmbree embreeEnabled]) {
-        RELEASE_OBJECT(VARIABLES);
-        RELEASE_OBJECT(BBOX_CACHE);
-    }
+    RELEASE_OBJECT(VARIABLES);
+    RELEASE_OBJECT(BBOX_CACHE);
     
     [ super dealloc ];
 }

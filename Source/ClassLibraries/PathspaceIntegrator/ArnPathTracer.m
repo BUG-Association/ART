@@ -933,7 +933,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     
     int lastNonzeroIndex = -1;
     nonzeroContributions[0] = 0;
-    
+
+    // debug - create reference to raycaster for embree
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        [embree setRayCaster: RAYCASTER];
+    }
+
     for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     {
         // set up the indices into buffer arrays
@@ -1032,8 +1038,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
         {
             break;
         }
-        
-       [ currentPoint prepareForUse: PHASE_INTERFACE_CACHE ];
+
+        [ currentPoint prepareForUse: PHASE_INTERFACE_CACHE ];
         
         if( !scatteringEvent ) // scattering events are not emitters
         {
@@ -1094,8 +1100,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
                 }
                 ++nonzeroContributions[lastNonzeroIndex = contributionIndex];
             }
-
-            // printf("contributionIndex: %d\n", contributionIndex);
             
             // store the current wavelength so that we can replace the value
             previousWavelength = wavelength;

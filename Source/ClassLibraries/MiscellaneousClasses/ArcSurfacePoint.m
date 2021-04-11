@@ -53,6 +53,10 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     //   This is a weak link, so we just remember it, but do not
     //   release it later.
 
+    // debug
+    ArNode <ArpVolumeMaterial> * outsideMaterial = ARCSURFACEPOINT_VOLUME_MATERIAL_OUTSIDE(self);
+    ArNode <ArpVolumeMaterial> * insideMaterial = ARCSURFACEPOINT_VOLUME_MATERIAL_INSIDE(self);
+
     ARCSURFACEPOINT_PHASEINTERFACE(self) =
         [ phaseInterfaceCache getPhaseInterfaceForMaterials
             :   ARCSURFACEPOINT_VOLUME_MATERIAL_OUTSIDE(self)

@@ -47,6 +47,11 @@ void errorFunction(void* userPtr, enum RTCError error, const char* str) {
     _bbox_objectSpace = box;
 }
 
+- (void) setIntersectionList
+        : (struct ArIntersectionList* ) list {
+    _intersectionList = list;
+}
+
 @end // EmbreeGeometryData
 
 
@@ -55,10 +60,11 @@ void errorFunction(void* userPtr, enum RTCError error, const char* str) {
 static BOOL EMBREE_ENABLED;
 
 static ArnEmbree * embreeManager;
-static ArnRayCaster * embreeRaycaster;
-static ArIntersectionList embreeIntersectionList;
 
-// #define EMBREE_DEBUG_PRINT
+static NSLock * embreeRayCaster_lock;
+static ArnRayCaster * embreeRayCaster;
+
+#define EMBREE_DEBUG_PRINT
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
@@ -93,6 +99,15 @@ static ArIntersectionList embreeIntersectionList;
     [embreeGeometryIDArray addObject: id_ns];
 }
 
+- (void) setRayCaster: (ArnRayCaster *) rayCaster {
+    arnEmbreeRayCaster = rayCaster;
+}
+
+- (ArnRayCaster *) getRayCaster {
+    return arnEmbreeRayCaster;
+}
+
+
 + (void) cleanUp {
     ArnEmbree * embree = [ArnEmbree embreeManager];
 
@@ -112,6 +127,7 @@ static ArIntersectionList embreeIntersectionList;
 #endif
         }
     }
+
 
     rtcReleaseScene([embree getScene]);
     rtcReleaseDevice([embree getDevice]);
@@ -145,7 +161,7 @@ static ArIntersectionList embreeIntersectionList;
             if(!newScene)
                 printf("error %d: cannot create embree scene on device\n", rtcGetDeviceError(NULL));
             rtcSetSceneFlags(newScene,RTC_SCENE_FLAG_NONE); // for now a bit pointless but change later
-            rtcSetSceneBuildQuality(newScene,RTC_BUILD_QUALITY_LOW); // for now using lowest build quality
+            rtcSetSceneBuildQuality(newScene,RTC_BUILD_QUALITY_MEDIUM); // for now using lowest build quality
             [embreeManager setScene: newScene];
         }
 
@@ -170,17 +186,27 @@ void embree_intersect_geometry(const int * valid,
     if(!valid[0])
         return;
 
+    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
+
     if(rtc_hit) {
 
         // TODO I need to come up with something better than this
-        if(rtc_ray->tfar < INFINITY) {
+        if(rtc_ray->tfar < INFINITY && rtc_ray->tfar > 0.0)
             return;
-        }
 
         Range  range = RANGE( 0.0, MATH_HUGE_DOUBLE);
-        ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
-        [attributes getIntersectionList: embreeRaycaster : range : &intersectionList];
+        // create ART ray and update ray-caster
+        Pnt3D point = PNT3D(rtc_ray->org_x, rtc_ray->org_y, rtc_ray->org_z);
+        Vec3D direction = VEC3D(rtc_ray->dir_x, rtc_ray->dir_y, rtc_ray->dir_z);
+        Ray3D worldRay = RAY3D(point, direction);
+
+        ArnRayCaster * helperRayCaster = [embreeRayCaster copy];
+        helperRayCaster->intersection_test_world_ray3d = worldRay;
+        helperRayCaster->state = geometryData->_traversalState;
+        helperRayCaster->surfacepoint_test_shape = geometryData->_shape;
+
+        [attributes getIntersectionList: helperRayCaster : range : &intersectionList];
 
         if(intersectionList.head) {
             rtc_ray->tfar = (float) intersectionList.head->t;
@@ -190,6 +216,10 @@ void embree_intersect_geometry(const int * valid,
             rtc_hit->primID = 0;
             // rtc_hit->instID[0] = instID;
         }
+
+        // free list
+        // [thisRayCaster->rayIntersectionFreelist releaseInstance: intersectionList.head];
+        [helperRayCaster release];
     }
 }
 
@@ -400,6 +430,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     embreeGeometry->_shape = shape;
     embreeGeometry->_traversalState = *traversalState;
     embreeGeometry->_combinedAttributes = combinedAttributes;
+    embreeGeometry->_intersectionList = NULL;
 
     rtcSetGeometryUserData(thisGeometry, (void *) embreeGeometry);
 }
@@ -427,11 +458,13 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
 
 - (ArcIntersection *) intersect
-        : (ArnRayCaster *) raycaster
+        : (ArnRayCaster *) rayCaster
+        : (Range) range_of_t
+        : (struct ArIntersectionList *) intersectionList
         : (ArNode <ArpRayCasting> *) araWorld
 {
-    // set raycaster to be called in callback functions
-    embreeRaycaster = raycaster;
+    if(!embreeRayCaster)
+        embreeRayCaster = rayCaster;
 
     // set up embree intersection context
     struct RTCIntersectContext context;
@@ -439,12 +472,12 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     struct RTCRayHit rayhit;
 
     // convert Ray3D to embree ray
-    rayhit.ray.org_x = (float) embreeRaycaster->intersection_test_world_ray3d.point.c.x[0];
-    rayhit.ray.org_y = (float) embreeRaycaster->intersection_test_world_ray3d.point.c.x[1];
-    rayhit.ray.org_z = (float) embreeRaycaster->intersection_test_world_ray3d.point.c.x[2];
-    rayhit.ray.dir_x = (float) embreeRaycaster->intersection_test_world_ray3d.vector.c.x[0];
-    rayhit.ray.dir_y = (float) embreeRaycaster->intersection_test_world_ray3d.vector.c.x[1];
-    rayhit.ray.dir_z = (float) embreeRaycaster->intersection_test_world_ray3d.vector.c.x[2];
+    rayhit.ray.org_x = (float) rayCaster->intersection_test_world_ray3d.point.c.x[0];
+    rayhit.ray.org_y = (float) rayCaster->intersection_test_world_ray3d.point.c.x[1];
+    rayhit.ray.org_z = (float) rayCaster->intersection_test_world_ray3d.point.c.x[2];
+    rayhit.ray.dir_x = (float) rayCaster->intersection_test_world_ray3d.vector.c.x[0];
+    rayhit.ray.dir_y = (float) rayCaster->intersection_test_world_ray3d.vector.c.x[1];
+    rayhit.ray.dir_z = (float) rayCaster->intersection_test_world_ray3d.vector.c.x[2];
     rayhit.ray.tnear = 0.0f;
     rayhit.ray.tfar = INFINITY;
     rayhit.ray.mask = (unsigned int) -1;
@@ -452,12 +485,13 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
     // rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
 
+
     // do the intersection
     rtcIntersect1(scene, &context, &rayhit);
 
     // if we did not hit anything, we are done here
     if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
-        return NULL;
+        return 0;
 
     // else:
     // retrieve further information about the intersected shape ...
@@ -477,53 +511,34 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     // ... and store intersection information in an
     // ArcIntersection and return it
 
-    raycaster->state = userDataGeometry->_traversalState;
-    raycaster->surfacepoint_test_shape = userDataGeometry->_shape;
+        rayCaster->state = userDataGeometry->_traversalState;
+        rayCaster->surfacepoint_test_shape = userDataGeometry->_shape;
 
-    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
-    if([userDataGeometry->_shape isKindOfClass: [ArnTriangle class]]
-            || [userDataGeometry->_shape isKindOfClass: [ArnTriangle class]]
-            || [userDataGeometry->_shape isKindOfClass: [ArnTriangle class]])
-    {
         arintersectionlist_init_1(
-                &intersectionList,
+                intersectionList,
                 rayhit.ray.tfar,
                 0,
-                arface_on_shape_is_planar, // TODO find out more about this
+                arface_on_shape_is_planar,
                 userDataGeometry->_shape,
-                raycaster
+                rayCaster
         );
-    }
-    else {
-        // TODO this is until I come up with something better
-        arintersectionlist_init_1(
-                &intersectionList,
-                rayhit.ray.tfar,
-                0,
-                arface_on_shape_is_planar, // TODO find out more about this
-                userDataGeometry->_shape,
-                raycaster
-        );
-    }
+
+    if ( ! ARINTERSECTIONLIST_HEAD(*intersectionList) )
+        return 0;
 
     // this is some kind of hack: In order to process the individual materials
     // correctly, the function 'getIntersectionList' of AraWorld offers the right
     // functionality. Please don't be confused, no ray-tracing is done here,
     // just the processing of the materials
-    // Range range;
-    Range range = RANGE( 0.0, MATH_HUGE_DOUBLE); // dummy
     [ araWorld getIntersectionList
-            :   raycaster
-            :   range // serves as dummy here
-            : & intersectionList
+            :   rayCaster
+            :   range_of_t // serves as dummy here
+            :   intersectionList
     ];
 
-    ArcIntersection  * intersection =
-            INTERSECTIONLIST_HEAD(intersectionList);
-    // ARCINTERSECTION_TRAVERSALSTATE(intersection) =  userDataGeometry->_traversalState;
+    ArcIntersection * intersection =
+            ARINTERSECTIONLIST_HEAD(*intersectionList);
 
-
-    // ARCINTERSECTION_WORLDSPACE_INCOMING_RAY(intersection) = embreeRaycaster->intersection_test_world_ray3d;
     SET_OBJECTSPACE_NORMAL(intersection, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
     TEXTURE_COORDS(intersection) = PNT2D(rayhit.hit.u, rayhit.hit.v);
 

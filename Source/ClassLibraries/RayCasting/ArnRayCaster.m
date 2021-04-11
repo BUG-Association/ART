@@ -390,30 +390,40 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     intersection_test_origin = startingPoint_worldCoordinates;
 
+    ArIntersectionList  intersectionList = ARINTERSECTIONLIST_EMPTY;
+
     // if embree is enabled,
     // find the intersection via embree and return
+    ArcIntersection * intersection;
+
     if([ArnEmbree embreeEnabled])
     {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        return [embree intersect
-                : self
-                : geometryToIntersectRayWith
-        ];
+        intersection = [ embree intersect
+                                : self
+                                : range
+                                : & intersectionList
+                                : geometryToIntersectRayWith
+                        ];
+
+        if(!intersection)
+            return  0;
+        else
+            return intersection;
     }
-
-    ArIntersectionList  intersectionList = ARINTERSECTIONLIST_EMPTY;
-
-    [ geometryToIntersectRayWith getIntersectionList
-        :   self
-        :   range
-        : & intersectionList
+    else {
+        [ geometryToIntersectRayWith getIntersectionList
+                :   self
+                :   range
+                : & intersectionList
         ];
 
-    if ( ! ARINTERSECTIONLIST_HEAD(intersectionList) )
-        return 0;
+        if ( ! ARINTERSECTIONLIST_HEAD(intersectionList) )
+            return 0;
 
-    ArcIntersection  * intersection =
-        ARINTERSECTIONLIST_HEAD(intersectionList);
+        intersection =
+                ARINTERSECTIONLIST_HEAD(intersectionList);
+    }
 
 #ifdef WITH_RSA_STATISTICS
     intersection->intersectionTests = intersectionList.intersectionTests;
@@ -449,12 +459,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
             rayIntersectionFreelist
             );
     }
-    /*
-    // debug
-    if(intersection)
-            printf("intersection at tfar=%f\n",
-                            intersection->t);
-*/
+
     return intersection;
 }
 
