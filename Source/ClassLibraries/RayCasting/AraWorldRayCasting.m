@@ -139,6 +139,17 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraWorld)
         "(before processing)"
         );
 
+    /*
+    // debug
+    static double smallest = INFINITY;
+    if(intersectionList->head) {
+        if(intersectionList->head->t < smallest) {
+            smallest = intersectionList->head->t;
+            printf("intersection tfar = %lf, smallest so far: %lf\n", intersectionList->head->t, smallest);
+        }
+    }
+     */
+
     ARNRAYCASTER_VOLUME_MATERIAL_REF(rayCaster) = ARNODEREF_NONE;
     ARNRAYCASTER_SURFACE_MATERIAL_REF(rayCaster)  = ARNODEREF_NONE;
     ARNRAYCASTER_TRAFO_REF(rayCaster)    = ARNODEREF_NONE;

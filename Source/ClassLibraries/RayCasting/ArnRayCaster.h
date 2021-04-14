@@ -82,6 +82,9 @@ ArHashedMailboxEntry;
     id <ArpRandomGenerator>  randomGenerator;
 
     BOOL                   * activeNodes;
+
+    // if embree is enabled
+    RTCScene embreeScene;
 }
 
 - init
@@ -108,6 +111,13 @@ ArHashedMailboxEntry;
 
 - (void) popUnionOptions
         : (ArUnionOptions) unionoptions_store
+        ;
+
+// for testing
+- (ArcIntersection *) intersectWithEmbree
+        : (Range) range_of_t
+        : (struct ArIntersectionList *) intersectionList
+        : (ArNode <ArpRayCasting> *) araWorld
         ;
 
 @end

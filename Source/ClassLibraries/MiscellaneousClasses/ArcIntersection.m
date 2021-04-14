@@ -165,7 +165,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 }
 
 
-
 - (BOOL) evaluateEmission
         : (      ArcPointContext *) illuminatedPoint
         // path direction assumed to be arpathdirection_from_eye
@@ -173,6 +172,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (      ArSamplingRegion *) samplingRegion
         : (      ArLightSample *) lightSample
 {
+
     if ( [ ARCINTERSECTION_SHAPE(self)
               isMemberOfClass
               :   [ ArnInfSphere class ] ] )

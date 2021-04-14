@@ -139,7 +139,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnGraphTraversal)
 
     RELEASE_OBJECT(VARIABLES);
     RELEASE_OBJECT(BBOX_CACHE);
-    
+
     [ super dealloc ];
 }
 

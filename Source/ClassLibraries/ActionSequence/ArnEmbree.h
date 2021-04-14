@@ -51,13 +51,11 @@ typedef enum Embree_state {
     ArTraversalState _traversalState;
     AraCombinedAttributes * _combinedAttributes;
     Box3D * _bbox_objectSpace;
-    struct ArIntersectionList * _intersectionList;
 }
 
 - init;
 
 - (void) setBoundigBox : (Box3D *) box;
-- (void) setIntersectionList : (struct ArIntersectionList *) list;
 
 @end
 
@@ -66,8 +64,6 @@ typedef enum Embree_state {
     RTCScene scene;
     Embree_state state;
     NSMutableArray * embreeGeometryIDArray;
-
-    ArnRayCaster * arnEmbreeRayCaster;
 }
 
 + (ArnEmbree *) embreeManager;
@@ -82,14 +78,9 @@ typedef enum Embree_state {
 - (RTCScene) getScene;
 - (void) commitScene;
 
-- (void) setRayCaster: (ArnRayCaster *) rayCaster;
-- (ArnRayCaster *) getRayCaster;
-
 - (void) initGeometryIDArray;
 - (NSMutableArray *) getGeometryIDArray;
 - (void) addGeometryIDToGeometryIDArray : (unsigned int) id;
-
-
 
 - (Embree_state) getState;
 

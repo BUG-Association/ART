@@ -245,6 +245,8 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         ArnEmbree * embree = [ArnEmbree embreeManager];
 
         if(![self isKindOfClass: [ArnTriangleMesh class]]) {
+            // debug
+            printf("classname %s\n", [[self className] UTF8String]);
             embreeGeomID = [embree initEmbreeUserGeometry: self];
         }
         [embree setGeometryUserData: self : &traversal->state : result];

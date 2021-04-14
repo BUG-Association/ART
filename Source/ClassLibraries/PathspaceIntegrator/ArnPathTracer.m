@@ -335,7 +335,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
         return NO;
     
     ASSERT_ALLOCATED_LIGHT_SAMPLE(contribution);
-    
     ArSamplingRegion lightSamplingRegion;
     ArNode * emitter;
     if( [ self getEmission
@@ -934,12 +933,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     int lastNonzeroIndex = -1;
     nonzeroContributions[0] = 0;
 
-    // debug - create reference to raycaster for embree
-    if([ArnEmbree embreeEnabled]) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        [embree setRayCaster: RAYCASTER];
-    }
-
+    // for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     {
         // set up the indices into buffer arrays
@@ -1040,7 +1034,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
         }
 
         [ currentPoint prepareForUse: PHASE_INTERFACE_CACHE ];
-        
+
         if( !scatteringEvent ) // scattering events are not emitters
         {
             // emission
@@ -1061,7 +1055,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
             }
             else
                 nonzeroContributions[contributionIndex] = 0; // initiliaze counter to zero, as before this point, there could not be a valid sample for that index
-            
+
             if ( [ ARCINTERSECTION_SHAPE(intersection)
                   isMemberOfClass
                   :   [ ArnInfSphere class ] ] )
@@ -1180,18 +1174,14 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
              :   scatteringEvent
              ];
     }
-    
+
     if(lastNonzeroIndex >= 0)
     {
         // accumulate contributions
         ArLightSample *accumulator = allContributions[lastNonzeroIndex]; // last actual contribution
 
-        // [Sebastian] TODO error lies here
         if(lastNonzeroIndex > 0 && nonclearMediaAttenuations[lastNonzeroIndex - 1])
             arlightsample_a_mul_l(art_gv, allMediaAttenuations[lastNonzeroIndex - 1], accumulator);
-
-        // debug
-        // arlightsample_l_debugprintf(art_gv, accumulator);
 
         for(int i = lastNonzeroIndex - 1; i > 0; --i)
         {
@@ -1217,6 +1207,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     }
     else
     {
+        //if(intersection)
+          //  printf("intersection\n");
         // zero contribution path
         ARLIGHTSAMPLE_INIT_AS_NONE(ARLIGHTALPHASAMPLE_LIGHT(*lightalpha_r));
     }

@@ -58,10 +58,11 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
         : (Range) range_of_t
         : (struct ArIntersectionList *) intersectionList
 {
-//    debugprintf("ArnSphere \n");
-//    ray3d_r_debugprintf(&WORLDSPACE_RAY);
-//    ray3d_r_debugprintf(&OBJECTSPACE_RAY);
-//    debugprintf("--- \n");
+
+    // debugprintf("ArnSphere \n");
+    // ray3d_r_debugprintf(&WORLDSPACE_RAY);
+    // ray3d_r_debugprintf(&OBJECTSPACE_RAY);
+    // debugprintf("--- \n");
 
 #ifdef ART_WITH_INTERSECTION_STATISTICS
     arnraycaster_count_test(rayCaster, ArnCone);
@@ -152,6 +153,16 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
             );
     }
 
+
+    // debug
+    // printf("c = %f, d = %f, orl = %f\n", c ,d , orl);
+    // static double smallest = INFINITY;
+    if(range_of_t.max < 0.001) {
+        // printf("smallest tmax: %f\n", range_of_t.max);
+        // printf("\n");
+    }
+
+
     arintersectionlist_init_2(
           intersectionList,
         & range_of_t,
@@ -162,10 +173,11 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
         );
     INTERSECTION_TEST_DEBUG_OUTPUT_RESULT_LIST;
 
-
 #ifdef ART_WITH_INTERSECTION_STATISTICS
     arnraycaster_count_intersection(rayCaster, ArnSphere);
 #endif
+
+
 }
 
 - (void) calculateLocalNormalForIntersection

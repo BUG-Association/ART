@@ -371,6 +371,86 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     return 0;
 }
 
+// for testing
+- (ArcIntersection *) intersectWithEmbree
+        : (Range) range_of_t
+        : (struct ArIntersectionList *) intersectionList
+        : (ArNode <ArpRayCasting> *) araWorld
+{
+    if(!embreeScene) {
+        ART_ERRORHANDLING_FATAL_ERROR(
+                "method [ArnRayCaster intersectWithEmbree:::] called, without member variable RTCScene being initialized"
+        );
+    }
+
+    // set up embree intersection context
+    struct RTCIntersectContext context;
+    rtcInitIntersectContext(&context);
+    struct RTCRayHit rayhit;
+
+    // convert Ray3D to embree ray
+    rayhit.ray.org_x = (float) self->intersection_test_world_ray3d.point.c.x[0];
+    rayhit.ray.org_y = (float) self->intersection_test_world_ray3d.point.c.x[1];
+    rayhit.ray.org_z = (float) self->intersection_test_world_ray3d.point.c.x[2];
+    rayhit.ray.dir_x = (float) self->intersection_test_world_ray3d.vector.c.x[0];
+    rayhit.ray.dir_y = (float) self->intersection_test_world_ray3d.vector.c.x[1];
+    rayhit.ray.dir_z = (float) self->intersection_test_world_ray3d.vector.c.x[2];
+    rayhit.ray.id = self->rayID;
+    rayhit.ray.tnear = (float) range_of_t.min + 1e-3f; // the offset is for compensating the rounding error when casting from double to float
+    rayhit.ray.tfar = (float) range_of_t.max;
+    rayhit.ray.mask = (unsigned int) -1;
+    rayhit.ray.flags = 0;
+    rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+    rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
+
+    // do the intersection
+    rtcIntersect1(embreeScene, &context, &rayhit);
+
+    // if we did not hit anything, we are done here
+    if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
+        return 0;
+
+    // else:
+    // retrieve further information about the intersected shape ...
+    unsigned int geomID = rayhit.hit.geomID;
+    RTCGeometry intersectedRTCGeometry = rtcGetGeometry(embreeScene, geomID);
+    EmbreeGeometryData * userDataGeometry = (EmbreeGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
+
+    /*
+    // debug
+    printf("Found intersection on geometry of type %s with geometryID %d, primitiveID %d at tfar=%f\n",
+           [[userDataGeometry->_shape className] UTF8String],
+           rayhit.hit.geomID,
+           rayhit.hit.primID,
+           rayhit.ray.tfar);
+    */
+
+    // ... and store intersection information in an
+    // ArcIntersection and return it
+
+    self->state = userDataGeometry->_traversalState;
+    self->surfacepoint_test_shape = userDataGeometry->_shape;
+
+    arintersectionlist_init_1(
+            intersectionList,
+            rayhit.ray.tfar,
+            0,
+            arface_on_shape_is_planar,
+            userDataGeometry->_shape,
+            self);
+
+
+    // this is some kind of hack: In order to process the individual materials
+    // correctly, the function 'getIntersectionList' of AraWorld offers the right
+    // functionality. Please don't be confused, no ray-tracing is done here,
+    // just the processing of the materials
+    [ araWorld getIntersectionList
+            :   self
+            :   range_of_t // serves as dummy here
+            :   intersectionList
+    ];
+}
+
 - (ArcIntersection *) firstRayObjectIntersection
         : (ArNode <ArpRayCasting> *) geometryToIntersectRayWith
         : (const ArcPointContext *) startingPoint_worldCoordinates
@@ -394,36 +474,29 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     // if embree is enabled,
     // find the intersection via embree and return
-    ArcIntersection * intersection;
-
     if([ArnEmbree embreeEnabled])
     {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        intersection = [ embree intersect
-                                : self
-                                : range
-                                : & intersectionList
-                                : geometryToIntersectRayWith
-                        ];
-
-        if(!intersection)
-            return  0;
-        else
-            return intersection;
+        // ArnEmbree * embree = [ArnEmbree embreeManager];
+        [ self intersectWithEmbree
+                : range
+                : & intersectionList
+                : geometryToIntersectRayWith
+        ];
     }
     else {
-        [ geometryToIntersectRayWith getIntersectionList
-                :   self
-                :   range
-                : & intersectionList
+        [geometryToIntersectRayWith getIntersectionList
+                :self
+                :range
+                :&intersectionList
         ];
-
-        if ( ! ARINTERSECTIONLIST_HEAD(intersectionList) )
-            return 0;
-
-        intersection =
-                ARINTERSECTIONLIST_HEAD(intersectionList);
     }
+
+    if ( ! ARINTERSECTIONLIST_HEAD(intersectionList) )
+        return 0;
+
+    ArcIntersection * intersection =
+            ARINTERSECTIONLIST_HEAD(intersectionList);
+
 
 #ifdef WITH_RSA_STATISTICS
     intersection->intersectionTests = intersectionList.intersectionTests;
@@ -471,6 +544,11 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     {
         ARARRAY_I(testCountArray, i) = 0;
         ARARRAY_I(hitCountArray, i)  = 0;
+    }
+
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        embreeScene = [embree getScene];
     }
 }
 
