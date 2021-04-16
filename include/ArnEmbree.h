@@ -54,7 +54,7 @@ typedef enum Embree_state {
     ArTraversalState _traversalState;
     AraCombinedAttributes * _combinedAttributes;
     Box3D _bboxObjectSpace;
-    double _tDouble;
+    BOOL _isUserGeometry;
 }
 
 - init;

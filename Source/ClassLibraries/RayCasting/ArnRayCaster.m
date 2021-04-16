@@ -432,30 +432,16 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // ... and store intersection information in an
     // ArcIntersection and return it
 
-        self->state = userDataGeometry->_traversalState;
-        self->surfacepoint_test_shape = userDataGeometry->_shape;
+    self->state = userDataGeometry->_traversalState;
+    self->surfacepoint_test_shape = userDataGeometry->_shape;
 
-        if(userDataGeometry->_tDouble != -1)
-        {
-            arintersectionlist_init_1(
-                    intersectionList,
-                    userDataGeometry->_tDouble,
-                    0,
-                    arface_on_shape_is_planar,
-                    userDataGeometry->_shape,
-                    self);
-        }
-        else
-        {
-            arintersectionlist_init_1(
-                    intersectionList,
-                    rayhit.ray.tfar,
-                    0,
-                    arface_on_shape_is_planar,
-                    userDataGeometry->_shape,
-                    self);
-        }
-
+    arintersectionlist_init_1(
+            intersectionList,
+            rayhit.ray.tfar,
+            0,
+            arface_on_shape_is_planar,
+            userDataGeometry->_shape,
+            self);
 
 
     // this is some kind of hack: In order to process the individual materials
@@ -468,8 +454,10 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
             :   intersectionList
     ];
 
-    if(intersectionList->head) {
-        SET_OBJECTSPACE_NORMAL(intersectionList->head, VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
+
+    if(intersectionList->head && !userDataGeometry->_isUserGeometry) {
+        SET_OBJECTSPACE_NORMAL(intersectionList->head,
+                               VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
         TEXTURE_COORDS(intersectionList->head) = PNT2D(rayhit.hit.u, rayhit.hit.v);
     }
 }

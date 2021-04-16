@@ -335,7 +335,7 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     embreeGeometry->_shape = shape;
     embreeGeometry->_traversalState = *traversalState;
     embreeGeometry->_combinedAttributes = combinedAttributes;
-    embreeGeometry->_tDouble = - 1.0;
+    embreeGeometry->_isUserGeometry = NO;
 
     rtcSetGeometryUserData(thisGeometry, (void *) embreeGeometry);
 }
@@ -381,37 +381,31 @@ void embree_intersect_geometry(const int * valid,
 
     if(rtc_hit) {
 
-        // TODO I need to come up with something better than this
-        // this doesn't work for two consecutive intersections
-        // if(rtc_ray->tfar < INFINITY)
-           //  return;
+        // if the tfar value of the embree ray is smaller than
+        // the tfar value with which it was initialized
+        // that must mean that an intersection with a nearer
+        // triangle or quad occured and we don't need to do further raycasting
+        if(rtc_ray->tfar < (float) MATH_HUGE_DOUBLE)
+            return;
+
 
         ArnEmbree * embree = [ArnEmbree embreeManager];
         EmbreeGeometryData * geometryData = (EmbreeGeometryData *) geometryUserPtr;
         AraCombinedAttributes * attributes = geometryData->_combinedAttributes;
+        geometryData->_isUserGeometry = YES;
 
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
         ArnRayCaster * helperRayCaster = embree->helperRayCaster;
         Range  range = RANGE( ARNRAYCASTER_EPSILON(helperRayCaster), MATH_HUGE_DOUBLE);
-        /*
-        helperRayCaster->state = geometryData->_traversalState;
-        helperRayCaster->intersection_test_world_ray3d
-                = RAY3D(PNT3D(rtc_ray->org_x, rtc_ray->org_y, rtc_ray->org_z),
-                        VEC3D(rtc_ray->dir_x, rtc_ray->dir_y, rtc_ray->dir_z));
-
-        ray3de_init(
-                  & helperRayCaster->intersection_test_world_ray3d,
-                  & helperRayCaster->intersection_test_ray3de
-        );
-         */
 
         [attributes getIntersectionList: helperRayCaster : range : &intersectionList];
 
+        // we are just interested in the tfar value,
+        // surface normal gets calculated later in the path
+        // tracer loop
         if(intersectionList.head) {
             rtc_ray->tfar = (float) intersectionList.head->t;
-            rtc_hit->u =  (float) intersectionList.head->texture_coordinates.c.x[0];
-            rtc_hit->v =  (float) intersectionList.head->texture_coordinates.c.x[1];
             rtc_hit->geomID = geomID;
             rtc_hit->primID = 0;
         }

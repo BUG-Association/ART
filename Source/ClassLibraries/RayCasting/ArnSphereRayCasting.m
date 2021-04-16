@@ -80,9 +80,6 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
     long  faceindex_for_min_t = ARFACE_ON_SHAPE_INVALID_INDEX;
     long  faceindex_for_max_t = ARFACE_ON_SHAPE_INVALID_INDEX;
 
-    Vec3D orv = OBJECTSPACE_RAY_VECTOR;
-    Pnt3D orp = OBJECTSPACE_RAY_POINT;
-
     *intersectionList = ARINTERSECTIONLIST_EMPTY;
 
     INTERSECTION_TEST_DEBUG_OUTPUT_INITIAL_LIST;
@@ -157,10 +154,6 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
             );
     }
 
-    if(faceindex_for_min_t != faceindex_for_max_t) {
-        // printf("halt\n");
-    }
-
     arintersectionlist_init_2(
           intersectionList,
         & range_of_t,
@@ -170,6 +163,11 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
           rayCaster
         );
     INTERSECTION_TEST_DEBUG_OUTPUT_RESULT_LIST;
+
+    if(intersectionList->head) {
+        if(intersectionList->head->t < 1.0)
+            printf("well, fuck\n");
+    }
 
 #ifdef ART_WITH_INTERSECTION_STATISTICS
     arnraycaster_count_intersection(rayCaster, ArnSphere);
