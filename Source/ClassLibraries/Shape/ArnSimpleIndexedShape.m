@@ -130,16 +130,6 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         outBBox->min.c.x[i] -= FLT_EPSILON;
         outBBox->max.c.x[i] += FLT_EPSILON;
     }
-
-    // note to self [Sebastian]: do I really need this?
-    /*
-    if([ArnEmbree embreeEnabled] && embreeGeomID != EMBREE_INVALID_GEOMETRY_ID) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry embreeGeometry = rtcGetGeometry([embree getScene], (unsigned int) self->embreeGeomID);
-        EmbreeGeometryData * geometryData = (EmbreeGeometryData *)rtcGetGeometryUserData(embreeGeometry);
-        [geometryData setBoundigBox: *outBBox];
-    }
-     */
 }
 
 - (void) initBBoxes
@@ -192,6 +182,8 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             :  ARNGT_VERTICES(traversal)
             ];
 
+    // if embree is enabled, convert this shape to an embree geometry
+    // and pass it along with traversal state to embree
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
         ArnVertexSet * vertices = (ArnVertexSet *) ARNGT_VERTICES(traversal);

@@ -103,6 +103,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 {
     (*outBoxObjectspace) = BOX3D_FULL;
 
+    // if embree is enabled, pass bounding box to embree
     if([ArnEmbree embreeEnabled] && embreeGeomID != EMBREE_INVALIDGEOMETRY_ID) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
         RTCGeometry geometry = rtcGetGeometry([embree getScene], (unsigned int) embreeGeomID);
