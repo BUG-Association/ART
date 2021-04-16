@@ -37,6 +37,8 @@
 
 ART_MODULE_INTERFACE(ArnEmbree)
 
+ARARRAY_INTERFACE_FOR_TYPE(ArnRayCaster, arnRayCaster);
+
 typedef enum Embree_state {
     Embree_Initialized,
     Scene_Initialized,
@@ -45,17 +47,19 @@ typedef enum Embree_state {
 } Embree_state;
 
 
+
 @interface EmbreeGeometryData : ArcObject {
 @public
     ArNode<ArpShape> * _shape;
     ArTraversalState _traversalState;
     AraCombinedAttributes * _combinedAttributes;
-    Box3D * _bbox_objectSpace;
+    Box3D _bboxObjectSpace;
+    double _tDouble;
 }
 
 - init;
 
-- (void) setBoundigBox : (Box3D *) box;
+- (void) setBoundigBox : (Box3D) box;
 
 @end
 
@@ -64,6 +68,8 @@ typedef enum Embree_state {
     RTCScene scene;
     Embree_state state;
     NSMutableArray * embreeGeometryIDArray;
+@public
+    ArnRayCaster * helperRayCaster;
 }
 
 + (ArnEmbree *) embreeManager;
@@ -112,6 +118,7 @@ typedef enum Embree_state {
 + (void) cleanUp;
 
 @end
+
 
 #endif // EMBREE_INSTALLED
 

@@ -43,8 +43,8 @@ void errorFunction(void* userPtr, enum RTCError error, const char* str) {
     return nil;
 }
 
-- (void) setBoundigBox : (Box3D *) box {
-    _bbox_objectSpace = box;
+- (void) setBoundigBox : (Box3D) box {
+    _bboxObjectSpace = box;
 }
 
 
@@ -59,7 +59,7 @@ static ArnEmbree * embreeManager;
 
 static ArnRayCaster * embreeRayCaster;
 
-// #define EMBREE_DEBUG_PRINT
+#define EMBREE_DEBUG_PRINT
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
@@ -116,6 +116,9 @@ static ArnRayCaster * embreeRayCaster;
     }
 
 
+    // if(embree->helperRayCaster)
+       // RELEASE_OBJECT(embree->helperRayCaster);
+
     rtcReleaseScene([embree getScene]);
     rtcReleaseDevice([embree getDevice]);
 
@@ -157,6 +160,29 @@ static ArnRayCaster * embreeRayCaster;
         isInitialized = YES;
         EMBREE_ENABLED = YES;
     }
+}
+
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+
+- (void) setState: (Embree_state) newState {
+    state = newState;
+}
+
+- (RTCDevice) getDevice {
+    return device;
+}
+- (RTCScene) getScene {
+    return scene;
+}
+- (Embree_state) getState {
+    return state;
+}
+
+- (void) commitScene {
+    rtcCommitScene(scene);
+    rtcSetSceneFlags(scene, RTC_SCENE_FLAG_COMPACT); // TODO change later
+    [self setState: Scene_Commited];
 }
 
 - (int) addGeometry: (RTCGeometry) newGeometry  {
@@ -286,6 +312,35 @@ static ArnRayCaster * embreeRayCaster;
     return geomID;
 }
 
+
+- (void) setGeometryUserData
+        : (ArNode <ArpShape> *) shape
+        : (ArTraversalState *) traversalState
+        : (AraCombinedAttributes *) combinedAttributes
+{
+    RTCGeometry thisGeometry = NULL;
+    if([shape isKindOfClass: [ArnShape class]]) {
+        ArnShape * arnShape = (ArnShape *) shape;
+        thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
+        [self addGeometryIDToGeometryIDArray:(unsigned int) arnShape->embreeGeomID];
+    }
+
+    else if(([shape isKindOfClass: [ArnSimpleIndexedShape class]])) {
+        ArnSimpleIndexedShape * arnShape = (ArnSimpleIndexedShape *) shape;
+        thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
+        [self addGeometryIDToGeometryIDArray:(unsigned int) arnShape->embreeGeomID];
+    }
+
+    EmbreeGeometryData * embreeGeometry = ALLOC_OBJECT(EmbreeGeometryData);
+    embreeGeometry->_shape = shape;
+    embreeGeometry->_traversalState = *traversalState;
+    embreeGeometry->_combinedAttributes = combinedAttributes;
+    embreeGeometry->_tDouble = - 1.0;
+
+    rtcSetGeometryUserData(thisGeometry, (void *) embreeGeometry);
+}
+
+
 void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
 
     if(!args->geometryUserPtr)
@@ -296,23 +351,20 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
 
 #ifdef EMBREE_DEBUG_PRINT
     printf("adding bounding box to embree\n");
-    printf("object box - min x: %f\n", geometryData->_bbox_objectSpace->min.c.x[0]);
-    printf("object box - min y: %f\n", geometryData->_bbox_objectSpace->min.c.x[1]);
-    printf("object box - min z: %f\n", geometryData->_bbox_objectSpace->min.c.x[2]);
-    printf("object box - max x: %f\n", geometryData->_bbox_objectSpace->max.c.x[0]);
-    printf("object box - max y: %f\n", geometryData->_bbox_objectSpace->max.c.x[1]);
-    printf("object box - max z: %f\n", geometryData->_bbox_objectSpace->max.c.x[2]);
+    printf("object box - min x: %f\n", geometryData->_bboxObjectSpace.min.c.x[0]);
+    printf("object box - min y: %f\n", geometryData->_bboxObjectSpace.min.c.x[1]);
+    printf("object box - min z: %f\n", geometryData->_bboxObjectSpace.min.c.x[2]);
+    printf("object box - max x: %f\n", geometryData->_bboxObjectSpace.max.c.x[0]);
+    printf("object box - max y: %f\n", geometryData->_bboxObjectSpace.max.c.x[1]);
+    printf("object box - max z: %f\n", geometryData->_bboxObjectSpace.max.c.x[2]);
 #endif
-    if(geometryData->_bbox_objectSpace) {
-        bounds_o->lower_x = (float) geometryData->_bbox_objectSpace->min.c.x[0];
-        bounds_o->lower_y = (float) geometryData->_bbox_objectSpace->min.c.x[1];
-        bounds_o->lower_z = (float) geometryData->_bbox_objectSpace->min.c.x[2];
-        bounds_o->upper_x = (float) geometryData->_bbox_objectSpace->max.c.x[0];
-        bounds_o->upper_y = (float) geometryData->_bbox_objectSpace->max.c.x[1];
-        bounds_o->upper_z = (float) geometryData->_bbox_objectSpace->max.c.x[2];
-    }
-    else
-        printf("error: embree geometry data has no bounding box\n");
+
+    bounds_o->lower_x = (float) geometryData->_bboxObjectSpace.min.c.x[0];
+    bounds_o->lower_y = (float) geometryData->_bboxObjectSpace.min.c.x[1];
+    bounds_o->lower_z = (float) geometryData->_bboxObjectSpace.min.c.x[2];
+    bounds_o->upper_x = (float) geometryData->_bboxObjectSpace.max.c.x[0];
+    bounds_o->upper_y = (float) geometryData->_bboxObjectSpace.max.c.x[1];
+    bounds_o->upper_z = (float) geometryData->_bboxObjectSpace.max.c.x[2];
 }
 
 void embree_intersect_geometry(const int * valid,
@@ -322,36 +374,39 @@ void embree_intersect_geometry(const int * valid,
                                struct RTCRay * rtc_ray,
                                struct RTCHit * rtc_hit)
 {
-    EmbreeGeometryData * geometryData = (EmbreeGeometryData *) geometryUserPtr;
-    AraCombinedAttributes * attributes = geometryData->_combinedAttributes;
+    // pthread_mutex_lock(&mutex);
 
     if(!valid[0])
         return;
-
-    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
     if(rtc_hit) {
 
         // TODO I need to come up with something better than this
         // this doesn't work for two consecutive intersections
-        //if(rtc_ray->tfar < INFINITY && rtc_ray->tfar > 0.0)
-         //   return;
+        // if(rtc_ray->tfar < INFINITY)
+           //  return;
 
-        Range  range = RANGE( rtc_ray->tnear, MATH_HUGE_DOUBLE);
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        EmbreeGeometryData * geometryData = (EmbreeGeometryData *) geometryUserPtr;
+        AraCombinedAttributes * attributes = geometryData->_combinedAttributes;
 
+        ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
+
+        ArnRayCaster * helperRayCaster = embree->helperRayCaster;
+        Range  range = RANGE( ARNRAYCASTER_EPSILON(helperRayCaster), MATH_HUGE_DOUBLE);
         /*
-        // create ART ray and update ray-caster
-        Pnt3D point = PNT3D(rtc_ray->org_x, rtc_ray->org_y, rtc_ray->org_z);
-        Vec3D direction = VEC3D(rtc_ray->dir_x, rtc_ray->dir_y, rtc_ray->dir_z);
-        Ray3D worldRay = RAY3D(point, direction);
-
-        ArnRayCaster * helperRayCaster = [embreeRayCaster copy];
-        helperRayCaster->intersection_test_world_ray3d = worldRay;
         helperRayCaster->state = geometryData->_traversalState;
-        helperRayCaster->surfacepoint_test_shape = geometryData->_shape;
-        */
+        helperRayCaster->intersection_test_world_ray3d
+                = RAY3D(PNT3D(rtc_ray->org_x, rtc_ray->org_y, rtc_ray->org_z),
+                        VEC3D(rtc_ray->dir_x, rtc_ray->dir_y, rtc_ray->dir_z));
 
-        [attributes getIntersectionList: embreeRayCaster : range : &intersectionList];
+        ray3de_init(
+                  & helperRayCaster->intersection_test_world_ray3d,
+                  & helperRayCaster->intersection_test_ray3de
+        );
+         */
+
+        [attributes getIntersectionList: helperRayCaster : range : &intersectionList];
 
         if(intersectionList.head) {
             rtc_ray->tfar = (float) intersectionList.head->t;
@@ -360,11 +415,8 @@ void embree_intersect_geometry(const int * valid,
             rtc_hit->geomID = geomID;
             rtc_hit->primID = 0;
         }
-
-        // free list
-        // [helperRayCaster->rayIntersectionFreelist releaseInstance: intersectionList.head];
-        // [helperRayCaster release];
     }
+    // pthread_mutex_unlock(&mutex);
 }
 
 void embree_intersect(const struct RTCIntersectFunctionNArguments* args) {
@@ -394,54 +446,6 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
 #endif
     return geomID;
-}
-
-
-- (void) setGeometryUserData
-        : (ArNode <ArpShape> *) shape
-        : (ArTraversalState *) traversalState
-        : (AraCombinedAttributes *) combinedAttributes
-{
-    RTCGeometry thisGeometry = NULL;
-    if([shape isKindOfClass: [ArnShape class]]) {
-        ArnShape * arnShape = (ArnShape *) shape;
-        thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
-        [self addGeometryIDToGeometryIDArray:(unsigned int) arnShape->embreeGeomID];
-    }
-
-    else if(([shape isKindOfClass: [ArnSimpleIndexedShape class]])) {
-        ArnSimpleIndexedShape * arnShape = (ArnSimpleIndexedShape *) shape;
-        thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
-        [self addGeometryIDToGeometryIDArray:(unsigned int) arnShape->embreeGeomID];
-    }
-
-    EmbreeGeometryData * embreeGeometry = ALLOC_OBJECT(EmbreeGeometryData);
-    embreeGeometry->_shape = shape;
-    embreeGeometry->_traversalState = *traversalState;
-    embreeGeometry->_combinedAttributes = combinedAttributes;
-
-    rtcSetGeometryUserData(thisGeometry, (void *) embreeGeometry);
-}
-
-
-- (void) setState: (Embree_state) newState {
-    state = newState;
-}
-
-- (RTCDevice) getDevice {
-    return device;
-}
-- (RTCScene) getScene {
-    return scene;
-}
-- (Embree_state) getState {
-    return state;
-}
-
-- (void) commitScene {
-    rtcCommitScene(scene);
-    rtcSetSceneFlags(scene, RTC_SCENE_FLAG_COMPACT); // TODO change later
-    [self setState: Scene_Commited];
 }
 
 

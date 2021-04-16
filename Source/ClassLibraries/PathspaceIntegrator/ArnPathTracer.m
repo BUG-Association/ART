@@ -880,7 +880,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
         ARCPOINTCONTEXT_WORLDSPACE_POINT(currentPoint);
     RAY3D_VECTOR(*generatedRay) =
         ARDIRECTIONCOSINE_VECTOR(sampledDirection);
-    
+
     // calculate the probability of sampling the wavelength when light-source sampling, but only if it then can end up being used
     // (this calculation is here, because we do not have a proper reference to the surface at calculateEmissionContribution -- because a SurfacePoint can end up there)
     if ( mode == arpathtracermode_mis || mode == arpathtracermode_weighed_direction_sampling )
@@ -933,7 +933,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     int lastNonzeroIndex = -1;
     nonzeroContributions[0] = 0;
 
-    // for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     {
         // set up the indices into buffer arrays

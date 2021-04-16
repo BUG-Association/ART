@@ -216,11 +216,41 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
     else
         box3d_ca_add_b(extremalCrdTable, 6, outBoxObjectspace);
 
+    // if embree is enabled, the bounding box is
+    // passed to it, because it is needed to find intersections
+    // on user defined shapes
     if([ArnEmbree embreeEnabled]) {
+
+        // conversion of object space bounding box
+        // to world space object box
+        // (hand-copied because I [Sebastian] couldn't find
+        // a better way to do it)
+        Box3D outBoxWorldspace;
+        HTrafo3D  trafoObject2World;
+        if ( ARNGT_TRAFO(traversal) )
+        {
+            HTrafo3D  trafoWorld2Object;
+
+            [ ARNGT_TRAFO(traversal) getHTrafo3Ds
+                : & trafoObject2World
+                : & trafoWorld2Object
+                ];
+            }
+        else
+        {
+            trafoObject2World = HTRAFO3D_UNIT;
+        }
+        box3d_b_htrafo3d_b(
+              outBoxObjectspace,
+            & trafoObject2World,
+            & outBoxWorldspace
+            );
+
+        // call embree manager singleton, retrieve geometry pointer and pass on bounding box
         ArnEmbree * embree = [ArnEmbree embreeManager];
         RTCGeometry embreeGeometry = rtcGetGeometry([embree getScene], (unsigned int) embreeGeomID);
         EmbreeGeometryData * geometryData = (EmbreeGeometryData *)rtcGetGeometryUserData(embreeGeometry);
-        [geometryData setBoundigBox: outBoxObjectspace];
+        [geometryData setBoundigBox: outBoxWorldspace];
     }
 }
 

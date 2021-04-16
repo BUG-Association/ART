@@ -72,12 +72,16 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
     //   quadratic equation solving further down. Normalising the ray
     //   vector helps with these issues.
 
+
     double  orl = vec3d_v_len( & OBJECTSPACE_RAY_VECTOR );
     
     vec3d_norm_v( & OBJECTSPACE_RAY_VECTOR );
 
     long  faceindex_for_min_t = ARFACE_ON_SHAPE_INVALID_INDEX;
     long  faceindex_for_max_t = ARFACE_ON_SHAPE_INVALID_INDEX;
+
+    Vec3D orv = OBJECTSPACE_RAY_VECTOR;
+    Pnt3D orp = OBJECTSPACE_RAY_POINT;
 
     *intersectionList = ARINTERSECTIONLIST_EMPTY;
 
@@ -153,15 +157,9 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
             );
     }
 
-
-    // debug
-    // printf("c = %f, d = %f, orl = %f\n", c ,d , orl);
-    // static double smallest = INFINITY;
-    if(range_of_t.max < 0.001) {
-        // printf("smallest tmax: %f\n", range_of_t.max);
-        // printf("\n");
+    if(faceindex_for_min_t != faceindex_for_max_t) {
+        // printf("halt\n");
     }
-
 
     arintersectionlist_init_2(
           intersectionList,
@@ -176,8 +174,6 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
 #ifdef ART_WITH_INTERSECTION_STATISTICS
     arnraycaster_count_intersection(rayCaster, ArnSphere);
 #endif
-
-
 }
 
 - (void) calculateLocalNormalForIntersection

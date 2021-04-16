@@ -83,7 +83,11 @@ ArHashedMailboxEntry;
 
     BOOL                   * activeNodes;
 
-    // if embree is enabled
+    // If raycasting with embree is enabled,
+    // during the copying of the raycaster objects
+    // for each thread, each copy is assigned a copy
+    // of the embree RTCScene, so that each raycaster
+    // copy can works unhindered
     RTCScene embreeScene;
 }
 
@@ -114,11 +118,12 @@ ArHashedMailboxEntry;
         ;
 
 // for testing
-- (ArcIntersection *) intersectWithEmbree
+- (ArcIntersection *) getIntersectionListWithEmbree
         : (Range) range_of_t
         : (struct ArIntersectionList *) intersectionList
         : (ArNode <ArpRayCasting> *) araWorld
         ;
+
 
 @end
 
