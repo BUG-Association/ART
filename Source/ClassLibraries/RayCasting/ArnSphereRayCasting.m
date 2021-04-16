@@ -165,8 +165,8 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
     INTERSECTION_TEST_DEBUG_OUTPUT_RESULT_LIST;
 
     if(intersectionList->head) {
-        if(intersectionList->head->t < 1.0)
-            printf("well, fuck\n");
+        // if(intersectionList->head->t < 1.0)
+
     }
 
 #ifdef ART_WITH_INTERSECTION_STATISTICS
