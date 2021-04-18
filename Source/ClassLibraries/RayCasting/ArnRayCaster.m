@@ -378,6 +378,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         : (struct ArIntersectionList *) intersectionList
         : (ArNode <ArpRayCasting> *) araWorld
 {
+    // we must have an RTCScene associated with this ray caster
     if(![embreeCopyForRayCaster getScene]) {
         ART_ERRORHANDLING_FATAL_ERROR(
                 "method [ArnRayCaster intersectWithEmbree:::] called, without member variable RTCScene being initialized"
@@ -427,7 +428,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     */
 
     // ... and store intersection information in an
-    // ArcIntersection and return it
+    // ArIntersectionList
 
     self->state = userDataGeometry->_traversalState;
     self->surfacepoint_test_shape = userDataGeometry->_shape;
@@ -452,6 +453,10 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     ];
 
 
+    // if the geometry that was hit is not a "user defined geometry" (triangles,
+    // triangle meshes, quads) we store surface normal and texture coords.
+    // for "user defined geometries", these are getting computed further down
+    // the path tracer loop
     if(intersectionList->head && !userDataGeometry->_isUserGeometry) {
         SET_OBJECTSPACE_NORMAL(intersectionList->head,
                                VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));

@@ -164,11 +164,6 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
         );
     INTERSECTION_TEST_DEBUG_OUTPUT_RESULT_LIST;
 
-    /*
-    if(faceindex_for_min_t != faceindex_for_max_t) {
-            printf("here\n");
-    }
-     */
 
 #ifdef ART_WITH_INTERSECTION_STATISTICS
     arnraycaster_count_intersection(rayCaster, ArnSphere);

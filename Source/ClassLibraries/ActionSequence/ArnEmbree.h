@@ -58,8 +58,6 @@ typedef enum Embree_state {
     BOOL _isUserGeometry;
 }
 
-- init;
-
 - (void) setBoundigBox : (Box3D) box;
 
 @end
@@ -111,15 +109,6 @@ typedef enum Embree_state {
         : (ArNode <ArpShape> *) shape
         : (ArTraversalState *) traversalState
         : (AraCombinedAttributes *) combinedAttributes
-        ;
-
-
-// intersection
-- (ArcIntersection *) intersect
-        : (ArnRayCaster *) raycaster
-        : (Range) range_of_t
-        : (struct ArIntersectionList *) intersectionList
-        : (ArNode <ArpRayCasting> *) araWorld
         ;
 
 

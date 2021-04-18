@@ -272,7 +272,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             : reverseSampleProbability
             : attenuationSample
             ];
-            
+
+
     if(material && sampleValid)
         *material =
             ARDIRECTIONCOSINE_COSINE(*sampledDirection) < 0.0 ?

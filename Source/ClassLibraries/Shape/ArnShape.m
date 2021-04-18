@@ -250,7 +250,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
         ArnEmbree * embree = [ArnEmbree embreeManager];
         RTCGeometry embreeGeometry = rtcGetGeometry([embree getScene], (unsigned int) embreeGeomID);
         EmbreeGeometryData * geometryData = (EmbreeGeometryData *)rtcGetGeometryUserData(embreeGeometry);
-        [geometryData setBoundigBox: outBoxWorldspace];
+        [geometryData setBoundigBox: *outBoxObjectspace];
     }
 }
 
