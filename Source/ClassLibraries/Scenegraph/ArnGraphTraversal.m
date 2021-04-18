@@ -137,8 +137,16 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnGraphTraversal)
 {
     artraversalstate_free_contents( & state );
 
-    RELEASE_OBJECT(VARIABLES);
-    RELEASE_OBJECT(BBOX_CACHE);
+    // [Sebastian] I am not 100% sure why, but when I omit this if-condition
+    // I get a warning from 'valgrind' that these are already freed.
+    // My guess is that during the rendering with embree, the ray caster(s)
+    // do not make use of variables and bbox_cache anyway, so they do not
+    // get initialized.
+    if(![ArnEmbree embreeEnabled])
+    {
+        RELEASE_OBJECT(VARIABLES);
+        RELEASE_OBJECT(BBOX_CACHE);
+    }
 
     [ super dealloc ];
 }

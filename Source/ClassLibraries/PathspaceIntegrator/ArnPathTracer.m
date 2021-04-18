@@ -1206,8 +1206,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     }
     else
     {
-        //if(intersection)
-          //  printf("intersection\n");
         // zero contribution path
         ARLIGHTSAMPLE_INIT_AS_NONE(ARLIGHTALPHASAMPLE_LIGHT(*lightalpha_r));
     }

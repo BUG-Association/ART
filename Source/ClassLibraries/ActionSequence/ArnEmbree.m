@@ -360,9 +360,8 @@ static ArnEmbree * embreeManager;
         RTCGeometry rtcGeometry = rtcGetGeometry(scene, (unsigned int) geomIDIntValue);
         EmbreeGeometryData * geom_data = (EmbreeGeometryData *)rtcGetGeometryUserData(rtcGeometry);
 
-        if(geom_data) {
+        if(geom_data)
             geom_data->_userGeometryRayCaster = [rayCaster copy];
-        }
     }
 }
 
@@ -412,6 +411,7 @@ void embree_intersect_geometry(const int * valid,
         if(rtc_ray->tfar < (float) MATH_HUGE_DOUBLE)
             return;
 
+
         EmbreeGeometryData * geometryData = (EmbreeGeometryData *) geometryUserPtr;
         geometryData->_isUserGeometry = YES;
 
@@ -420,13 +420,11 @@ void embree_intersect_geometry(const int * valid,
         if([geometryData->_shape isKindOfClass: [ArnInfSphere class]]) {
             rtc_hit->geomID = geomID;
             rtc_hit->primID = 0;
-
             return;
         }
 
         // update the ray caster
         ArnRayCaster * rayCaster = [geometryData->_userGeometryRayCaster copy];
-        // ArnRayCaster * rayCaster = geometryData->_userGeometryRayCaster;
         rayCaster->intersection_test_world_ray3d =
                 RAY3D(PNT3D(rtc_ray->org_x, rtc_ray->org_y, rtc_ray->org_z),
                       VEC3D(rtc_ray->dir_x, rtc_ray->dir_y, rtc_ray->dir_z));
@@ -434,8 +432,6 @@ void embree_intersect_geometry(const int * valid,
                 & rayCaster->intersection_test_world_ray3d,
                 & rayCaster->intersection_test_ray3de
         );
-        // rayCaster->surfacepoint_test_shape = geometryData->_shape;
-        // rayCaster->state = geometryData->_traversalState;
 
         // perform the intersection
         ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
@@ -453,6 +449,9 @@ void embree_intersect_geometry(const int * valid,
             rtc_hit->geomID = geomID;
             rtc_hit->primID = 0;
         }
+
+        // clean-up
+        arintersectionlist_free_contents(&intersectionList, rayCaster->rayIntersectionFreelist);
         RELEASE_OBJECT(rayCaster);
     }
 }
