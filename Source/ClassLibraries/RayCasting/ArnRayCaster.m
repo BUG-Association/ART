@@ -378,7 +378,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         : (struct ArIntersectionList *) intersectionList
         : (ArNode <ArpRayCasting> *) araWorld
 {
-    if(!embreeScene) {
+    if(![embreeCopyForRayCaster getScene]) {
         ART_ERRORHANDLING_FATAL_ERROR(
                 "method [ArnRayCaster intersectWithEmbree:::] called, without member variable RTCScene being initialized"
         );
@@ -404,11 +404,8 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
     rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
 
-    ArnEmbree * embree = [ArnEmbree embreeManager];
-    embree->helperRayCaster = self;
-
     // do the intersection
-    rtcIntersect1(embreeScene, &context, &rayhit);
+    rtcIntersect1([embreeCopyForRayCaster getScene], &context, &rayhit);
 
     // if we did not hit anything, we are done here
     if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
@@ -417,7 +414,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // else:
     // retrieve further information about the intersected shape ...
     unsigned int geomID = rayhit.hit.geomID;
-    RTCGeometry intersectedRTCGeometry = rtcGetGeometry(embreeScene, geomID);
+    RTCGeometry intersectedRTCGeometry = rtcGetGeometry([embreeCopyForRayCaster getScene], geomID);
     EmbreeGeometryData * userDataGeometry = (EmbreeGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
 
     /*
@@ -558,7 +555,8 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        embreeScene = [embree getScene];
+        embreeCopyForRayCaster = [embree copy];
+        [embreeCopyForRayCaster prepareForRayCasting :self];
     }
 }
 

@@ -88,7 +88,7 @@ ArHashedMailboxEntry;
     // for each thread, each copy is assigned a copy
     // of the embree RTCScene, so that each raycaster
     // copy can works unhindered
-    RTCScene embreeScene;
+    ArnEmbree * embreeCopyForRayCaster;
 }
 
 - init

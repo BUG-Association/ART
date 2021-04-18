@@ -54,6 +54,7 @@ typedef enum Embree_state {
     ArTraversalState _traversalState;
     AraCombinedAttributes * _combinedAttributes;
     Box3D _bboxObjectSpace;
+    ArnRayCaster * _userGeometryRayCaster;
     BOOL _isUserGeometry;
 }
 
@@ -69,10 +70,13 @@ typedef enum Embree_state {
     Embree_state state;
     NSMutableArray * embreeGeometryIDArray;
 @public
-    ArnRayCaster * helperRayCaster;
+    ArnRayCaster * referenceRayCaster;
 }
 
+// returning the singleton object
 + (ArnEmbree *) embreeManager;
+
+- (ArnEmbree *) copy;
 
 + (BOOL) embreeEnabled;
 + (void) enableEmbree: (BOOL) enabled;
@@ -86,9 +90,12 @@ typedef enum Embree_state {
 
 - (void) initGeometryIDArray;
 - (NSMutableArray *) getGeometryIDArray;
+- (void) setGeometryIDArray : (NSMutableArray *) geometryIDArray;
 - (void) addGeometryIDToGeometryIDArray : (unsigned int) id;
 
 - (Embree_state) getState;
+
+- (void) prepareForRayCasting : (ArnRayCaster *) rayCaster;
 
 - (int) initEmbreeSimpleIndexedGeometry: (ArnSimpleIndexedShape *) shape : (ArnVertexSet *) vertexSet;
 - (int) initEmbreeUserGeometry : (ArnShape *) shape;
@@ -114,6 +121,7 @@ typedef enum Embree_state {
         : (struct ArIntersectionList *) intersectionList
         : (ArNode <ArpRayCasting> *) araWorld
         ;
+
 
 + (void) cleanUp;
 
