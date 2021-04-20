@@ -39,8 +39,8 @@ void errorFunction(void* userPtr, enum RTCError error, const char* str) {
 
 @implementation EmbreeGeometryData
 
-- (void) setBoundigBox : (Box3D) box {
-    _bboxObjectSpace = box;
+- (void) setBoundigBox : (Box3D *) box {
+    _bboxObjectSpace = *box;
 }
 
 
@@ -57,7 +57,7 @@ static BOOL EMBREE_ENABLED;
 static ArnEmbree * embreeManager;
 
 
-#define EMBREE_DEBUG_PRINT
+ #define EMBREE_DEBUG_PRINT
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
@@ -128,7 +128,6 @@ static ArnEmbree * embreeManager;
 #endif
         }
     }
-
 
     rtcReleaseScene([embree getScene]);
     rtcReleaseDevice([embree getDevice]);
@@ -364,7 +363,6 @@ static ArnEmbree * embreeManager;
             // in the 'user geometry' intersect function
             geom_data->_userGeometryRayCaster->hitEps = 1e-3f;
         }
-
     }
 }
 
@@ -375,6 +373,10 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
 
     const EmbreeGeometryData * geometryData = (const EmbreeGeometryData *) args->geometryUserPtr;
     struct RTCBounds * bounds_o = args->bounds_o;
+
+    // debug
+    Box3D box;
+    [geometryData->_combinedAttributes getBBoxObjectspace: &box];
 
 #ifdef EMBREE_DEBUG_PRINT
     printf("adding bounding box to embree\n");
@@ -426,8 +428,11 @@ void embree_intersect_geometry(const int * valid,
             return;
         }
 
-        // fetch and update the ray caster
+        ArIntersectionList * intersectionList = &ARINTERSECTIONLIST_EMPTY;
+
+        // fetch a copy of the ray caster and update it
         ArnRayCaster * rayCaster = [geometryData->_userGeometryRayCaster copy];
+
         rayCaster->intersection_test_world_ray3d =
                 RAY3D(PNT3D(rtc_ray->org_x, rtc_ray->org_y, rtc_ray->org_z),
                       VEC3D(rtc_ray->dir_x, rtc_ray->dir_y, rtc_ray->dir_z));
@@ -437,24 +442,23 @@ void embree_intersect_geometry(const int * valid,
         );
 
         // perform the intersection
-        ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
         [geometryData->_combinedAttributes
                 getIntersectionList : rayCaster
                                     : RANGE( ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
-                                    : &intersectionList
+                                    : intersectionList
         ];
 
         // we are just interested in the tfar value,
         // surface normal gets calculated later in the path
         // tracer loop
-        if(intersectionList.head) {
-            rtc_ray->tfar = (float) intersectionList.head->t;
+        if(intersectionList->head) {
+            rtc_ray->tfar = (float) intersectionList->head->t;
             rtc_hit->geomID = geomID;
             rtc_hit->primID = 0;
         }
 
         // clean-up
-        arintersectionlist_free_contents(&intersectionList, rayCaster->rayIntersectionFreelist);
+        arintersectionlist_free_contents(intersectionList, geometryData->_userGeometryRayCaster->rayIntersectionFreelist);
         RELEASE_OBJECT(rayCaster);
     }
 }
@@ -486,6 +490,18 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
 #endif
     return geomID;
+}
+
+- (void) boundingbox_debugprintf {
+    for (id geomID in embreeGeometryIDArray) {
+        int geomIDIntValue = [geomID intValue];
+        RTCGeometry rtcGeometry = rtcGetGeometry(scene, (unsigned int) geomIDIntValue);
+        EmbreeGeometryData * geom_data = (EmbreeGeometryData *)rtcGetGeometryUserData(rtcGeometry);
+
+        if(geom_data) {
+            box3d_b_debugprintf(&geom_data->_bboxObjectSpace);
+        }
+    }
 }
 
 @end // ArnEmbree

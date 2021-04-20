@@ -84,11 +84,11 @@ ArHashedMailboxEntry;
     BOOL                   * activeNodes;
 
     // If raycasting with embree is enabled,
-    // during the copying of the raycaster objects
-    // for each thread, each copy is assigned a copy
-    // of the embree RTCScene, so that each raycaster
+    // when the raycaster object is copied
+    // for each thread, a reference is stored here to
+    // Embree's RTCScene so that each raycaster
     // copy can works unhindered
-    ArnEmbree * embreeCopyForRayCaster;
+    RTCScene embreeScene;
 }
 
 - init
@@ -117,7 +117,8 @@ ArHashedMailboxEntry;
         : (ArUnionOptions) unionoptions_store
         ;
 
-// for testing
+// if embree support is enabled, this function calculates
+// intersections with geometry with the help of Embree API calls
 - (ArcIntersection *) getIntersectionListWithEmbree
         : (Range) range_of_t
         : (struct ArIntersectionList *) intersectionList

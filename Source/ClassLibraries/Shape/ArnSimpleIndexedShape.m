@@ -66,6 +66,8 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
     copiedInstance->indexTable = arlongarray_copy_by_reference(&indexTable);
 
+    copiedInstance->embreeGeomID = embreeGeomID;
+
     return copiedInstance;
 }
 
@@ -78,6 +80,8 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             ];
 
     copiedInstance->indexTable = arlongarray_copy_by_reference(&indexTable);
+
+    copiedInstance->embreeGeomID = embreeGeomID;
 
     return copiedInstance;
 }

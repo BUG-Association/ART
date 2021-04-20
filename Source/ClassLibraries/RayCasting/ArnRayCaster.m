@@ -372,14 +372,14 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     return 0;
 }
 
-// for testing
+
 - (ArcIntersection *) getIntersectionListWithEmbree
         : (Range) range_of_t
         : (struct ArIntersectionList *) intersectionList
         : (ArNode <ArpRayCasting> *) araWorld
 {
     // we must have an RTCScene associated with this ray caster
-    if(![embreeCopyForRayCaster getScene]) {
+    if(!embreeScene) {
         ART_ERRORHANDLING_FATAL_ERROR(
                 "method [ArnRayCaster intersectWithEmbree:::] called, without member variable RTCScene being initialized"
         );
@@ -406,7 +406,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
 
     // do the intersection
-    rtcIntersect1([embreeCopyForRayCaster getScene], &context, &rayhit);
+    rtcIntersect1(embreeScene, &context, &rayhit);
 
     // if we did not hit anything, we are done here
     if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
@@ -415,7 +415,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // else:
     // retrieve further information about the intersected shape ...
     unsigned int geomID = rayhit.hit.geomID;
-    RTCGeometry intersectedRTCGeometry = rtcGetGeometry([embreeCopyForRayCaster getScene], geomID);
+    RTCGeometry intersectedRTCGeometry = rtcGetGeometry(embreeScene, geomID);
     EmbreeGeometryData * userDataGeometry = (EmbreeGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
 
     /*
@@ -430,16 +430,17 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // ... and store intersection information in an
     // ArIntersectionList
 
-    self->state = userDataGeometry->_traversalState;
-    self->surfacepoint_test_shape = userDataGeometry->_shape;
+        self->state = userDataGeometry->_traversalState;
+        self->surfacepoint_test_shape = userDataGeometry->_shape;
 
-    arintersectionlist_init_1(
-            intersectionList,
-            rayhit.ray.tfar,
-            0,
-            arface_on_shape_is_planar,
-            userDataGeometry->_shape,
-            self);
+
+        arintersectionlist_init_1(
+                intersectionList,
+                rayhit.ray.tfar,
+                0,
+                arface_on_shape_is_planar,
+                userDataGeometry->_shape,
+                self);
 
 
     // this is some kind of hack: In order to process the individual materials
@@ -560,8 +561,9 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        embreeCopyForRayCaster = [embree copy];
-        [embreeCopyForRayCaster prepareForRayCasting :self];
+        // embreeCopyForRayCaster = [embree copy];
+        embreeScene = [embree getScene];
+        // [embreeCopyForRayCaster prepareForRayCasting :self];
     }
 }
 

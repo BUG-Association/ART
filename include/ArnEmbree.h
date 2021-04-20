@@ -47,7 +47,6 @@ typedef enum Embree_state {
 } Embree_state;
 
 
-
 @interface EmbreeGeometryData : ArcObject {
 @public
     ArNode<ArpShape> * _shape;
@@ -58,7 +57,7 @@ typedef enum Embree_state {
     BOOL _isUserGeometry;
 }
 
-- (void) setBoundigBox : (Box3D) box;
+- (void) setBoundigBox : (Box3D *) box;
 
 @end
 
@@ -111,6 +110,7 @@ typedef enum Embree_state {
         : (AraCombinedAttributes *) combinedAttributes
         ;
 
+- (void) boundingbox_debugprintf;
 
 + (void) cleanUp;
 

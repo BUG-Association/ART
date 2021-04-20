@@ -329,9 +329,6 @@ ArNode * arntrianglemesh_from_ply(
                                     : numberOfFaces
                                 ];
     }
-    else
-        thisMesh->embreeGeomID = -1;
-
     //   Before we return the triangle mesh we need to apply the vertex set
     //   on it.
 
@@ -607,6 +604,8 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
     copiedInstance->minPoint = minPoint;
     copiedInstance->maxPoint = maxPoint;
 
+    copiedInstance->embreeGeomID = embreeGeomID;
+
     //   shallow copy of BSP tree!
 
     copiedInstance->internalMeshTree = RETAIN_OBJECT( internalMeshTree );
@@ -672,17 +671,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 - (void) setupNodeData
         : (ArTraversalState *) traversalState
 {
-    // If Embree is enabled, pass the triangle array to the corresponding embree shape
-    // and return
-    if([ArnEmbree embreeEnabled]) {
-
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-
-        // [embree setGeometryUserData: self : traversalState];
-
-        return;
-    }
-
     //   If the internal tree is not null then the setup must have
     //   been done already.
 

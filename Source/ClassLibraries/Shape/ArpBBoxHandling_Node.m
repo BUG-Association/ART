@@ -123,6 +123,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
         [self clipToBox: & box ];
 
+
     RELEASE_OBJECT(traversal);
 }
 
@@ -2293,7 +2294,6 @@ ARPBBOXHANDLING_DEFAULT_IMPLEMENTATION
             :   traversal
             :   outBBox
             ];
-
 
         if ( COMBINED_VERTICES_ATTRIBUTE )
             [ traversal popVertices

@@ -41,7 +41,7 @@ ART_MODULE_INITIALISATION_FUNCTION
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-#define EMBREE_INVALID_GEMOETRY_ID -1
+#define EMBREE_INVALID_GEMOETRY_ID (-1)
 
 /* ===========================================================================
     'ArnShape'
@@ -60,14 +60,6 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
     {
         shapeGeometry = newGeometry;
         embreeGeomID = EMBREE_INVALID_GEMOETRY_ID;
-    }
-
-    if([ArnEmbree embreeEnabled]) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-
-        if(![self isKindOfClass: [ArnTriangleMesh class]]) {
-            embreeGeomID = [embree initEmbreeUserGeometry: self];
-        }
     }
     
     return self;
@@ -221,36 +213,11 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
     // on user defined shapes
     if([ArnEmbree embreeEnabled]) {
 
-        // conversion of object space bounding box
-        // to world space object box
-        // (hand-copied because I [Sebastian] couldn't find
-        // a better way to do it)
-        Box3D outBoxWorldspace;
-        HTrafo3D  trafoObject2World;
-        if ( ARNGT_TRAFO(traversal) )
-        {
-            HTrafo3D  trafoWorld2Object;
-
-            [ ARNGT_TRAFO(traversal) getHTrafo3Ds
-                : & trafoObject2World
-                : & trafoWorld2Object
-                ];
-            }
-        else
-        {
-            trafoObject2World = HTRAFO3D_UNIT;
-        }
-        box3d_b_htrafo3d_b(
-              outBoxObjectspace,
-            & trafoObject2World,
-            & outBoxWorldspace
-            );
-
         // call embree manager singleton, retrieve geometry pointer and pass on bounding box
         ArnEmbree * embree = [ArnEmbree embreeManager];
         RTCGeometry embreeGeometry = rtcGetGeometry([embree getScene], (unsigned int) embreeGeomID);
         EmbreeGeometryData * geometryData = (EmbreeGeometryData *)rtcGetGeometryUserData(embreeGeometry);
-        [geometryData setBoundigBox: *outBoxObjectspace];
+        [geometryData setBoundigBox: outBoxObjectspace];
     }
 }
 
@@ -274,6 +241,8 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
 
+        // triangle meshes should already be initialized for embree
+        // at this point
         if(![self isKindOfClass: [ArnTriangleMesh class]]) {
             embreeGeomID = [embree initEmbreeUserGeometry: self];
         }

@@ -120,7 +120,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         outBoxObjectspace->max.c.x[2] = MATH_HUGE_FLOAT;
 
         // set bounding box for embree
-        [geometryData setBoundigBox: *outBoxObjectspace];
+        [geometryData setBoundigBox: outBoxObjectspace];
     }
 }
 
