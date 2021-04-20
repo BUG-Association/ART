@@ -2,7 +2,7 @@
 
 import os, re, subprocess
 
-spp = 512
+spp = 50
 
 def extract_doc(file_path):
     with open(file_path) as f:

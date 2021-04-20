@@ -442,7 +442,7 @@ void embree_intersect_geometry(const int * valid,
 
 
         // fetch a copy of the ray caster and update it
-        ArnRayCaster * rayCaster = [geometryData->_userGeometryRayCaster copy];
+        ArnRayCaster * rayCaster = geometryData->_userGeometryRayCaster ;
 
         rayCaster->intersection_test_world_ray3d =
                 RAY3D(PNT3D(rtc_ray->org_x, rtc_ray->org_y, rtc_ray->org_z),
