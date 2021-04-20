@@ -933,9 +933,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     int lastNonzeroIndex = -1;
     nonzeroContributions[0] = 0;
 
-    // debug
-    Vec3D surfaceNormal_os;
-    Vec3D surfaceNormal_ws;
 
     for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     {
@@ -1120,9 +1117,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
             if( ! ARPDFVALUE_IS_INFINITE(directionSamplingPDF) )
                 specularOnlyPath = NO;
 
-            // debug
-            surfaceNormal_os = intersection->objectspace_normal;
-            surfaceNormal_ws = intersection->worldspace_normal;
             
             // release the last intersection, but don't touch eyePoint
             if(rayOriginIntersection)

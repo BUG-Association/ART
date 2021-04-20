@@ -52,12 +52,9 @@ typedef enum Embree_state {
     ArNode<ArpShape> * _shape;
     ArTraversalState _traversalState;
     AraCombinedAttributes * _combinedAttributes;
-    Box3D _bboxObjectSpace;
     ArnRayCaster * _userGeometryRayCaster;
     BOOL _isUserGeometry;
 }
-
-- (void) setBoundigBox : (Box3D *) box;
 
 @end
 
@@ -109,8 +106,6 @@ typedef enum Embree_state {
         : (ArTraversalState *) traversalState
         : (AraCombinedAttributes *) combinedAttributes
         ;
-
-- (void) boundingbox_debugprintf;
 
 + (void) cleanUp;
 

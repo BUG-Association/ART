@@ -207,18 +207,6 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
     }
     else
         box3d_ca_add_b(extremalCrdTable, 6, outBoxObjectspace);
-
-    // if embree is enabled, the bounding box is
-    // passed to it, because it is needed to find intersections
-    // on user defined shapes
-    if([ArnEmbree embreeEnabled]) {
-
-        // call embree manager singleton, retrieve geometry pointer and pass on bounding box
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry embreeGeometry = rtcGetGeometry([embree getScene], (unsigned int) embreeGeomID);
-        EmbreeGeometryData * geometryData = (EmbreeGeometryData *)rtcGetGeometryUserData(embreeGeometry);
-        [geometryData setBoundigBox: outBoxObjectspace];
-    }
 }
 
 ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION

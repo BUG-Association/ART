@@ -134,7 +134,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 {
     if ( ! ARCSURFACEPOINT_TEXTURE_COORDS_ARE_VALID(self) )
     {
-
         id mapping =
             [ ARCSURFACEPOINT_SHAPE(self) createMappingFor
                 :   armapping_default

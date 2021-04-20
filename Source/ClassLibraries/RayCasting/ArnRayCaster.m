@@ -430,17 +430,16 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // ... and store intersection information in an
     // ArIntersectionList
 
-        self->state = userDataGeometry->_traversalState;
-        self->surfacepoint_test_shape = userDataGeometry->_shape;
+    self->state = userDataGeometry->_traversalState;
+    self->surfacepoint_test_shape = userDataGeometry->_shape;
 
-
-        arintersectionlist_init_1(
-                intersectionList,
-                rayhit.ray.tfar,
-                0,
-                arface_on_shape_is_planar,
-                userDataGeometry->_shape,
-                self);
+    arintersectionlist_init_1(
+            intersectionList,
+            rayhit.ray.tfar,
+            0,
+            arface_on_shape_is_planar,
+            userDataGeometry->_shape,
+            self);
 
 
     // this is some kind of hack: In order to process the individual materials
@@ -461,7 +460,12 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     if(intersectionList->head && !userDataGeometry->_isUserGeometry) {
         SET_OBJECTSPACE_NORMAL(intersectionList->head,
                                VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
-        TEXTURE_COORDS(intersectionList->head) = PNT2D(rayhit.hit.u, rayhit.hit.v);
+
+        // texture coordinates
+        // for some reason, the UV coordinates need to be switched for ART to map the
+        // image in the right orientation
+        TEXTURE_COORDS(intersectionList->head) = PNT2D(rayhit.hit.v, rayhit.hit.u);
+        ARCSURFACEPOINT_FLAG_TEXTURE_COORDS_AS_VALID(intersectionList->head);
     }
 }
 
@@ -561,9 +565,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        // embreeCopyForRayCaster = [embree copy];
         embreeScene = [embree getScene];
-        // [embreeCopyForRayCaster prepareForRayCasting :self];
     }
 }
 

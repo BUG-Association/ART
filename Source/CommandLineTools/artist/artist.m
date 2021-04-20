@@ -28,8 +28,6 @@
 #import "_ArLight_GV.h"
 #import "FoundationAssertionMacros.h"
 
-// #import "ArnEmbree.h" // added by [Sebastian] for now. TODO delete when not needed anymore
-
 /* ===========================================================================
 
     'artist' comand line rendering tool
@@ -261,6 +259,7 @@ int artist(
 #if EMBREE_INSTALLED
         [ArnEmbree enableEmbree: YES];
         [ArnEmbree initialize];
+        printf("embree support enabled\n");
 #else
         printf("error: embree support enabled without embree being installed...\n");
         exit(0);
@@ -269,7 +268,6 @@ int artist(
     else {
         [ArnEmbree enableEmbree: NO];
     }
-    printf("embree enabled: %s", [ArnEmbree embreeEnabled]? "true\n" : "false\n");
     // END -- [Sebastian] TODO remove this block, once embree parsing works
 
 

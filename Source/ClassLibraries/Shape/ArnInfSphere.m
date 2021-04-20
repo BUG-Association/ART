@@ -102,26 +102,6 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         : (Box3D *) outBoxObjectspace
 {
     (*outBoxObjectspace) = BOX3D_FULL;
-
-    // if embree is enabled, pass bounding box to embree
-    if([ArnEmbree embreeEnabled] && embreeGeomID != EMBREE_INVALIDGEOMETRY_ID) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        RTCGeometry geometry = rtcGetGeometry([embree getScene], (unsigned int) embreeGeomID);
-        EmbreeGeometryData * geometryData = (EmbreeGeometryData *) rtcGetGeometryUserData(geometry);
-
-        // since embree is working with floats and ART with doubles
-        // the infinite sphere can't get hit by an embree way.
-        // this is a work-around for now
-        outBoxObjectspace->min.c.x[0] = - MATH_HUGE_FLOAT;
-        outBoxObjectspace->min.c.x[1] = - MATH_HUGE_FLOAT;
-        outBoxObjectspace->min.c.x[2] = - MATH_HUGE_FLOAT;
-        outBoxObjectspace->max.c.x[0] = MATH_HUGE_FLOAT;
-        outBoxObjectspace->max.c.x[1] = MATH_HUGE_FLOAT;
-        outBoxObjectspace->max.c.x[2] = MATH_HUGE_FLOAT;
-
-        // set bounding box for embree
-        [geometryData setBoundigBox: outBoxObjectspace];
-    }
 }
 
 - (void) getLocalCentroid

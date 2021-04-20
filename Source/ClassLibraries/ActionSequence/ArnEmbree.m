@@ -39,11 +39,6 @@ void errorFunction(void* userPtr, enum RTCError error, const char* str) {
 
 @implementation EmbreeGeometryData
 
-- (void) setBoundigBox : (Box3D *) box {
-    _bboxObjectSpace = *box;
-}
-
-
 @end // EmbreeGeometryData
 
 
@@ -57,7 +52,7 @@ static BOOL EMBREE_ENABLED;
 static ArnEmbree * embreeManager;
 
 
- #define EMBREE_DEBUG_PRINT
+#define EMBREE_DEBUG_PRINT
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
@@ -374,26 +369,41 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
     const EmbreeGeometryData * geometryData = (const EmbreeGeometryData *) args->geometryUserPtr;
     struct RTCBounds * bounds_o = args->bounds_o;
 
-    // debug
-    Box3D box;
-    [geometryData->_combinedAttributes getBBoxObjectspace: &box];
+    // calculate the bounding box
+    // _combinedAttributes is the messenger because information
+    // about the transl, rot and scale is needed
+    Box3D boundingBox;
+    [geometryData->_combinedAttributes getBBoxObjectspace: &boundingBox];
+
+    // special case:
+    // since embree is working with floats and ART with doubles
+    // the infinite sphere can't get hit by an embree way.
+    // this is a work-around for now
+    if([geometryData->_shape isKindOfClass: [ArnInfSphere class]]) {
+        boundingBox.min.c.x[0] = - MATH_HUGE_FLOAT;
+        boundingBox.min.c.x[1] = - MATH_HUGE_FLOAT;
+        boundingBox.min.c.x[2] = - MATH_HUGE_FLOAT;
+        boundingBox.max.c.x[0] = MATH_HUGE_FLOAT;
+        boundingBox.max.c.x[1] = MATH_HUGE_FLOAT;
+        boundingBox.max.c.x[2] = MATH_HUGE_FLOAT;
+    }
+
+    bounds_o->lower_x = (float) boundingBox.min.c.x[0];
+    bounds_o->lower_y = (float) boundingBox.min.c.x[1];
+    bounds_o->lower_z = (float) boundingBox.min.c.x[2];
+    bounds_o->upper_x = (float) boundingBox.max.c.x[0];
+    bounds_o->upper_y = (float) boundingBox.max.c.x[1];
+    bounds_o->upper_z = (float) boundingBox.max.c.x[2];
 
 #ifdef EMBREE_DEBUG_PRINT
-    printf("adding bounding box to embree\n");
-    printf("object box - min x: %f\n", geometryData->_bboxObjectSpace.min.c.x[0]);
-    printf("object box - min y: %f\n", geometryData->_bboxObjectSpace.min.c.x[1]);
-    printf("object box - min z: %f\n", geometryData->_bboxObjectSpace.min.c.x[2]);
-    printf("object box - max x: %f\n", geometryData->_bboxObjectSpace.max.c.x[0]);
-    printf("object box - max y: %f\n", geometryData->_bboxObjectSpace.max.c.x[1]);
-    printf("object box - max z: %f\n", geometryData->_bboxObjectSpace.max.c.x[2]);
+    printf("added bounding box to embree\n");
+    printf("object box - min x: %f\n", bounds_o->lower_x);
+    printf("object box - min y: %f\n", bounds_o->lower_y);
+    printf("object box - min z: %f\n", bounds_o->lower_z);
+    printf("object box - max x: %f\n", bounds_o->upper_x);
+    printf("object box - max y: %f\n", bounds_o->upper_x);
+    printf("object box - max z: %f\n", bounds_o->upper_x);
 #endif
-
-    bounds_o->lower_x = (float) geometryData->_bboxObjectSpace.min.c.x[0];
-    bounds_o->lower_y = (float) geometryData->_bboxObjectSpace.min.c.x[1];
-    bounds_o->lower_z = (float) geometryData->_bboxObjectSpace.min.c.x[2];
-    bounds_o->upper_x = (float) geometryData->_bboxObjectSpace.max.c.x[0];
-    bounds_o->upper_y = (float) geometryData->_bboxObjectSpace.max.c.x[1];
-    bounds_o->upper_z = (float) geometryData->_bboxObjectSpace.max.c.x[2];
 }
 
 
@@ -430,6 +440,7 @@ void embree_intersect_geometry(const int * valid,
 
         ArIntersectionList * intersectionList = &ARINTERSECTIONLIST_EMPTY;
 
+
         // fetch a copy of the ray caster and update it
         ArnRayCaster * rayCaster = [geometryData->_userGeometryRayCaster copy];
 
@@ -448,6 +459,7 @@ void embree_intersect_geometry(const int * valid,
                                     : intersectionList
         ];
 
+
         // we are just interested in the tfar value,
         // surface normal gets calculated later in the path
         // tracer loop
@@ -459,7 +471,7 @@ void embree_intersect_geometry(const int * valid,
 
         // clean-up
         arintersectionlist_free_contents(intersectionList, geometryData->_userGeometryRayCaster->rayIntersectionFreelist);
-        RELEASE_OBJECT(rayCaster);
+        // RELEASE_OBJECT(rayCaster);
     }
 }
 
@@ -490,18 +502,6 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
 #endif
     return geomID;
-}
-
-- (void) boundingbox_debugprintf {
-    for (id geomID in embreeGeometryIDArray) {
-        int geomIDIntValue = [geomID intValue];
-        RTCGeometry rtcGeometry = rtcGetGeometry(scene, (unsigned int) geomIDIntValue);
-        EmbreeGeometryData * geom_data = (EmbreeGeometryData *)rtcGetGeometryUserData(rtcGeometry);
-
-        if(geom_data) {
-            box3d_b_debugprintf(&geom_data->_bboxObjectSpace);
-        }
-    }
 }
 
 @end // ArnEmbree
