@@ -27,19 +27,21 @@
 
 #define ART_MODULE_NAME     ArnEmbree
 
+#import <ArnEmbree.h>
 #import <RayCastingCommonMacros.h>
 #import <ARM_RayCasting.h>
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
+
+#define THREAD_MAX 25
+
+ARLIST_IMPLEMENTATION_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
+
 void errorFunction(void* userPtr, enum RTCError error, const char* str) {
     printf("\nembree error %d: %s\n", error, str);
 }
-
-@implementation EmbreeGeometryData
-
-@end // EmbreeGeometryData
 
 
 @implementation ArnEmbree
@@ -50,6 +52,7 @@ void errorFunction(void* userPtr, enum RTCError error, const char* str) {
 // initializing embree geometries and such
 static BOOL EMBREE_ENABLED;
 static ArnEmbree * embreeManager;
+static PtreadRayCasterPair rayCasterArray[THREAD_MAX];
 
 
 #define EMBREE_DEBUG_PRINT
@@ -66,16 +69,8 @@ static ArnEmbree * embreeManager;
     return embreeManager;
 }
 
-- (ArnEmbree *) copy {
-    ArnEmbree * copy = [super copy];
-
-    if(copy) {
-        [copy setDevice: device];
-        [copy setScene: scene];
-        [copy setGeometryIDArray: embreeGeometryIDArray];
-    }
-
-    return copy;
+- (void) addToUserGeometryList : (UserGeometryData *) data {
+    arlist_add_userGeometryDataptr_at_tail( &userGeometryList, data );
 }
 
 - (void) setDevice: (RTCDevice) newDevice {
@@ -86,21 +81,28 @@ static ArnEmbree * embreeManager;
     scene = newScene;
 }
 
-- (void) initGeometryIDArray {
-    embreeGeometryIDArray = [[NSMutableArray alloc] init];
+- (void) increaseRayCasterCount {
+    rayCasterCount++;
 }
 
-- (NSMutableArray *) getGeometryIDArray {
-    return embreeGeometryIDArray;
+- (int) getRayCasterCount {
+    return rayCasterCount;
 }
 
-- (void) setGeometryIDArray : (NSMutableArray *) geometryIDArray {
-    embreeGeometryIDArray = geometryIDArray;
+- (int) setRayCasterCount : (int) value {
+    rayCasterCount = value;
 }
 
-- (void) addGeometryIDToGeometryIDArray : (unsigned int) id {
-    NSNumber * id_ns = [NSNumber numberWithInt: id];
-    [embreeGeometryIDArray addObject: id_ns];
+- (void) initializeEmptyGeometryList {
+    userGeometryList = ARLIST_EMPTY;
+}
+
+- (ArList *) getUserGeometryList {
+    return &userGeometryList;
+}
+
+- (void) freeGeometryList {
+    arlist_free_userGeometryDataptr_entries(&userGeometryList);
 }
 
 
@@ -110,19 +112,7 @@ static ArnEmbree * embreeManager;
     if(!embree)
         return;
 
-    NSMutableArray * geomID_array = [embree getGeometryIDArray];
-
-    for (id geomID in geomID_array) {
-        int geomIDIntValue = [geomID intValue];
-        RTCGeometry rtcGeometry = rtcGetGeometry([embree getScene], (unsigned int) geomIDIntValue);
-        EmbreeGeometryData * geom_data = (EmbreeGeometryData *)rtcGetGeometryUserData(rtcGeometry);
-        if(geom_data) {
-            RELEASE_OBJECT(geom_data);
-#ifdef EMBREE_DEBUG_PRINT
-            printf("freed memory of user data with address: %p\n", (void *) geom_data);
-#endif
-        }
-    }
+    [embree freeGeometryList];
 
     rtcReleaseScene([embree getScene]);
     rtcReleaseDevice([embree getDevice]);
@@ -160,16 +150,12 @@ static ArnEmbree * embreeManager;
             [embreeManager setScene: newScene];
         }
 
-        [embreeManager initGeometryIDArray];
+        [embreeManager initializeEmptyGeometryList];
+        [embreeManager setRayCasterCount: 0];
 
         isInitialized = YES;
         EMBREE_ENABLED = YES;
     }
-}
-
-
-- (void) setState: (Embree_state) newState {
-    state = newState;
 }
 
 - (RTCDevice) getDevice {
@@ -178,14 +164,10 @@ static ArnEmbree * embreeManager;
 - (RTCScene) getScene {
     return scene;
 }
-- (Embree_state) getState {
-    return state;
-}
 
 - (void) commitScene {
     rtcCommitScene(scene);
-    rtcSetSceneFlags(scene, RTC_SCENE_FLAG_COMPACT); // TODO change later
-    [self setState: Scene_Commited];
+    rtcSetSceneFlags(scene, RTC_SCENE_FLAG_COMPACT);
 }
 
 - (int) addGeometry: (RTCGeometry) newGeometry  {
@@ -322,51 +304,40 @@ static ArnEmbree * embreeManager;
         : (AraCombinedAttributes *) combinedAttributes
 {
     RTCGeometry thisGeometry = NULL;
+    struct UserGeometryData * data = malloc(sizeof(struct UserGeometryData));
+
     if([shape isKindOfClass: [ArnShape class]]) {
         ArnShape * arnShape = (ArnShape *) shape;
         thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
-        [self addGeometryIDToGeometryIDArray:(unsigned int) arnShape->embreeGeomID];
+        if([shape isKindOfClass: [ArnTriangleMesh class]])
+            data->_isUserGeometry = NO;
+        else
+            data->_isUserGeometry = YES;
     }
 
     else if(([shape isKindOfClass: [ArnSimpleIndexedShape class]])) {
-        ArnSimpleIndexedShape * arnShape = (ArnSimpleIndexedShape *) shape;
-        thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
-        [self addGeometryIDToGeometryIDArray:(unsigned int) arnShape->embreeGeomID];
+        ArnSimpleIndexedShape * arnSimpleIndexedShape = (ArnSimpleIndexedShape *) shape;
+        thisGeometry = rtcGetGeometry(scene, (unsigned int) arnSimpleIndexedShape->embreeGeomID);
+        data->_isUserGeometry = NO;
     }
 
-    EmbreeGeometryData * embreeGeometry = ALLOC_OBJECT(EmbreeGeometryData);
-    embreeGeometry->_shape = shape;
-    embreeGeometry->_traversalState = *traversalState;
-    embreeGeometry->_combinedAttributes = combinedAttributes;
-    embreeGeometry->_userGeometryRayCaster = NULL;
-    embreeGeometry->_isUserGeometry = NO;
+    data->_shape = shape;
+    data->_traversalState = *traversalState;
+    data->_combinedAttributes = combinedAttributes;
 
-    rtcSetGeometryUserData(thisGeometry, (void *) embreeGeometry);
+    [self addToUserGeometryList: data];
+
+    rtcSetGeometryUserData(thisGeometry, (void *) data);
 }
 
-- (void) prepareForRayCasting : (ArnRayCaster *) rayCaster {
-    for (id geomID in embreeGeometryIDArray) {
-        int geomIDIntValue = [geomID intValue];
-        RTCGeometry rtcGeometry = rtcGetGeometry(scene, (unsigned int) geomIDIntValue);
-        EmbreeGeometryData * geom_data = (EmbreeGeometryData *)rtcGetGeometryUserData(rtcGeometry);
 
-        if(geom_data) {
-            geom_data->_userGeometryRayCaster = [rayCaster copy];
-
-            // in order to compensate for the rounding error
-            // introduced by casting float values to double
-            // in the 'user geometry' intersect function
-            geom_data->_userGeometryRayCaster->hitEps = 1e-3f;
-        }
-    }
-}
 
 void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
 
     if(!args->geometryUserPtr)
         return;
 
-    const EmbreeGeometryData * geometryData = (const EmbreeGeometryData *) args->geometryUserPtr;
+    const UserGeometryData * geometryData = (const UserGeometryData *) args->geometryUserPtr;
     struct RTCBounds * bounds_o = args->bounds_o;
 
     // calculate the bounding box
@@ -401,11 +372,10 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
     printf("object box - min y: %f\n", bounds_o->lower_y);
     printf("object box - min z: %f\n", bounds_o->lower_z);
     printf("object box - max x: %f\n", bounds_o->upper_x);
-    printf("object box - max y: %f\n", bounds_o->upper_x);
-    printf("object box - max z: %f\n", bounds_o->upper_x);
+    printf("object box - max y: %f\n", bounds_o->upper_y);
+    printf("object box - max z: %f\n", bounds_o->upper_z);
 #endif
 }
-
 
 void embree_intersect_geometry(const int * valid,
                                void * geometryUserPtr,
@@ -417,65 +387,49 @@ void embree_intersect_geometry(const int * valid,
     if(!valid[0])
         return;
 
-    if(rtc_hit) {
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+    ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
 
-        // if the tfar value of the embree ray is smaller than
-        // the tfar value with which it was originally initialized
-        // that must mean that an intersection with a nearer
-        // triangle or quad occured and we don't need to do further raycasting
-        if(rtc_ray->tfar < (float) MATH_HUGE_DOUBLE)
-            return;
+    UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
 
 
-        EmbreeGeometryData * geometryData = (EmbreeGeometryData *) geometryUserPtr;
-        geometryData->_isUserGeometry = YES;
-
-        // in case we hit an inf-sphere
-        // we can omit the raycasting process
-        if([geometryData->_shape isKindOfClass: [ArnInfSphere class]]) {
-            rtc_hit->geomID = geomID;
-            rtc_hit->primID = 0;
-            return;
-        }
-
-        ArIntersectionList * intersectionList = &ARINTERSECTIONLIST_EMPTY;
+    // if the tfar value of the embree ray is smaller than
+    // the tfar value with which it was originally initialized
+    // that must mean that an intersection with a nearer
+    // triangle or quad occured and we don't need to do further raycasting
+    if(rtc_ray->tfar < (float) MATH_HUGE_DOUBLE)
+        return;
 
 
-        // fetch a copy of the ray caster and update it
-        ArnRayCaster * rayCaster = geometryData->_userGeometryRayCaster ;
+    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
-        rayCaster->intersection_test_world_ray3d =
-                RAY3D(PNT3D(rtc_ray->org_x, rtc_ray->org_y, rtc_ray->org_z),
-                      VEC3D(rtc_ray->dir_x, rtc_ray->dir_y, rtc_ray->dir_z));
-        ray3de_init(
-                & rayCaster->intersection_test_world_ray3d,
-                & rayCaster->intersection_test_ray3de
-        );
+    // perform the intersection
+    [geometryData->_combinedAttributes
+            getIntersectionList
+            : rayCaster
+            : RANGE( ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
+            : &intersectionList
+    ];
 
-        // perform the intersection
-        [geometryData->_combinedAttributes
-                getIntersectionList : rayCaster
-                                    : RANGE( ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
-                                    : intersectionList
-        ];
+    if ( ! ARINTERSECTIONLIST_HEAD(intersectionList) )
+        return;
 
+    ArcIntersection * intersection =
+            ARINTERSECTIONLIST_HEAD(intersectionList);
 
-        // we are just interested in the tfar value,
-        // surface normal gets calculated later in the path
-        // tracer loop
-        if(intersectionList->head) {
-            rtc_ray->tfar = (float) intersectionList->head->t;
-            rtc_hit->geomID = geomID;
-            rtc_hit->primID = 0;
-        }
+    // we are just interested in the tfar value,
+    // surface normal gets calculated later in the path
+    // tracer loop
+    if(intersection) {
+        rtc_ray->tfar = (float) intersection->t;
+        rtc_hit->geomID = geomID;
+        rtc_hit->primID = 0;
 
-        // clean-up
-        arintersectionlist_free_contents(intersectionList, geometryData->_userGeometryRayCaster->rayIntersectionFreelist);
-        // RELEASE_OBJECT(rayCaster);
+        rayCaster->embreeIntersection = intersection;
     }
 }
 
-void embree_intersect(const struct RTCIntersectFunctionNArguments* args) {
+void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {
     struct RTCRayHit * rayHit = (struct RTCRayHit *) args->rayhit;
     embree_intersect_geometry(
             args->valid, args->geometryUserPtr, args->geomID,
@@ -503,6 +457,29 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 #endif
     return geomID;
 }
+
+
+- (ArnRayCaster *) getRayCasterFromRayCasterArray {
+    for(int i = 0; i < rayCasterCount; i++) {
+        if(rayCasterArray[i].pthreadID == pthread_self())
+            return rayCasterArray[i].rayCaster;
+    }
+}
+
+- (void) ptreadRayCasterPairSetRayCaster : (ArnRayCaster *) rayCaster {
+    PtreadRayCasterPair pair = { .rayCaster = rayCaster};
+    rayCasterArray[rayCasterCount] = pair;
+    [self increaseRayCasterCount];
+}
+
+- (void) ptreadRayCasterPairSetPThread : (ArnRayCaster *) rayCaster {
+    for(int i = 0; i < rayCasterCount; i++) {
+        if(rayCasterArray[i].rayCaster == rayCaster)
+            rayCasterArray[i].pthreadID = pthread_self();
+    }
+}
+
+
 
 @end // ArnEmbree
 

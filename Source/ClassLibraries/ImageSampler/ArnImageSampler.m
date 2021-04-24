@@ -125,14 +125,6 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
             numberOfRenderThreads
             );
 
-    if([ArnEmbree embreeEnabled]) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        [embree prepareForRayCasting : RAYCASTER];
-
-        // debug
-        embree->referenceRayCaster = RAYCASTER;
-    }
-
     for ( unsigned int i = 0; i < numberOfRenderThreads; i++)
     {
         ARFREELIST_INIT_FOR_TYPE(

@@ -270,7 +270,7 @@ def artist(args_str, scene_dir, output_file_noext, latex_dir):
     output_path = os.path.join(os.path.abspath(latex_dir), output_file_noext)
     
     if not os.path.exists(output_path + '.png'):
-        args = ['artist'] + (' '.join(args_str.split())).split() + ['-b', '-o', output_path]
+        args = ['artist'] + (' '.join(args_str.split())).split() + ['-b', '-o', output_path, '-e']
         args += ['-DSAMPLES=' + str(spp)]
         subprocess.run(args, cwd=scene_dir)
         subprocess.run(['convert',

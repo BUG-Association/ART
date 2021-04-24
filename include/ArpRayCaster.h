@@ -104,7 +104,8 @@ struct ArIntersectionList;
         : (const double) range_end_t
         ;
 
-/* ---------------------------------------------------------------------------
+/* ---------------------------------------------------------------------------// debug
+        printf("pointer to entireScene: %p\n", entireScene);
 
     'getMaterial_at_WorldPnt3D'
 

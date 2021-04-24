@@ -228,6 +228,7 @@ ArPixelID;
 
     ArPathspaceResult  ** sampleValue =
         ALLOC_ARRAY( ArPathspaceResult *, numberOfImagesToWrite );
+
     
     /* ------------------------------------------------------------------
          We render scanlines until there is no unrendered scanline left.

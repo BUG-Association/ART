@@ -86,9 +86,12 @@ ArHashedMailboxEntry;
     // If raycasting with embree is enabled,
     // when the raycaster object is copied
     // for each thread, a reference is stored here to
-    // Embree's RTCScene so that each raycaster
-    // copy can works unhindered
-    RTCScene embreeScene;
+    // the embree scene so that each raycaster
+    // copy can work unhindered
+    RTCScene embreeRTCSceneCopy;
+    ArcIntersection * embreeIntersection;
+    BOOL rayCasterAddedToEmbreeArray;
+    BOOL nonUserGeometryWasHit;
 }
 
 - init
@@ -124,6 +127,16 @@ ArHashedMailboxEntry;
         : (struct ArIntersectionList *) intersectionList
         : (ArNode <ArpRayCasting> *) araWorld
         ;
+
+// test
+- (void) embree_intersect_geometry
+        : (const int *) valid
+        : (void *) geometryUserPtr
+        : (unsigned int) geomID
+        : (unsigned int) instID
+        : (struct RTCRay *) rtc_ray
+        : (struct RTCHit *) rtc_hit
+                ;
 
 
 @end

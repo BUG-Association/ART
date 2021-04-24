@@ -26,8 +26,11 @@
 
 #define ART_MODULE_NAME     ArnRayCaster
 
+#import <ArnInfSphere.h>
 #import "ArnRayCaster.h"
 #import "RayCastingCommonMacros.h"
+
+@class ArnInfSphere;
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
@@ -379,10 +382,17 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         : (ArNode <ArpRayCasting> *) araWorld
 {
     // we must have an RTCScene associated with this ray caster
-    if(!embreeScene) {
+    if(!embreeRTCSceneCopy) {
         ART_ERRORHANDLING_FATAL_ERROR(
                 "method [ArnRayCaster intersectWithEmbree:::] called, without member variable RTCScene being initialized"
         );
+    }
+
+
+    if(!self->rayCasterAddedToEmbreeArray) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        [embree ptreadRayCasterPairSetPThread :self];
+        self->rayCasterAddedToEmbreeArray = YES;
     }
 
     // set up embree intersection context
@@ -406,7 +416,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
 
     // do the intersection
-    rtcIntersect1(embreeScene, &context, &rayhit);
+    rtcIntersect1(embreeRTCSceneCopy, &context, &rayhit);
 
     // if we did not hit anything, we are done here
     if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
@@ -415,13 +425,14 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // else:
     // retrieve further information about the intersected shape ...
     unsigned int geomID = rayhit.hit.geomID;
-    RTCGeometry intersectedRTCGeometry = rtcGetGeometry(embreeScene, geomID);
-    EmbreeGeometryData * userDataGeometry = (EmbreeGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
+    RTCGeometry intersectedRTCGeometry = rtcGetGeometry(embreeRTCSceneCopy, geomID);
+    // EmbreeUserGeometryData * userDataGeometry = (EmbreeUserGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
+    UserGeometryData * geometryData = (UserGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
 
     /*
     // debug
     printf("Found intersection on geometry of type %s with geometryID %d, primitiveID %d at tfar=%f\n",
-           [[userDataGeometry->_shape className] UTF8String],
+           [[geometryData->_shape className] UTF8String],
            rayhit.hit.geomID,
            rayhit.hit.primID,
            rayhit.ray.tfar);
@@ -430,16 +441,22 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // ... and store intersection information in an
     // ArIntersectionList
 
-    self->state = userDataGeometry->_traversalState;
-    self->surfacepoint_test_shape = userDataGeometry->_shape;
+    if(!geometryData->_isUserGeometry) {
+        self->state = geometryData->_traversalState;
+        self->surfacepoint_test_shape = geometryData->_shape;
 
-    arintersectionlist_init_1(
-            intersectionList,
-            rayhit.ray.tfar,
-            0,
-            arface_on_shape_is_planar,
-            userDataGeometry->_shape,
-            self);
+        arintersectionlist_init_1(
+                intersectionList,
+                rayhit.ray.tfar,
+                0,
+                arface_on_shape_is_planar,
+                geometryData->_shape,
+                self);
+    }
+    else {
+        arintersectionlist_append_intersection(intersectionList, self->embreeIntersection);
+        // intersectionList->head = intersectionList->tail = self->embreeIntersection;
+    }
 
 
     // this is some kind of hack: In order to process the individual materials
@@ -457,14 +474,16 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // triangle meshes, quads) we store surface normal and texture coords.
     // for "user defined geometries", these are getting computed further down
     // the path tracer loop
-    if(intersectionList->head && !userDataGeometry->_isUserGeometry) {
+    if(intersectionList->head && !geometryData->_isUserGeometry) {
         SET_OBJECTSPACE_NORMAL(intersectionList->head,
                                VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
+
+        ARCINTERSECTION_FLAG_OBJECTSPACE_NORMAL_AS_VALID(intersectionList->head);
 
         // texture coordinates
         // for some reason, the UV coordinates need to be switched for ART to map the
         // image in the right orientation
-        TEXTURE_COORDS(intersectionList->head) = PNT2D(rayhit.hit.v, rayhit.hit.u);
+        TEXTURE_COORDS(intersectionList->head) = PNT2D(rayhit.hit.u, rayhit.hit.v);
         ARCSURFACEPOINT_FLAG_TEXTURE_COORDS_AS_VALID(intersectionList->head);
     }
 }
@@ -510,6 +529,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     if ( ! ARINTERSECTIONLIST_HEAD(intersectionList) )
         return 0;
+
 
     ArcIntersection * intersection =
             ARINTERSECTIONLIST_HEAD(intersectionList);
@@ -565,7 +585,10 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        embreeScene = [embree getScene];
+        embreeRTCSceneCopy = [embree getScene];
+        self->rayCasterAddedToEmbreeArray = NO;
+        self->embreeIntersection = NULL;
+        [embree ptreadRayCasterPairSetRayCaster: self];
     }
 }
 
@@ -717,6 +740,21 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     intersection_test_ray3de = *temporaryRay3DEStore;
 }
+
+
+
+// test
+- (void) embree_intersect_geometry
+        : (const int *) valid
+        : (void *) geometryUserPtr
+        : (unsigned int) geomID
+        : (unsigned int) instID
+        : (struct RTCRay *) rtc_ray
+        : (struct RTCHit *) rtc_hit
+{
+
+}
+
 
 @end
 

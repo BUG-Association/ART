@@ -57,6 +57,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             :   self
             ];
 
+
     if ( ! ARCINTERSECTION_WORLDSPACE_POINT_IS_VALID(self) )
     {
         Pnt3D  temp;
@@ -66,7 +67,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             & ARCINTERSECTION_OBJECTSPACE_INCOMING_RAY(self),
             & temp
             );
-        
+
         if ( ARCINTERSECTION_TRAFO(self) )
         {
             [ ARCINTERSECTION_TRAFO(self) transformPnt3D
@@ -85,6 +86,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
     if ( ! ARCINTERSECTION_WORLDSPACE_NORMAL_IS_VALID(self) )
     {
+
         if ( ARCINTERSECTION_TRAFO(self) )
         {
             [ ARCINTERSECTION_TRAFO(self) transformNormalVec3D

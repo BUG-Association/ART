@@ -34,43 +34,38 @@
 @class AraCombinedAttributes;
 @class ArcSurfacePoint;
 @class ArnVertexSet;
+@class ArcInteger;
 
 ART_MODULE_INTERFACE(ArnEmbree)
 
-ARARRAY_INTERFACE_FOR_TYPE(ArnRayCaster, arnRayCaster);
 
-typedef enum Embree_state {
-    Embree_Initialized,
-    Scene_Initialized,
-    Scene_Commited,
-    Embree_Released
-} Embree_state;
+typedef struct PtreadRayCasterPair {
+    ArnRayCaster * rayCaster;
+    pthread_t pthreadID;
+}
+PtreadRayCasterPair;
 
-
-@interface EmbreeGeometryData : ArcObject {
-@public
+typedef struct UserGeometryData {
     ArNode<ArpShape> * _shape;
     ArTraversalState _traversalState;
     AraCombinedAttributes * _combinedAttributes;
-    ArnRayCaster * _userGeometryRayCaster;
     BOOL _isUserGeometry;
 }
+UserGeometryData;
 
-@end
+ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 
 @interface ArnEmbree : ArcObject {
     RTCDevice device;
     RTCScene scene;
-    Embree_state state;
-    NSMutableArray * embreeGeometryIDArray;
-@public
-    ArnRayCaster * referenceRayCaster;
+    ArList userGeometryList;
+    int rayCasterCount;
 }
 
 // returning the singleton object
 + (ArnEmbree *) embreeManager;
 
-- (ArnEmbree *) copy;
+- (void) addToUserGeometryList : (UserGeometryData *) data;
 
 + (BOOL) embreeEnabled;
 + (void) enableEmbree: (BOOL) enabled;
@@ -78,18 +73,18 @@ typedef enum Embree_state {
 - (void) setDevice: (RTCDevice) newDevice;
 - (RTCDevice) getDevice;
 - (void) setScene: (RTCScene) newScene;
-- (void) setState: (Embree_state) newState;
 - (RTCScene) getScene;
 - (void) commitScene;
 
-- (void) initGeometryIDArray;
-- (NSMutableArray *) getGeometryIDArray;
-- (void) setGeometryIDArray : (NSMutableArray *) geometryIDArray;
-- (void) addGeometryIDToGeometryIDArray : (unsigned int) id;
+- (int) getRayCasterCount;
+- (int) setRayCasterCount : (int) value;
 
-- (Embree_state) getState;
+- (ArList *) getUserGeometryList;
+- (void) initializeEmptyGeometryList;
+- (void) freeGeometryList;
 
-- (void) prepareForRayCasting : (ArnRayCaster *) rayCaster;
+- (void) increaseRayCasterCount;
+
 
 - (int) initEmbreeSimpleIndexedGeometry: (ArnSimpleIndexedShape *) shape : (ArnVertexSet *) vertexSet;
 - (int) initEmbreeUserGeometry : (ArnShape *) shape;
@@ -107,10 +102,14 @@ typedef enum Embree_state {
         : (AraCombinedAttributes *) combinedAttributes
         ;
 
+- (ArnRayCaster *) getRayCasterFromRayCasterArray;
+
+- (void) ptreadRayCasterPairSetRayCaster : (ArnRayCaster *) rayCaster;
+- (void) ptreadRayCasterPairSetPThread : (ArnRayCaster *) rayCaster;
+
 + (void) cleanUp;
 
 @end
-
 
 #endif // EMBREE_INSTALLED
 

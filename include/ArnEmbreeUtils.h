@@ -70,7 +70,6 @@ typedef enum Embree_state {
 - (void) setGeometryListHead: (ArEmbreeGeometryNode *) geometry;
 - (void) addGeometry: (RTCGeometry *) newGeometry;
 - (void) commitScene;
-- (void) setState: (Embree_state) newState;
 
 - (RTCDevice *) getDevice;
 - (RTCScene *) getScene;
