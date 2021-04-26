@@ -35,6 +35,7 @@
 @class ArcSurfacePoint;
 @class ArnVertexSet;
 @class ArcInteger;
+@class ArnTriangleMesh;
 
 ART_MODULE_INTERFACE(ArnEmbree)
 
@@ -86,8 +87,21 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 - (void) increaseRayCasterCount;
 
 
-- (int) initEmbreeSimpleIndexedGeometry: (ArnSimpleIndexedShape *) shape : (ArnVertexSet *) vertexSet;
-- (int) initEmbreeUserGeometry : (ArnShape *) shape;
+- (RTCGeometry) initEmbreeSimpleIndexedGeometry
+        : (ArNode<ArpShape> *) shape
+        : (ArnVertexSet *) vertexSet
+        : (ArNode *) trafo
+        ;
+
+- (int) initEmbreeGeometry
+        : (ArNode <ArpShape> *) shape
+        : (ArTraversalState *) traversalState
+        : (AraCombinedAttributes *) combinedAttributes
+        : (ArnVertexSet *) vertexSet
+        : (ArNode *) trafo
+        ;
+
+/*
 - (int) initEmbreeTriangleMeshGeometry
         : (ArnShape *) shape
         : (Pnt3D *) vertices
@@ -95,8 +109,17 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
         : (ArLongArray *) faces
         : (long) numberOfFaces
         ;
+        */
+// test
+- (RTCGeometry) initEmbreeTriangleMeshGeometry
+        : (ArNode<ArpShape> *) shape
+        : (ArnVertexSet *) vertexSet
+        : (ArNode *) trafo
+        ;
+
 - (int) addGeometry: (RTCGeometry) newGeometry;
 - (void) setGeometryUserData
+        : (RTCGeometry) newGeometry
         : (ArNode <ArpShape> *) shape
         : (ArTraversalState *) traversalState
         : (AraCombinedAttributes *) combinedAttributes
@@ -108,6 +131,7 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 - (void) ptreadRayCasterPairSetPThread : (ArnRayCaster *) rayCaster;
 
 + (void) cleanUp;
+
 
 @end
 

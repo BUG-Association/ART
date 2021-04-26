@@ -60,6 +60,9 @@ ART_MODULE_INTERFACE(ArnTriangleMesh)
         : (Pnt3D) maxPoint_
         ;
 
+// for embree
+- (ArLongArray) getFaceArray;
+
 @end
 
 // Triangle mesh init function from file.
@@ -75,6 +78,8 @@ ArNode  * arntrianglemesh_from_ply(
         ArShapeGeometry    newGeometry,
         const char       * pathToPlyFile
         );
+
+
 
 
 // ===========================================================================

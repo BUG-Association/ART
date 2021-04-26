@@ -41,6 +41,9 @@ ART_MODULE_INTERFACE(ArcIntersection)
     double  worldspace_cosine;
     Ray3D   worldspace_incoming_ray;
     Ray3D   objectspace_incoming_ray;
+
+    // test
+    BOOL    embreeShapeUserGeometry;
 #ifdef WITH_RSA_STATISTICS
     unsigned int  intersectionTests;
     unsigned int  traversalSteps;

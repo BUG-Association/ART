@@ -30,6 +30,7 @@
 #import <ArnEmbree.h>
 #import <RayCastingCommonMacros.h>
 #import <ARM_RayCasting.h>
+#import <ArnTriangleMesh.h>
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
@@ -55,7 +56,7 @@ static ArnEmbree * embreeManager;
 static PtreadRayCasterPair rayCasterArray[THREAD_MAX];
 
 
-#define EMBREE_DEBUG_PRINT
+// #define EMBREE_DEBUG_PRINT
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
@@ -177,12 +178,25 @@ static PtreadRayCasterPair rayCasterArray[THREAD_MAX];
     return (int) geomID;
 }
 
-- (int) initEmbreeSimpleIndexedGeometry
-        : (ArnSimpleIndexedShape *) shape
+- (RTCGeometry) initEmbreeSimpleIndexedGeometry
+        : (ArNode<ArpShape> *) shape
         : (ArnVertexSet *) vertexSet
+        : (ArNode *) trafo
 {
-    RTCGeometry newGeometry;
+    id trafoToUse = trafo;
+    if ( trafo && ! [ trafo isMemberOfClass: [ ArnHTrafo3D class ] ] )
+    {
+        trafoToUse =
+                [ (ArNode <ArpTrafo3D> *)trafo reduceToSingleHTrafo3D ];
+    }
 
+
+    RTCGeometry newGeometry = NULL;
+    ArnSimpleIndexedShape * simpleIndexedShape =
+            (ArnSimpleIndexedShape *) shape;
+
+    // if the shape is a triangle, create a new geometry buffer with type
+    // RTC_GEOMETRY_TYPE_TRIANGLE
     if([shape isKindOfClass: [ArnTriangle class]]) {
         newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
         float * vertices = (float *) rtcSetNewGeometryBuffer(newGeometry,
@@ -200,19 +214,34 @@ static PtreadRayCasterPair rayCasterArray[THREAD_MAX];
                                                                   1);
 
 
-        int iterator = -1;
-        for(int i = 0; i < ARARRAY_SIZE(shape->indexTable); i++) {
-            long currentIndex = ARARRAY_I(shape->indexTable, i);
+        int index = -1;
+        for(int i = 0; i < ARARRAY_SIZE(simpleIndexedShape->indexTable); i++) {
+            long currentIndex = ARARRAY_I(simpleIndexedShape->indexTable, i);
             Pnt3D currentPoint = ARARRAY_I(vertexSet->pointTable, currentIndex);
 
-            vertices[++iterator] = (float) currentPoint.c.x[0];
-            vertices[++iterator] = (float) currentPoint.c.x[1];
-            vertices[++iterator] = (float) currentPoint.c.x[2];
+            if(!trafo)
+            {
+                vertices[++index] = (float) currentPoint.c.x[0];
+                vertices[++index] = (float) currentPoint.c.x[1];
+                vertices[++index] = (float) currentPoint.c.x[2];
+            }
+            else
+            {
+                Pnt3D transformedPoint;
+
+                [trafoToUse transformPnt3D : &currentPoint : &transformedPoint ];
+
+                vertices[++index] = (float) transformedPoint.c.x[0];
+                vertices[++index] = (float) transformedPoint.c.x[1];
+                vertices[++index] = (float) transformedPoint.c.x[2];
+            }
 
             indices[i] = (unsigned int) i;
         }
     }
 
+    // else, if the shape is a triangle, create a new geometry buffer with type
+    // RTC_GEOMETRY_TYPE_QUAD
     else if([shape isKindOfClass: [ArnQuadrangle class]]) {
         newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_QUAD);
         float * vertices = (float *) rtcSetNewGeometryBuffer(newGeometry,
@@ -230,36 +259,62 @@ static PtreadRayCasterPair rayCasterArray[THREAD_MAX];
                                                                 1);
 
 
-        int iterator = -1;
-        for(int i = 0; i < ARARRAY_SIZE(shape->indexTable); i++) {
-            long currentIndex = ARARRAY_I(shape->indexTable, i);
+        int index = -1;
+        for(int i = 0; i < ARARRAY_SIZE(simpleIndexedShape->indexTable); i++) {
+            long currentIndex = ARARRAY_I(simpleIndexedShape->indexTable, i);
             Pnt3D currentPoint = ARARRAY_I(vertexSet->pointTable, currentIndex);
 
-            vertices[++iterator] = (float) currentPoint.c.x[0];
-            vertices[++iterator] = (float) currentPoint.c.x[1];
-            vertices[++iterator] = (float) currentPoint.c.x[2];
+            if(!trafo)
+            {
+                vertices[++index] = (float) currentPoint.c.x[0];
+                vertices[++index] = (float) currentPoint.c.x[1];
+                vertices[++index] = (float) currentPoint.c.x[2];
+            }
+            else
+            {
+                Pnt3D transformedPoint;
+
+                [trafoToUse transformPnt3D : &currentPoint : &transformedPoint ];
+
+                vertices[++index] = (float) transformedPoint.c.x[0];
+                vertices[++index] = (float) transformedPoint.c.x[1];
+                vertices[++index] = (float) transformedPoint.c.x[2];
+            }
 
             indices[i] = (unsigned int) i;
         }
     }
 
-    int geomID = [self addGeometry: newGeometry];
-
 #ifdef EMBREE_DEBUG_PRINT
     printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
 #endif
-    return geomID;
+    return newGeometry;
 }
 
 
-- (int) initEmbreeTriangleMeshGeometry
-        : (ArnShape *) shape
-        : (Pnt3D *) vertices
-        : (long) numberOfVertices
-        : (ArLongArray *) faces
-        : (long) numberOfFaces
+- (RTCGeometry) initEmbreeTriangleMeshGeometry
+          : (ArNode<ArpShape> *) shape
+          : (ArnVertexSet *) vertexSet
+          : (ArNode *) trafo
 {
+    id trafoToUse = trafo;
+    if ( trafo && ! [ trafo isMemberOfClass: [ ArnHTrafo3D class ] ] )
+    {
+        trafoToUse =
+                [ (ArNode <ArpTrafo3D> *)trafo reduceToSingleHTrafo3D ];
+    }
+
+    // init embree geometry
     RTCGeometry embreeMesh = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
+
+    // fetch vertex array
+    ArPnt3DArray vertices = vertexSet->pointTable;
+    unsigned long numberOfVertices = arpnt3darray_size(&vertices);
+
+    // fetch index array
+    ArnTriangleMesh * triangleMesh = (ArnTriangleMesh *) shape;
+    ArLongArray faces = [triangleMesh getFaceArray];
+    unsigned long numberOfIndices = arlongarray_size(&faces);
 
     // first set up geometry buffers for vertices and indeces
     float * embreeMeshVertices = (float *) rtcSetNewGeometryBuffer(embreeMesh,
@@ -273,42 +328,52 @@ static PtreadRayCasterPair rayCasterArray[THREAD_MAX];
                                                                         0,
                                                                         RTC_FORMAT_UINT3,
                                                                         3 * sizeof(unsigned),
-                                                                        numberOfFaces);
+                                                                        numberOfIndices);
 
     // fill up embree vertex buffer
-    int index = 0;
+    int index = -1;
     for (int i = 0; i < numberOfVertices; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            embreeMeshVertices[index] = (float) vertices[i].c.x[j];
-            index++;
+
+        if(!trafo) {
+            embreeMeshVertices[++index] = (float) vertices.content->array[i].c.x[0];
+            embreeMeshVertices[++index] = (float) vertices.content->array[i].c.x[1];
+            embreeMeshVertices[++index] = (float) vertices.content->array[i].c.x[2];
         }
+        else {
+            Pnt3D transformedPoint;
+
+            [trafoToUse transformPnt3D : &vertices.content->array[i] : &transformedPoint ];
+
+            embreeMeshVertices[++index] = (float) transformedPoint.c.x[0];
+            embreeMeshVertices[++index] = (float) transformedPoint.c.x[1];
+            embreeMeshVertices[++index] = (float) transformedPoint.c.x[2];
+        }
+
     }
 
     // fill up embree index buffer
-    for (int i = 0; i < (numberOfFaces * 3); ++i) {
-        embreeMeshIndices[i] = (unsigned int) faces->content->array[i];
+    for (int i = 0; i < numberOfIndices; i++) {
+        embreeMeshIndices[i] = (unsigned int) faces.content->array[i];
     }
-
-    int geomID = [self addGeometry: embreeMesh];
 
 #ifdef EMBREE_DEBUG_PRINT
     printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
 #endif
-    return geomID;
+    return embreeMesh;
 }
 
-
+// create a struct containing all the information that is needed
+// for user geometry ray casting and pass it as
+// user geometry pointer to the corresponding embree geometry
 - (void) setGeometryUserData
+        : (RTCGeometry) thisGeometry
         : (ArNode <ArpShape> *) shape
         : (ArTraversalState *) traversalState
         : (AraCombinedAttributes *) combinedAttributes
 {
-    RTCGeometry thisGeometry = NULL;
     struct UserGeometryData * data = malloc(sizeof(struct UserGeometryData));
 
     if([shape isKindOfClass: [ArnShape class]]) {
-        ArnShape * arnShape = (ArnShape *) shape;
-        thisGeometry = rtcGetGeometry(scene, (unsigned int) arnShape->embreeGeomID);
         if([shape isKindOfClass: [ArnTriangleMesh class]])
             data->_isUserGeometry = NO;
         else
@@ -316,8 +381,6 @@ static PtreadRayCasterPair rayCasterArray[THREAD_MAX];
     }
 
     else if(([shape isKindOfClass: [ArnSimpleIndexedShape class]])) {
-        ArnSimpleIndexedShape * arnSimpleIndexedShape = (ArnSimpleIndexedShape *) shape;
-        thisGeometry = rtcGetGeometry(scene, (unsigned int) arnSimpleIndexedShape->embreeGeomID);
         data->_isUserGeometry = NO;
     }
 
@@ -389,19 +452,22 @@ void embree_intersect_geometry(const int * valid,
 
     ArnEmbree * embree = [ArnEmbree embreeManager];
     ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
-
     UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
 
 
-    // if the tfar value of the embree ray is smaller than
-    // the tfar value with which it was originally initialized
-    // that must mean that an intersection with a nearer
-    // triangle or quad occured and we don't need to do further raycasting
-    if(rtc_ray->tfar < (float) MATH_HUGE_DOUBLE)
-        return;
-
+    // filter intersection points:
+    // if a previous hit point lies on a shape
+    // that is not defined as an embree user geometry
+    // we return
+    if(rtc_ray->tfar < (float) MATH_HUGE_DOUBLE) {
+        RTCGeometry prevIntersectedGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
+        UserGeometryData * prevGeometryData = (UserGeometryData *) rtcGetGeometryUserData(prevIntersectedGeometry);
+        if(!prevGeometryData->_isUserGeometry)
+            return;
+    }
 
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
+
 
     // perform the intersection
     [geometryData->_combinedAttributes
@@ -411,21 +477,16 @@ void embree_intersect_geometry(const int * valid,
             : &intersectionList
     ];
 
-    if ( ! ARINTERSECTIONLIST_HEAD(intersectionList) )
-        return;
-
-    ArcIntersection * intersection =
-            ARINTERSECTIONLIST_HEAD(intersectionList);
-
     // we are just interested in the tfar value,
     // surface normal gets calculated later in the path
     // tracer loop
-    if(intersection) {
-        rtc_ray->tfar = (float) intersection->t;
+    if(intersectionList.head) {
+        rtc_ray->tfar = (float) intersectionList.head->t;
         rtc_hit->geomID = geomID;
         rtc_hit->primID = 0;
 
-        rayCaster->embreeIntersection = intersection;
+        intersectionList.head->embreeShapeUserGeometry = YES;
+        rayCaster->embreeIntersection = intersectionList.head;
     }
 }
 
@@ -444,21 +505,41 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
             NULL);
 }
 
-- (int) initEmbreeUserGeometry : (ArnShape *) shape {
-    RTCGeometry newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_USER);
-    rtcSetGeometryBoundsFunction(newGeometry, embree_bbox, NULL);
-    rtcSetGeometryIntersectFunction(newGeometry, embree_intersect);
-    rtcSetGeometryOccludedFunction(newGeometry, embree_occluded);
-    rtcSetGeometryUserPrimitiveCount(newGeometry, 1);
+// initialization of an embree geometry
+- (int) initEmbreeGeometry
+        : (ArNode <ArpShape> *) shape
+        : (ArTraversalState *) traversalState
+        : (AraCombinedAttributes *) combinedAttributes
+        : (ArnVertexSet *) vertexSet
+        : (ArNode *) trafo
+{
+    RTCGeometry newGeometry;
+
+    if([shape isKindOfClass: [ArnTriangleMesh class]]) {
+        newGeometry = [self initEmbreeTriangleMeshGeometry: shape : vertexSet :trafo];
+    }
+    else if([shape isKindOfClass: [ArnSimpleIndexedShape class]]) {
+        newGeometry = [self initEmbreeSimpleIndexedGeometry: shape : vertexSet :trafo];
+    }
+    else {
+        newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_USER);
+        rtcSetGeometryBoundsFunction(newGeometry, embree_bbox, NULL);
+        rtcSetGeometryIntersectFunction(newGeometry, embree_intersect);
+        rtcSetGeometryOccludedFunction(newGeometry, embree_occluded);
+        rtcSetGeometryUserPrimitiveCount(newGeometry, 1);
+    }
 
     int geomID = [self addGeometry: newGeometry];
+    [self setGeometryUserData :newGeometry :shape :traversalState :combinedAttributes];
+
 #ifdef EMBREE_DEBUG_PRINT
     printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
 #endif
     return geomID;
 }
 
-
+// does a linear search in the static raycaster array
+// and returns the raycaster object with the matching pthread id
 - (ArnRayCaster *) getRayCasterFromRayCasterArray {
     for(int i = 0; i < rayCasterCount; i++) {
         if(rayCasterArray[i].pthreadID == pthread_self())

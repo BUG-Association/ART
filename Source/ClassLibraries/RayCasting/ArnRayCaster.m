@@ -379,7 +379,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 - (ArcIntersection *) getIntersectionListWithEmbree
         : (Range) range_of_t
         : (struct ArIntersectionList *) intersectionList
-        : (ArNode <ArpRayCasting> *) araWorld
 {
     // we must have an RTCScene associated with this ray caster
     if(!embreeRTCSceneCopy) {
@@ -387,7 +386,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
                 "method [ArnRayCaster intersectWithEmbree:::] called, without member variable RTCScene being initialized"
         );
     }
-
 
     if(!self->rayCasterAddedToEmbreeArray) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
@@ -426,7 +424,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // retrieve further information about the intersected shape ...
     unsigned int geomID = rayhit.hit.geomID;
     RTCGeometry intersectedRTCGeometry = rtcGetGeometry(embreeRTCSceneCopy, geomID);
-    // EmbreeUserGeometryData * userDataGeometry = (EmbreeUserGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
     UserGeometryData * geometryData = (UserGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
 
     /*
@@ -452,23 +449,12 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
                 arface_on_shape_is_planar,
                 geometryData->_shape,
                 self);
+
+        intersectionList->head->embreeShapeUserGeometry = NO;
     }
     else {
         arintersectionlist_append_intersection(intersectionList, self->embreeIntersection);
-        // intersectionList->head = intersectionList->tail = self->embreeIntersection;
     }
-
-
-    // this is some kind of hack: In order to process the individual materials
-    // correctly, the function 'getIntersectionList' of AraWorld offers the right
-    // functionality. Please don't be confused, no ray-tracing is done here,
-    // just the processing of the materials
-    [ araWorld getIntersectionList
-            :   self
-            :   range_of_t // serves as dummy here
-            :   intersectionList
-    ];
-
 
     // if the geometry that was hit is not a "user defined geometry" (triangles,
     // triangle meshes, quads) we store surface normal and texture coords.
@@ -510,7 +496,8 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     ArIntersectionList  intersectionList = ARINTERSECTIONLIST_EMPTY;
 
     // if embree is enabled,
-    // find the intersection via embree and return
+    // find the intersection via embree
+    /*
     if([ArnEmbree embreeEnabled])
     {
         [ self getIntersectionListWithEmbree
@@ -519,13 +506,14 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
                 : geometryToIntersectRayWith
         ];
     }
-    else {
+     */
+    // else {
         [geometryToIntersectRayWith getIntersectionList
                 :self
                 :range
                 :&intersectionList
         ];
-    }
+    // }
 
     if ( ! ARINTERSECTIONLIST_HEAD(intersectionList) )
         return 0;

@@ -319,6 +319,7 @@ ArNode * arntrianglemesh_from_ply(
                     :   maxPoint
             ];
 
+    /*
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
         thisMesh->embreeGeomID = [embree initEmbreeTriangleMeshGeometry
@@ -329,6 +330,8 @@ ArNode * arntrianglemesh_from_ply(
                                     : numberOfFaces
                                 ];
     }
+     */
+
     //   Before we return the triangle mesh we need to apply the vertex set
     //   on it.
 
@@ -789,6 +792,11 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
     RELEASE_OBJECT(leafBBoxes);
 
     return;
+}
+
+
+- (ArLongArray) getFaceArray {
+    return faces;
 }
 
 

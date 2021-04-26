@@ -51,6 +51,9 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         :   phaseInterfaceCache
         ];
 
+
+    BOOL embreeEnabled = [ArnEmbree embreeEnabled];
+
     if ( ! ARCINTERSECTION_OBJECTSPACE_NORMAL_IS_VALID(self) )
         [ (ArNode <ArpShapeRayCasting> *)ARCINTERSECTION_SHAPE(self)
             calculateLocalNormalForIntersection
@@ -70,10 +73,18 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
         if ( ARCINTERSECTION_TRAFO(self) )
         {
-            [ ARCINTERSECTION_TRAFO(self) transformPnt3D
-                : & temp
-                : & ARCINTERSECTION_WORLDSPACE_POINT(self)
+            if( embreeEnabled && !self->embreeShapeUserGeometry )
+            {
+                ARCINTERSECTION_WORLDSPACE_POINT(self) =
+                        temp;
+            }
+            else
+            {
+                [ ARCINTERSECTION_TRAFO(self) transformPnt3D
+                        : & temp
+                        : & ARCINTERSECTION_WORLDSPACE_POINT(self)
                 ];
+            }
         }
         else
         {
@@ -84,15 +95,25 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         ARCINTERSECTION_FLAG_WORLD_POINT_AS_VALID(self);
     }
 
+
     if ( ! ARCINTERSECTION_WORLDSPACE_NORMAL_IS_VALID(self) )
     {
 
         if ( ARCINTERSECTION_TRAFO(self) )
         {
-            [ ARCINTERSECTION_TRAFO(self) transformNormalVec3D
-                : & ARCINTERSECTION_OBJECTSPACE_NORMAL(self)
-                : & ARCINTERSECTION_WORLDSPACE_NORMAL(self)
+
+            if(embreeEnabled && !self->embreeShapeUserGeometry)
+            {
+                ARCINTERSECTION_WORLDSPACE_NORMAL(self) =
+                        ARCINTERSECTION_OBJECTSPACE_NORMAL(self);
+            }
+            else
+            {
+                [ ARCINTERSECTION_TRAFO(self) transformNormalVec3D
+                        : & ARCINTERSECTION_OBJECTSPACE_NORMAL(self)
+                        : & ARCINTERSECTION_WORLDSPACE_NORMAL(self)
                 ];
+            }
         }
         else
         {

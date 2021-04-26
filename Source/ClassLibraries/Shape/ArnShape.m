@@ -207,17 +207,6 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
     }
     else
         box3d_ca_add_b(extremalCrdTable, 6, outBoxObjectspace);
-
-    /*
-    // debug
-    printf("bounding box\n");
-    printf("object box - min x: %f\n", outBoxObjectspace->min.c.x[0]);
-    printf("object box - min y: %f\n", outBoxObjectspace->min.c.x[1]);
-    printf("object box - min z: %f\n", outBoxObjectspace->min.c.x[2]);
-    printf("object box - max x: %f\n", outBoxObjectspace->max.c.x[0]);
-    printf("object box - max y: %f\n", outBoxObjectspace->max.c.x[1]);
-    printf("object box - max z: %f\n", outBoxObjectspace->max.c.x[2]);
-     */
 }
 
 ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
@@ -239,13 +228,8 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-
-        // triangle meshes should already be initialized for embree
-        // at this point
-        if(![self isKindOfClass: [ArnTriangleMesh class]]) {
-            embreeGeomID = [embree initEmbreeUserGeometry: self];
-        }
-        [embree setGeometryUserData: self : &traversal->state : result];
+        ArnVertexSet * vertexSet = (ArnVertexSet *)ARNGT_VERTICES(traversal);
+        embreeGeomID = [embree initEmbreeGeometry :self : &traversal->state :result :vertexSet :ARNGT_TRAFO(traversal)];
     }
 
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)

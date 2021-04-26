@@ -125,19 +125,7 @@ ArHashedMailboxEntry;
 - (ArcIntersection *) getIntersectionListWithEmbree
         : (Range) range_of_t
         : (struct ArIntersectionList *) intersectionList
-        : (ArNode <ArpRayCasting> *) araWorld
         ;
-
-// test
-- (void) embree_intersect_geometry
-        : (const int *) valid
-        : (void *) geometryUserPtr
-        : (unsigned int) geomID
-        : (unsigned int) instID
-        : (struct RTCRay *) rtc_ray
-        : (struct RTCHit *) rtc_hit
-                ;
-
 
 @end
 

@@ -270,6 +270,7 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraCombinedAttributes)
 
     INTERSECTION_TEST_DEBUG_CALLING_SUBNODE(SUBNODE,"");
 
+
     if ( TRAFO )
     {
         ArNodeRef  trafoStore;
