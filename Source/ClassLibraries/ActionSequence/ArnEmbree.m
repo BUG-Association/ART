@@ -440,6 +440,7 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
 #endif
 }
 
+// intersection callback function
 void embree_intersect_geometry(const int * valid,
                                void * geometryUserPtr,
                                unsigned int geomID,
@@ -450,26 +451,38 @@ void embree_intersect_geometry(const int * valid,
     if(!valid[0])
         return;
 
+    // retreive raycaster and geometry data
     ArnEmbree * embree = [ArnEmbree embreeManager];
     ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
     UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
-
 
     // filter intersection points:
     // if a previous hit point lies on a shape
     // that is not defined as an embree user geometry
     // we return
-    if(rtc_ray->tfar < (float) MATH_HUGE_DOUBLE) {
+
+    // make it right at the beginning
+    /*
+#warning adapt tfar value
+    // if(rtc_ray->tfar < (float) MATH_HUGE_DOUBLE) {
+    if(rtc_ray->tfar <= 1.E20f) {
+        RTCGeometry prevIntersectedGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
+        UserGeometryData * prevGeometryData = (UserGeometryData *) rtcGetGeometryUserData(prevIntersectedGeometry);
+        if(!prevGeometryData->_isUserGeometry)
+            return;
+    }
+    assert(0);
+    */
+
+    if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
         RTCGeometry prevIntersectedGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
         UserGeometryData * prevGeometryData = (UserGeometryData *) rtcGetGeometryUserData(prevIntersectedGeometry);
         if(!prevGeometryData->_isUserGeometry)
             return;
     }
 
-    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
-
-
     // perform the intersection
+    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
     [geometryData->_combinedAttributes
             getIntersectionList
             : rayCaster

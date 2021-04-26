@@ -406,8 +406,11 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     rayhit.ray.dir_y = (float) self->intersection_test_world_ray3d.vector.c.x[1];
     rayhit.ray.dir_z = (float) self->intersection_test_world_ray3d.vector.c.x[2];
     rayhit.ray.id = self->rayID;
+
+#warning Find a more suitable value for tfar
     rayhit.ray.tnear = (float) range_of_t.min + 1e-3f; // the offset is for compensating the rounding error when casting from double to float
-    rayhit.ray.tfar = (float) range_of_t.max;
+   // rayhit.ray.tfar = (float) range_of_t.max;
+    rayhit.ray.tfar = INFINITY;
     rayhit.ray.mask = (unsigned int) -1;
     rayhit.ray.flags = 0;
     rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
