@@ -278,6 +278,12 @@ void arintersectionlist_free_contents(
         ArcFreelist         * intersection_freelist
         );
 
+
+ArcIntersection * arintersectionlist_extract_head(
+        ArIntersectionList  * list,
+        ArcFreelist         * intersection_freelist
+        );
+
 /* ---------------------------------------------------------------------------
     'arintersectionlist_init_2'
     Generates a intersectionlist of up to 2 intersections.

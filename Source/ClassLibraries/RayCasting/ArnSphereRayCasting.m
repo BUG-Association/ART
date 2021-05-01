@@ -58,7 +58,6 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
         : (Range) range_of_t
         : (struct ArIntersectionList *) intersectionList
 {
-
     // debugprintf("ArnSphere \n");
     // ray3d_r_debugprintf(&WORLDSPACE_RAY);
     // ray3d_r_debugprintf(&OBJECTSPACE_RAY);

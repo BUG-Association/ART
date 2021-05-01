@@ -75,7 +75,7 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 - (RTCDevice) getDevice;
 - (void) setScene: (RTCScene) newScene;
 - (RTCScene) getScene;
-- (void) commitScene;
++ (void) commitScene;
 
 - (int) getRayCasterCount;
 - (int) setRayCasterCount : (int) value;
@@ -110,7 +110,7 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
         : (long) numberOfFaces
         ;
         */
-// test
+
 - (RTCGeometry) initEmbreeTriangleMeshGeometry
         : (ArNode<ArpShape> *) shape
         : (ArnVertexSet *) vertexSet
@@ -132,7 +132,8 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 
 + (void) cleanUp;
 
-
+- (void) resetCount;
+- (int) getCount;
 @end
 
 #endif // EMBREE_INSTALLED

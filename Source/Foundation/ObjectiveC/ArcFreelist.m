@@ -87,8 +87,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
                 :   instanceActivationMethod
         ];
 
-
-
 //   uncomment this to see tons of debug output about which instances
 //   get requested from the freelist
 

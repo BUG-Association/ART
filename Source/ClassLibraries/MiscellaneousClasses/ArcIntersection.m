@@ -44,6 +44,21 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
+- copy
+{
+    /*
+    ArcIntersection  * copiedInstance = [ super copy ];
+
+    copiedInstance->t = t;
+    copiedInstance->worldspace_cosine = worldspace_cosine;
+    copiedInstance->worldspace_incoming_ray = worldspace_incoming_ray;
+    copiedInstance->objectspace_incoming_ray = objectspace_incoming_ray;
+    copiedInstance->embreeShapeUserGeometry = embreeShapeUserGeometry;
+
+    return copiedInstance;
+     */
+}
+
 - (void) prepareForUse
         : (ArcPhaseInterfaceCache *) phaseInterfaceCache
 {

@@ -142,11 +142,11 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnGraphTraversal)
     // My guess is that during the rendering with embree, the ray caster(s)
     // do not make use of variables and bbox_cache anyway, so they do not
     // get initialized.
-    if(![ArnEmbree embreeEnabled])
-    {
+    // if(![ArnEmbree embreeEnabled])
+    //{
         RELEASE_OBJECT(VARIABLES);
         RELEASE_OBJECT(BBOX_CACHE);
-    }
+    //}
 
     [ super dealloc ];
 }

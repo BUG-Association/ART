@@ -43,6 +43,27 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
+- copy
+{
+    /*
+    ArcSurfacePoint * copiedInstance = [super copy];
+
+    copiedInstance->sp_status_flags = sp_status_flags;
+    copiedInstance->texture_coordinates = texture_coordinates;
+    copiedInstance->objectspace_normal = objectspace_normal;
+    copiedInstance->worldspace_normal = worldspace_normal;
+
+    copiedInstance->surfaceType = surfaceType;
+    copiedInstance->faceOnShape = faceOnShape;
+    copiedInstance->shape = shape;
+    copiedInstance->materialInsideRef = materialInsideRef;
+    copiedInstance->materialOutsideRef = materialOutsideRef;
+    copiedInstance->phaseInterface = phaseInterface;
+
+    return copiedInstance;
+     */
+}
+
 - (void) prepareForUse
         : (ArcPhaseInterfaceCache *) phaseInterfaceCache
 {

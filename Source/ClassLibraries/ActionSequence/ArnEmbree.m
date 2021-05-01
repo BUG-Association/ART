@@ -31,6 +31,7 @@
 #import <RayCastingCommonMacros.h>
 #import <ARM_RayCasting.h>
 #import <ArnTriangleMesh.h>
+#import <unistd.h>
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
@@ -53,7 +54,7 @@ void errorFunction(void* userPtr, enum RTCError error, const char* str) {
 // initializing embree geometries and such
 static BOOL EMBREE_ENABLED;
 static ArnEmbree * embreeManager;
-static PtreadRayCasterPair rayCasterArray[THREAD_MAX];
+static ArnRayCaster * rayCasterArray[THREAD_MAX];
 
 
 // #define EMBREE_DEBUG_PRINT
@@ -166,9 +167,11 @@ static PtreadRayCasterPair rayCasterArray[THREAD_MAX];
     return scene;
 }
 
-- (void) commitScene {
-    rtcCommitScene(scene);
-    rtcSetSceneFlags(scene, RTC_SCENE_FLAG_COMPACT);
++ (void) commitScene {
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+
+    rtcCommitScene([embree getScene]);
+    rtcSetSceneFlags([embree getScene], RTC_SCENE_FLAG_COMPACT);
 }
 
 - (int) addGeometry: (RTCGeometry) newGeometry  {
@@ -393,8 +396,6 @@ static PtreadRayCasterPair rayCasterArray[THREAD_MAX];
     rtcSetGeometryUserData(thisGeometry, (void *) data);
 }
 
-
-
 void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
 
     if(!args->geometryUserPtr)
@@ -439,6 +440,13 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
     printf("object box - max z: %f\n", bounds_o->upper_z);
 #endif
 }
+static int callCount = 0;
+- (void) resetCount {
+    callCount = 0;
+}
+- (int) getCount {
+    return callCount;
+}
 
 // intersection callback function
 void embree_intersect_geometry(const int * valid,
@@ -448,6 +456,10 @@ void embree_intersect_geometry(const int * valid,
                                struct RTCRay * rtc_ray,
                                struct RTCHit * rtc_hit)
 {
+    callCount++;
+
+    // printf("count: %d\n", callCount);
+
     if(!valid[0])
         return;
 
@@ -460,20 +472,6 @@ void embree_intersect_geometry(const int * valid,
     // if a previous hit point lies on a shape
     // that is not defined as an embree user geometry
     // we return
-
-    // make it right at the beginning
-    /*
-#warning adapt tfar value
-    // if(rtc_ray->tfar < (float) MATH_HUGE_DOUBLE) {
-    if(rtc_ray->tfar <= 1.E20f) {
-        RTCGeometry prevIntersectedGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
-        UserGeometryData * prevGeometryData = (UserGeometryData *) rtcGetGeometryUserData(prevIntersectedGeometry);
-        if(!prevGeometryData->_isUserGeometry)
-            return;
-    }
-    assert(0);
-    */
-
     if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
         RTCGeometry prevIntersectedGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
         UserGeometryData * prevGeometryData = (UserGeometryData *) rtcGetGeometryUserData(prevIntersectedGeometry);
@@ -490,17 +488,33 @@ void embree_intersect_geometry(const int * valid,
             : &intersectionList
     ];
 
-    // we are just interested in the tfar value,
-    // surface normal gets calculated later in the path
-    // tracer loop
-    if(intersectionList.head) {
-        rtc_ray->tfar = (float) intersectionList.head->t;
-        rtc_hit->geomID = geomID;
-        rtc_hit->primID = 0;
+    // only first hit will be considered
+    // so we free everything from the intersection list
+    // that is not the head
+    /*
+    while (intersectionList->head != intersectionList->tail)
+        arintersectionlist_remove_tail(intersectionList,
+                                       rayCaster->rayIntersectionFreelist
+        );
+    */
 
-        intersectionList.head->embreeShapeUserGeometry = YES;
-        rayCaster->embreeIntersection = intersectionList.head;
+    if(!intersectionList.head) {
+        return;
     }
+
+    // update embree components
+    rtc_ray->tfar = (float) intersectionList.head->t;
+    rtc_hit->geomID = geomID;
+    rtc_hit->primID = 0;
+
+    // send closest intersection to ray caster
+    /*
+    arintersectionlist_append(intersectionList,
+                              rayCaster->embreeIntersectionList,
+                              rayCaster->rayIntersectionFreelist);
+                              */
+    arintersectionlist_free_contents(rayCaster->embreeIntersectionList, rayCaster->rayIntersectionFreelist);
+    *rayCaster->embreeIntersectionList = intersectionList;
 }
 
 void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {
@@ -554,23 +568,36 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 // does a linear search in the static raycaster array
 // and returns the raycaster object with the matching pthread id
 - (ArnRayCaster *) getRayCasterFromRayCasterArray {
+    int key = gettid() % rayCasterCount;
+    return rayCasterArray[key];
+
+    /*
     for(int i = 0; i < rayCasterCount; i++) {
         if(rayCasterArray[i].pthreadID == pthread_self())
             return rayCasterArray[i].rayCaster;
     }
+     */
 }
 
 - (void) ptreadRayCasterPairSetRayCaster : (ArnRayCaster *) rayCaster {
+    /*
     PtreadRayCasterPair pair = { .rayCaster = rayCaster};
     rayCasterArray[rayCasterCount] = pair;
     [self increaseRayCasterCount];
+     */
 }
 
 - (void) ptreadRayCasterPairSetPThread : (ArnRayCaster *) rayCaster {
+    int key = gettid() % rayCasterCount;
+    rayCasterArray[key] = rayCaster;
+
+
+    /*
     for(int i = 0; i < rayCasterCount; i++) {
         if(rayCasterArray[i].rayCaster == rayCaster)
             rayCasterArray[i].pthreadID = pthread_self();
     }
+     */
 }
 
 

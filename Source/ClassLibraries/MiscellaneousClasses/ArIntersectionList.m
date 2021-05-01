@@ -1219,6 +1219,30 @@ void arintersectionlist_free_contents(
     *list = ARINTERSECTIONLIST_EMPTY;
 }
 
+ArcIntersection * arintersectionlist_extract_head(
+        ArIntersectionList  * list,
+        ArcFreelist         * intersection_freelist
+        )
+{
+    if(!ARINTERSECTIONLIST_HEAD(*list))
+        return NULL;
+
+    ArcIntersection * head = ARINTERSECTIONLIST_HEAD(*list);
+    ArcIntersection * tail = ARINTERSECTIONLIST_TAIL(*list);
+
+    if(head == tail)
+        return head;
+
+    ArcIntersection * next = ARCINTERSECTION_NEXT(head);
+
+    if (next)
+    {
+        releaseIntersections(next, intersection_freelist);
+    }
+
+    return head;
+}
+
 void arcintersection_link(
         ArcIntersection  * i0,
         ArcIntersection  * i1

@@ -496,18 +496,22 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
 - (void) performOn
         : (ArNode <ArpNodeStack> *) nodeStack
 {
-
     // if embree is enabled, all we have to do is
     // to commit the embree-scene containing the
     // embree-geometries (which should be done until
     // now), so embree builds its own internal
     // ray-acceleration-structures and we are done ...
     if([ArnEmbree embreeEnabled]) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        [embree commitScene];
+        [ REPORTER beginTimedAction
+        :   "building embree ray acceleration structure"
+        ];
+
+        [ArnEmbree commitScene];
+
+        [ REPORTER endAction];
+
         return;
     }
-
 
     ArNodeRef  node_Ref_Scene  = [ nodeStack pop ];
 

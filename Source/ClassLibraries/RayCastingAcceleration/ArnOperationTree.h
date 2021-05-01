@@ -38,7 +38,7 @@ ART_MODULE_INTERFACE(ArnOperationTree)
         int allocatedNodes;
 @public
         struct ArOpNode* opNodeArray;
-        //the following variables are used as temporary storage when bulding the tree.
+        //the following variables are used as temporary storage when building the tree.
         //outside that context the values in them are meaningless.
         int superID;
         int myId;

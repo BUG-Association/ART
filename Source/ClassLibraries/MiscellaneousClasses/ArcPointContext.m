@@ -47,6 +47,24 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
+- copy
+{
+    /*
+    ArcPointContext * copiedInstance = [super copy];
+
+    copiedInstance->next = next;
+    copiedInstance->prev = prev;
+
+    copiedInstance->pc_status_flags = pc_status_flags;
+    copiedInstance->traversalState = traversalState;
+
+    copiedInstance->objectspace_point = objectspace_point;
+    copiedInstance->worldspace_point = worldspace_point;
+
+    return copiedInstance;
+     */
+}
+
 - (void) prepareForUse
         : (ArcPhaseInterfaceCache *) phaseInterfaceCache
 {

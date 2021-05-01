@@ -96,7 +96,7 @@ ARM_MAIN_FUNCTION(Camera)
         ];
     #elif defined UNIFORM_FISHEYE_CAMERA_
 		[ UNIFORM_FISHEYE_CAMERA
-            imageSize : IVEC2D(128, 128)
+            imageSize : IVEC2D(300, 300)
                 ray   : RAY3D(PNT3D(0.0, 1.0, 0.0), VEC3D(0.0, -1.0, 0.0) )
                 zoom  : 1.0
 		  ];
