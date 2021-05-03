@@ -508,12 +508,11 @@ void embree_intersect_geometry(const int * valid,
     rtc_hit->primID = 0;
 
     // send closest intersection to ray caster
-    /*
-    arintersectionlist_append(intersectionList,
+    arintersectionlist_append(&intersectionList,
                               rayCaster->embreeIntersectionList,
                               rayCaster->rayIntersectionFreelist);
-                              */
-    arintersectionlist_free_contents(rayCaster->embreeIntersectionList, rayCaster->rayIntersectionFreelist);
+
+    // arintersectionlist_free_contents(rayCaster->embreeIntersectionList, rayCaster->rayIntersectionFreelist);
     *rayCaster->embreeIntersectionList = intersectionList;
 }
 

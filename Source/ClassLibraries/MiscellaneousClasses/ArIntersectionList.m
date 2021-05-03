@@ -1193,7 +1193,8 @@ void arintersectionlist_append(
             }
             else
             {
-                ART_ERRORHANDLING_WARNING("appended overlapping hitlists!\n");
+                if(![ArnEmbree embreeEnabled])
+                    ART_ERRORHANDLING_WARNING("appended overlapping hitlists!\n");
             }
         }
     }

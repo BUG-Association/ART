@@ -679,6 +679,11 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
     if ( internalMeshTree ) return;
 
+    // If embree is enabled, there is no need to create an internal
+    // mesh tree since embree does that by itself
+
+    if ( [ArnEmbree embreeEnabled]) return;
+
     //   The number of faces is the size of the faces array divided by 3 since
     //   there are 3 indices for every face.
 

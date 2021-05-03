@@ -468,7 +468,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         // }
     }
 
-    if(! self->embreeIntersectionList->head)
+    if(! (*intersectionList)->head)
         return 0;
 
     // hack
