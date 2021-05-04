@@ -1,11 +1,14 @@
 # The XCode generator only works properly on cmake > 2.8.11
 # On other platforms, earlier 2.8 versions are fine
+# Now deprecated...
 
-if ( APPLE )
-	cmake_minimum_required (VERSION 2.8.11)
-else ( APPLE )
-	cmake_minimum_required (VERSION 2.8)
-endif ( APPLE )
+# if ( APPLE )
+# 	cmake_minimum_required (VERSION 2.8.11)
+# else ( APPLE )
+# 	cmake_minimum_required (VERSION 2.8)
+# endif ( APPLE )
+
+cmake_minimum_required (VERSION 3.0)
 
 project (ART)
 
@@ -45,21 +48,39 @@ message("")
 #  message("Unknown platform...")
 #endif ( APPLE )
 
+find_package( TIFF REQUIRED )
+
+# Try to find the OpenEXR native cmake package config
+find_package(Imath CONFIG)
+find_package(OpenEXR CONFIG)
+
+if (OpenEXR_FOUND)
+	message("Native OpenEXR 3.0 configure")
+
+	set(OPENEXR_LIBRARIES 
+		OpenEXR::OpenEXR
+		Imath::Imath
+        # Imath::Half
+		)
+endif()
+
+# Now, activate our custom modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake_modules/")
 
-find_package( TIFF REQUIRED )
+# For older version of OpenEXR, we need to use our CMake module
+if (NOT OpenEXR_FOUND)
+	message("OpenEXR 3.0 not found, trying older releases")
+
+	find_package( OPENEXR )
+endif()
+
 find_package( LCMS2 REQUIRED )
 #find_package( JPEG REQUIRED )
 find_package( GSL )
-find_package( OPENEXR )
 
-if ( APPLE )
-
-else ( APPLE )
-
+if ( NOT APPLE )
     find_package( GNUSTEP-BASE REQUIRED )
-
-endif ( APPLE )
+endif()
 
 ## debug - DELETE THIS eventually!
 message("")

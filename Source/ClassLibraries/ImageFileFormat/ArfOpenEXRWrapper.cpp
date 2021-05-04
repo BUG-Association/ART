@@ -35,14 +35,15 @@
 #include <string>
 #include <array>
 
-#include <OpenEXR/ImathBox.h>
-#include <OpenEXR/ImathHalfLimits.h>
-#include <OpenEXR/ImfArray.h>
-#include <OpenEXR/ImfChannelList.h>
-#include <OpenEXR/ImfInputFile.h>
-#include <OpenEXR/ImfOutputFile.h>
-#include <OpenEXR/ImfStandardAttributes.h>
-#include <OpenEXR/half.h>
+//#include <ImathBox.h>
+//#include <ImathHalfLimits.h>
+#include <ImfArray.h>
+#include <ImfChannelList.h>
+#include <ImfInputFile.h>
+#include <ImfOutputFile.h>
+#include <ImfFrameBuffer.h>
+#include <ImfStandardAttributes.h>
+#include <half.h>
 
 #define INTERNAL_ERROR -1
 

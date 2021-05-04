@@ -50,6 +50,7 @@ else ( APPLE )
 
 	target_link_libraries(
 		AdvancedRenderingToolkit
+		PUBLIC
 		${art_other_link_libraries}
 		)
 
