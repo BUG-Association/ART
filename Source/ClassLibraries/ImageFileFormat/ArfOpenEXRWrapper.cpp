@@ -239,6 +239,9 @@ void saveEXR(
     // Write metadata
     // -----------------------------------------------------------------------
 
+    // Format version
+    exrHeader.insert("Spectral layout version", Imf::StringAttribute("1.0"));
+    
     for (size_t i = 0; i < n_metadata; i++) {
         if (metadata_values[i] != NULL) {
             exrHeader.insert(metadata_keys[i], Imf::StringAttribute(metadata_values[i]));
