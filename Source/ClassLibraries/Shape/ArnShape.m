@@ -27,6 +27,7 @@
 #define ART_MODULE_NAME     ArnShape
 
 
+#import <ART_RayCasting.h>
 #import "ArnShape.h"
 #import "ArpBBoxHandling_Node.h"
 
@@ -228,8 +229,15 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        ArnVertexSet * vertexSet = (ArnVertexSet *)ARNGT_VERTICES(traversal);
-        embreeGeomID = [embree initEmbreeGeometry :self : &traversal->state :result :vertexSet :ARNGT_TRAFO(traversal)];
+
+        if([self isKindOfClass: [ArnInfSphere class]]) {
+            embree->environmentLighting = YES;
+            embree->environmentLight = result;
+        }
+        else {
+            ArnVertexSet * vertexSet = (ArnVertexSet *)ARNGT_VERTICES(traversal);
+            embreeGeomID = [embree initEmbreeGeometry :self : &traversal->state :result :vertexSet :ARNGT_TRAFO(traversal)];
+        }
     }
 
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
@@ -276,14 +284,6 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         : (ArMappingCriteria) criteria
 {
     return 0;
-}
-
-- (void) getIntersectionList
-        : (ArnRayCaster *) rayCaster
-        : (Range) range_of_t
-        : (struct ArIntersectionList *) intersectionList
-{
-    // TODO do
 }
 
 @end

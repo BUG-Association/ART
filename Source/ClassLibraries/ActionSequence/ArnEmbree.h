@@ -36,15 +36,10 @@
 @class ArnVertexSet;
 @class ArcInteger;
 @class ArnTriangleMesh;
+@class ArnInfSphere;
 
 ART_MODULE_INTERFACE(ArnEmbree)
 
-
-typedef struct PtreadRayCasterPair {
-    ArnRayCaster * rayCaster;
-    pthread_t pthreadID;
-}
-PtreadRayCasterPair;
 
 typedef struct UserGeometryData {
     ArNode<ArpShape> * _shape;
@@ -56,11 +51,18 @@ UserGeometryData;
 
 ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 
+#define THREAD_MAX 25
+
 @interface ArnEmbree : ArcObject {
     RTCDevice device;
     RTCScene scene;
     ArList userGeometryList;
+    ArnRayCaster * rayCasterArray[THREAD_MAX];
     int rayCasterCount;
+
+@public
+    BOOL environmentLighting;
+    AraCombinedAttributes * environmentLight;
 }
 
 // returning the singleton object
@@ -101,16 +103,6 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
         : (ArNode *) trafo
         ;
 
-/*
-- (int) initEmbreeTriangleMeshGeometry
-        : (ArnShape *) shape
-        : (Pnt3D *) vertices
-        : (long) numberOfVertices
-        : (ArLongArray *) faces
-        : (long) numberOfFaces
-        ;
-        */
-
 - (RTCGeometry) initEmbreeTriangleMeshGeometry
         : (ArNode<ArpShape> *) shape
         : (ArnVertexSet *) vertexSet
@@ -126,14 +118,13 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
         ;
 
 - (ArnRayCaster *) getRayCasterFromRayCasterArray;
-
-- (void) ptreadRayCasterPairSetRayCaster : (ArnRayCaster *) rayCaster;
-- (void) ptreadRayCasterPairSetPThread : (ArnRayCaster *) rayCaster;
+- (void) addRayCasterToRayCasterArray : (ArnRayCaster *) rayCaster;
 
 + (void) cleanUp;
 
 - (void) resetCount;
 - (int) getCount;
+
 @end
 
 #endif // EMBREE_INSTALLED

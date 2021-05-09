@@ -48,6 +48,15 @@ typedef struct ArHashedMailboxEntry
 }
 ArHashedMailboxEntry;
 
+
+typedef struct GeometryDistancePair {
+    double distance;
+    AraCombinedAttributes * _geometry;
+}
+GeometryDistancePair;
+
+ARLIST_INTERFACE_FOR_PTR_TYPE(GeometryDistancePair, geometryDistancePair)
+
 @protocol ArpRayCaster;
 
 @interface ArnRayCaster
@@ -91,6 +100,8 @@ ArHashedMailboxEntry;
     struct ArIntersectionList * embreeIntersectionList;
 
     BOOL rayCasterAddedToEmbreeArray;
+
+    ArList distanceList;
 }
 
 
@@ -122,9 +133,9 @@ ArHashedMailboxEntry;
 
 // if embree support is enabled, this function calculates
 // intersections with geometry with the help of Embree API calls
-- (ArcIntersection *) getIntersectionListWithEmbree
+- (void) getIntersectionListWithEmbree
         : (Range) range_of_t
-        : (struct ArIntersectionList **) intersectionList
+        : (struct ArIntersectionList *) intersectionList
         : (ArNode<ArpRayCasting> *) araWorld
         ;
 

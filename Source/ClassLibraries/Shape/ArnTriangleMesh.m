@@ -319,19 +319,6 @@ ArNode * arntrianglemesh_from_ply(
                     :   maxPoint
             ];
 
-    /*
-    if([ArnEmbree embreeEnabled]) {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-        thisMesh->embreeGeomID = [embree initEmbreeTriangleMeshGeometry
-                                    : thisMesh
-                                    : vertices
-                                    : numberOfVertices
-                                    : &faces
-                                    : numberOfFaces
-                                ];
-    }
-     */
-
     //   Before we return the triangle mesh we need to apply the vertex set
     //   on it.
 
@@ -721,7 +708,6 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         // debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Created triangle %li with vertex indices (%li,%li,%li)\n", i, ARARRAY_I(triangle->indexTable, 0), ARARRAY_I(triangle->indexTable, 1), ARARRAY_I(triangle->indexTable, 2))
     }
 
-
     //   Set the internal tree to the union of the triangles.
 
     internalMeshTree =
@@ -741,6 +727,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
     ArnGraphTraversal  * traversal =
             [ ALLOC_INIT_OBJECT(ArnGraphTraversal) ];
+
 
     [ traversal setReporter: ART_GLOBAL_REPORTER ];
 
@@ -773,6 +760,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
 
     ArnGraphTraversal  *traversal1 =
             [ ALLOC_INIT_OBJECT(ArnGraphTraversal) ];
+
 
     [ (id <ArpBBoxHandling>)internalMeshTree collectLeafBBoxes
             :   traversal1

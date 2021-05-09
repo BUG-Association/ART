@@ -502,13 +502,15 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
     // now), so embree builds its own internal
     // ray-acceleration-structures and we are done ...
     if([ArnEmbree embreeEnabled]) {
+        /*
         [ REPORTER beginTimedAction
         :   "building embree ray acceleration structure"
         ];
+         */
 
         [ArnEmbree commitScene];
 
-        [ REPORTER endAction];
+        // [ REPORTER endAction];
 
         return;
     }

@@ -40,6 +40,9 @@ ART_MODULE_INITIALISATION_FUNCTION
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 
+ARLIST_IMPLEMENTATION_FOR_PTR_TYPE(GeometryDistancePair, geometryDistancePair)
+
+
 void releaseAllIntersectionsAfterFirst(
         ArcIntersection  * intersectionToKeep,
         ArcFreelist      * rayIntersectionFreelist
@@ -376,9 +379,9 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 }
 
 
-- (ArcIntersection *) getIntersectionListWithEmbree
+- (void) getIntersectionListWithEmbree
         : (Range) range_of_t
-        : (struct ArIntersectionList **) intersectionList
+        : (struct ArIntersectionList *) intersectionList
         : (ArNode<ArpRayCasting> *) araWorld
 {
     // we must have an RTCScene associated with this ray caster
@@ -388,9 +391,12 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         );
     }
 
+    // at the first call of 'getIntersectionListWithEmbree'
+    // add this ray caster object to the static ray caster array
+    // using gettid() as key
     if(!self->rayCasterAddedToEmbreeArray) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        [embree ptreadRayCasterPairSetPThread :self];
+        [embree addRayCasterToRayCasterArray :self];
         self->rayCasterAddedToEmbreeArray = YES;
     }
 
@@ -402,38 +408,52 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     struct RTCRayHit rayhit;
 
     // convert Ray3D to embree ray
-    rayhit.ray.org_x = (float) self->intersection_test_world_ray3d.point.c.x[0];
-    rayhit.ray.org_y = (float) self->intersection_test_world_ray3d.point.c.x[1];
-    rayhit.ray.org_z = (float) self->intersection_test_world_ray3d.point.c.x[2];
-    rayhit.ray.dir_x = (float) self->intersection_test_world_ray3d.vector.c.x[0];
-    rayhit.ray.dir_y = (float) self->intersection_test_world_ray3d.vector.c.x[1];
-    rayhit.ray.dir_z = (float) self->intersection_test_world_ray3d.vector.c.x[2];
-    rayhit.ray.id = self->rayID;
-    rayhit.ray.tnear = (float) range_of_t.min + 1e-3f; // the offset is for compensating the rounding error when casting from double to float
+    rayhit.ray.org_x = (float) intersection_test_world_ray3d.point.c.x[0];
+    rayhit.ray.org_y = (float) intersection_test_world_ray3d.point.c.x[1];
+    rayhit.ray.org_z = (float) intersection_test_world_ray3d.point.c.x[2];
+    rayhit.ray.dir_x = (float) intersection_test_world_ray3d.vector.c.x[0];
+    rayhit.ray.dir_y = (float) intersection_test_world_ray3d.vector.c.x[1];
+    rayhit.ray.dir_z = (float) intersection_test_world_ray3d.vector.c.x[2];
+    rayhit.ray.id = rayID;
+    rayhit.ray.tnear = 1e-3f; // the offset is for compensating the rounding error when casting from double to float
     rayhit.ray.tfar = INFINITY;
     rayhit.ray.mask = (unsigned int) -1;
     rayhit.ray.flags = 0;
     rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
     rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
 
+    // arlist_free_geometryDistancePairptr_entries(&distanceList);
+
     // do the intersection
     rtcIntersect1(embreeRTCSceneCopy, &context, &rayhit);
 
     // debug
     ArnEmbree * embree = [ArnEmbree embreeManager];
-    // printf("count: %d\n", [embree getCount]);
-    [embree resetCount];
+    // [embree resetCount];
 
-    // if we did not hit anything, we are done here
-    if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
-        return 0;
+        // if we did not hit anything and we do not have environment lighting, we are done here
+    if(rayhit.hit.geomID == INFINITY && !embree->environmentLighting) {
+        return;
+    }
+
+    // if nothing was hit and we do have environment lighting, we return the environment light
+    else if(rayhit.ray.tfar == INFINITY && embree->environmentLighting) {
+        [embree->environmentLight
+                getIntersectionList
+                :self
+                :RANGE(ARNRAYCASTER_EPSILON(self), MATH_HUGE_DOUBLE)
+                :intersectionList
+        ];
+
+        return;
+    }
+
 
     // else:
     // retrieve further information about the intersected shape ...
     unsigned int geomID = rayhit.hit.geomID;
     RTCGeometry intersectedRTCGeometry = rtcGetGeometry(embreeRTCSceneCopy, geomID);
     UserGeometryData * geometryData = (UserGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
-
 
     /*
     // debug
@@ -446,58 +466,47 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     // ... and store intersection information in an
     // ArIntersectionList
-
     if(!geometryData->_isUserGeometry) {
         self->state = geometryData->_traversalState;
         self->surfacepoint_test_shape = geometryData->_shape;
 
         arintersectionlist_init_1(
-                *intersectionList,
+                intersectionList,
                 rayhit.ray.tfar,
                 0,
                 arface_on_shape_is_planar,
                 geometryData->_shape,
                 self);
 
-        (*intersectionList)->head->embreeShapeUserGeometry = NO;
+        intersectionList->head->embreeShapeUserGeometry = NO;
     }
     else {
-        *intersectionList = self->embreeIntersectionList;
-        if((*intersectionList)->head)
-            (*intersectionList)->head->embreeShapeUserGeometry = YES;
-        // }
+
+        *intersectionList = *self->embreeIntersectionList;
+        if(intersectionList->head)
+            intersectionList->head->embreeShapeUserGeometry = YES;
     }
 
-    if(! (*intersectionList)->head)
-        return 0;
+    if(! intersectionList->head)
+        return;
 
-    // hack
-    [araWorld getIntersectionList
-            : self
-            : range_of_t
-            : *intersectionList ];
 
     // if the geometry that was hit is not a "user defined geometry" (triangles,
     // triangle meshes, quads) we store surface normal and texture coords.
     // for "user defined geometries", these are getting computed further down
     // the path tracer loop
-    if((*intersectionList)->head && !geometryData->_isUserGeometry) {
-        SET_OBJECTSPACE_NORMAL((*intersectionList)->head,
+    if(intersectionList->head && !geometryData->_isUserGeometry) {
+        SET_OBJECTSPACE_NORMAL(intersectionList->head,
                                VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
 
-        ARCINTERSECTION_FLAG_OBJECTSPACE_NORMAL_AS_VALID((*intersectionList)->head);
+        ARCINTERSECTION_FLAG_OBJECTSPACE_NORMAL_AS_VALID(intersectionList->head);
 
         // texture coordinates
         // for some reason, the UV coordinates need to be switched for ART to map the
         // image in the right orientation
-        TEXTURE_COORDS((*intersectionList)->head) = PNT2D(rayhit.hit.u, rayhit.hit.v);
-        ARCSURFACEPOINT_FLAG_TEXTURE_COORDS_AS_VALID((*intersectionList)->head);
+        TEXTURE_COORDS(intersectionList->head) = PNT2D(rayhit.hit.v, rayhit.hit.u);
+        ARCSURFACEPOINT_FLAG_TEXTURE_COORDS_AS_VALID(intersectionList->head);
     }
-
-    // since the pointer to the intersection was inserted
-    // to the intersection list, we can reset the embreeIntersection
-    // field of the ray caster
-    // self->embreeIntersection = 0;
 }
 
 - (ArcIntersection *) firstRayObjectIntersection
@@ -521,18 +530,11 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     ArIntersectionList * intersectionList = &ARINTERSECTIONLIST_EMPTY;
 
-    if([ArnEmbree embreeEnabled])
-        [ self getIntersectionListWithEmbree
-        : range
-        : &intersectionList
-                : geometryToIntersectRayWith
-        ];
-    else
-        [geometryToIntersectRayWith getIntersectionList
+    [geometryToIntersectRayWith getIntersectionList
             :self
             :range
             :intersectionList
-        ];
+    ];
 
     if ( ! ARINTERSECTIONLIST_HEAD(*intersectionList) )
         return 0;

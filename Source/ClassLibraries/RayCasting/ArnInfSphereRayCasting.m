@@ -44,7 +44,7 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
 {
     return 0;
 }
-
+static int infSphereCount = 0;
 - (void) getIntersectionList
         : (ArnRayCaster *) rayCaster
         : (Range) range_of_t

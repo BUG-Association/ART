@@ -128,12 +128,22 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraWorld)
 
     INTERSECTION_TEST_DEBUG_CALLING_SUBNODE(SUBNODE,"");
 
-    if(![ArnEmbree embreeEnabled])
+    if([ArnEmbree embreeEnabled])
+
+        [ rayCaster getIntersectionListWithEmbree
+                : range_of_t
+                : intersectionList
+                : self
+        ];
+
+    else
+
         [ SUBNODE getIntersectionList
             :   rayCaster
             :   range_of_t
             :   intersectionList
             ];
+
 
     INTERSECTION_TEST_DEBUG_OUTPUT_RESULT_LIST_WITH_COMMENT(
         "(before processing)"

@@ -30,14 +30,12 @@
 #import <ArnEmbree.h>
 #import <RayCastingCommonMacros.h>
 #import <ARM_RayCasting.h>
-#import <ArnTriangleMesh.h>
 #import <unistd.h>
+
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-
-#define THREAD_MAX 25
 
 ARLIST_IMPLEMENTATION_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 
@@ -54,10 +52,9 @@ void errorFunction(void* userPtr, enum RTCError error, const char* str) {
 // initializing embree geometries and such
 static BOOL EMBREE_ENABLED;
 static ArnEmbree * embreeManager;
-static ArnRayCaster * rayCasterArray[THREAD_MAX];
 
 
-// #define EMBREE_DEBUG_PRINT
+#define EMBREE_DEBUG_PRINT
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
@@ -157,6 +154,8 @@ static ArnRayCaster * rayCasterArray[THREAD_MAX];
 
         isInitialized = YES;
         EMBREE_ENABLED = YES;
+
+        embreeManager->environmentLighting = NO;
     }
 }
 
@@ -288,9 +287,6 @@ static ArnRayCaster * rayCasterArray[THREAD_MAX];
         }
     }
 
-#ifdef EMBREE_DEBUG_PRINT
-    printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
-#endif
     return newGeometry;
 }
 
@@ -359,9 +355,6 @@ static ArnRayCaster * rayCasterArray[THREAD_MAX];
         embreeMeshIndices[i] = (unsigned int) faces.content->array[i];
     }
 
-#ifdef EMBREE_DEBUG_PRINT
-    printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
-#endif
     return embreeMesh;
 }
 
@@ -441,6 +434,7 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
 #endif
 }
 static int callCount = 0;
+
 - (void) resetCount {
     callCount = 0;
 }
@@ -456,10 +450,6 @@ void embree_intersect_geometry(const int * valid,
                                struct RTCRay * rtc_ray,
                                struct RTCHit * rtc_hit)
 {
-    callCount++;
-
-    // printf("count: %d\n", callCount);
-
     if(!valid[0])
         return;
 
@@ -468,16 +458,23 @@ void embree_intersect_geometry(const int * valid,
     ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
     UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
 
+    // debug
+    // printf("%s\n", [[geometryData->_shape className] UTF8String]);
+
     // filter intersection points:
     // if a previous hit point lies on a shape
     // that is not defined as an embree user geometry
     // we return
+
+    /*
     if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
         RTCGeometry prevIntersectedGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
-        UserGeometryData * prevGeometryData = (UserGeometryData *) rtcGetGeometryUserData(prevIntersectedGeometry);
-        if(!prevGeometryData->_isUserGeometry)
+        UserGeometryData *prevGeometryData = (UserGeometryData *) rtcGetGeometryUserData(prevIntersectedGeometry);
+        if (!prevGeometryData->_isUserGeometry)
             return;
     }
+    */
+
 
     // perform the intersection
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
@@ -488,32 +485,65 @@ void embree_intersect_geometry(const int * valid,
             : &intersectionList
     ];
 
-    // only first hit will be considered
-    // so we free everything from the intersection list
-    // that is not the head
-    /*
-    while (intersectionList->head != intersectionList->tail)
-        arintersectionlist_remove_tail(intersectionList,
-                                       rayCaster->rayIntersectionFreelist
-        );
-    */
 
-    if(!intersectionList.head) {
+    // if no intersection is found, return
+    if(!intersectionList.head)
         return;
-    }
+
+
 
     // update embree components
     rtc_ray->tfar = (float) intersectionList.head->t;
     rtc_hit->geomID = geomID;
     rtc_hit->primID = 0;
 
-    // send closest intersection to ray caster
+    // append intersection to ray caster intersection list
     arintersectionlist_append(&intersectionList,
                               rayCaster->embreeIntersectionList,
                               rayCaster->rayIntersectionFreelist);
 
-    // arintersectionlist_free_contents(rayCaster->embreeIntersectionList, rayCaster->rayIntersectionFreelist);
+
+    // set
     *rayCaster->embreeIntersectionList = intersectionList;
+
+    /*
+    Pnt3D ray_origin = PNT3D(rtc_ray->org_x, rtc_ray->org_y, rtc_ray->org_z);
+
+    Pnt3D localCentroid;
+    [geometryData->_shape getLocalCentroid
+            : &geometryData->_traversalState
+            : &localCentroid];
+
+    id trafo = [geometryData->_combinedAttributes unambigousSubnodeTrafo];
+    id trafoToUse;
+    if ( trafo && ! [ trafo isMemberOfClass: [ ArnHTrafo3D class ] ] )
+    {
+        trafoToUse =
+                [ (ArNode <ArpTrafo3D> *)trafo reduceToSingleHTrafo3D ];
+    }
+
+    Pnt3D worldCentroid;
+    [trafoToUse transformPnt3D : &localCentroid : &worldCentroid ];
+
+    // calculate distance
+    Pnt3D A = ray_origin;
+    Pnt3D B = worldCentroid;
+
+    double distance = pnt3d_pp_dist( &B, &A);
+
+
+    // update embree components
+    rtc_ray->tfar = (float) distance;
+    rtc_hit->geomID = geomID;
+    rtc_hit->primID = 0;
+
+    // create new distance pair
+    // struct GeometryDistancePair * distancePair = malloc(sizeof(struct GeometryDistancePair));
+    // distancePair->distance = distance;
+    // distancePair->_geometry = geometryData->_combinedAttributes;
+
+    // arlist_add_geometryDistancePairptr_at_head(&rayCaster->distanceList, distancePair);
+     */
 }
 
 void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {
@@ -570,33 +600,10 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     int key = gettid() % rayCasterCount;
     return rayCasterArray[key];
 
-    /*
-    for(int i = 0; i < rayCasterCount; i++) {
-        if(rayCasterArray[i].pthreadID == pthread_self())
-            return rayCasterArray[i].rayCaster;
-    }
-     */
 }
-
-- (void) ptreadRayCasterPairSetRayCaster : (ArnRayCaster *) rayCaster {
-    /*
-    PtreadRayCasterPair pair = { .rayCaster = rayCaster};
-    rayCasterArray[rayCasterCount] = pair;
-    [self increaseRayCasterCount];
-     */
-}
-
-- (void) ptreadRayCasterPairSetPThread : (ArnRayCaster *) rayCaster {
+- (void) addRayCasterToRayCasterArray : (ArnRayCaster *) rayCaster {
     int key = gettid() % rayCasterCount;
     rayCasterArray[key] = rayCaster;
-
-
-    /*
-    for(int i = 0; i < rayCasterCount; i++) {
-        if(rayCasterArray[i].rayCaster == rayCaster)
-            rayCasterArray[i].pthreadID = pthread_self();
-    }
-     */
 }
 
 

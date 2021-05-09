@@ -49,7 +49,7 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
     else
         return 0;
 }
-
+static int cylinder_count = 0;
 - (void) getIntersectionList
         : (ArnRayCaster *) rayCaster
         : (Range) range_of_t
@@ -205,6 +205,8 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
           self,
           rayCaster
         );
+
+    // printf("cylinder count: %d\n", ++cylinder_count);
 
 #ifdef ART_WITH_INTERSECTION_STATISTICS
     arnraycaster_count_intersection(rayCaster, ArnCylinder);
