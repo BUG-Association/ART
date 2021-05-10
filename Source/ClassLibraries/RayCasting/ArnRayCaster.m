@@ -26,7 +26,6 @@
 
 #define ART_MODULE_NAME     ArnRayCaster
 
-#import <ArnInfSphere.h>
 #import "ArnRayCaster.h"
 #import "RayCastingCommonMacros.h"
 
@@ -422,7 +421,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
     rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
 
-    // arlist_free_geometryDistancePairptr_entries(&distanceList);
+    printf("-----------------------------------\n");
 
     // do the intersection
     rtcIntersect1(embreeRTCSceneCopy, &context, &rayhit);
@@ -432,13 +431,13 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // [embree resetCount];
 
         // if we did not hit anything and we do not have environment lighting, we are done here
-    if(rayhit.hit.geomID == INFINITY && !embree->environmentLighting) {
+    if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID && !embree->environmentLighting) {
         return;
     }
 
     // if nothing was hit and we do have environment lighting, we return the environment light
     else if(rayhit.ray.tfar == INFINITY && embree->environmentLighting) {
-        [embree->environmentLight
+        [(id) embree->environmentLight
                 getIntersectionList
                 :self
                 :RANGE(ARNRAYCASTER_EPSILON(self), MATH_HUGE_DOUBLE)

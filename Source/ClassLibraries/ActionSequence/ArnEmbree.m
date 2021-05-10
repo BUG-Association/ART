@@ -54,7 +54,7 @@ static BOOL EMBREE_ENABLED;
 static ArnEmbree * embreeManager;
 
 
-#define EMBREE_DEBUG_PRINT
+// #define EMBREE_DEBUG_PRINT
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
@@ -490,7 +490,7 @@ void embree_intersect_geometry(const int * valid,
     if(!intersectionList.head)
         return;
 
-
+    printf("head: %f, tail: %f\n", intersectionList.head->t, intersectionList.tail->t);
 
     // update embree components
     rtc_ray->tfar = (float) intersectionList.head->t;
