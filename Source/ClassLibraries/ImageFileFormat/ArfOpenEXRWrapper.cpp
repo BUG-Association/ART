@@ -240,15 +240,22 @@ void saveEXR(
     // -----------------------------------------------------------------------
 
     // Format version
-    exrHeader.insert("Spectral layout version", Imf::StringAttribute("1.0"));
+    exrHeader.insert("spectralLayoutVersion", Imf::StringAttribute("1.0"));
     
+    // Units
+    exrHeader.insert("emissiveUnits", Imf::StringAttribute("W.m^2.sr^-1"));
+
+    // If it is a polarised image, specify its handedness
+    if (spectral_buffers[1] != NULL) {
+        exrHeader.insert("polarisationHandedness", Imf::StringAttribute("right"));
+    }
+
+    // ART metadata
     for (size_t i = 0; i < n_metadata; i++) {
         if (metadata_values[i] != NULL) {
             exrHeader.insert(metadata_keys[i], Imf::StringAttribute(metadata_values[i]));
         }
     }
-
-    exrHeader.insert("Polarisation handedness", Imf::StringAttribute("right"));
 
     if (chromaticities != NULL) {
         Imf::Chromaticities exrChr = Imf::Chromaticities(

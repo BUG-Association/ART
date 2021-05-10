@@ -672,20 +672,23 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
 
         asprintf(
             & creationDateStr,
-            "%.2d.%.2d.%d %.2d:%.2d\n",
+            "%.2d.%.2d.%d %.2d:%.2d",
             tblock->tm_mday,
             tblock->tm_mon + 1,
             tblock->tm_year + 1900,
             tblock->tm_hour,
             tblock->tm_min);
 
+        // Notice, camelCased attribute names
+        // This is to make it consistent with existing OpenEXR attribute
+        // naming scheme
         const char* metadata_keys[6] = {
-            "File created by",
-            "Platform",
-            "Command line",
-            "Creation date",
-            "Render time",
-            "Samples per pixel"
+            "fileCreatedBy",
+            "platform",
+            "commandLine",
+            "creationDate",
+            "renderTime",
+            "samplesPerPixel"
         };
 
         const char* metadata_values[6] = {

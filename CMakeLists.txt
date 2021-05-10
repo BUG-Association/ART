@@ -62,6 +62,8 @@ if (OpenEXR_FOUND)
 		Imath::Imath
         # Imath::Half
 		)
+
+	SET(OPENEXR_FOUND 1)
 endif()
 
 # Now, activate our custom modules
