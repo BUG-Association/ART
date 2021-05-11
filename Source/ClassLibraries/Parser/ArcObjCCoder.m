@@ -1426,12 +1426,14 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
         : (ArNode **) objectPtr
         : (ArList *) externalList
 {
+    /*
     // init ArnEmbree singleton
     ArnEmbree * embree;
     if([ArnEmbree embreeEnabled])
         embree = [ArnEmbree embreeManager];
     else
         embree = NULL;
+        */
 
     [ stream scans
         :   ARCOBJCCODER_CODING_STRING

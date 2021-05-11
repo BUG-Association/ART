@@ -496,6 +496,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
 - (void) performOn
         : (ArNode <ArpNodeStack> *) nodeStack
 {
+#if defined(ENABLE_EMBREE_SUPPORT)
     // if embree is enabled, all we have to do is
     // to commit the embree-scene containing the
     // embree-geometries (which should be done until
@@ -514,6 +515,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
 
         return;
     }
+#endif
 
     ArNodeRef  node_Ref_Scene  = [ nodeStack pop ];
 

@@ -186,6 +186,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             :  ARNGT_VERTICES(traversal)
             ];
 
+#if defined(ENABLE_EMBREE_SUPPORT)
     // if embree is enabled, convert this shape to an embree geometry
     // and pass it along with traversal state to embree
     if([ArnEmbree embreeEnabled]) {
@@ -193,6 +194,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         ArnVertexSet * vertices = (ArnVertexSet *) ARNGT_VERTICES(traversal);
         self->embreeGeomID = [embree initEmbreeGeometry : self : &traversal->state :result :vertices :ARNGT_TRAFO(traversal)];
     }
+#endif
 
     return result;
 }

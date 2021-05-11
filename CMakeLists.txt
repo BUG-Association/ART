@@ -60,7 +60,11 @@ find_package( LCMS2 REQUIRED )
 #find_package( JPEG REQUIRED )
 find_package( GSL )
 find_package( OPENEXR )
-find_package( EMBREE 3.0 )
+
+option(ENABLE_EMBREE_SUPPORT  "Use Embree for ray tracing operations?" ON)
+if( ENABLE_EMBREE_SUPPORT )
+	find_package( EMBREE 3.0 )
+endif( ENABLE_EMBREE_SUPPORT )
 
 if ( APPLE )
 
@@ -93,8 +97,12 @@ message("GSL library:           ${GSL_LIBRARY}")
 message("OPENEXR_FOUND:         ${OPENEXR_FOUND}")
 message("OPENEXR include dir:   ${OPENEXR_INCLUDE_DIR}")
 message("OPENEXR library:       ${OPENEXR_LIBRARY}")
+
+if(ENABLE_EMBREE_SUPPORT)
 message("EMBREE found:          ${EMBREE_FOUND}")
 message("EMBREE library:        ${EMBREE_LIBRARY}")
+endif(ENABLE_EMBREE_SUPPORT)
+
 message("")
 
 
@@ -394,17 +402,27 @@ if ( OPENEXR_FOUND )
 
 endif ( OPENEXR_FOUND )
 
-if ( EMBREE_FOUND )
+if( ENABLE_EMBREE_SUPPORT )
 
-	set (
-			art_other_link_libraries
-			${art_other_link_libraries}
-			${EMBREE_LIBRARIES}
-	)
+	if ( EMBREE_FOUND )
 
-endif( EMBREE_FOUND )
+		set (
+				art_other_link_libraries
+				${art_other_link_libraries}
+				${EMBREE_LIBRARIES}
+		)
+		add_definitions(-DENABLE_EMBREE_SUPPORT=1)
+		
+	else ( EMBREE_FOUND ) 
+		add_definitions(-DENABLE_EMBREE_SUPPORT=0)
+		
 
-add_compile_definitions( EMBREE_INSTALLED=${EMBREE_FOUND} )
+	endif( EMBREE_FOUND )
+
+else( ENABLE_EMBREE_SUPPORT )
+	add_definitions(-DENABLE_EMBREE_SUPPORT=0)
+
+endif( ENABLE_EMBREE_SUPPORT )
 
 
 set (

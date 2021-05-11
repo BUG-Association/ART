@@ -23,7 +23,7 @@
     along with ART.  If not, see <http://www.gnu.org/licenses/>.
 
 =========================================================================== */
-#ifdef EMBREE_INSTALLED
+#if defined(ENABLE_EMBREE_SUPPORT)
 
 #include "ART_Foundation.h"
 #include "ArNode.h"
@@ -127,6 +127,6 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 
 @end
 
-#endif // EMBREE_INSTALLED
+#endif // ENABLE_EMBREE_SUPPORT
 
 // ===========================================================================

@@ -31,6 +31,10 @@ ART_MODULE_INTERFACE(ArnRayCaster)
 #include "ART_Scenegraph.h"
 #include "ART_Protocols.h"
 
+#if defined(ENABLE_EMBREE_SUPPORT)
+#include <embree3/rtcore.h>
+#endif
+
 //   These two macros define the size of the cache used for hashed mailboxing
 //   during BSP raycasting
 
@@ -92,6 +96,7 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(GeometryDistancePair, geometryDistancePair)
 
     BOOL                   * activeNodes;
 
+#if defined(ENABLE_EMBREE_SUPPORT)
 //----------------------------------------------------------------//
 //              embree related stuff                              //
 //----------------------------------------------------------------//
@@ -102,6 +107,7 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(GeometryDistancePair, geometryDistancePair)
     BOOL rayCasterAddedToEmbreeArray;
 
     ArList distanceList;
+#endif
 }
 
 

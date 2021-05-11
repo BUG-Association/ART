@@ -66,8 +66,12 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         :   phaseInterfaceCache
         ];
 
-
-    BOOL embreeEnabled = [ArnEmbree embreeEnabled];
+    BOOL embreeEnabled =
+#if defined(ENABLE_EMBREE_SUPPORT)
+        [ArnEmbree embreeEnabled];
+#else
+    NO;
+#endif
 
     if ( ! ARCINTERSECTION_OBJECTSPACE_NORMAL_IS_VALID(self) )
         [ (ArNode <ArpShapeRayCasting> *)ARCINTERSECTION_SHAPE(self)

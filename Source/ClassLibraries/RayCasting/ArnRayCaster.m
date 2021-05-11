@@ -383,6 +383,8 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         : (struct ArIntersectionList *) intersectionList
         : (ArNode<ArpRayCasting> *) araWorld
 {
+#if defined(ENABLE_EMBREE_SUPPORT)
+
     // we must have an RTCScene associated with this ray caster
     if(!embreeRTCSceneCopy) {
         ART_ERRORHANDLING_FATAL_ERROR(
@@ -420,8 +422,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     rayhit.ray.flags = 0;
     rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
     rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
-
-    printf("-----------------------------------\n");
 
     // do the intersection
     rtcIntersect1(embreeRTCSceneCopy, &context, &rayhit);
@@ -506,6 +506,13 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         TEXTURE_COORDS(intersectionList->head) = PNT2D(rayhit.hit.v, rayhit.hit.u);
         ARCSURFACEPOINT_FLAG_TEXTURE_COORDS_AS_VALID(intersectionList->head);
     }
+
+#else
+    ART_ERRORHANDLING_FATAL_ERROR(
+                "method [ArnRayCaster intersectWithEmbree:::] called, without Embree being initialized"
+        );
+
+#endif
 }
 
 - (ArcIntersection *) firstRayObjectIntersection
@@ -591,12 +598,14 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         ARARRAY_I(hitCountArray, i)  = 0;
     }
 
+#if defined(ENABLE_EMBREE_SUPPORT)
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
         embreeRTCSceneCopy = [embree getScene];
         self->rayCasterAddedToEmbreeArray = NO;
         [embree increaseRayCasterCount];
     }
+#endif
 }
 
 - (void) cleanupAfterRayCasting

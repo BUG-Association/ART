@@ -23,7 +23,7 @@
     along with ART.  If not, see <http://www.gnu.org/licenses/>.
 
 =========================================================================== */
-#if EMBREE_INSTALLED
+#if defined(ENABLE_EMBREE_SUPPORT)
 
 #define ART_MODULE_NAME     ArnEmbree
 
@@ -50,7 +50,7 @@ void errorFunction(void* userPtr, enum RTCError error, const char* str) {
 // EMBREE_ENABLED is true, when embree is enabled and false otherwise
 // embreeManager is the singleton object dealing with things like
 // initializing embree geometries and such
-static BOOL EMBREE_ENABLED;
+static BOOL EMBREE_ENABLED = NO;
 static ArnEmbree * embreeManager;
 
 
@@ -490,7 +490,6 @@ void embree_intersect_geometry(const int * valid,
     if(!intersectionList.head)
         return;
 
-    printf("head: %f, tail: %f\n", intersectionList.head->t, intersectionList.tail->t);
 
     // update embree components
     rtc_ray->tfar = (float) intersectionList.head->t;
@@ -610,4 +609,4 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
 @end // ArnEmbree
 
-#endif // EMBREE_INSTALLED
+#endif // ENABLE_EMBREE_SUPPORT

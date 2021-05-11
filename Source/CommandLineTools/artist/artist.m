@@ -256,7 +256,7 @@ int artist(
 
     // [Sebastian] TODO remove this block, once embree parsing works
     if ( [ embreeOpt hasBeenSpecified ]) {
-#if EMBREE_INSTALLED
+#if defined(ENABLE_EMBREE_SUPPORT)
         [ArnEmbree enableEmbree: YES];
         [ArnEmbree initialize];
         printf("embree support enabled\n");
@@ -265,9 +265,9 @@ int artist(
         exit(0);
 #endif
     }
-    else {
-        [ArnEmbree enableEmbree: NO];
-    }
+    // else {
+       //  [ArnEmbree enableEmbree: NO];
+    // }
     // END -- [Sebastian] TODO remove this block, once embree parsing works
 
 

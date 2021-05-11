@@ -128,6 +128,7 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraWorld)
 
     INTERSECTION_TEST_DEBUG_CALLING_SUBNODE(SUBNODE,"");
 
+#if defined(ENABLE_EMBREE_SUPPORT)
     if([ArnEmbree embreeEnabled])
 
         [ rayCaster getIntersectionListWithEmbree
@@ -137,7 +138,7 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraWorld)
         ];
 
     else
-
+#endif
         [ SUBNODE getIntersectionList
             :   rayCaster
             :   range_of_t
