@@ -243,7 +243,7 @@ void saveEXR(
     exrHeader.insert("spectralLayoutVersion", Imf::StringAttribute("1.0"));
     
     // Units
-    exrHeader.insert("emissiveUnits", Imf::StringAttribute("W.m^2.sr^-1"));
+    exrHeader.insert("emissiveUnits", Imf::StringAttribute("W.m^-2.sr^-1"));
 
     // If it is a polarised image, specify its handedness
     if (spectral_buffers[1] != NULL) {
