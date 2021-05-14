@@ -839,6 +839,8 @@ int m_iii_atomic_compare_and_swap(
         volatile int  * location_to_swap_with
         )
 {
+#ifdef __aarch64__
+#else
     int  result;
 
     asm volatile (
@@ -851,6 +853,7 @@ int m_iii_atomic_compare_and_swap(
         );
 
     return result;
+#endif
 }
 
 void m_i_xadd_i(
@@ -858,6 +861,8 @@ void m_i_xadd_i(
     int  * memory_location_to_increment
     )
 {
+#ifdef __aarch64__
+#else
     asm volatile (
         "lock; xaddl %0,%1"
         : "=r" (*increment_value_and_prev_value),
@@ -866,6 +871,7 @@ void m_i_xadd_i(
           "m"  (*memory_location_to_increment)
         : "memory", "cc"
         );
+#endif
 }
 
 float m_ff_atomic_add(
@@ -877,10 +883,12 @@ float m_ff_atomic_add(
     union { float  f; Int32  i; } newVal;
 
     do {
+#ifdef __aarch64__
+#else
         asm volatile (
             "pause"
             );
-
+#endif
         oldVal.f = *fr;
         newVal.f = oldVal.f + f0;
     }
@@ -907,10 +915,12 @@ double m_dd_atomic_add(
     union { double  d; Int64  i; } newVal;
 
     do {
+#ifdef __aarch64__
+#else
         asm volatile (
             "pause"
             );
-
+#endif
         oldVal.d = *dr;
         newVal.d = oldVal.d + d0;
     }

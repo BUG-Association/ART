@@ -265,9 +265,29 @@ ArNode * createMunsellPage(
 #define CHART_ILLUMINANT_DESC "FL3"
 #endif
 
+#ifdef FL10
+#define CHART_ILLUMINANT CIE_ILLUMINANT_FL10
+#define CHART_ILLUMINANT_DESC "FL10"
+#endif
+
 #ifdef FL11
 #define CHART_ILLUMINANT CIE_ILLUMINANT_FL11
 #define CHART_ILLUMINANT_DESC "FL11"
+#endif
+
+#ifdef FL12
+#define CHART_ILLUMINANT CIE_ILLUMINANT_FL12
+#define CHART_ILLUMINANT_DESC "FL12"
+#endif
+
+#ifdef FL3_1
+#define CHART_ILLUMINANT CIE_ILLUMINANT_FL3_1
+#define CHART_ILLUMINANT_DESC "FL3_1"
+#endif
+
+#ifdef FL3_7
+#define CHART_ILLUMINANT CIE_ILLUMINANT_FL3_7
+#define CHART_ILLUMINANT_DESC "FL3_7"
 #endif
 
 #ifdef FL3_13
@@ -301,22 +321,20 @@ ArNode * createMunsellPage(
     id scene_geometry = \
         UNION( \
             [ createMunsellPage_##__name(art_gv) apply \
-                :   ROT_Z( 180 DEGREES ) \
-                :   ROT_X( -66 DEGREES ) \
+                :   ROT_Z( -90 DEGREES ) \
+                :   ROT_X( 0 DEGREES ) \
                 :   USCALE( 0.65 ) \
                 :   TRANSLATION( 0.0, 0.0 , 5.6 ) \
                 ], \
-\
-            cylinder0, \
 \
             UNION_END \
             ); \
 \
     id camera = \
         [ CAMERA \
-            imageSize:  IVEC2D( 256 , 256 ) \
-            ray:        RAY3D( PNT3D(0.0,50.0,28.0),VEC3D(0.0,-50.0,-23) ) \
-            zoom:       1.1 \
+            imageSize:  IVEC2D( 512 , 512 ) \
+            ray:        RAY3D( PNT3D(0.0,0.0,100.0),VEC3D(0.0,0.0,-1) ) \
+            zoom:       2.1 \
             ]; \
 \
     id actionsequence = \

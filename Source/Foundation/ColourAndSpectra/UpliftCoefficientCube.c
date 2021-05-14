@@ -290,6 +290,7 @@ void ucc_rgb_to_sps(
               ArSpectralSample  * sps
         )
 {
+//printf("RGB: %f %f %f \n", XC(*rgb)*255, YC(*rgb)*255, ZC(*rgb)*255);
     IPnt3D  bc;
     
     XC(bc) = M_MIN(UCC_F_TO_I( ucc, XC(*rgb) ), UCC_DIMENSION(ucc) - 2. );

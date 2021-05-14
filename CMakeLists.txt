@@ -2,9 +2,9 @@
 # On other platforms, earlier 2.8 versions are fine
 
 if ( APPLE )
-	cmake_minimum_required (VERSION 2.8.11)
+	cmake_minimum_required (VERSION 3.0)
 else ( APPLE )
-	cmake_minimum_required (VERSION 2.8)
+	cmake_minimum_required (VERSION 3.0)
 endif ( APPLE )
 
 project (ART)
@@ -129,11 +129,12 @@ message("Executables will be installed in '${art_executable_directory}'")
 # (depending on platform)
 
 if ( APPLE )
+	set(CMAKE_XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "-o linker-signed")
 	set( art_resource_directory_location "Library" )
 #	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE -DART_4_OPENSTEP -D_ART_WITHOUT_JPEGLIB" )
 #	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -DART_4_OPENSTEP -D_ART_WITHOUT_JPEGLIB" )
 	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE -DART_4_OPENSTEP -D_ART_WITHOUT_JPEGLIB_ -O3" )
-	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -DART_4_OPENSTEP -D_ART_WITHOUT_JPEGLIB_ -O3" )
+	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -DART_4_OPENSTEP -D_ART_WITHOUT_JPEGLIB_ -O3 -std=c++11" )
 else ( APPLE )
 	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE -DNDEBUG -DART_4_GNUSTEP -O3" )
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -DNDEBUG -DART_4_GNUSTEP -D_NATIVE_OBJC_EXCEPTIONS=1 -O3" )

@@ -377,6 +377,8 @@ static inline int m_ii_atomic_add(
         int  * variable
         )
 {
+#ifdef __aarch64__
+#else
     __asm__ volatile("lock; xaddl %0, %1"
     : "+r" (value), "+m" (*variable) // input+output
     : // No input-only
@@ -384,6 +386,7 @@ static inline int m_ii_atomic_add(
     );
     
     return value;
+#endif
 }
 
 
