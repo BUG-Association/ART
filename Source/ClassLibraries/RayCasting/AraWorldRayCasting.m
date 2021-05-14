@@ -132,9 +132,7 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraWorld)
     if([ArnEmbree embreeEnabled])
 
         [ rayCaster getIntersectionListWithEmbree
-                : range_of_t
                 : intersectionList
-                : self
         ];
 
     else
@@ -144,6 +142,7 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraWorld)
             :   range_of_t
             :   intersectionList
             ];
+
 
 
     INTERSECTION_TEST_DEBUG_OUTPUT_RESULT_LIST_WITH_COMMENT(

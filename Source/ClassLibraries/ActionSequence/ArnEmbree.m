@@ -101,7 +101,7 @@ static ArnEmbree * embreeManager;
 }
 
 - (void) freeGeometryList {
-    arlist_free_userGeometryDataptr_entries(&userGeometryList);
+    // arlist_free_userGeometryDataptr_entries(&userGeometryList);
 }
 
 
@@ -189,10 +189,11 @@ static ArnEmbree * embreeManager;
     ArnSimpleIndexedShape * simpleIndexedShape =
             (ArnSimpleIndexedShape *) shape;
 
-    // if the shape is a triangle, create a new geometry buffer with type
-    // RTC_GEOMETRY_TYPE_TRIANGLE
+    // differentiale between Triangles and Quadrangles
+    // and create the according embree geometry buffers
     float * vertices;
     unsigned * indices;
+
 
     if([shape isKindOfClass: [ArnTriangle class]])
     {
@@ -230,6 +231,7 @@ static ArnEmbree * embreeManager;
                                                                  1);
     }
 
+    // fill up vertices and indices array
     int index = -1;
 
     if(!trafo)
@@ -269,6 +271,7 @@ static ArnEmbree * embreeManager;
             indices[i] = (unsigned int) i;
         }
     }
+
 
     return newGeometry;
 }
@@ -475,61 +478,32 @@ void embree_intersect_geometry(const int * valid,
 
     // debug
     ArcIntersection * prevIsect = ARINTERSECTIONLIST_HEAD(*rayCaster->embreeIntersectionList);
-    if(prevIsect && prevIsect->t < intersectionList.head->t)
+    if(prevIsect && prevIsect->t < intersectionList.head->t) {
+        arintersectionlist_free_contents(&intersectionList,
+                                         ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
         return;
+    }
+
 
     // update embree components
     rtc_ray->tfar = (float) intersectionList.head->t;
     rtc_hit->geomID = geomID;
     rtc_hit->primID = 0;
 
+
+    /*
     // append intersection to ray caster intersection list
     arintersectionlist_append(&intersectionList,
-                              rayCaster->embreeIntersectionList,
-                              rayCaster->rayIntersectionFreelist);
+                              ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
+                              ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
+    */
 
+    // debug
+    arintersectionlist_free_contents(ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
+                                     ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
 
     // set
     *rayCaster->embreeIntersectionList = intersectionList;
-
-    /*
-    Pnt3D ray_origin = PNT3D(rtc_ray->org_x, rtc_ray->org_y, rtc_ray->org_z);
-
-    Pnt3D localCentroid;
-    [geometryData->_shape getLocalCentroid
-            : &geometryData->_traversalState
-            : &localCentroid];
-
-    id trafo = [geometryData->_combinedAttributes unambigousSubnodeTrafo];
-    id trafoToUse;
-    if ( trafo && ! [ trafo isMemberOfClass: [ ArnHTrafo3D class ] ] )
-    {
-        trafoToUse =
-                [ (ArNode <ArpTrafo3D> *)trafo reduceToSingleHTrafo3D ];
-    }
-
-    Pnt3D worldCentroid;
-    [trafoToUse transformPnt3D : &localCentroid : &worldCentroid ];
-
-    // calculate distance
-    Pnt3D A = ray_origin;
-    Pnt3D B = worldCentroid;
-
-    double distance = pnt3d_pp_dist( &B, &A);
-
-
-    // update embree components
-    rtc_ray->tfar = (float) distance;
-    rtc_hit->geomID = geomID;
-    rtc_hit->primID = 0;
-
-    // create new distance pair
-    // struct GeometryDistancePair * distancePair = malloc(sizeof(struct GeometryDistancePair));
-    // distancePair->distance = distance;
-    // distancePair->_geometry = geometryData->_combinedAttributes;
-
-    // arlist_add_geometryDistancePairptr_at_head(&rayCaster->distanceList, distancePair);
-     */
 }
 
 void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {

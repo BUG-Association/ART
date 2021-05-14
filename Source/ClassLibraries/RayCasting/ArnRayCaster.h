@@ -140,9 +140,7 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(GeometryDistancePair, geometryDistancePair)
 // if embree support is enabled, this function calculates
 // intersections with geometry with the help of Embree API calls
 - (void) getIntersectionListWithEmbree
-        : (Range) range_of_t
         : (struct ArIntersectionList *) intersectionList
-        : (ArNode<ArpRayCasting> *) araWorld
         ;
 
 @end
@@ -172,6 +170,12 @@ ARNRAYCASTER_MAILBOX(__rc)[ (Pointer)(__objID) & ARNRAYCASTER_HASH_TABLE_MASK ].
 #define ARNRAYCASTER_OBJECTSPACE_RAY_INVVEC(_rc)  RAY3DE_INVVEC(ARNRAYCASTER_OBJECTSPACE_RAY3DE(_rc))
 #define ARNRAYCASTER_OBJECTSPACE_RAYDIR(_rc)        RAY3DE_DIR(ARNRAYCASTER_OBJECTSPACE_RAY3DE(_rc))
 #define ARNRAYCASTER_EPSILON(_rc)           ((_rc)->hitEps)
+
+#if defined(ENABLE_EMBREE_SUPPORT)
+#define ARNRAYCASTER_EMBREE_INTERSECTIONLIST(_rc) \
+    ((_rc)->embreeIntersectionList)
+#endif
+
 #define ARNRAYCASTER_INTERSECTION_FREELIST(_rc) \
     ((_rc)->rayIntersectionFreelist)
 #define ARNRAYCASTER_SURFACEPOINT_FREELIST(_rc) \

@@ -42,7 +42,7 @@ ART_MODULE_INTERFACE(ArnEmbree)
 
 
 typedef struct UserGeometryData {
-    ArNode<ArpShape> * _shape;
+    ArNode * _shape;
     ArTraversalState _traversalState;
     AraCombinedAttributes * _combinedAttributes;
     BOOL _isUserGeometry;

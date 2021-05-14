@@ -379,9 +379,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
 
 - (void) getIntersectionListWithEmbree
-        : (Range) range_of_t
         : (struct ArIntersectionList *) intersectionList
-        : (ArNode<ArpRayCasting> *) araWorld
 {
 #if defined(ENABLE_EMBREE_SUPPORT)
 
@@ -467,20 +465,19 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // ArIntersectionList
     if(!geometryData->_isUserGeometry) {
         self->state = geometryData->_traversalState;
-        self->surfacepoint_test_shape = geometryData->_shape;
+        self->surfacepoint_test_shape = (ArNode<ArpShape> *)geometryData->_shape;
 
         arintersectionlist_init_1(
                 intersectionList,
                 rayhit.ray.tfar,
                 0,
                 arface_on_shape_is_planar,
-                geometryData->_shape,
+                (ArNode<ArpShape> *) geometryData->_shape,
                 self);
 
         intersectionList->head->embreeShapeUserGeometry = NO;
     }
     else {
-
         *intersectionList = *self->embreeIntersectionList;
         if(intersectionList->head)
             intersectionList->head->embreeShapeUserGeometry = YES;
