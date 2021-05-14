@@ -181,107 +181,90 @@ static ArnEmbree * embreeManager;
 }
 
 - (RTCGeometry) initEmbreeSimpleIndexedGeometry
-        : (ArNode<ArpShape> *) shape
+        : (ArNode *) shape
         : (ArnVertexSet *) vertexSet
         : (ArNode *) trafo
 {
-    id trafoToUse = trafo;
-    if ( trafo && ! [ trafo isMemberOfClass: [ ArnHTrafo3D class ] ] )
-    {
-        trafoToUse =
-                [ (ArNode <ArpTrafo3D> *)trafo reduceToSingleHTrafo3D ];
-    }
-
-
     RTCGeometry newGeometry = NULL;
     ArnSimpleIndexedShape * simpleIndexedShape =
             (ArnSimpleIndexedShape *) shape;
 
     // if the shape is a triangle, create a new geometry buffer with type
     // RTC_GEOMETRY_TYPE_TRIANGLE
-    if([shape isKindOfClass: [ArnTriangle class]]) {
+    float * vertices;
+    unsigned * indices;
+
+    if([shape isKindOfClass: [ArnTriangle class]])
+    {
         newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
-        float * vertices = (float *) rtcSetNewGeometryBuffer(newGeometry,
-                                                             RTC_BUFFER_TYPE_VERTEX,
-                                                             0,
-                                                             RTC_FORMAT_FLOAT3,
-                                                             3*sizeof(float),
-                                                             3);
+        vertices = (float *) rtcSetNewGeometryBuffer(newGeometry,
+                                                            RTC_BUFFER_TYPE_VERTEX,
+                                                            0,
+                                                            RTC_FORMAT_FLOAT3,
+                                                            3 * sizeof(float),
+                                                            3);
 
-        unsigned * indices = (unsigned *) rtcSetNewGeometryBuffer(newGeometry,
-                                                                  RTC_BUFFER_TYPE_INDEX,
-                                                                  0,
-                                                                  RTC_FORMAT_UINT3,
-                                                                  3*sizeof(unsigned),
-                                                                  1);
+        indices = (unsigned *) rtcSetNewGeometryBuffer(newGeometry,
+                                                                 RTC_BUFFER_TYPE_INDEX,
+                                                                 0,
+                                                                 RTC_FORMAT_UINT3,
+                                                                 3 * sizeof(unsigned),
+                                                                 1);
 
+    }
 
-        int index = -1;
+    else if([shape isKindOfClass: [ArnQuadrangle class]]) {
+        newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_QUAD);
+        vertices = (float *) rtcSetNewGeometryBuffer(newGeometry,
+                                                            RTC_BUFFER_TYPE_VERTEX,
+                                                            0,
+                                                            RTC_FORMAT_FLOAT3,
+                                                            3 * sizeof(float),
+                                                            4);
+
+        indices = (unsigned *) rtcSetNewGeometryBuffer(newGeometry,
+                                                                 RTC_BUFFER_TYPE_INDEX,
+                                                                 0,
+                                                                 RTC_FORMAT_UINT4,
+                                                                 4 * sizeof(unsigned),
+                                                                 1);
+    }
+
+    int index = -1;
+
+    if(!trafo)
+    {
         for(int i = 0; i < ARARRAY_SIZE(simpleIndexedShape->indexTable); i++) {
             long currentIndex = ARARRAY_I(simpleIndexedShape->indexTable, i);
             Pnt3D currentPoint = ARARRAY_I(vertexSet->pointTable, currentIndex);
 
-            if(!trafo)
-            {
-                vertices[++index] = (float) currentPoint.c.x[0];
-                vertices[++index] = (float) currentPoint.c.x[1];
-                vertices[++index] = (float) currentPoint.c.x[2];
-            }
-            else
-            {
-                Pnt3D transformedPoint;
-
-                [trafoToUse transformPnt3D : &currentPoint : &transformedPoint ];
-
-                vertices[++index] = (float) transformedPoint.c.x[0];
-                vertices[++index] = (float) transformedPoint.c.x[1];
-                vertices[++index] = (float) transformedPoint.c.x[2];
-            }
+            vertices[++index] = (float) currentPoint.c.x[0];
+            vertices[++index] = (float) currentPoint.c.x[1];
+            vertices[++index] = (float) currentPoint.c.x[2];
 
             indices[i] = (unsigned int) i;
         }
     }
-
-    // else, if the shape is a triangle, create a new geometry buffer with type
-    // RTC_GEOMETRY_TYPE_QUAD
-    else if([shape isKindOfClass: [ArnQuadrangle class]]) {
-        newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_QUAD);
-        float * vertices = (float *) rtcSetNewGeometryBuffer(newGeometry,
-                                                           RTC_BUFFER_TYPE_VERTEX,
-                                                           0,
-                                                           RTC_FORMAT_FLOAT3,
-                                                           3*sizeof(float),
-                                                           4);
-
-        unsigned * indices = (unsigned *) rtcSetNewGeometryBuffer(newGeometry,
-                                                                RTC_BUFFER_TYPE_INDEX,
-                                                                0,
-                                                                RTC_FORMAT_UINT4,
-                                                                4*sizeof(unsigned),
-                                                                1);
+    else
+    {
+        id trafoToUse = trafo;
+        if ( [ trafo isMemberOfClass: [ ArnHTrafo3D class ] ] )
+        {
+            trafoToUse =
+                    [ (ArNode <ArpTrafo3D> *)trafo reduceToSingleHTrafo3D ];
+        }
 
 
-        int index = -1;
         for(int i = 0; i < ARARRAY_SIZE(simpleIndexedShape->indexTable); i++) {
             long currentIndex = ARARRAY_I(simpleIndexedShape->indexTable, i);
             Pnt3D currentPoint = ARARRAY_I(vertexSet->pointTable, currentIndex);
+            Pnt3D transformedPoint;
 
-            if(!trafo)
-            {
-                vertices[++index] = (float) currentPoint.c.x[0];
-                vertices[++index] = (float) currentPoint.c.x[1];
-                vertices[++index] = (float) currentPoint.c.x[2];
-            }
-            else
-            {
-                Pnt3D transformedPoint;
+            [trafoToUse transformPnt3D : &currentPoint : &transformedPoint ];
 
-                [trafoToUse transformPnt3D : &currentPoint : &transformedPoint ];
-
-                vertices[++index] = (float) transformedPoint.c.x[0];
-                vertices[++index] = (float) transformedPoint.c.x[1];
-                vertices[++index] = (float) transformedPoint.c.x[2];
-            }
+            vertices[++index] = (float) transformedPoint.c.x[0];
+            vertices[++index] = (float) transformedPoint.c.x[1];
+            vertices[++index] = (float) transformedPoint.c.x[2];
 
             indices[i] = (unsigned int) i;
         }
@@ -292,7 +275,7 @@ static ArnEmbree * embreeManager;
 
 
 - (RTCGeometry) initEmbreeTriangleMeshGeometry
-          : (ArNode<ArpShape> *) shape
+          : (ArNode *) shape
           : (ArnVertexSet *) vertexSet
           : (ArNode *) trafo
 {
@@ -363,7 +346,7 @@ static ArnEmbree * embreeManager;
 // user geometry pointer to the corresponding embree geometry
 - (void) setGeometryUserData
         : (RTCGeometry) thisGeometry
-        : (ArNode <ArpShape> *) shape
+        : (ArNode *) shape
         : (ArTraversalState *) traversalState
         : (AraCombinedAttributes *) combinedAttributes
 {
@@ -490,6 +473,10 @@ void embree_intersect_geometry(const int * valid,
     if(!intersectionList.head)
         return;
 
+    // debug
+    ArcIntersection * prevIsect = ARINTERSECTIONLIST_HEAD(*rayCaster->embreeIntersectionList);
+    if(prevIsect && prevIsect->t < intersectionList.head->t)
+        return;
 
     // update embree components
     rtc_ray->tfar = (float) intersectionList.head->t;
@@ -562,7 +549,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
 // initialization of an embree geometry
 - (int) initEmbreeGeometry
-        : (ArNode <ArpShape> *) shape
+        : (ArNode *) shape
         : (ArTraversalState *) traversalState
         : (AraCombinedAttributes *) combinedAttributes
         : (ArnVertexSet *) vertexSet

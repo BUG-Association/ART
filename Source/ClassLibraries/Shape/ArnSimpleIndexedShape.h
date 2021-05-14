@@ -33,7 +33,7 @@ ART_MODULE_INTERFACE(ArnSimpleIndexedShape)
 
 @interface ArnSimpleIndexedShape
         : ArNode
-        < ArpShape, ArpCoding, ArpActivateAndGetBBoxes, ArpAttributeConcatenation,
+        < ArpCoding, ArpActivateAndGetBBoxes, ArpAttributeConcatenation,
           ArpInsertAndRemoveBBoxes >
 {
 

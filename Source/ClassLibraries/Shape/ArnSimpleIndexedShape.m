@@ -199,6 +199,9 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     return result;
 }
 
+// empty functions for making compiler warnings go away
+
+
 
 @end
 

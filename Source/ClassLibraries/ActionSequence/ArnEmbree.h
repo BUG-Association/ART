@@ -90,13 +90,13 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 
 
 - (RTCGeometry) initEmbreeSimpleIndexedGeometry
-        : (ArNode<ArpShape> *) shape
+        : (ArNode *) shape
         : (ArnVertexSet *) vertexSet
         : (ArNode *) trafo
         ;
 
 - (int) initEmbreeGeometry
-        : (ArNode <ArpShape> *) shape
+        : (ArNode *) shape
         : (ArTraversalState *) traversalState
         : (AraCombinedAttributes *) combinedAttributes
         : (ArnVertexSet *) vertexSet
@@ -104,7 +104,7 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
         ;
 
 - (RTCGeometry) initEmbreeTriangleMeshGeometry
-        : (ArNode<ArpShape> *) shape
+        : (ArNode *) shape
         : (ArnVertexSet *) vertexSet
         : (ArNode *) trafo
         ;
@@ -112,7 +112,7 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 - (int) addGeometry: (RTCGeometry) newGeometry;
 - (void) setGeometryUserData
         : (RTCGeometry) newGeometry
-        : (ArNode <ArpShape> *) shape
+        : (ArNode *) shape
         : (ArTraversalState *) traversalState
         : (AraCombinedAttributes *) combinedAttributes
         ;
