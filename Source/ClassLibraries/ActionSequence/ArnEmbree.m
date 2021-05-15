@@ -37,7 +37,7 @@ ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 
-ARLIST_IMPLEMENTATION_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
+// ARLIST_IMPLEMENTATION_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 
 void errorFunction(void* userPtr, enum RTCError error, const char* str) {
     printf("\nembree error %d: %s\n", error, str);
@@ -69,7 +69,35 @@ static ArnEmbree * embreeManager;
 }
 
 - (void) addToUserGeometryList : (UserGeometryData *) data {
-    arlist_add_userGeometryDataptr_at_tail( &userGeometryList, data );
+    // arlist_add_userGeometryDataptr_at_tail( &userGeometryList, data );
+
+
+    // code is based on this stack-overflow answer:
+    // https://stackoverflow.com/questions/5797548/c-linked-list-inserting-node-at-the-end
+    UserGeometryDataList * newNode =
+            (UserGeometryDataList *) malloc(sizeof(UserGeometryDataList));
+
+    if( !newNode ) {
+        fprintf(stderr, "Unable to allocate memory for new user geometry list node\n");
+        exit(-1);
+    }
+
+    newNode->next = NULL;
+    newNode->data = data;
+
+    if( !userGeometryListHead ) {
+        userGeometryListHead = newNode;
+        return;
+    }
+
+    UserGeometryDataList * iteratorNode = userGeometryListHead;
+    while( true ) {
+        if (!iteratorNode->next) {
+            iteratorNode->next = newNode;
+            break;
+        }
+        iteratorNode = iteratorNode->next;
+    }
 }
 
 - (void) setDevice: (RTCDevice) newDevice {
@@ -81,27 +109,34 @@ static ArnEmbree * embreeManager;
 }
 
 - (void) increaseRayCasterCount {
-    rayCasterCount++;
+    numRayCaster++;
 }
 
 - (int) getRayCasterCount {
-    return rayCasterCount;
+    return numRayCaster;
 }
 
 - (int) setRayCasterCount : (int) value {
-    rayCasterCount = value;
+    numRayCaster = value;
 }
 
 - (void) initializeEmptyGeometryList {
-    userGeometryList = ARLIST_EMPTY;
-}
-
-- (ArList *) getUserGeometryList {
-    return &userGeometryList;
+    // userGeometryList = ARLIST_EMPTY;
+    userGeometryListHead = NULL;
 }
 
 - (void) freeGeometryList {
     // arlist_free_userGeometryDataptr_entries(&userGeometryList);
+
+    UserGeometryDataList * iteratorNode = userGeometryListHead;
+    UserGeometryDataList * next;
+
+    while( iteratorNode ) {
+        next = iteratorNode->next;
+        free(iteratorNode->data);
+        free(iteratorNode);
+        iteratorNode = next;
+    }
 }
 
 
@@ -355,6 +390,11 @@ static ArnEmbree * embreeManager;
 {
     struct UserGeometryData * data = malloc(sizeof(struct UserGeometryData));
 
+    if( !data ) {
+        fprintf(stderr, "Unable to allocate memory for new user geometry data struct\n");
+        exit(-1);
+    }
+
     if([shape isKindOfClass: [ArnShape class]]) {
         if([shape isKindOfClass: [ArnTriangleMesh class]])
             data->_isUserGeometry = NO;
@@ -444,24 +484,6 @@ void embree_intersect_geometry(const int * valid,
     ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
     UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
 
-    // debug
-    // printf("%s\n", [[geometryData->_shape className] UTF8String]);
-
-    // filter intersection points:
-    // if a previous hit point lies on a shape
-    // that is not defined as an embree user geometry
-    // we return
-
-    /*
-    if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
-        RTCGeometry prevIntersectedGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
-        UserGeometryData *prevGeometryData = (UserGeometryData *) rtcGetGeometryUserData(prevIntersectedGeometry);
-        if (!prevGeometryData->_isUserGeometry)
-            return;
-    }
-    */
-
-
     // perform the intersection
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
     [geometryData->_combinedAttributes
@@ -476,7 +498,7 @@ void embree_intersect_geometry(const int * valid,
     if(!intersectionList.head)
         return;
 
-    // debug
+    // if the prev intersection is closer, free intersection list and return
     ArcIntersection * prevIsect = ARINTERSECTIONLIST_HEAD(*rayCaster->embreeIntersectionList);
     if(prevIsect && prevIsect->t < intersectionList.head->t) {
         arintersectionlist_free_contents(&intersectionList,
@@ -490,19 +512,12 @@ void embree_intersect_geometry(const int * valid,
     rtc_hit->geomID = geomID;
     rtc_hit->primID = 0;
 
-
-    /*
-    // append intersection to ray caster intersection list
-    arintersectionlist_append(&intersectionList,
-                              ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
-                              ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
-    */
-
-    // debug
+    // since this function is called mutlple times in one go, clear out already existing
+    // intersection list, since we are only interested in nearest hit
     arintersectionlist_free_contents(ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
                                      ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
 
-    // set
+    // set intersection list
     *rayCaster->embreeIntersectionList = intersectionList;
 }
 
@@ -557,12 +572,12 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 // does a linear search in the static raycaster array
 // and returns the raycaster object with the matching pthread id
 - (ArnRayCaster *) getRayCasterFromRayCasterArray {
-    int key = gettid() % rayCasterCount;
+    int key = gettid() % numRayCaster;
     return rayCasterArray[key];
 
 }
 - (void) addRayCasterToRayCasterArray : (ArnRayCaster *) rayCaster {
-    int key = gettid() % rayCasterCount;
+    int key = gettid() % numRayCaster;
     rayCasterArray[key] = rayCaster;
 }
 

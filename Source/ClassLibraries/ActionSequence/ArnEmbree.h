@@ -49,16 +49,23 @@ typedef struct UserGeometryData {
 }
 UserGeometryData;
 
-ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
+typedef struct UserGeometryDataList {
+    UserGeometryData * data;
+    struct UserGeometryDataList * next;
+}
+UserGeometryDataList;
+
+// ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 
 #define THREAD_MAX 25
 
 @interface ArnEmbree : ArcObject {
     RTCDevice device;
     RTCScene scene;
-    ArList userGeometryList;
+    // ArList userGeometryList;
+    UserGeometryDataList * userGeometryListHead;
     ArnRayCaster * rayCasterArray[THREAD_MAX];
-    int rayCasterCount;
+    int numRayCaster;
 
 @public
     BOOL environmentLighting;
@@ -82,7 +89,6 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 - (int) getRayCasterCount;
 - (int) setRayCasterCount : (int) value;
 
-- (ArList *) getUserGeometryList;
 - (void) initializeEmptyGeometryList;
 - (void) freeGeometryList;
 
