@@ -704,7 +704,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
         double * wavelengths = ALLOC_ARRAY(double, _spectralChannels);
 
         for (int i = 0; i < _spectralChannels; i++) {
-            float central = 0.F;
+            double central = 0.;
             
             switch(_spectralChannels) {
                 case 8:
