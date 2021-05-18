@@ -498,6 +498,9 @@ void embree_intersect_geometry(const int * valid,
     if(!intersectionList.head)
         return;
 
+    // TEMPORARY SOLUTION TO GET NEAREST INTERSECTION
+
+    /*
     // if the prev intersection is closer, free intersection list and return
     ArcIntersection * prevIsect = ARINTERSECTIONLIST_HEAD(*rayCaster->embreeIntersectionList);
     if(prevIsect && prevIsect->t < intersectionList.head->t) {
@@ -505,20 +508,35 @@ void embree_intersect_geometry(const int * valid,
                                          ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
         return;
     }
+    // since this function is called mutlple times in one go, clear out already existing
+    // intersection list, since we are only interested in nearest hit
+    arintersectionlist_free_contents(ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
+                                     ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
 
+    // TEMPORARY SOLUTION TO GET NEAREST INTERSECTION - END
+     */
+    /*
+    arintersectionlist_append(&intersectionList,
+                              ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
+                              ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
+                              */
 
     // update embree components
     rtc_ray->tfar = (float) intersectionList.head->t;
     rtc_hit->geomID = geomID;
     rtc_hit->primID = 0;
 
-    // since this function is called mutlple times in one go, clear out already existing
-    // intersection list, since we are only interested in nearest hit
-    arintersectionlist_free_contents(ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
-                                     ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
+    ArIntersectionList combinedList;
+    arintersectionlist_combine(&intersectionList,
+                               ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
+                               &combinedList,
+                               ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster),
+                               ARNRAYCASTER_EPSILON(rayCaster)
+                               );
 
     // set intersection list
-    *rayCaster->embreeIntersectionList = intersectionList;
+    // *rayCaster->embreeIntersectionList = intersectionList;
+    *rayCaster->embreeIntersectionList = combinedList;
 }
 
 void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {
