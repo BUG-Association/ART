@@ -39,9 +39,6 @@ ART_MODULE_INITIALISATION_FUNCTION
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 
-ARLIST_IMPLEMENTATION_FOR_PTR_TYPE(GeometryDistancePair, geometryDistancePair)
-
-
 void releaseAllIntersectionsAfterFirst(
         ArcIntersection  * intersectionToKeep,
         ArcFreelist      * rayIntersectionFreelist
@@ -399,7 +396,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         self->rayCasterAddedToEmbreeArray = YES;
     }
 
-    self->embreeIntersectionList = &ARINTERSECTIONLIST_EMPTY;
+    // self->embreeIntersectionList = &ARINTERSECTIONLIST_EMPTY;
 
     // set up embree intersection context
     struct RTCIntersectContext context;
@@ -426,7 +423,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     // debug
     ArnEmbree * embree = [ArnEmbree embreeManager];
-    // [embree resetCount];
+    [embree resetCount];
 
         // if we did not hit anything and we do not have environment lighting, we are done here
     if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID && !embree->environmentLighting) {
@@ -478,9 +475,16 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         intersectionList->head->embreeShapeUserGeometry = NO;
     }
     else {
+        *intersectionList = [embree extractClosestIntersectionList: self];
+
+        if(intersectionList->head)
+            intersectionList->head->embreeShapeUserGeometry = YES;
+
+        /*
         *intersectionList = *self->embreeIntersectionList;
         if(intersectionList->head)
             intersectionList->head->embreeShapeUserGeometry = YES;
+            */
     }
 
     if(! intersectionList->head)
@@ -600,6 +604,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         ArnEmbree * embree = [ArnEmbree embreeManager];
         embreeRTCSceneCopy = [embree getScene];
         self->rayCasterAddedToEmbreeArray = NO;
+        self->intersectionListHead = NULL;
         [embree increaseRayCasterCount];
     }
 #endif

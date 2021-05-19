@@ -56,6 +56,8 @@ typedef struct UserGeometryDataList {
 }
 UserGeometryDataList;
 
+
+
 // ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 
 #define THREAD_MAX 25
@@ -101,6 +103,14 @@ UserGeometryDataList;
 
 - (void) increaseRayCasterCount;
 
+- (void) addIntersectionToIntersectionLinkedList
+        : (ArnRayCaster *) rayCaster
+        : (struct ArIntersectionList) list
+                ;
+
+- (struct ArIntersectionList) extractClosestIntersectionList
+        : (ArnRayCaster *) rayCaster
+        ;
 
 - (RTCGeometry) initEmbreeSimpleIndexedGeometry
         : (ArNode *) shape
@@ -143,6 +153,7 @@ UserGeometryDataList;
 
 - (void) resetCount;
 - (int) getCount;
+- (void) increaseCount;
 
 @end
 

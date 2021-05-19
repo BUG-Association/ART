@@ -217,8 +217,8 @@ static ArnEmbree * embreeManager;
     ArnEmbree * embree = [ArnEmbree embreeManager];
 
     // debug
-    printf("\n");
-    [embree->csgTree printCSGTree];
+    // printf("\n");
+    // [embree->csgTree printCSGTree];
 
     rtcCommitScene([embree getScene]);
     rtcSetSceneFlags([embree getScene], RTC_SCENE_FLAG_COMPACT);
@@ -563,6 +563,82 @@ static int callCount = 0;
     return callCount;
 }
 
+- (void) increaseCount {
+    callCount += 1;
+}
+
+- (void) addIntersectionToIntersectionLinkedList
+        : (ArnRayCaster *) rayCaster
+        : (struct ArIntersectionList) list
+{
+    IntersectionLinkedListNode * newNode =
+            (IntersectionLinkedListNode *) malloc(sizeof(IntersectionLinkedListNode));
+
+    if( !newNode ) {
+        fprintf(stderr, "Unable to allocate memory for new IntersectionLinkedListNode\n");
+        exit(-1);
+    }
+
+    newNode->intersectionList = list;
+    newNode->next = NULL;
+
+    if( !rayCaster->intersectionListHead ) {
+        rayCaster->intersectionListHead = newNode;
+        return;
+    }
+
+    IntersectionLinkedListNode * head = rayCaster->intersectionListHead;
+    IntersectionLinkedListNode * iteratorNode = head;
+    while( true ) {
+        if (!iteratorNode->next) {
+            iteratorNode->next = newNode;
+            break;
+        }
+        iteratorNode = iteratorNode->next;
+    }
+}
+
+- (struct ArIntersectionList) extractClosestIntersectionList
+        : (ArnRayCaster *) rayCaster
+{
+    if( !rayCaster->intersectionListHead )
+        return ARINTERSECTIONLIST_EMPTY;
+
+    ArIntersectionList minimumList;
+    ArIntersectionList * minimumListPtr = &minimumList;
+    double min_t = MATH_HUGE_DOUBLE;
+
+    // find minimum
+    IntersectionLinkedListNode * iteratorNode = rayCaster->intersectionListHead;
+    while( iteratorNode ) {
+
+        if(iteratorNode->intersectionList.head->t <= min_t) {
+            minimumList = iteratorNode->intersectionList;
+            min_t = iteratorNode->intersectionList.head->t;
+        }
+
+        iteratorNode = iteratorNode->next;
+    }
+
+    // delete linked list entries
+    iteratorNode = rayCaster->intersectionListHead;
+    IntersectionLinkedListNode * next;
+    while( iteratorNode ) {
+        next = iteratorNode->next;
+
+        ArIntersectionList * ptr = &iteratorNode->intersectionList;
+        if(ptr->head != minimumListPtr->head)
+            arintersectionlist_free_contents(&iteratorNode->intersectionList,
+                                             rayCaster->rayIntersectionFreelist);
+
+        free(iteratorNode);
+        iteratorNode = next;
+    }
+    rayCaster->intersectionListHead = NULL;
+
+    return minimumList;
+}
+
 // intersection callback function
 void embree_intersect_geometry(const int * valid,
                                void * geometryUserPtr,
@@ -579,6 +655,12 @@ void embree_intersect_geometry(const int * valid,
     ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
     UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
 
+    // debug
+    [embree increaseCount];
+    if( [embree getCount] > 1 ) {
+        // printf("break\n");
+    }
+
     // perform the intersection
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
     [geometryData->_combinedAttributes
@@ -593,6 +675,7 @@ void embree_intersect_geometry(const int * valid,
     if(!intersectionList.head)
         return;
 
+    /*
     // TEMPORARY SOLUTION TO GET NEAREST INTERSECTION
 
     // if the prev intersection is closer, free intersection list and return
@@ -608,31 +691,22 @@ void embree_intersect_geometry(const int * valid,
                                      ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
 
     // TEMPORARY SOLUTION TO GET NEAREST INTERSECTION - END
+    */
 
     /*
     arintersectionlist_append(&intersectionList,
                               ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
                               ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
-                              */
+    */
 
     // update embree components
     rtc_ray->tfar = (float) intersectionList.head->t;
     rtc_hit->geomID = geomID;
     rtc_hit->primID = 0;
 
-    /*
-    ArIntersectionList combinedList;
-    arintersectionlist_combine(&intersectionList,
-                               ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
-                               &combinedList,
-                               ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster),
-                               ARNRAYCASTER_EPSILON(rayCaster)
-                               );
-    */
-
     // set intersection list
-    *rayCaster->embreeIntersectionList = intersectionList;
-    // *rayCaster->embreeIntersectionList = combinedList;
+    // *rayCaster->embreeIntersectionList = intersectionList;
+    [embree addIntersectionToIntersectionLinkedList: rayCaster : intersectionList];
 }
 
 void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {
@@ -666,13 +740,13 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     else if([shape isKindOfClass: [ArnSimpleIndexedShape class]]) {
         newGeometry = [self initEmbreeSimpleIndexedGeometry: shape : vertexSet :trafo];
     }
-
+    /*
     // debug
     else if([shape isKindOfClass: [ArnCube class]]) {
         ArnCube * cube = (ArnCube *) shape;
         newGeometry = [self initEmbreeCube: cube :trafo];
     }
-
+    */
 
     else {
         newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_USER);

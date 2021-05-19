@@ -52,14 +52,14 @@ typedef struct ArHashedMailboxEntry
 }
 ArHashedMailboxEntry;
 
-
-typedef struct GeometryDistancePair {
-    double distance;
-    AraCombinedAttributes * _geometry;
+#if defined(ENABLE_EMBREE_SUPPORT)
+typedef struct IntersectionLinkedListNode {
+    struct ArIntersectionList intersectionList;
+    struct IntersectionLinkedListNode * next;
 }
-GeometryDistancePair;
+IntersectionLinkedListNode;
+#endif
 
-ARLIST_INTERFACE_FOR_PTR_TYPE(GeometryDistancePair, geometryDistancePair)
 
 @protocol ArpRayCaster;
 
@@ -102,11 +102,11 @@ ARLIST_INTERFACE_FOR_PTR_TYPE(GeometryDistancePair, geometryDistancePair)
 //----------------------------------------------------------------//
     RTCScene embreeRTCSceneCopy;
 
-    struct ArIntersectionList * embreeIntersectionList;
+    // struct ArIntersectionList * embreeIntersectionList;
+
+    IntersectionLinkedListNode * intersectionListHead;
 
     BOOL rayCasterAddedToEmbreeArray;
-
-    ArList distanceList;
 #endif
 }
 
