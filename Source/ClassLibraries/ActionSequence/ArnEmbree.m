@@ -31,6 +31,8 @@
 #import <RayCastingCommonMacros.h>
 #import <ARM_RayCasting.h>
 #import <unistd.h>
+#import <ArnCube.h>
+#import <ArSurfacePointMappingMacros.h>
 
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
@@ -190,7 +192,10 @@ static ArnEmbree * embreeManager;
         isInitialized = YES;
         EMBREE_ENABLED = YES;
 
+        embreeManager->csgScene = NO;
+        embreeManager->csgTree = NULL;
         embreeManager->environmentLighting = NO;
+        embreeManager->environmentLight = NULL;
     }
 }
 
@@ -201,8 +206,19 @@ static ArnEmbree * embreeManager;
     return scene;
 }
 
++ (void) setCSGTreeNode : (ArNode *) csgTree {
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+
+    if( !embree->csgTree )
+        embree->csgTree = csgTree;
+}
+
 + (void) commitScene {
     ArnEmbree * embree = [ArnEmbree embreeManager];
+
+    // debug
+    printf("\n");
+    [embree->csgTree printCSGTree];
 
     rtcCommitScene([embree getScene]);
     rtcSetSceneFlags([embree getScene], RTC_SCENE_FLAG_COMPACT);
@@ -379,6 +395,85 @@ static ArnEmbree * embreeManager;
     return embreeMesh;
 }
 
+// debug
+- (RTCGeometry) initEmbreeCube
+        : (ArnCube *) cube
+        : (ArNode *) trafo
+{
+    // get hull table
+    int hullPointTableSize;
+    const Pnt3D * hullPointTable = [cube getLocalHullPointTable: &hullPointTableSize];
+
+    Pnt3DE point;
+    point.coord = hullPointTable[2];
+    Pnt3DE * inPoint3D = &point;
+
+    int faceIndex = IN_3D_FACEINDEX;
+
+    unsigned indicesSize = 6;
+
+    // init embree geometry
+    RTCGeometry newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_QUAD);
+
+    // first set up geometry buffers for vertices and indeces
+    float * vertices = (float *) rtcSetNewGeometryBuffer(newGeometry,
+                                                     RTC_BUFFER_TYPE_VERTEX,
+                                                     0,
+                                                     RTC_FORMAT_FLOAT3,
+                                                     3 * sizeof(float),
+                                                     hullPointTableSize);
+
+    unsigned * indices = (unsigned *) rtcSetNewGeometryBuffer(newGeometry,
+                                                       RTC_BUFFER_TYPE_INDEX,
+                                                       0,
+                                                       RTC_FORMAT_UINT4,
+                                                       4 * sizeof(unsigned),
+                                                       indicesSize);
+
+    // fill up vertices
+    int index = -1;
+
+    if(!trafo)
+    {
+        for(int i = 0; i < hullPointTableSize; i++) {
+            vertices[++index] = (float) hullPointTable[i].c.x[0];
+            vertices[++index] = (float) hullPointTable[i].c.x[1];
+            vertices[++index] = (float) hullPointTable[i].c.x[2];
+        }
+    }
+    else
+    {
+        id trafoToUse = trafo;
+        if ( [ trafo isMemberOfClass: [ ArnHTrafo3D class ] ] )
+        {
+            trafoToUse =
+                    [ (ArNode <ArpTrafo3D> *)trafo reduceToSingleHTrafo3D ];
+        }
+
+        for(int i = 0; i < hullPointTableSize; i++) {
+            Pnt3D transformedPoint;
+
+            [trafoToUse transformPnt3D : &hullPointTable[i] : &transformedPoint ];
+
+            vertices[++index] = (float) transformedPoint.c.x[0];
+            vertices[++index] = (float) transformedPoint.c.x[1];
+            vertices[++index] = (float) transformedPoint.c.x[2];
+        }
+    }
+
+    // fill up indices
+    // TODO: somethings wrong here
+    indices[0] = 0; indices[1] = 1; indices[2] = 3; indices[3] = 2;
+    indices[4] = 0; indices[5] = 1; indices[6] = 5; indices[7] = 4;
+    indices[8] = 6; indices[9] = 7; indices[10] = 5; indices[11] = 4;
+
+    indices[12] = 2; indices[13] = 3; indices[14] = 7; indices[15] = 6;
+    indices[16] = 3; indices[17] = 1; indices[18] = 5; indices[19] = 7;
+    indices[20] = 2; indices[21] = 0; indices[22] = 4; indices[23] = 6;
+
+    return newGeometry;
+}
+
 // create a struct containing all the information that is needed
 // for user geometry ray casting and pass it as
 // user geometry pointer to the corresponding embree geometry
@@ -500,7 +595,6 @@ void embree_intersect_geometry(const int * valid,
 
     // TEMPORARY SOLUTION TO GET NEAREST INTERSECTION
 
-    /*
     // if the prev intersection is closer, free intersection list and return
     ArcIntersection * prevIsect = ARINTERSECTIONLIST_HEAD(*rayCaster->embreeIntersectionList);
     if(prevIsect && prevIsect->t < intersectionList.head->t) {
@@ -514,7 +608,7 @@ void embree_intersect_geometry(const int * valid,
                                      ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
 
     // TEMPORARY SOLUTION TO GET NEAREST INTERSECTION - END
-     */
+
     /*
     arintersectionlist_append(&intersectionList,
                               ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
@@ -526,6 +620,7 @@ void embree_intersect_geometry(const int * valid,
     rtc_hit->geomID = geomID;
     rtc_hit->primID = 0;
 
+    /*
     ArIntersectionList combinedList;
     arintersectionlist_combine(&intersectionList,
                                ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
@@ -533,10 +628,11 @@ void embree_intersect_geometry(const int * valid,
                                ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster),
                                ARNRAYCASTER_EPSILON(rayCaster)
                                );
+    */
 
     // set intersection list
-    // *rayCaster->embreeIntersectionList = intersectionList;
-    *rayCaster->embreeIntersectionList = combinedList;
+    *rayCaster->embreeIntersectionList = intersectionList;
+    // *rayCaster->embreeIntersectionList = combinedList;
 }
 
 void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {
@@ -570,6 +666,14 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     else if([shape isKindOfClass: [ArnSimpleIndexedShape class]]) {
         newGeometry = [self initEmbreeSimpleIndexedGeometry: shape : vertexSet :trafo];
     }
+
+    // debug
+    else if([shape isKindOfClass: [ArnCube class]]) {
+        ArnCube * cube = (ArnCube *) shape;
+        newGeometry = [self initEmbreeCube: cube :trafo];
+    }
+
+
     else {
         newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_USER);
         rtcSetGeometryBoundsFunction(newGeometry, embree_bbox, NULL);

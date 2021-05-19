@@ -231,12 +231,13 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
 
+        ArnVertexSet * vertexSet = (ArnVertexSet *)ARNGT_VERTICES(traversal);
+
         if([self isKindOfClass: [ArnInfSphere class]]) {
             embree->environmentLighting = YES;
             embree->environmentLight = result;
         }
         else {
-            ArnVertexSet * vertexSet = (ArnVertexSet *)ARNGT_VERTICES(traversal);
             embreeGeomID = [embree initEmbreeGeometry :self : &traversal->state :result :vertexSet :ARNGT_TRAFO(traversal)];
         }
     }

@@ -37,6 +37,7 @@
 @class ArcInteger;
 @class ArnTriangleMesh;
 @class ArnInfSphere;
+@class ArnCube;
 
 ART_MODULE_INTERFACE(ArnEmbree)
 
@@ -62,12 +63,16 @@ UserGeometryDataList;
 @interface ArnEmbree : ArcObject {
     RTCDevice device;
     RTCScene scene;
-    // ArList userGeometryList;
+
     UserGeometryDataList * userGeometryListHead;
+
     ArnRayCaster * rayCasterArray[THREAD_MAX];
     int numRayCaster;
 
 @public
+    BOOL csgScene;
+    ArNode * csgTree;
+
     BOOL environmentLighting;
     AraCombinedAttributes * environmentLight;
 }
@@ -86,6 +91,8 @@ UserGeometryDataList;
 - (RTCScene) getScene;
 + (void) commitScene;
 
++ (void) setCSGTreeNode : (ArNode *) csgTree;
+
 - (int) getRayCasterCount;
 - (int) setRayCasterCount : (int) value;
 
@@ -98,6 +105,12 @@ UserGeometryDataList;
 - (RTCGeometry) initEmbreeSimpleIndexedGeometry
         : (ArNode *) shape
         : (ArnVertexSet *) vertexSet
+        : (ArNode *) trafo
+        ;
+
+// debug
+- (RTCGeometry) initEmbreeCube
+        : (ArnCube *) cube
         : (ArNode *) trafo
         ;
 

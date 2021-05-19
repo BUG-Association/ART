@@ -977,7 +977,7 @@ void arintersectionlist_combine(
 #endif
     ArNodeRef    left_mat_ref = ARINTERSECTIONLIST_HEAD_VOLUME_MATERIAL_REF(*left_list);
     ArNodeRef    right_mat_ref = ARINTERSECTIONLIST_HEAD_VOLUME_MATERIAL_REF(*right_list);
-    //ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     // TODO: Macro COMBINE_MAT_REF ot working properly
     ArNodeRef    new_mat_ref = COMBINE_MAT_REF(left_mat_ref, right_mat_ref);
     ArNodeRef    old_mat_ref;
@@ -1133,7 +1133,7 @@ void arintersectionlist_combine(
 
     ARINTERSECTIONLIST_VALIDATE(combi_list);
 
-    // ART_ERRORHANDLING_WARNING("arintersectionlist_combine not implemented fully. Check the COMBINE_MAT_REF Macro");
+    ART_ERRORHANDLING_WARNING("arintersectionlist_combine not implemented fully. Check the COMBINE_MAT_REF Macro");
 }
 
 

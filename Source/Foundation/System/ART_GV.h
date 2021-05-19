@@ -125,9 +125,6 @@
 //   have canonical names: the type should be <module name>_GV, and the
 //   entry <module name in lowercase>_gv
 
-
-#include <objc/objc.h> // [Sebastian TODO] remove this, when not needed anymore
-
 typedef struct ART_GV
 {
     unsigned int                          moduleManagementVerbosity;

@@ -496,6 +496,18 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
 - (void) performOn
         : (ArNode <ArpNodeStack> *) nodeStack
 {
+    ArNodeRef  node_Ref_Scene  = [ nodeStack pop ];
+
+    ART_ERRORHANDLING_MANDATORY_ARPROTOCOL_CHECK(
+        ARNODEREF_POINTER(node_Ref_Scene),
+        ArpWorld
+        );
+
+    ArNode <ArpWorld>  * worldNode =
+        (ArNode <ArpWorld> *)ARNODEREF_POINTER(node_Ref_Scene);
+
+    ArNode  * sceneGeometry = [ worldNode scene ];
+
 #if defined(ENABLE_EMBREE_SUPPORT)
     // if embree is enabled, all we have to do is
     // to commit the embree-scene containing the
@@ -509,25 +521,21 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
         ];
          */
 
+        [ArnEmbree setCSGTreeNode: sceneGeometry];
+
         [ArnEmbree commitScene];
 
         // [ REPORTER endAction];
 
+        [ nodeStack push
+        :   node_Ref_Scene
+        ];
+
+        RELEASE_NODE_REF( node_Ref_Scene );
+
         return;
     }
 #endif
-
-    ArNodeRef  node_Ref_Scene  = [ nodeStack pop ];
-
-    ART_ERRORHANDLING_MANDATORY_ARPROTOCOL_CHECK(
-        ARNODEREF_POINTER(node_Ref_Scene),
-        ArpWorld
-        );
-
-    ArNode <ArpWorld>  * worldNode =
-        (ArNode <ArpWorld> *)ARNODEREF_POINTER(node_Ref_Scene);
-
-    ArNode  * sceneGeometry = [ worldNode scene ];
 
     ArNodeRef  node_Ref_BBoxes  = [ nodeStack pop ];
 
@@ -559,7 +567,6 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
             :   leafNodeBBoxCollection
             :   operationTree
             ];
-
     [ worldNode setScene
         :   bspTree
         ];
