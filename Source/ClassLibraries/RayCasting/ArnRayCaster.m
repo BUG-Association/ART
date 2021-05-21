@@ -475,6 +475,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         intersectionList->head->embreeShapeUserGeometry = NO;
     }
     else {
+        // *intersectionList = [embree getClosestIntersectionListFromArray: self];
         *intersectionList = [embree extractClosestIntersectionList: self];
 
         if(intersectionList->head)
@@ -487,7 +488,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
             */
     }
 
-    if(! intersectionList->head)
+    if(! intersectionList->head )
         return;
 
 
@@ -605,7 +606,9 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         embreeRTCSceneCopy = [embree getScene];
         self->rayCasterAddedToEmbreeArray = NO;
         self->intersectionListHead = NULL;
+        self->scenegraphReference = [embree->orgScenegraphReference copy];
         [embree increaseRayCasterCount];
+        [embree initRayCasterIntersectionArray: self];
     }
 #endif
 }

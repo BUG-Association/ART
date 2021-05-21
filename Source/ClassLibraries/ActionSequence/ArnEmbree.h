@@ -73,7 +73,7 @@ UserGeometryDataList;
 
 @public
     BOOL csgScene;
-    ArNode * csgTree;
+    ArNode * orgScenegraphReference;
 
     BOOL environmentLighting;
     AraCombinedAttributes * environmentLight;
@@ -102,6 +102,23 @@ UserGeometryDataList;
 - (void) freeGeometryList;
 
 - (void) increaseRayCasterCount;
+
+- (void) initRayCasterIntersectionArray
+        : (ArnRayCaster *) rayCaster
+        ;
+
+- (void) addIntersectionListToArray
+        : (ArnRayCaster *) rayCaster
+        : (struct ArIntersectionList) list
+                ;
+
+- (struct ArIntersectionList) getClosestIntersectionListFromArray
+        : (ArnRayCaster *) rayCaster
+        ;
+
+- (struct ArIntersectionList) evaluateIntersectionListsAccordingToCSGTree
+        : (ArnRayCaster *) rayCaster
+        ;
 
 - (void) addIntersectionToIntersectionLinkedList
         : (ArnRayCaster *) rayCaster

@@ -127,6 +127,14 @@ static ArnEmbree * embreeManager;
     userGeometryListHead = NULL;
 }
 
+- (void) initRayCasterIntersectionArray
+        : (ArnRayCaster *) rayCaster
+{
+    for( int i = 0; i < INTERSECTION_LIST_ARRAY_MAX_SIZE; i++) {
+        rayCaster->intersectionListArray[i] = ARINTERSECTIONLIST_EMPTY;
+    }
+}
+
 - (void) freeGeometryList {
     // arlist_free_userGeometryDataptr_entries(&userGeometryList);
 
@@ -193,7 +201,7 @@ static ArnEmbree * embreeManager;
         EMBREE_ENABLED = YES;
 
         embreeManager->csgScene = NO;
-        embreeManager->csgTree = NULL;
+        embreeManager->orgScenegraphReference = NULL;
         embreeManager->environmentLighting = NO;
         embreeManager->environmentLight = NULL;
     }
@@ -209,16 +217,12 @@ static ArnEmbree * embreeManager;
 + (void) setCSGTreeNode : (ArNode *) csgTree {
     ArnEmbree * embree = [ArnEmbree embreeManager];
 
-    if( !embree->csgTree )
-        embree->csgTree = csgTree;
+    if( !embree->orgScenegraphReference )
+        embree->orgScenegraphReference = csgTree;
 }
 
 + (void) commitScene {
     ArnEmbree * embree = [ArnEmbree embreeManager];
-
-    // debug
-    // printf("\n");
-    // [embree->csgTree printCSGTree];
 
     rtcCommitScene([embree getScene]);
     rtcSetSceneFlags([embree getScene], RTC_SCENE_FLAG_COMPACT);
@@ -639,6 +643,80 @@ static int callCount = 0;
     return minimumList;
 }
 
+- (struct ArIntersectionList) getClosestIntersectionListFromArray
+        : (ArnRayCaster *) rayCaster
+{
+    ArIntersectionList minimumList = ARINTERSECTIONLIST_EMPTY;
+    double min_t = MATH_HUGE_DOUBLE;
+
+    for( int i = 0; i < INTERSECTION_LIST_ARRAY_MAX_SIZE; i++) {
+        if( rayCaster->intersectionListArray[i].head && rayCaster->intersectionListArray[i].tail ) {
+            ArIntersectionList list = rayCaster->intersectionListArray[i];
+            if( list.head->t < min_t ) {
+                min_t = list.head->t;
+                minimumList = list;
+            }
+            rayCaster->intersectionListArray[i] = ARINTERSECTIONLIST_EMPTY;
+        }
+    }
+
+    return minimumList;
+}
+
+- (struct ArIntersectionList) evaluateIntersectionListsAccordingToCSGTree
+        : (ArnRayCaster *) rayCaster
+{
+    ArNode * csgTree = rayCaster->scenegraphReference;
+
+    // debug
+    ArnVisitor  * visitor =
+            [ ALLOC_INIT_OBJECT(ArnVisitor)
+            ];
+
+    [ visitor visitPreOrder
+            :   arvisitmode_full_tree_with_attributes
+            :   csgTree
+            :   @selector(printfSelf)
+    ];
+
+    RELEASE_OBJECT(visitor);
+
+}
+
+uint32_t hash(uint32_t v) {
+    return v * UINT32_C(2654435761);
+}
+
+
+- (void) addIntersectionListToArray
+        : (ArnRayCaster *) rayCaster
+        : (ArIntersectionList) list
+{
+    assert(list.head->shape == list.tail->shape);
+    ArNode <ArpShape> * intersectedShape = list.head->shape;
+    int shapePtrInt = (intptr_t) intersectedShape;
+
+    uint32_t key = hash(shapePtrInt) % INTERSECTION_LIST_ARRAY_MAX_SIZE;
+
+    /*
+    if( rayCaster->intersectionListArray[key].head )
+        printf("collision!!\n");
+
+    rayCaster->intersectionListArray[key] = list;
+     */
+    int i = 0;
+    while (true) {
+        if( !rayCaster->intersectionListArray[i].head &&
+            !rayCaster->intersectionListArray[i].tail)
+        {
+            rayCaster->intersectionListArray[i] = list;
+            break;
+        }
+        i++;
+    }
+
+}
+
 // intersection callback function
 void embree_intersect_geometry(const int * valid,
                                void * geometryUserPtr,
@@ -659,6 +737,7 @@ void embree_intersect_geometry(const int * valid,
     [embree increaseCount];
     if( [embree getCount] > 1 ) {
         // printf("break\n");
+        // return ;
     }
 
     // perform the intersection
@@ -706,7 +785,9 @@ void embree_intersect_geometry(const int * valid,
 
     // set intersection list
     // *rayCaster->embreeIntersectionList = intersectionList;
+    [embree evaluateIntersectionListsAccordingToCSGTree: rayCaster];
     [embree addIntersectionToIntersectionLinkedList: rayCaster : intersectionList];
+    // [embree addIntersectionListToArray: rayCaster :intersectionList];
 }
 
 void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {

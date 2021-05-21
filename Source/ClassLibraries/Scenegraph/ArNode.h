@@ -114,6 +114,9 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
 - (ArNode <ArpVolumeMaterial> *) unambigousSubnodeVolumeMaterial
         ;
 
+// debug
+- (void) printfSelf;
+
 @end
 
 @interface ArnUnary

@@ -127,6 +127,11 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArNode)
 {
 }
 
+// debug
+- (void) printfSelf {
+    printf("node: %s\n", [[self className] UTF8String]);
+}
+
 - (void) visit
         : (ArnVisitor *) visitor
 {

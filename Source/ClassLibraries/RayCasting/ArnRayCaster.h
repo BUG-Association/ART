@@ -58,6 +58,9 @@ typedef struct IntersectionLinkedListNode {
     struct IntersectionLinkedListNode * next;
 }
 IntersectionLinkedListNode;
+
+#define INTERSECTION_LIST_ARRAY_MAX_SIZE 40
+
 #endif
 
 
@@ -102,11 +105,16 @@ IntersectionLinkedListNode;
 //----------------------------------------------------------------//
     RTCScene embreeRTCSceneCopy;
 
+    BOOL rayCasterAddedToEmbreeArray;
+
     // struct ArIntersectionList * embreeIntersectionList;
 
     IntersectionLinkedListNode * intersectionListHead;
 
-    BOOL rayCasterAddedToEmbreeArray;
+    struct ArIntersectionList intersectionListArray[INTERSECTION_LIST_ARRAY_MAX_SIZE];
+
+    ArNode * scenegraphReference;
+
 #endif
 }
 
@@ -170,11 +178,6 @@ ARNRAYCASTER_MAILBOX(__rc)[ (Pointer)(__objID) & ARNRAYCASTER_HASH_TABLE_MASK ].
 #define ARNRAYCASTER_OBJECTSPACE_RAY_INVVEC(_rc)  RAY3DE_INVVEC(ARNRAYCASTER_OBJECTSPACE_RAY3DE(_rc))
 #define ARNRAYCASTER_OBJECTSPACE_RAYDIR(_rc)        RAY3DE_DIR(ARNRAYCASTER_OBJECTSPACE_RAY3DE(_rc))
 #define ARNRAYCASTER_EPSILON(_rc)           ((_rc)->hitEps)
-
-#if defined(ENABLE_EMBREE_SUPPORT)
-#define ARNRAYCASTER_EMBREE_INTERSECTIONLIST(_rc) \
-    ((_rc)->embreeIntersectionList)
-#endif
 
 #define ARNRAYCASTER_INTERSECTION_FREELIST(_rc) \
     ((_rc)->rayIntersectionFreelist)
