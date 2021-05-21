@@ -785,7 +785,7 @@ void embree_intersect_geometry(const int * valid,
 
     // set intersection list
     // *rayCaster->embreeIntersectionList = intersectionList;
-    [embree evaluateIntersectionListsAccordingToCSGTree: rayCaster];
+    // [embree evaluateIntersectionListsAccordingToCSGTree: rayCaster];
     [embree addIntersectionToIntersectionLinkedList: rayCaster : intersectionList];
     // [embree addIntersectionListToArray: rayCaster :intersectionList];
 }

@@ -606,7 +606,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         embreeRTCSceneCopy = [embree getScene];
         self->rayCasterAddedToEmbreeArray = NO;
         self->intersectionListHead = NULL;
-        self->scenegraphReference = [embree->orgScenegraphReference copy];
+        // self->scenegraphReference = [embree->orgScenegraphReference copy];
         [embree increaseRayCasterCount];
         [embree initRayCasterIntersectionArray: self];
     }
