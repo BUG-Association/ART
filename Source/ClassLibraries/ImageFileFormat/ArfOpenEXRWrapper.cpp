@@ -476,9 +476,9 @@ int readEXR(
         for (size_t s = 0; s < n_stokes_components; s++) {
             for (size_t wl_idx = 0; wl_idx < (*n_spectralBands); wl_idx++) {
                 char* ptrS = (char*)(&_spectral_buffers[s][wl_idx]);
-                exrFrameBuffer.insert(
-                    wavelengths_nm_S[s][wl_idx].second,
-                    Imf::Slice(compType, ptrS, xStride, yStride));
+                Imf::Slice slice = Imf::Slice::Make(compType, ptrS, exrDataWindow);
+
+                exrFrameBuffer.insert(wavelengths_nm_S[s][wl_idx].second, slice);
             }
         }
     }
@@ -493,9 +493,9 @@ int readEXR(
 
             if (hasRGBAChannel[c]) {
                 char* ptrC = (char*)(&_rgba_buffer[c]);
-                exrFrameBuffer.insert(
-                    rgbaChannels[c],
-                    Imf::Slice(compType, ptrC, xStride, yStride));
+                Imf::Slice slice = Imf::Slice::Make(compType, ptrC, exrDataWindow, xStride, yStride);
+
+                exrFrameBuffer.insert(rgbaChannels[c], slice);
             }
         }
     }
@@ -504,7 +504,9 @@ int readEXR(
     if (hasYChannel) {
         const size_t xStride = sizeof(float);
         const size_t yStride = xStride * (*width);
-        exrFrameBuffer.insert("Y", Imf::Slice(compType, (char*)_grey_buffer, xStride, yStride));
+        Imf::Slice slice = Imf::Slice::Make(compType, (char*)_grey_buffer, exrDataWindow, xStride, yStride);
+
+        exrFrameBuffer.insert("Y", slice);
     }
 
     exrIn.setFrameBuffer(exrFrameBuffer);
