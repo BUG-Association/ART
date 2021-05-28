@@ -97,7 +97,6 @@ ArShapeGeometry;
         : (ArMappingCriteria) criteria
         ;
 
-
 @end
 
 /* ===========================================================================

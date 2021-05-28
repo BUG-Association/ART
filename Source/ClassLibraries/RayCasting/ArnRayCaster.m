@@ -26,6 +26,7 @@
 
 #define ART_MODULE_NAME     ArnRayCaster
 
+#import <ArnInfSphere.h>
 #import "ArnRayCaster.h"
 #import "RayCastingCommonMacros.h"
 
@@ -432,7 +433,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     // if nothing was hit and we do have environment lighting, we return the environment light
     else if(rayhit.ray.tfar == INFINITY && embree->environmentLighting) {
-        [(id) embree->environmentLight
+        [(id) embree->environmentLightAttributes
                 getIntersectionList
                 :self
                 :RANGE(ARNRAYCASTER_EPSILON(self), MATH_HUGE_DOUBLE)
@@ -441,7 +442,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
         return;
     }
-
 
     // else:
     // retrieve further information about the intersected shape ...
@@ -475,11 +475,28 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         intersectionList->head->embreeShapeUserGeometry = NO;
     }
     else {
-        // *intersectionList = [embree getClosestIntersectionListFromArray: self];
-        *intersectionList = [embree extractClosestIntersectionList: self];
+        //*intersectionList = [embree extractClosestIntersectionList: self];
+        *intersectionList = [embree evaluateIntersectionListsAccordingToCSGTree
+                                : self
+                                : self->scenegraphReference];
+
+       // *intersectionList = filteredIntersectionList;
+
+       /*
+        if(!arintersectionlist_is_nonempty(intersectionList) && embree->environmentLighting) {
+            [(id) embree->environmentLightAttributes
+                    getIntersectionList
+                    :self
+                    :RANGE(ARNRAYCASTER_EPSILON(self), MATH_HUGE_DOUBLE)
+                    :intersectionList
+            ];
+        }
+        */
 
         if(intersectionList->head)
             intersectionList->head->embreeShapeUserGeometry = YES;
+
+        [embree clearRayCasterIntersectionList: self];
 
         /*
         *intersectionList = *self->embreeIntersectionList;
@@ -488,7 +505,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
             */
     }
 
-    if(! intersectionList->head )
+    if(!arintersectionlist_is_nonempty(intersectionList))
         return;
 
 
@@ -606,7 +623,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         embreeRTCSceneCopy = [embree getScene];
         self->rayCasterAddedToEmbreeArray = NO;
         self->intersectionListHead = NULL;
-        // self->scenegraphReference = [embree->orgScenegraphReference copy];
+        self->scenegraphReference = embree->orgScenegraphReference;
         [embree increaseRayCasterCount];
         [embree initRayCasterIntersectionArray: self];
     }

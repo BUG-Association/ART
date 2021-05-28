@@ -127,11 +127,6 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArNode)
 {
 }
 
-// debug
-- (void) printfSelf {
-    printf("node: %s\n", [[self className] UTF8String]);
-}
-
 - (void) visit
         : (ArnVisitor *) visitor
 {
@@ -255,6 +250,10 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnUnary)
     RELEASE_NODE_REF(subnodeRef);
 
     [ super dealloc ];
+}
+
+- (ArNode *) getSubnodeRef {
+    return subnodeRef.reference;
 }
 
 - copy
@@ -468,6 +467,14 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
     }
     
     return self;
+}
+
+-(ArNode *) getSubnodeRef0 {
+    return subnodeRefArray[0].reference;
+}
+
+-(ArNode *) getSubnodeRef1 {
+    return subnodeRefArray[1].reference;
 }
 
 - (void) dealloc
@@ -892,6 +899,16 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
             ];
 }
 
+-(ArNode *) getSubnodeRef0 {
+    return subnodeRefArray[0].reference;
+}
+-(ArNode *) getSubnodeRef1 {
+    return subnodeRefArray[1].reference;
+}
+-(ArNode *) getSubnodeRef2 {
+    return subnodeRefArray[2].reference;
+}
+
 @end
 
 /* ===========================================================================
@@ -1118,6 +1135,19 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
         [ ARNODEREF_POINTER(subnodeRefArray[i])
             reinitialiseAfterISRChange
             ];
+}
+
+-(ArNode *) getSubnodeRef0 {
+    return subnodeRefArray[0].reference;
+}
+-(ArNode *) getSubnodeRef1 {
+    return subnodeRefArray[1].reference;
+}
+-(ArNode *) getSubnodeRef2 {
+    return subnodeRefArray[2].reference;
+}
+-(ArNode *) getSubnodeRef3 {
+    return subnodeRefArray[3].reference;
 }
 
 @end
@@ -1419,6 +1449,10 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
             reinitialiseAfterISRChange
             ];
     }
+}
+
+- (ArNodeRefDynArray) getSubnodeRefArray {
+    return subnodeRefArray;
 }
 
 @end

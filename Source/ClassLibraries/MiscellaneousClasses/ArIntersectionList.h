@@ -220,7 +220,16 @@ void arintersectionlist_and(
     Combine the supplied intersectionlists using the CSG or operator.
 --------------------------------------------------------------------------- */
 
-void arintersectionlist_or(
+struct ArIntersectionList arintersectionlist_or(
+        ArIntersectionList  * left_list,
+        ArIntersectionList  * right_list,
+        ArIntersectionList  * combined_list,
+        ArcFreelist         * intersection_freelist,
+        double                eps
+        );
+
+// debug
+void arintersectionlist_or_void(
         ArIntersectionList  * left_list,
         ArIntersectionList  * right_list,
         ArIntersectionList  * combined_list,

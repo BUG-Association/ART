@@ -450,7 +450,7 @@ while (0)
     } \
     while (0)
 
-void arintersectionlist_or(
+struct ArIntersectionList arintersectionlist_or(
         ArIntersectionList  * left_list,
         ArIntersectionList  * right_list,
         ArIntersectionList  * combined_list,
@@ -648,6 +648,205 @@ void arintersectionlist_or(
     ARINTERSECTIONLIST_VALIDATE(combined_list);
 }
 
+// debug
+void arintersectionlist_or_void(
+        ArIntersectionList  * left_list,
+        ArIntersectionList  * right_list,
+        ArIntersectionList  * combined_list,
+        ArcFreelist         * intersection_freelist,
+        double                eps
+)
+{
+#ifdef WITH_RSA_STATISTICS
+    combined_list->intersectionTests =
+        left_list->intersectionTests + right_list->intersectionTests;
+    combined_list->traversalSteps =
+        M_MAX( left_list->traversalSteps, right_list->traversalSteps );
+#endif
+    ArNodeRef  left_mat_ref  = ARINTERSECTIONLIST_HEAD_VOLUME_MATERIAL_REF(*left_list);
+    ArNodeRef  right_mat_ref = ARINTERSECTIONLIST_HEAD_VOLUME_MATERIAL_REF(*right_list);
+
+    ArNodeRef  new_mat_ref   = OR_MAT_REF(left_mat_ref, right_mat_ref);
+    ArNodeRef  old_mat_ref   = ARNODEREF_NONE;
+
+    ArcIntersection   * left_hit  = ARINTERSECTIONLIST_HEAD(*left_list);
+    ArcIntersection   * right_hit = ARINTERSECTIONLIST_HEAD(*right_list);
+    ArcIntersection   * combi_hit = 0;
+    ArcIntersection  ** combi_next_ptr =
+            &(ARINTERSECTIONLIST_HEAD(*combined_list));
+
+    COPY_OBJECT_REF(
+            new_mat_ref,
+            ARINTERSECTIONLIST_HEAD_VOLUME_MATERIAL_REF(*combined_list)
+    );
+
+    while ( left_hit && right_hit )
+    {
+        old_mat_ref = new_mat_ref;
+
+        if ( ARCINTERSECTION_T(left_hit) < ARCINTERSECTION_T(right_hit) )
+        {
+            left_mat_ref = ARCINTERSECTION_VOLUME_MATERIAL_INTO_REF(left_hit);
+            new_mat_ref  = OR_MAT_REF(left_mat_ref, right_mat_ref);
+
+            if (      ARNODEREF_POINTER(new_mat_ref)
+                      != ARNODEREF_POINTER(old_mat_ref)
+                      || (ARCINTERSECTION_FACE_TYPE(left_hit) & arface_on_shape_is_singular)
+                    )
+            {
+                TAKE_INTERSECTION(
+                        left_hit, old_mat_ref, new_mat_ref,
+                        combi_hit, combi_next_ptr
+                );
+            }
+            else
+            {
+                SKIP_INTERSECTION(left_hit);
+            }
+        }
+        else
+        {
+            if (ARCINTERSECTION_T(right_hit) < ARCINTERSECTION_T(left_hit))
+            {
+                right_mat_ref = ARCINTERSECTION_VOLUME_MATERIAL_INTO_REF(right_hit);
+                new_mat_ref   = OR_MAT_REF(left_mat_ref, right_mat_ref);
+
+                if (      ARNODEREF_POINTER(new_mat_ref)
+                          != ARNODEREF_POINTER(old_mat_ref)
+                          || ((  ARCINTERSECTION_FACE_TYPE(right_hit)
+                                 & arface_on_shape_is_singular)
+                              && ! ARNODEREF_POINTER(left_mat_ref)))
+                {
+                    TAKE_INTERSECTION(
+                            right_hit, old_mat_ref, new_mat_ref,
+                            combi_hit, combi_next_ptr
+                    );
+                }
+                else
+                {
+                    SKIP_INTERSECTION(right_hit);
+                }
+            }
+            else // ARCINTERSECTION_T(*left_hit) == ARCINTERSECTION_T(*right_hit)
+            {
+                left_mat_ref  = ARCINTERSECTION_VOLUME_MATERIAL_INTO_REF(left_hit);
+                right_mat_ref = ARCINTERSECTION_VOLUME_MATERIAL_INTO_REF(right_hit);
+                new_mat_ref   = OR_MAT_REF(left_mat_ref, right_mat_ref);
+
+                if (      ARNODEREF_POINTER(new_mat_ref)
+                          != ARNODEREF_POINTER(old_mat_ref)
+                          || (ARCINTERSECTION_FACE_TYPE(left_hit) & arface_on_shape_is_singular))
+                {
+                    TAKE_INTERSECTION(
+                            left_hit, old_mat_ref, new_mat_ref,
+                            combi_hit, combi_next_ptr);
+                }
+                else
+                {
+                    SKIP_INTERSECTION(left_hit);
+                }
+
+                SKIP_INTERSECTION(right_hit);
+            }
+        }
+    }
+
+    if (left_hit)
+    {
+        if ( ARNODEREF_POINTER(right_mat_ref) )
+        {
+            while (left_hit)
+            {
+                left_mat_ref = ARCINTERSECTION_VOLUME_MATERIAL_INTO_REF(left_hit);
+                old_mat_ref  = new_mat_ref;
+                new_mat_ref  = OR_MAT_REF(left_mat_ref, right_mat_ref);
+
+                if (     ARNODEREF_POINTER(new_mat_ref)
+                         != ARNODEREF_POINTER(old_mat_ref)
+                         || (ARCINTERSECTION_FACE_TYPE(left_hit)
+                             & arface_on_shape_is_singular))
+                {
+                    TAKE_INTERSECTION(
+                            left_hit, old_mat_ref, new_mat_ref,
+                            combi_hit, combi_next_ptr);
+                }
+                else
+                {
+                    SKIP_INTERSECTION(left_hit);
+                }
+            }
+
+            *combi_next_ptr = NULL;
+
+            ARINTERSECTIONLIST_TAIL(*combined_list) = combi_hit;
+
+            COPY_OBJECT_REF(
+                    new_mat_ref,
+                    ARINTERSECTIONLIST_TAIL_VOLUME_MATERIAL_REF(*combined_list)
+            );
+        }
+        else
+        {
+            *combi_next_ptr = left_hit;
+            ARCINTERSECTION_PREV_PTR(left_hit) = combi_hit;
+            ARINTERSECTIONLIST_TAIL(*combined_list) = ARINTERSECTIONLIST_TAIL(*left_list);
+
+            COPY_OBJECT_REF(
+                    ARINTERSECTIONLIST_TAIL_VOLUME_MATERIAL_REF(*left_list),
+                    ARINTERSECTIONLIST_TAIL_VOLUME_MATERIAL_REF(*combined_list)
+            );
+        }
+    }
+    else
+    {
+        if ( ARNODEREF_POINTER(left_mat_ref) )
+        {
+            if ( right_hit )
+            {
+                releaseIntersections(right_hit,intersection_freelist);
+            }
+
+            *combi_next_ptr = NULL;
+
+            ARINTERSECTIONLIST_TAIL(*combined_list) = combi_hit;
+
+            COPY_OBJECT_REF(
+                    left_mat_ref,
+                    ARINTERSECTIONLIST_TAIL_VOLUME_MATERIAL_REF(*combined_list)
+            );
+        }
+        else
+        {
+            *combi_next_ptr = right_hit;
+
+            if (right_hit)
+            {
+                right_hit->prev = combi_hit;
+                ARINTERSECTIONLIST_TAIL(*combined_list) =
+                        ARINTERSECTIONLIST_TAIL(*right_list);
+
+                COPY_OBJECT_REF(
+                        ARINTERSECTIONLIST_TAIL_VOLUME_MATERIAL_REF(*right_list),
+                        ARINTERSECTIONLIST_TAIL_VOLUME_MATERIAL_REF(*combined_list)
+                );
+            }
+            else
+            {
+                *combi_next_ptr = NULL;
+
+                ARINTERSECTIONLIST_TAIL(*combined_list) = combi_hit;
+
+                COPY_OBJECT_REF(
+                        new_mat_ref,
+                        ARINTERSECTIONLIST_TAIL_VOLUME_MATERIAL_REF(*combined_list)
+                );
+            }
+        }
+    }
+
+    ARINTERSECTIONLIST_VALIDATE(combined_list);
+}
+
 
 void arintersectionlist_and(
         ArIntersectionList  * left_list,
@@ -816,6 +1015,11 @@ void arintersectionlist_sub(
         double                eps
         )
 {
+    if(!arintersectionlist_is_nonempty(left_list) && !arintersectionlist_is_nonempty(right_list)) {
+        // printf("halt\n");
+    }
+
+
 #ifdef WITH_RSA_STATISTICS
     combined_list->intersectionTests =
         left_list->intersectionTests + right_list->intersectionTests;

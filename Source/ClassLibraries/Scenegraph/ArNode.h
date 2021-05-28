@@ -114,9 +114,6 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
 - (ArNode <ArpVolumeMaterial> *) unambigousSubnodeVolumeMaterial
         ;
 
-// debug
-- (void) printfSelf;
-
 @end
 
 @interface ArnUnary
@@ -128,6 +125,8 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
 - init
         : (ArNodeRef) newSubnodeRef
         ;
+
+- (ArNode *) getSubnodeRef;
 
 @end
 
@@ -144,6 +143,9 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
         : (ArNodeRef) newSubnodeRef0
         : (ArNodeRef) newSubnodeRef1
         ;
+
+-(ArNode *) getSubnodeRef0;
+-(ArNode *) getSubnodeRef1;
 
 @end
 
@@ -163,6 +165,10 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
         : (ArNodeRef) newSubnodeRef1
         : (ArNodeRef) newSubnodeRef2
         ;
+
+-(ArNode *) getSubnodeRef0;
+-(ArNode *) getSubnodeRef1;
+-(ArNode *) getSubnodeRef2;
 
 @end
 
@@ -186,6 +192,11 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
         : (ArNodeRef) newSubnodeRef3
         ;
 
+-(ArNode *) getSubnodeRef0;
+-(ArNode *) getSubnodeRef1;
+-(ArNode *) getSubnodeRef2;
+-(ArNode *) getSubnodeRef3;
+
 @end
 
 #define ARNQUATERNARY_SUBNODE_0 \
@@ -206,6 +217,8 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
 - init
         : (ArNodeRefDynArray *) newSubnodeRefArray
         ;
+
+- (ArNodeRefDynArray) getSubnodeRefArray;
 
 @end
 

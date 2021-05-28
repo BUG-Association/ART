@@ -72,20 +72,20 @@ UserGeometryDataList;
     int numRayCaster;
 
 @public
-    BOOL csgScene;
     ArNode * orgScenegraphReference;
 
     BOOL environmentLighting;
-    AraCombinedAttributes * environmentLight;
+    AraCombinedAttributes * environmentLightAttributes;
 }
 
 // returning the singleton object
 + (ArnEmbree *) embreeManager;
 
-- (void) addToUserGeometryList : (UserGeometryData *) data;
-
 + (BOOL) embreeEnabled;
 + (void) enableEmbree: (BOOL) enabled;
+
+- (void) addToUserGeometryList : (UserGeometryData *) data;
+
 
 - (void) setDevice: (RTCDevice) newDevice;
 - (RTCDevice) getDevice;
@@ -116,12 +116,22 @@ UserGeometryDataList;
         : (ArnRayCaster *) rayCaster
         ;
 
+- (struct ArIntersectionList) findIntersectionListByShape
+        : (ArnShape *) shape
+        : (AraCombinedAttributes *) combinedAttributes
+        : (ArnRayCaster *) rayCaster
+        ;
+
+- (void) clearRayCasterIntersectionList: (ArnRayCaster *) rayCaster;
+
 - (struct ArIntersectionList) evaluateIntersectionListsAccordingToCSGTree
         : (ArnRayCaster *) rayCaster
+        : (ArNode *) csgTreeRoot
         ;
 
 - (void) addIntersectionToIntersectionLinkedList
         : (ArnRayCaster *) rayCaster
+        : (AraCombinedAttributes *) combinedAttributes
         : (struct ArIntersectionList) list
                 ;
 

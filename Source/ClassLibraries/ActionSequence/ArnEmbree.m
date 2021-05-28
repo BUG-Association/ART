@@ -34,6 +34,9 @@
 #import <ArnCube.h>
 #import <ArSurfacePointMappingMacros.h>
 
+// TODO delete when not needed anymore
+#import <ArcObjCCoder.h>
+
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
@@ -130,9 +133,7 @@ static ArnEmbree * embreeManager;
 - (void) initRayCasterIntersectionArray
         : (ArnRayCaster *) rayCaster
 {
-    for( int i = 0; i < INTERSECTION_LIST_ARRAY_MAX_SIZE; i++) {
-        rayCaster->intersectionListArray[i] = ARINTERSECTIONLIST_EMPTY;
-    }
+
 }
 
 - (void) freeGeometryList {
@@ -200,10 +201,8 @@ static ArnEmbree * embreeManager;
         isInitialized = YES;
         EMBREE_ENABLED = YES;
 
-        embreeManager->csgScene = NO;
-        embreeManager->orgScenegraphReference = NULL;
         embreeManager->environmentLighting = NO;
-        embreeManager->environmentLight = NULL;
+        embreeManager->environmentLightAttributes = NULL;
     }
 }
 
@@ -573,6 +572,7 @@ static int callCount = 0;
 
 - (void) addIntersectionToIntersectionLinkedList
         : (ArnRayCaster *) rayCaster
+        : (AraCombinedAttributes *) combinedAttributes
         : (struct ArIntersectionList) list
 {
     IntersectionLinkedListNode * newNode =
@@ -584,6 +584,7 @@ static int callCount = 0;
     }
 
     newNode->intersectionList = list;
+    newNode->combinedAttributes = combinedAttributes;
     newNode->next = NULL;
 
     if( !rayCaster->intersectionListHead ) {
@@ -596,10 +597,33 @@ static int callCount = 0;
     while( true ) {
         if (!iteratorNode->next) {
             iteratorNode->next = newNode;
+
+            if(iteratorNode != head && iteratorNode->intersectionList.tail->t == head->intersectionList.head->t) {
+                // printf("smth is wrong\n");
+            }
+
             break;
         }
         iteratorNode = iteratorNode->next;
     }
+}
+
+- (void) clearRayCasterIntersectionList: (ArnRayCaster *) rayCaster {
+    // delete linked list entries
+    IntersectionLinkedListNode * iteratorNode = rayCaster->intersectionListHead;
+    IntersectionLinkedListNode * next;
+    while( iteratorNode ) {
+        next = iteratorNode->next;
+        // if(ptr->head != minimumListPtr->head)
+        /*
+        arintersectionlist_free_contents(&iteratorNode->intersectionList,
+                                         rayCaster->rayIntersectionFreelist);
+                                         */
+
+        free(iteratorNode);
+        iteratorNode = next;
+    }
+    rayCaster->intersectionListHead = NULL;
 }
 
 - (struct ArIntersectionList) extractClosestIntersectionList
@@ -624,21 +648,7 @@ static int callCount = 0;
         iteratorNode = iteratorNode->next;
     }
 
-    // delete linked list entries
-    iteratorNode = rayCaster->intersectionListHead;
-    IntersectionLinkedListNode * next;
-    while( iteratorNode ) {
-        next = iteratorNode->next;
-
-        ArIntersectionList * ptr = &iteratorNode->intersectionList;
-        if(ptr->head != minimumListPtr->head)
-            arintersectionlist_free_contents(&iteratorNode->intersectionList,
-                                             rayCaster->rayIntersectionFreelist);
-
-        free(iteratorNode);
-        iteratorNode = next;
-    }
-    rayCaster->intersectionListHead = NULL;
+    [self clearRayCasterIntersectionList: rayCaster];
 
     return minimumList;
 }
@@ -646,75 +656,247 @@ static int callCount = 0;
 - (struct ArIntersectionList) getClosestIntersectionListFromArray
         : (ArnRayCaster *) rayCaster
 {
-    ArIntersectionList minimumList = ARINTERSECTIONLIST_EMPTY;
-    double min_t = MATH_HUGE_DOUBLE;
 
-    for( int i = 0; i < INTERSECTION_LIST_ARRAY_MAX_SIZE; i++) {
-        if( rayCaster->intersectionListArray[i].head && rayCaster->intersectionListArray[i].tail ) {
-            ArIntersectionList list = rayCaster->intersectionListArray[i];
-            if( list.head->t < min_t ) {
-                min_t = list.head->t;
-                minimumList = list;
+}
+
+- (struct ArIntersectionList) findIntersectionListByShape
+        : (ArnShape *) shape
+        : (AraCombinedAttributes *) combinedAttributes
+        : (ArnRayCaster *) rayCaster
+{
+    // edge case
+    // if([shape isKindOfClass: [ArnInfSphere class]])
+       //  return ARINTERSECTIONLIST_EMPTY;
+
+    IntersectionLinkedListNode * iterator = rayCaster->intersectionListHead;
+
+    while(iterator) {
+        if(combinedAttributes == iterator->combinedAttributes) {
+            // printf("found it, embree geom id:%d\n", shape->embreeGeomID);
+            ArIntersectionList thisIntersectionList = iterator->intersectionList;
+
+            /*
+            if(iterator == rayCaster->intersectionListHead) {
+                iterator->next = NULL;
+                free(iterator);
             }
-            rayCaster->intersectionListArray[i] = ARINTERSECTIONLIST_EMPTY;
+            else if(prev) {
+                prev->next = iterator->next;
+                iterator->next = NULL;
+                free(iterator);
+            }
+             */
+
+            return thisIntersectionList;
         }
+
+        iterator = iterator->next;
     }
 
-    return minimumList;
+    return ARINTERSECTIONLIST_EMPTY;
 }
 
 - (struct ArIntersectionList) evaluateIntersectionListsAccordingToCSGTree
         : (ArnRayCaster *) rayCaster
+        : (ArNode *) csgTreeRoot
 {
-    ArNode * csgTree = rayCaster->scenegraphReference;
+    ArNode * traversal = csgTreeRoot;
 
-    // debug
-    ArnVisitor  * visitor =
-            [ ALLOC_INIT_OBJECT(ArnVisitor)
-            ];
+    while([traversal isKindOfClass: [ArnUnary class]]
+            && ![traversal isKindOfClass: [AraCombinedAttributes class]]) {
+        // printf("%s\n", [[traversal className] UTF8String]);
 
-    [ visitor visitPreOrder
-            :   arvisitmode_full_tree_with_attributes
-            :   csgTree
-            :   @selector(printfSelf)
-    ];
+        traversal = [(ArnUnary *) traversal getSubnodeRef];
+    }
 
-    RELEASE_OBJECT(visitor);
+    if([traversal isKindOfClass: [ArnCSGor class]]
+            || [traversal isKindOfClass: [ArnCSGand class]]
+                    || [traversal isKindOfClass: [ArnCSGsub class]])
+    {
+        // printf("%s\n", [[traversal className] UTF8String]);
 
+        ArNode * leftChild = [(ArnBinary *) traversal getSubnodeRef0];
+        ArNode * rightChild = [(ArnBinary *) traversal getSubnodeRef1];
+
+        ArIntersectionList leftIntersectionList =
+                [self evaluateIntersectionListsAccordingToCSGTree
+                 :rayCaster :leftChild];
+
+        ArIntersectionList rightIntersectionList =
+                [self evaluateIntersectionListsAccordingToCSGTree
+                :rayCaster :rightChild];
+
+        /*
+        if(!leftIntersectionList.head && !leftIntersectionList.tail) {
+            return rightIntersectionList;
+        }
+        else if(!rightIntersectionList.head && !rightIntersectionList.tail) {
+            return leftIntersectionList;
+        }
+        */
+
+        ArIntersectionList combinedList = ARINTERSECTIONLIST_EMPTY;
+
+        if([traversal isKindOfClass: [ArnCSGor class]] ) {
+
+            // if one of the intersectionlists is empty, return the other one
+            if(leftIntersectionList.head && !rightIntersectionList.head)
+                return leftIntersectionList;
+            else if(!leftIntersectionList.head && rightIntersectionList.head)
+                return rightIntersectionList;
+
+            arintersectionlist_or_void(&leftIntersectionList,
+                                   &rightIntersectionList,
+                                   &combinedList,
+                                   rayCaster->rayIntersectionFreelist,
+                                   ARNRAYCASTER_EPSILON(rayCaster)
+            );
+
+            return combinedList;
+        }
+
+        else if([traversal isKindOfClass: [ArnCSGand class]]) {
+
+            arintersectionlist_and(&leftIntersectionList,
+                                   &rightIntersectionList,
+                                   &combinedList,
+                                   rayCaster->rayIntersectionFreelist,
+                                   ARNRAYCASTER_EPSILON(rayCaster)
+            );
+
+            return combinedList;
+        }
+
+        else if([traversal isKindOfClass: [ArnCSGsub class]]) {
+
+            // if one of the intersectionlists is empty, return the other one
+            if((leftIntersectionList.head && !rightIntersectionList.head)
+                    || (!leftIntersectionList.head && rightIntersectionList.head))
+            {
+                // printf("halt\n");
+            }
+
+            arintersectionlist_sub(&leftIntersectionList,
+                                   &rightIntersectionList,
+                                   &combinedList,
+                                   rayCaster->rayIntersectionFreelist,
+                                   ARNRAYCASTER_EPSILON(rayCaster)
+            );
+
+            return combinedList;
+        }
+    }
+
+    else if([traversal isKindOfClass: [ArnTernary class]]
+            || [traversal isKindOfClass: [ArnQuaternary class]]
+            || [traversal isKindOfClass: [ArnNary class]])
+    {
+        // printf("%s , %p\n", [[traversal className] UTF8String], traversal);
+
+        if([traversal isKindOfClass: [ArnTernary class]])
+        {
+            ArNode * subnode0 = [(ArnTernary *) traversal getSubnodeRef0];
+            ArNode * subnode1 = [(ArnTernary *) traversal getSubnodeRef1];
+            ArNode * subnode2 = [(ArnTernary *) traversal getSubnodeRef2];
+
+            int subnodes_size = 3;
+
+            struct ArIntersectionList subnodes_intersectionlist[subnodes_size];
+
+            subnodes_intersectionlist[0] = [self evaluateIntersectionListsAccordingToCSGTree
+                                              :rayCaster :subnode0];
+
+            subnodes_intersectionlist[1] = [self evaluateIntersectionListsAccordingToCSGTree
+                                              :rayCaster :subnode1];
+
+            subnodes_intersectionlist[2] = [self evaluateIntersectionListsAccordingToCSGTree
+                                              :rayCaster :subnode2];
+
+            for(int i = 0; i < subnodes_size; i++) {
+                if(arintersectionlist_is_nonempty(&subnodes_intersectionlist[i])) {
+                    return subnodes_intersectionlist[i];
+                }
+            }
+            return ARINTERSECTIONLIST_EMPTY;
+        }
+
+        else if([traversal isKindOfClass: [ArnQuaternary class]])
+        {
+            ArNode * subnode0 = [(ArnQuaternary *) traversal getSubnodeRef0];
+            ArNode * subnode1 = [(ArnQuaternary *) traversal getSubnodeRef1];
+            ArNode * subnode2 = [(ArnQuaternary *) traversal getSubnodeRef2];
+            ArNode * subnode3 = [(ArnQuaternary *) traversal getSubnodeRef3];
+
+            int subnodes_size = 4;
+
+            struct ArIntersectionList subnodes_intersectionlist[subnodes_size];
+
+            subnodes_intersectionlist[0] = [self evaluateIntersectionListsAccordingToCSGTree
+                                                 :rayCaster :subnode0];
+
+            subnodes_intersectionlist[1] = [self evaluateIntersectionListsAccordingToCSGTree
+                                                 :rayCaster :subnode1];
+
+            subnodes_intersectionlist[2] = [self evaluateIntersectionListsAccordingToCSGTree
+                                                 :rayCaster :subnode2];
+
+            subnodes_intersectionlist[3] = [self evaluateIntersectionListsAccordingToCSGTree
+                                                 :rayCaster :subnode2];
+
+            for(int i = 0; i < subnodes_size; i++) {
+                if(arintersectionlist_is_nonempty(&subnodes_intersectionlist[i])) {
+                    return subnodes_intersectionlist[i];
+                }
+            }
+            return ARINTERSECTIONLIST_EMPTY;
+        }
+
+        else if([traversal isKindOfClass: [ArnNary class]])
+        {
+            ArNodeRefDynArray subnodes = [(ArnNary *) traversal getSubnodeRefArray];
+
+            int subnodes_size = arnoderefdynarray_size(&subnodes);
+
+            struct ArIntersectionList subnodes_intersectionlist[subnodes_size];
+
+            for(int i = 0; i < subnodes_size; i++) {
+                ArNode * child_i = arnoderefdynarray_i(&subnodes, i).reference;
+                subnodes_intersectionlist[i] = [self evaluateIntersectionListsAccordingToCSGTree
+                                                      :rayCaster :child_i];
+            }
+
+            for(int i = 0; i < subnodes_size; i++) {
+                if(arintersectionlist_is_nonempty(&subnodes_intersectionlist[i])) {
+                    return subnodes_intersectionlist[i];
+                }
+            }
+            return ARINTERSECTIONLIST_EMPTY;
+        }
+    }
+
+    else if([traversal isKindOfClass: [AraCombinedAttributes class]]) {
+        // printf("combinedAttr %s , %p\n", [[traversal className] UTF8String], traversal);
+
+        AraCombinedAttributes * combinedAttributes = (AraCombinedAttributes *) traversal;
+        ArNode * shapeNode = [(ArnUnary *) traversal getSubnodeRef];
+        ArnShape * shape = (ArnShape *) shapeNode;
+
+        // printf("shape %s , %p\n", [[shape className] UTF8String], shape);
+
+        ArIntersectionList  list =
+                [self findIntersectionListByShape: shape :combinedAttributes :rayCaster];
+
+        if(!list.head && !list.tail)
+            return ARINTERSECTIONLIST_EMPTY;
+
+        return list;
+    }
 }
-
-uint32_t hash(uint32_t v) {
-    return v * UINT32_C(2654435761);
-}
-
 
 - (void) addIntersectionListToArray
         : (ArnRayCaster *) rayCaster
         : (ArIntersectionList) list
 {
-    assert(list.head->shape == list.tail->shape);
-    ArNode <ArpShape> * intersectedShape = list.head->shape;
-    int shapePtrInt = (intptr_t) intersectedShape;
-
-    uint32_t key = hash(shapePtrInt) % INTERSECTION_LIST_ARRAY_MAX_SIZE;
-
-    /*
-    if( rayCaster->intersectionListArray[key].head )
-        printf("collision!!\n");
-
-    rayCaster->intersectionListArray[key] = list;
-     */
-    int i = 0;
-    while (true) {
-        if( !rayCaster->intersectionListArray[i].head &&
-            !rayCaster->intersectionListArray[i].tail)
-        {
-            rayCaster->intersectionListArray[i] = list;
-            break;
-        }
-        i++;
-    }
-
 }
 
 // intersection callback function
@@ -735,10 +917,6 @@ void embree_intersect_geometry(const int * valid,
 
     // debug
     [embree increaseCount];
-    if( [embree getCount] > 1 ) {
-        // printf("break\n");
-        // return ;
-    }
 
     // perform the intersection
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
@@ -749,34 +927,9 @@ void embree_intersect_geometry(const int * valid,
             : &intersectionList
     ];
 
-
     // if no intersection is found, return
     if(!intersectionList.head)
         return;
-
-    /*
-    // TEMPORARY SOLUTION TO GET NEAREST INTERSECTION
-
-    // if the prev intersection is closer, free intersection list and return
-    ArcIntersection * prevIsect = ARINTERSECTIONLIST_HEAD(*rayCaster->embreeIntersectionList);
-    if(prevIsect && prevIsect->t < intersectionList.head->t) {
-        arintersectionlist_free_contents(&intersectionList,
-                                         ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
-        return;
-    }
-    // since this function is called mutlple times in one go, clear out already existing
-    // intersection list, since we are only interested in nearest hit
-    arintersectionlist_free_contents(ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
-                                     ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
-
-    // TEMPORARY SOLUTION TO GET NEAREST INTERSECTION - END
-    */
-
-    /*
-    arintersectionlist_append(&intersectionList,
-                              ARNRAYCASTER_EMBREE_INTERSECTIONLIST(rayCaster),
-                              ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster));
-    */
 
     // update embree components
     rtc_ray->tfar = (float) intersectionList.head->t;
@@ -784,10 +937,8 @@ void embree_intersect_geometry(const int * valid,
     rtc_hit->primID = 0;
 
     // set intersection list
-    // *rayCaster->embreeIntersectionList = intersectionList;
-    // [embree evaluateIntersectionListsAccordingToCSGTree: rayCaster];
-    [embree addIntersectionToIntersectionLinkedList: rayCaster : intersectionList];
-    // [embree addIntersectionListToArray: rayCaster :intersectionList];
+
+    [embree addIntersectionToIntersectionLinkedList: rayCaster :geometryData->_combinedAttributes : intersectionList];
 }
 
 void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {
@@ -821,14 +972,6 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     else if([shape isKindOfClass: [ArnSimpleIndexedShape class]]) {
         newGeometry = [self initEmbreeSimpleIndexedGeometry: shape : vertexSet :trafo];
     }
-    /*
-    // debug
-    else if([shape isKindOfClass: [ArnCube class]]) {
-        ArnCube * cube = (ArnCube *) shape;
-        newGeometry = [self initEmbreeCube: cube :trafo];
-    }
-    */
-
     else {
         newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_USER);
         rtcSetGeometryBoundsFunction(newGeometry, embree_bbox, NULL);

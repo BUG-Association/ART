@@ -79,9 +79,6 @@ ART_MODULE_INTERFACE(AraBBox)
 - (BOOL) isLeafNode
         ;
 
-- (void) setBoxWorldSpace : (Box3D *) box;
-- (Box3D *) getBoxWorldSpace;
-
 @end
 
 // ===========================================================================

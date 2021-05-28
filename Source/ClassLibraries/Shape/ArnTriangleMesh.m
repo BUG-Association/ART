@@ -594,7 +594,9 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
     copiedInstance->minPoint = minPoint;
     copiedInstance->maxPoint = maxPoint;
 
+#if defined(ENABLE_EMBREE_SUPPORT)
     copiedInstance->embreeGeomID = embreeGeomID;
+#endif
 
     //   shallow copy of BSP tree!
 

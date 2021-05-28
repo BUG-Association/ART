@@ -124,14 +124,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraBBox)
     [ coder codeBOOL : & box_for_leafnode ];
 }
 
-- (void) setBoxWorldSpace : (Box3D *) box {
-    box_worldspace = *box;
-}
-
-- (Box3D *) getBoxWorldSpace {
-    return &box_worldspace;
-}
-
 @end
 
 // ===========================================================================

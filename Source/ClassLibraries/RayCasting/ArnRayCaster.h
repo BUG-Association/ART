@@ -53,13 +53,13 @@ typedef struct ArHashedMailboxEntry
 ArHashedMailboxEntry;
 
 #if defined(ENABLE_EMBREE_SUPPORT)
+
 typedef struct IntersectionLinkedListNode {
     struct ArIntersectionList intersectionList;
+    AraCombinedAttributes * combinedAttributes;
     struct IntersectionLinkedListNode * next;
 }
 IntersectionLinkedListNode;
-
-#define INTERSECTION_LIST_ARRAY_MAX_SIZE 40
 
 #endif
 
@@ -110,8 +110,6 @@ IntersectionLinkedListNode;
     // struct ArIntersectionList * embreeIntersectionList;
 
     IntersectionLinkedListNode * intersectionListHead;
-
-    struct ArIntersectionList intersectionListArray[INTERSECTION_LIST_ARRAY_MAX_SIZE];
 
     ArNode * scenegraphReference;
 

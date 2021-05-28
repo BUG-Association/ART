@@ -520,6 +520,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
         :   "building embree ray acceleration structure"
         ];
          */
+        // debug
+        arcobjccoder_write_file( art_gv, & ARNODEREF_POINTER(node_Ref_Scene), "csgdebug.art" );
 
         [ArnEmbree setCSGTreeNode: sceneGeometry];
 
