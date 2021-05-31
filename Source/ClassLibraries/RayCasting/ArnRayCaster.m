@@ -422,11 +422,11 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // do the intersection
     rtcIntersect1(embreeRTCSceneCopy, &context, &rayhit);
 
-    // debug
     ArnEmbree * embree = [ArnEmbree embreeManager];
+    // debug
     [embree resetCount];
 
-        // if we did not hit anything and we do not have environment lighting, we are done here
+    // if we did not hit anything and we do not have environment lighting, we are done here
     if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID && !embree->environmentLighting) {
         return;
     }
@@ -525,7 +525,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         TEXTURE_COORDS(intersectionList->head) = PNT2D(rayhit.hit.v, rayhit.hit.u);
         ARCSURFACEPOINT_FLAG_TEXTURE_COORDS_AS_VALID(intersectionList->head);
     }
-
 #else
     ART_ERRORHANDLING_FATAL_ERROR(
                 "method [ArnRayCaster intersectWithEmbree:::] called, without Embree being initialized"
@@ -623,9 +622,9 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         embreeRTCSceneCopy = [embree getScene];
         self->rayCasterAddedToEmbreeArray = NO;
         self->intersectionListHead = NULL;
+        self->intersectionList_size = 0;
         self->scenegraphReference = embree->orgScenegraphReference;
         [embree increaseRayCasterCount];
-        [embree initRayCasterIntersectionArray: self];
     }
 #endif
 }
@@ -777,6 +776,48 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         ];
 
     intersection_test_ray3de = *temporaryRay3DEStore;
+}
+
+- (void) addIntersectionToIntersectionLinkedList
+        : (AraCombinedAttributes *) combinedAttributes
+        : (struct ArIntersectionList) list
+{
+    if(!arintersectionlist_is_nonempty(&list)) {
+        printf("isect list is empty\n");
+    }
+
+    IntersectionLinkedListNode * newNode =
+            (IntersectionLinkedListNode *) malloc(sizeof(IntersectionLinkedListNode));
+
+    if( !newNode ) {
+        fprintf(stderr, "Unable to allocate memory for new IntersectionLinkedListNode\n");
+        exit(-1);
+    }
+
+    newNode->intersectionList = list;
+    newNode->combinedAttributes = combinedAttributes;
+    newNode->next = NULL;
+
+    if( !self->intersectionListHead ) {
+        self->intersectionListHead = newNode;
+        self->intersectionList_size += 1;
+        return;
+    }
+
+    IntersectionLinkedListNode * head = self->intersectionListHead;
+    IntersectionLinkedListNode * iteratorNode = head;
+    while( true ) {
+        if (!iteratorNode->next) {
+            iteratorNode->next = newNode;
+            self->intersectionList_size += 1;
+            if(iteratorNode != head && iteratorNode->intersectionList.tail->t == head->intersectionList.head->t) {
+                // printf("smth is wrong\n");
+            }
+
+            break;
+        }
+        iteratorNode = iteratorNode->next;
+    }
 }
 
 @end

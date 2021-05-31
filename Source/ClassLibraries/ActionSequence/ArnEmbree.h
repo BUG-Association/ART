@@ -76,6 +76,9 @@ UserGeometryDataList;
 
     BOOL environmentLighting;
     AraCombinedAttributes * environmentLightAttributes;
+
+    // debug
+    UserGeometryData * prevUserData;
 }
 
 // returning the singleton object
@@ -103,19 +106,6 @@ UserGeometryDataList;
 
 - (void) increaseRayCasterCount;
 
-- (void) initRayCasterIntersectionArray
-        : (ArnRayCaster *) rayCaster
-        ;
-
-- (void) addIntersectionListToArray
-        : (ArnRayCaster *) rayCaster
-        : (struct ArIntersectionList) list
-                ;
-
-- (struct ArIntersectionList) getClosestIntersectionListFromArray
-        : (ArnRayCaster *) rayCaster
-        ;
-
 - (struct ArIntersectionList) findIntersectionListByShape
         : (ArnShape *) shape
         : (AraCombinedAttributes *) combinedAttributes
@@ -129,11 +119,13 @@ UserGeometryDataList;
         : (ArNode *) csgTreeRoot
         ;
 
+/*
 - (void) addIntersectionToIntersectionLinkedList
         : (ArnRayCaster *) rayCaster
         : (AraCombinedAttributes *) combinedAttributes
         : (struct ArIntersectionList) list
                 ;
+                */
 
 - (struct ArIntersectionList) extractClosestIntersectionList
         : (ArnRayCaster *) rayCaster
@@ -142,12 +134,6 @@ UserGeometryDataList;
 - (RTCGeometry) initEmbreeSimpleIndexedGeometry
         : (ArNode *) shape
         : (ArnVertexSet *) vertexSet
-        : (ArNode *) trafo
-        ;
-
-// debug
-- (RTCGeometry) initEmbreeCube
-        : (ArnCube *) cube
         : (ArNode *) trafo
         ;
 

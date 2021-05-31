@@ -847,7 +847,7 @@ void arintersectionlist_or_void(
     ARINTERSECTIONLIST_VALIDATE(combined_list);
 }
 
-
+static int count = 0;
 void arintersectionlist_and(
         ArIntersectionList  * left_list,
         ArIntersectionList  * right_list,
@@ -1002,7 +1002,6 @@ void arintersectionlist_and(
             ARINTERSECTIONLIST_HEAD_VOLUME_MATERIAL_REF(*combined_list)
             );
     }
-
     ARINTERSECTIONLIST_VALIDATE(combined_list);
 }
 
@@ -1015,11 +1014,6 @@ void arintersectionlist_sub(
         double                eps
         )
 {
-    if(!arintersectionlist_is_nonempty(left_list) && !arintersectionlist_is_nonempty(right_list)) {
-        // printf("halt\n");
-    }
-
-
 #ifdef WITH_RSA_STATISTICS
     combined_list->intersectionTests =
         left_list->intersectionTests + right_list->intersectionTests;

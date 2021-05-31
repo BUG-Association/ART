@@ -398,85 +398,6 @@ static ArnEmbree * embreeManager;
     return embreeMesh;
 }
 
-// debug
-- (RTCGeometry) initEmbreeCube
-        : (ArnCube *) cube
-        : (ArNode *) trafo
-{
-    // get hull table
-    int hullPointTableSize;
-    const Pnt3D * hullPointTable = [cube getLocalHullPointTable: &hullPointTableSize];
-
-    Pnt3DE point;
-    point.coord = hullPointTable[2];
-    Pnt3DE * inPoint3D = &point;
-
-    int faceIndex = IN_3D_FACEINDEX;
-
-    unsigned indicesSize = 6;
-
-    // init embree geometry
-    RTCGeometry newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_QUAD);
-
-    // first set up geometry buffers for vertices and indeces
-    float * vertices = (float *) rtcSetNewGeometryBuffer(newGeometry,
-                                                     RTC_BUFFER_TYPE_VERTEX,
-                                                     0,
-                                                     RTC_FORMAT_FLOAT3,
-                                                     3 * sizeof(float),
-                                                     hullPointTableSize);
-
-    unsigned * indices = (unsigned *) rtcSetNewGeometryBuffer(newGeometry,
-                                                       RTC_BUFFER_TYPE_INDEX,
-                                                       0,
-                                                       RTC_FORMAT_UINT4,
-                                                       4 * sizeof(unsigned),
-                                                       indicesSize);
-
-    // fill up vertices
-    int index = -1;
-
-    if(!trafo)
-    {
-        for(int i = 0; i < hullPointTableSize; i++) {
-            vertices[++index] = (float) hullPointTable[i].c.x[0];
-            vertices[++index] = (float) hullPointTable[i].c.x[1];
-            vertices[++index] = (float) hullPointTable[i].c.x[2];
-        }
-    }
-    else
-    {
-        id trafoToUse = trafo;
-        if ( [ trafo isMemberOfClass: [ ArnHTrafo3D class ] ] )
-        {
-            trafoToUse =
-                    [ (ArNode <ArpTrafo3D> *)trafo reduceToSingleHTrafo3D ];
-        }
-
-        for(int i = 0; i < hullPointTableSize; i++) {
-            Pnt3D transformedPoint;
-
-            [trafoToUse transformPnt3D : &hullPointTable[i] : &transformedPoint ];
-
-            vertices[++index] = (float) transformedPoint.c.x[0];
-            vertices[++index] = (float) transformedPoint.c.x[1];
-            vertices[++index] = (float) transformedPoint.c.x[2];
-        }
-    }
-
-    // fill up indices
-    // TODO: somethings wrong here
-    indices[0] = 0; indices[1] = 1; indices[2] = 3; indices[3] = 2;
-    indices[4] = 0; indices[5] = 1; indices[6] = 5; indices[7] = 4;
-    indices[8] = 6; indices[9] = 7; indices[10] = 5; indices[11] = 4;
-
-    indices[12] = 2; indices[13] = 3; indices[14] = 7; indices[15] = 6;
-    indices[16] = 3; indices[17] = 1; indices[18] = 5; indices[19] = 7;
-    indices[20] = 2; indices[21] = 0; indices[22] = 4; indices[23] = 6;
-
-    return newGeometry;
-}
-
 // create a struct containing all the information that is needed
 // for user geometry ray casting and pass it as
 // user geometry pointer to the corresponding embree geometry
@@ -570,44 +491,6 @@ static int callCount = 0;
     callCount += 1;
 }
 
-- (void) addIntersectionToIntersectionLinkedList
-        : (ArnRayCaster *) rayCaster
-        : (AraCombinedAttributes *) combinedAttributes
-        : (struct ArIntersectionList) list
-{
-    IntersectionLinkedListNode * newNode =
-            (IntersectionLinkedListNode *) malloc(sizeof(IntersectionLinkedListNode));
-
-    if( !newNode ) {
-        fprintf(stderr, "Unable to allocate memory for new IntersectionLinkedListNode\n");
-        exit(-1);
-    }
-
-    newNode->intersectionList = list;
-    newNode->combinedAttributes = combinedAttributes;
-    newNode->next = NULL;
-
-    if( !rayCaster->intersectionListHead ) {
-        rayCaster->intersectionListHead = newNode;
-        return;
-    }
-
-    IntersectionLinkedListNode * head = rayCaster->intersectionListHead;
-    IntersectionLinkedListNode * iteratorNode = head;
-    while( true ) {
-        if (!iteratorNode->next) {
-            iteratorNode->next = newNode;
-
-            if(iteratorNode != head && iteratorNode->intersectionList.tail->t == head->intersectionList.head->t) {
-                // printf("smth is wrong\n");
-            }
-
-            break;
-        }
-        iteratorNode = iteratorNode->next;
-    }
-}
-
 - (void) clearRayCasterIntersectionList: (ArnRayCaster *) rayCaster {
     // delete linked list entries
     IntersectionLinkedListNode * iteratorNode = rayCaster->intersectionListHead;
@@ -624,6 +507,7 @@ static int callCount = 0;
         iteratorNode = next;
     }
     rayCaster->intersectionListHead = NULL;
+    rayCaster->intersectionList_size = 0;
 }
 
 - (struct ArIntersectionList) extractClosestIntersectionList
@@ -664,10 +548,6 @@ static int callCount = 0;
         : (AraCombinedAttributes *) combinedAttributes
         : (ArnRayCaster *) rayCaster
 {
-    // edge case
-    // if([shape isKindOfClass: [ArnInfSphere class]])
-       //  return ARINTERSECTIONLIST_EMPTY;
-
     IntersectionLinkedListNode * iterator = rayCaster->intersectionListHead;
 
     while(iterator) {
@@ -756,6 +636,25 @@ static int callCount = 0;
         }
 
         else if([traversal isKindOfClass: [ArnCSGand class]]) {
+/*
+            if(!arintersectionlist_is_nonempty(&leftIntersectionList)
+               && !arintersectionlist_is_nonempty(&rightIntersectionList))
+            {
+                return ARINTERSECTIONLIST_EMPTY;
+            }
+
+            else if(arintersectionlist_is_nonempty(&leftIntersectionList)
+                    && !arintersectionlist_is_nonempty(&rightIntersectionList))
+            {
+                return rightIntersectionList;
+            }
+
+            else if(!arintersectionlist_is_nonempty(&leftIntersectionList)
+                    && arintersectionlist_is_nonempty(&rightIntersectionList))
+            {
+                return leftIntersectionList;
+            }
+            */
 
             arintersectionlist_and(&leftIntersectionList,
                                    &rightIntersectionList,
@@ -769,11 +668,22 @@ static int callCount = 0;
 
         else if([traversal isKindOfClass: [ArnCSGsub class]]) {
 
-            // if one of the intersectionlists is empty, return the other one
-            if((leftIntersectionList.head && !rightIntersectionList.head)
-                    || (!leftIntersectionList.head && rightIntersectionList.head))
+            if(!arintersectionlist_is_nonempty(&leftIntersectionList)
+                    && !arintersectionlist_is_nonempty(&rightIntersectionList))
             {
-                // printf("halt\n");
+                return ARINTERSECTIONLIST_EMPTY;
+            }
+
+            else if(arintersectionlist_is_nonempty(&leftIntersectionList)
+                    && !arintersectionlist_is_nonempty(&rightIntersectionList))
+            {
+                return leftIntersectionList;
+            }
+
+            else if(!arintersectionlist_is_nonempty(&leftIntersectionList)
+                    && arintersectionlist_is_nonempty(&rightIntersectionList))
+            {
+                return ARINTERSECTIONLIST_EMPTY;
             }
 
             arintersectionlist_sub(&leftIntersectionList,
@@ -870,6 +780,7 @@ static int callCount = 0;
                     return subnodes_intersectionlist[i];
                 }
             }
+
             return ARINTERSECTIONLIST_EMPTY;
         }
     }
@@ -886,18 +797,15 @@ static int callCount = 0;
         ArIntersectionList  list =
                 [self findIntersectionListByShape: shape :combinedAttributes :rayCaster];
 
-        if(!list.head && !list.tail)
+        if(!list.head && !list.tail) {
             return ARINTERSECTIONLIST_EMPTY;
+        }
+
 
         return list;
     }
 }
 
-- (void) addIntersectionListToArray
-        : (ArnRayCaster *) rayCaster
-        : (ArIntersectionList) list
-{
-}
 
 // intersection callback function
 void embree_intersect_geometry(const int * valid,
@@ -915,9 +823,6 @@ void embree_intersect_geometry(const int * valid,
     ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
     UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
 
-    // debug
-    [embree increaseCount];
-
     // perform the intersection
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
     [geometryData->_combinedAttributes
@@ -931,14 +836,22 @@ void embree_intersect_geometry(const int * valid,
     if(!intersectionList.head)
         return;
 
+    // debug
+    [embree increaseCount];
+
     // update embree components
     rtc_ray->tfar = (float) intersectionList.head->t;
     rtc_hit->geomID = geomID;
     rtc_hit->primID = 0;
 
-    // set intersection list
+    /*
+    if([embree getCount] > 1) {
+        if(!rayCaster->intersectionListHead) printf("booom\n");
+    }
+     */
 
-    [embree addIntersectionToIntersectionLinkedList: rayCaster :geometryData->_combinedAttributes : intersectionList];
+    // set intersection list
+    [rayCaster addIntersectionToIntersectionLinkedList :geometryData->_combinedAttributes : intersectionList];
 }
 
 void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {

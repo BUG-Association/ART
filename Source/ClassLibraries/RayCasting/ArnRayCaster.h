@@ -111,6 +111,8 @@ IntersectionLinkedListNode;
 
     IntersectionLinkedListNode * intersectionListHead;
 
+    int intersectionList_size;
+
     ArNode * scenegraphReference;
 
 #endif
@@ -148,6 +150,11 @@ IntersectionLinkedListNode;
 - (void) getIntersectionListWithEmbree
         : (struct ArIntersectionList *) intersectionList
         ;
+
+- (void) addIntersectionToIntersectionLinkedList
+        : (AraCombinedAttributes *) combinedAttributes
+        : (struct ArIntersectionList) list
+                ;
 
 @end
 
