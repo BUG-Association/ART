@@ -580,230 +580,242 @@ static int callCount = 0;
         : (ArnRayCaster *) rayCaster
         : (ArNode *) csgTreeRoot
 {
-    ArNode * traversal = csgTreeRoot;
 
-    while([traversal isKindOfClass: [ArnUnary class]]
-            && ![traversal isKindOfClass: [AraCombinedAttributes class]]) {
-        // printf("%s\n", [[traversal className] UTF8String]);
+    struct ArIntersectionList list;
 
-        traversal = [(ArnUnary *) traversal getSubnodeRef];
-    }
+    [ csgTreeRoot getIntersectionList
+            : rayCaster
+            : RANGE( ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
+            : &list
+            ];
 
-    if([traversal isKindOfClass: [ArnCSGor class]]
-            || [traversal isKindOfClass: [ArnCSGand class]]
-                    || [traversal isKindOfClass: [ArnCSGsub class]])
-    {
-        // printf("%s\n", [[traversal className] UTF8String]);
+    return list;
 
-        ArNode * leftChild = [(ArnBinary *) traversal getSubnodeRef0];
-        ArNode * rightChild = [(ArnBinary *) traversal getSubnodeRef1];
+    
+//     ArNode * traversal = csgTreeRoot;
 
-        ArIntersectionList leftIntersectionList =
-                [self evaluateIntersectionListsAccordingToCSGTree
-                 :rayCaster :leftChild];
+//     while([traversal isKindOfClass: [ArnUnary class]]
+//             && ![traversal isKindOfClass: [AraCombinedAttributes class]]) {
+//         // printf("%s\n", [[traversal className] UTF8String]);
 
-        ArIntersectionList rightIntersectionList =
-                [self evaluateIntersectionListsAccordingToCSGTree
-                :rayCaster :rightChild];
+//         traversal = [(ArnUnary *) traversal getSubnodeRef];
+//     }
 
-        /*
-        if(!leftIntersectionList.head && !leftIntersectionList.tail) {
-            return rightIntersectionList;
-        }
-        else if(!rightIntersectionList.head && !rightIntersectionList.tail) {
-            return leftIntersectionList;
-        }
-        */
+//     if([traversal isKindOfClass: [ArnCSGor class]]
+//             || [traversal isKindOfClass: [ArnCSGand class]]
+//                     || [traversal isKindOfClass: [ArnCSGsub class]])
+//     {
+//         // printf("%s\n", [[traversal className] UTF8String]);
 
-        ArIntersectionList combinedList = ARINTERSECTIONLIST_EMPTY;
+//         ArNode * leftChild = [(ArnBinary *) traversal getSubnodeRef0];
+//         ArNode * rightChild = [(ArnBinary *) traversal getSubnodeRef1];
 
-        if([traversal isKindOfClass: [ArnCSGor class]] ) {
+//         ArIntersectionList leftIntersectionList =
+//                 [self evaluateIntersectionListsAccordingToCSGTree
+//                  :rayCaster :leftChild];
 
-            // if one of the intersectionlists is empty, return the other one
-            if(leftIntersectionList.head && !rightIntersectionList.head)
-                return leftIntersectionList;
-            else if(!leftIntersectionList.head && rightIntersectionList.head)
-                return rightIntersectionList;
+//         ArIntersectionList rightIntersectionList =
+//                 [self evaluateIntersectionListsAccordingToCSGTree
+//                 :rayCaster :rightChild];
 
-            arintersectionlist_or_void(&leftIntersectionList,
-                                   &rightIntersectionList,
-                                   &combinedList,
-                                   rayCaster->rayIntersectionFreelist,
-                                   ARNRAYCASTER_EPSILON(rayCaster)
-            );
+//         /*
+//         if(!leftIntersectionList.head && !leftIntersectionList.tail) {
+//             return rightIntersectionList;
+//         }
+//         else if(!rightIntersectionList.head && !rightIntersectionList.tail) {
+//             return leftIntersectionList;
+//         }
+//         */
 
-            return combinedList;
-        }
+//         ArIntersectionList combinedList = ARINTERSECTIONLIST_EMPTY;
 
-        else if([traversal isKindOfClass: [ArnCSGand class]]) {
-/*
-            if(!arintersectionlist_is_nonempty(&leftIntersectionList)
-               && !arintersectionlist_is_nonempty(&rightIntersectionList))
-            {
-                return ARINTERSECTIONLIST_EMPTY;
-            }
+//         if([traversal isKindOfClass: [ArnCSGor class]] ) {
 
-            else if(arintersectionlist_is_nonempty(&leftIntersectionList)
-                    && !arintersectionlist_is_nonempty(&rightIntersectionList))
-            {
-                return rightIntersectionList;
-            }
+//             // if one of the intersectionlists is empty, return the other one
+//             if(leftIntersectionList.head && !rightIntersectionList.head)
+//                 return leftIntersectionList;
+//             else if(!leftIntersectionList.head && rightIntersectionList.head)
+//                 return rightIntersectionList;
 
-            else if(!arintersectionlist_is_nonempty(&leftIntersectionList)
-                    && arintersectionlist_is_nonempty(&rightIntersectionList))
-            {
-                return leftIntersectionList;
-            }
-            */
+//             arintersectionlist_or_void(&leftIntersectionList,
+//                                    &rightIntersectionList,
+//                                    &combinedList,
+//                                    rayCaster->rayIntersectionFreelist,
+//                                    ARNRAYCASTER_EPSILON(rayCaster)
+//             );
 
-            arintersectionlist_and(&leftIntersectionList,
-                                   &rightIntersectionList,
-                                   &combinedList,
-                                   rayCaster->rayIntersectionFreelist,
-                                   ARNRAYCASTER_EPSILON(rayCaster)
-            );
+//             return combinedList;
+//         }
 
-            return combinedList;
-        }
+//         else if([traversal isKindOfClass: [ArnCSGand class]]) {
+// /*
+//             if(!arintersectionlist_is_nonempty(&leftIntersectionList)
+//                && !arintersectionlist_is_nonempty(&rightIntersectionList))
+//             {
+//                 return ARINTERSECTIONLIST_EMPTY;
+//             }
 
-        else if([traversal isKindOfClass: [ArnCSGsub class]]) {
+//             else if(arintersectionlist_is_nonempty(&leftIntersectionList)
+//                     && !arintersectionlist_is_nonempty(&rightIntersectionList))
+//             {
+//                 return rightIntersectionList;
+//             }
 
-            if(!arintersectionlist_is_nonempty(&leftIntersectionList)
-                    && !arintersectionlist_is_nonempty(&rightIntersectionList))
-            {
-                return ARINTERSECTIONLIST_EMPTY;
-            }
+//             else if(!arintersectionlist_is_nonempty(&leftIntersectionList)
+//                     && arintersectionlist_is_nonempty(&rightIntersectionList))
+//             {
+//                 return leftIntersectionList;
+//             }
+//             */
 
-            else if(arintersectionlist_is_nonempty(&leftIntersectionList)
-                    && !arintersectionlist_is_nonempty(&rightIntersectionList))
-            {
-                return leftIntersectionList;
-            }
+//             arintersectionlist_and(&leftIntersectionList,
+//                                    &rightIntersectionList,
+//                                    &combinedList,
+//                                    rayCaster->rayIntersectionFreelist,
+//                                    ARNRAYCASTER_EPSILON(rayCaster)
+//             );
 
-            else if(!arintersectionlist_is_nonempty(&leftIntersectionList)
-                    && arintersectionlist_is_nonempty(&rightIntersectionList))
-            {
-                return ARINTERSECTIONLIST_EMPTY;
-            }
+//             return combinedList;
+//         }
 
-            arintersectionlist_sub(&leftIntersectionList,
-                                   &rightIntersectionList,
-                                   &combinedList,
-                                   rayCaster->rayIntersectionFreelist,
-                                   ARNRAYCASTER_EPSILON(rayCaster)
-            );
+//         else if([traversal isKindOfClass: [ArnCSGsub class]]) {
 
-            return combinedList;
-        }
-    }
+//             if(!arintersectionlist_is_nonempty(&leftIntersectionList)
+//                     && !arintersectionlist_is_nonempty(&rightIntersectionList))
+//             {
+//                 return ARINTERSECTIONLIST_EMPTY;
+//             }
 
-    else if([traversal isKindOfClass: [ArnTernary class]]
-            || [traversal isKindOfClass: [ArnQuaternary class]]
-            || [traversal isKindOfClass: [ArnNary class]])
-    {
-        // printf("%s , %p\n", [[traversal className] UTF8String], traversal);
+//             else if(arintersectionlist_is_nonempty(&leftIntersectionList)
+//                     && !arintersectionlist_is_nonempty(&rightIntersectionList))
+//             {
+//                 return leftIntersectionList;
+//             }
 
-        if([traversal isKindOfClass: [ArnTernary class]])
-        {
-            ArNode * subnode0 = [(ArnTernary *) traversal getSubnodeRef0];
-            ArNode * subnode1 = [(ArnTernary *) traversal getSubnodeRef1];
-            ArNode * subnode2 = [(ArnTernary *) traversal getSubnodeRef2];
+//             else if(!arintersectionlist_is_nonempty(&leftIntersectionList)
+//                     && arintersectionlist_is_nonempty(&rightIntersectionList))
+//             {
+//                 return ARINTERSECTIONLIST_EMPTY;
+//             }
 
-            int subnodes_size = 3;
+//             arintersectionlist_sub(&leftIntersectionList,
+//                                    &rightIntersectionList,
+//                                    &combinedList,
+//                                    rayCaster->rayIntersectionFreelist,
+//                                    ARNRAYCASTER_EPSILON(rayCaster)
+//             );
 
-            struct ArIntersectionList subnodes_intersectionlist[subnodes_size];
+//             return combinedList;
+//         }
+//     }
 
-            subnodes_intersectionlist[0] = [self evaluateIntersectionListsAccordingToCSGTree
-                                              :rayCaster :subnode0];
+//     else if([traversal isKindOfClass: [ArnTernary class]]
+//             || [traversal isKindOfClass: [ArnQuaternary class]]
+//             || [traversal isKindOfClass: [ArnNary class]])
+//     {
+//         // printf("%s , %p\n", [[traversal className] UTF8String], traversal);
 
-            subnodes_intersectionlist[1] = [self evaluateIntersectionListsAccordingToCSGTree
-                                              :rayCaster :subnode1];
+//         if([traversal isKindOfClass: [ArnTernary class]])
+//         {
+//             ArNode * subnode0 = [(ArnTernary *) traversal getSubnodeRef0];
+//             ArNode * subnode1 = [(ArnTernary *) traversal getSubnodeRef1];
+//             ArNode * subnode2 = [(ArnTernary *) traversal getSubnodeRef2];
 
-            subnodes_intersectionlist[2] = [self evaluateIntersectionListsAccordingToCSGTree
-                                              :rayCaster :subnode2];
+//             int subnodes_size = 3;
 
-            for(int i = 0; i < subnodes_size; i++) {
-                if(arintersectionlist_is_nonempty(&subnodes_intersectionlist[i])) {
-                    return subnodes_intersectionlist[i];
-                }
-            }
-            return ARINTERSECTIONLIST_EMPTY;
-        }
+//             struct ArIntersectionList subnodes_intersectionlist[subnodes_size];
 
-        else if([traversal isKindOfClass: [ArnQuaternary class]])
-        {
-            ArNode * subnode0 = [(ArnQuaternary *) traversal getSubnodeRef0];
-            ArNode * subnode1 = [(ArnQuaternary *) traversal getSubnodeRef1];
-            ArNode * subnode2 = [(ArnQuaternary *) traversal getSubnodeRef2];
-            ArNode * subnode3 = [(ArnQuaternary *) traversal getSubnodeRef3];
+//             subnodes_intersectionlist[0] = [self evaluateIntersectionListsAccordingToCSGTree
+//                                               :rayCaster :subnode0];
 
-            int subnodes_size = 4;
+//             subnodes_intersectionlist[1] = [self evaluateIntersectionListsAccordingToCSGTree
+//                                               :rayCaster :subnode1];
 
-            struct ArIntersectionList subnodes_intersectionlist[subnodes_size];
+//             subnodes_intersectionlist[2] = [self evaluateIntersectionListsAccordingToCSGTree
+//                                               :rayCaster :subnode2];
 
-            subnodes_intersectionlist[0] = [self evaluateIntersectionListsAccordingToCSGTree
-                                                 :rayCaster :subnode0];
+//             for(int i = 0; i < subnodes_size; i++) {
+//                 if(arintersectionlist_is_nonempty(&subnodes_intersectionlist[i])) {
+//                     return subnodes_intersectionlist[i];
+//                 }
+//             }
+//             return ARINTERSECTIONLIST_EMPTY;
+//         }
 
-            subnodes_intersectionlist[1] = [self evaluateIntersectionListsAccordingToCSGTree
-                                                 :rayCaster :subnode1];
+//         else if([traversal isKindOfClass: [ArnQuaternary class]])
+//         {
+//             ArNode * subnode0 = [(ArnQuaternary *) traversal getSubnodeRef0];
+//             ArNode * subnode1 = [(ArnQuaternary *) traversal getSubnodeRef1];
+//             ArNode * subnode2 = [(ArnQuaternary *) traversal getSubnodeRef2];
+//             ArNode * subnode3 = [(ArnQuaternary *) traversal getSubnodeRef3];
 
-            subnodes_intersectionlist[2] = [self evaluateIntersectionListsAccordingToCSGTree
-                                                 :rayCaster :subnode2];
+//             int subnodes_size = 4;
 
-            subnodes_intersectionlist[3] = [self evaluateIntersectionListsAccordingToCSGTree
-                                                 :rayCaster :subnode2];
+//             struct ArIntersectionList subnodes_intersectionlist[subnodes_size];
 
-            for(int i = 0; i < subnodes_size; i++) {
-                if(arintersectionlist_is_nonempty(&subnodes_intersectionlist[i])) {
-                    return subnodes_intersectionlist[i];
-                }
-            }
-            return ARINTERSECTIONLIST_EMPTY;
-        }
+//             subnodes_intersectionlist[0] = [self evaluateIntersectionListsAccordingToCSGTree
+//                                                  :rayCaster :subnode0];
 
-        else if([traversal isKindOfClass: [ArnNary class]])
-        {
-            ArNodeRefDynArray subnodes = [(ArnNary *) traversal getSubnodeRefArray];
+//             subnodes_intersectionlist[1] = [self evaluateIntersectionListsAccordingToCSGTree
+//                                                  :rayCaster :subnode1];
 
-            int subnodes_size = arnoderefdynarray_size(&subnodes);
+//             subnodes_intersectionlist[2] = [self evaluateIntersectionListsAccordingToCSGTree
+//                                                  :rayCaster :subnode2];
 
-            struct ArIntersectionList subnodes_intersectionlist[subnodes_size];
+//             subnodes_intersectionlist[3] = [self evaluateIntersectionListsAccordingToCSGTree
+//                                                  :rayCaster :subnode2];
 
-            for(int i = 0; i < subnodes_size; i++) {
-                ArNode * child_i = arnoderefdynarray_i(&subnodes, i).reference;
-                subnodes_intersectionlist[i] = [self evaluateIntersectionListsAccordingToCSGTree
-                                                      :rayCaster :child_i];
-            }
+//             for(int i = 0; i < subnodes_size; i++) {
+//                 if(arintersectionlist_is_nonempty(&subnodes_intersectionlist[i])) {
+//                     return subnodes_intersectionlist[i];
+//                 }
+//             }
+//             return ARINTERSECTIONLIST_EMPTY;
+//         }
 
-            for(int i = 0; i < subnodes_size; i++) {
-                if(arintersectionlist_is_nonempty(&subnodes_intersectionlist[i])) {
-                    return subnodes_intersectionlist[i];
-                }
-            }
+//         else if([traversal isKindOfClass: [ArnNary class]])
+//         {
+//             ArNodeRefDynArray subnodes = [(ArnNary *) traversal getSubnodeRefArray];
 
-            return ARINTERSECTIONLIST_EMPTY;
-        }
-    }
+//             int subnodes_size = arnoderefdynarray_size(&subnodes);
 
-    else if([traversal isKindOfClass: [AraCombinedAttributes class]]) {
-        // printf("combinedAttr %s , %p\n", [[traversal className] UTF8String], traversal);
+//             struct ArIntersectionList subnodes_intersectionlist[subnodes_size];
 
-        AraCombinedAttributes * combinedAttributes = (AraCombinedAttributes *) traversal;
-        ArNode * shapeNode = [(ArnUnary *) traversal getSubnodeRef];
-        ArnShape * shape = (ArnShape *) shapeNode;
+//             for(int i = 0; i < subnodes_size; i++) {
+//                 ArNode * child_i = arnoderefdynarray_i(&subnodes, i).reference;
+//                 subnodes_intersectionlist[i] = [self evaluateIntersectionListsAccordingToCSGTree
+//                                                       :rayCaster :child_i];
+//             }
 
-        // printf("shape %s , %p\n", [[shape className] UTF8String], shape);
+//             for(int i = 0; i < subnodes_size; i++) {
+//                 if(arintersectionlist_is_nonempty(&subnodes_intersectionlist[i])) {
+//                     return subnodes_intersectionlist[i];
+//                 }
+//             }
 
-        ArIntersectionList  list =
-                [self findIntersectionListByShape: shape :combinedAttributes :rayCaster];
+//             return ARINTERSECTIONLIST_EMPTY;
+//         }
+//     }
 
-        if(!list.head && !list.tail) {
-            return ARINTERSECTIONLIST_EMPTY;
-        }
+//     else if([traversal isKindOfClass: [AraCombinedAttributes class]]) {
+//         // printf("combinedAttr %s , %p\n", [[traversal className] UTF8String], traversal);
+
+//         AraCombinedAttributes * combinedAttributes = (AraCombinedAttributes *) traversal;
+//         ArNode * shapeNode = [(ArnUnary *) traversal getSubnodeRef];
+//         ArnShape * shape = (ArnShape *) shapeNode;
+
+//         // printf("shape %s , %p\n", [[shape className] UTF8String], shape);
+
+//         ArIntersectionList  list =
+//                 [self findIntersectionListByShape: shape :combinedAttributes :rayCaster];
+
+//         if(!list.head && !list.tail) {
+//             return ARINTERSECTIONLIST_EMPTY;
+//         }
 
 
-        return list;
-    }
+//         return list;
+//     }
 }
 
 
