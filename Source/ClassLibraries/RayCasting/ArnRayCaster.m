@@ -782,10 +782,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         : (AraCombinedAttributes *) combinedAttributes
         : (struct ArIntersectionList) list
 {
-    if(!arintersectionlist_is_nonempty(&list)) {
-        printf("isect list is empty\n");
-    }
-
     IntersectionLinkedListNode * newNode =
             (IntersectionLinkedListNode *) malloc(sizeof(IntersectionLinkedListNode));
 

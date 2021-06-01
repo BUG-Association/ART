@@ -543,8 +543,8 @@ static int callCount = 0;
 
 }
 
-- (struct ArIntersectionList) findIntersectionListByShape
-        : (ArnShape *) shape
+- (struct ArIntersectionList) findIntersectionListByShapeAttributes
+        // : (ArnShape *) shape
         : (AraCombinedAttributes *) combinedAttributes
         : (ArnRayCaster *) rayCaster
 {
@@ -580,6 +580,19 @@ static int callCount = 0;
         : (ArnRayCaster *) rayCaster
         : (ArNode *) csgTreeRoot
 {
+    struct ArIntersectionList list;
+
+    AraBBox * rootBox = (AraBBox *) csgTreeRoot;
+
+    [rootBox getIntersectionList
+           : rayCaster
+            : RANGE(ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
+            : &list
+    ];
+
+    return list;
+
+    /*
     ArNode * traversal = csgTreeRoot;
 
     while([traversal isKindOfClass: [ArnUnary class]]
@@ -613,7 +626,7 @@ static int callCount = 0;
         else if(!rightIntersectionList.head && !rightIntersectionList.tail) {
             return leftIntersectionList;
         }
-        */
+
 
         ArIntersectionList combinedList = ARINTERSECTIONLIST_EMPTY;
 
@@ -654,7 +667,7 @@ static int callCount = 0;
             {
                 return leftIntersectionList;
             }
-            */
+
 
             arintersectionlist_and(&leftIntersectionList,
                                    &rightIntersectionList,
@@ -695,6 +708,7 @@ static int callCount = 0;
 
             return combinedList;
         }
+
     }
 
     else if([traversal isKindOfClass: [ArnTernary class]]
@@ -804,6 +818,7 @@ static int callCount = 0;
 
         return list;
     }
+     */
 }
 
 

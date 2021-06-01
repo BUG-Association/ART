@@ -76,9 +76,6 @@ UserGeometryDataList;
 
     BOOL environmentLighting;
     AraCombinedAttributes * environmentLightAttributes;
-
-    // debug
-    UserGeometryData * prevUserData;
 }
 
 // returning the singleton object
@@ -106,8 +103,8 @@ UserGeometryDataList;
 
 - (void) increaseRayCasterCount;
 
-- (struct ArIntersectionList) findIntersectionListByShape
-        : (ArnShape *) shape
+- (struct ArIntersectionList) findIntersectionListByShapeAttributes
+       //  : (ArnShape *) shape
         : (AraCombinedAttributes *) combinedAttributes
         : (ArnRayCaster *) rayCaster
         ;

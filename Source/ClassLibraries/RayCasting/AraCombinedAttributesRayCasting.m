@@ -232,6 +232,26 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraCombinedAttributes)
         : (Range) range_of_t
         : (struct ArIntersectionList *) intersectionList
 {
+#if defined(ENABLE_EMBREE_SUPPORT)
+
+    // in the case of embree csg evaluation
+    // we check if there is already an according
+    // intersection list present and if so,
+    // we take that one
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+        if(rayCaster->intersectionListHead) {
+            struct ArIntersectionList found_list
+                    = [embree findIntersectionListByShapeAttributes: self :rayCaster];
+
+            if(arintersectionlist_is_nonempty(&found_list)) {
+                *intersectionList = found_list;
+                return;
+            }
+        }
+    }
+#endif
+
     ArNodeRef  surfaceMaterialStore;
 
     if ( SURFACE_MATERIAL )
