@@ -475,34 +475,16 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         intersectionList->head->embreeShapeUserGeometry = NO;
     }
     else {
-        //*intersectionList = [embree extractClosestIntersectionList: self];
+        // *intersectionList = [embree extractClosestIntersectionList: self];
+
         *intersectionList = [embree evaluateIntersectionListsAccordingToCSGTree
                                 : self
                                 : self->scenegraphReference];
-
-       // *intersectionList = filteredIntersectionList;
-
-       /*
-        if(!arintersectionlist_is_nonempty(intersectionList) && embree->environmentLighting) {
-            [(id) embree->environmentLightAttributes
-                    getIntersectionList
-                    :self
-                    :RANGE(ARNRAYCASTER_EPSILON(self), MATH_HUGE_DOUBLE)
-                    :intersectionList
-            ];
-        }
-        */
 
         if(intersectionList->head)
             intersectionList->head->embreeShapeUserGeometry = YES;
 
         [embree clearRayCasterIntersectionList: self];
-
-        /*
-        *intersectionList = *self->embreeIntersectionList;
-        if(intersectionList->head)
-            intersectionList->head->embreeShapeUserGeometry = YES;
-            */
     }
 
     if(!arintersectionlist_is_nonempty(intersectionList))

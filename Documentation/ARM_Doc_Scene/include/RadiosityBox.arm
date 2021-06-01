@@ -28,6 +28,7 @@ ArObj  planarLamp(
             [ QUADRANGLE( 0, 1, 3, 2 ) apply: emitterMaterial ],
             UNION_END
             );
+           
     
     lampPoint[0] = PNT3D( 1.0, 1.0, 0.0);
     lampPoint[1] = PNT3D( 1.0,-1.0, 0.0);
@@ -394,9 +395,10 @@ ArObj  illuminatedRadiosityBox_SimpleGrid(
     //ArObj light = planarLamp( art_gv, CIE_ILLUMINANT_D65, 0.2, intensity );
     ArObj light = planarLamp( art_gv, fullSpectrum, 0.2, intensity );
     
-    light = [ light trafo: USCALE(0.4) : TRANSLATION(0.0,0.0,0.99) ];
+    light = [ light trafo: USCALE(0.4) : TRANSLATION(0.0,0.0, 0.99)];
     
     return [ box or: light ];
+    // return light;
 }
 
 //ArObj  illuminatedRadiosityBox_DoubleGrid(
@@ -417,7 +419,8 @@ ArObj  radiosityBoxCamera(
 {
     return
         [ CAMERA
-            imageSize:	IVEC2D( 1280, 1280 )
+            // imageSize:	IVEC2D( 1280, 1280 )
+            imageSize:	IVEC2D( 600, 600 )
             ray:        RAY3D( PNT3D(0.0,5.0,0.0),VEC3D(0.0,-1.0,0.0) )
             zoom:       1.42
             ];

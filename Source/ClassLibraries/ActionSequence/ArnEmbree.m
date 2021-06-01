@@ -326,7 +326,6 @@ static ArnEmbree * embreeManager;
         }
     }
 
-
     return newGeometry;
 }
 
