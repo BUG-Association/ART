@@ -592,6 +592,7 @@ static int callCount = 0;
 
     return list;
 
+
     /*
     ArNode * traversal = csgTreeRoot;
 
