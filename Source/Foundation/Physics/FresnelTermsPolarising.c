@@ -46,9 +46,9 @@ void fresnel_dd_attenuation_dddd(
     double  cos_phi_sqr = M_SQR( cos_phi );
     double  sin_phi_sqr =  1 - cos_phi_sqr ;
     double  sin_phi = sqrt(sin_phi_sqr);
-    
+
     double  tan_phi;
-    
+
     if ( cos_phi > 0. )
     {
         tan_phi = sin_phi / cos_phi;
@@ -65,7 +65,7 @@ void fresnel_dd_attenuation_dddd(
      MATH_SQRT_2*cos_phi*sqrt(n_sqr - sin_phi_sqr + sqrt(M_SQR(n_sqr - sin_phi_sqr))))/
    (cos_phi_sqr + sqrt(M_SQR(n_sqr - sin_phi_sqr)) +
      MATH_SQRT_2*cos_phi*sqrt(n_sqr - sin_phi_sqr + sqrt(M_SQR(n_sqr - sin_phi_sqr))));
-    
+
     *attenuation_parallel =
         ((cos_phi_sqr + sqrt(M_SQR(n_sqr - sin_phi_sqr)) -
        MATH_SQRT_2*cos_phi*sqrt(n_sqr - sin_phi_sqr + sqrt(M_SQR(n_sqr - sin_phi_sqr))))*
@@ -75,14 +75,14 @@ void fresnel_dd_attenuation_dddd(
        MATH_SQRT_2*cos_phi*sqrt(n_sqr - sin_phi_sqr + sqrt(M_SQR(n_sqr - sin_phi_sqr))))*
      (sqrt(M_SQR(n_sqr - sin_phi_sqr)) + MATH_SQRT_2*sin_phi*
         sqrt(n_sqr - sin_phi_sqr + sqrt(M_SQR(n_sqr - sin_phi_sqr)))*tan_phi + sin_phi_sqr*tan_phi_sqr));
-    
+
     *retardance_senkrecht =
-        atan2(cos_phi_sqr - sqrt(M_SQR(n_sqr - sin_phi_sqr)),
-    MATH_SQRT_2*cos_phi*sqrt(-n_sqr + sin_phi_sqr + sqrt(M_SQR(n_sqr - sin_phi_sqr))));
-    
+        atan2(MATH_SQRT_2*cos_phi*sqrt(-n_sqr + sin_phi_sqr + sqrt(M_SQR(n_sqr - sin_phi_sqr))),
+              cos_phi_sqr - sqrt(M_SQR(n_sqr - sin_phi_sqr)));
+
     *retardance_parallel =
-        atan2(M_SQR(n_sqr)*cos_phi_sqr - sqrt(M_SQR(n_sqr - sin_phi_sqr)),
-    MATH_SQRT_2*n_sqr*cos_phi*sqrt(-n_sqr + sin_phi_sqr + sqrt(M_SQR(n_sqr - sin_phi_sqr))));
+        atan2(MATH_SQRT_2*n_sqr*cos_phi*sqrt(-n_sqr + sin_phi_sqr + sqrt(M_SQR(n_sqr - sin_phi_sqr))),
+              M_SQR(n_sqr)*cos_phi_sqr - sqrt(M_SQR(n_sqr - sin_phi_sqr)));
 }
 
 void fresnel_ddd_attenuation_dddd(
@@ -100,9 +100,9 @@ void fresnel_ddd_attenuation_dddd(
     double  cos_phi_sqr = M_SQR( cos_phi );
     double  sin_phi_sqr =  1 - cos_phi_sqr ;
     double  sin_phi = sqrt(sin_phi_sqr);
-    
+
     double  tan_phi;
-    
+
     if ( cos_phi > 0. )
     {
         tan_phi = sin_phi / cos_phi;
@@ -120,7 +120,7 @@ void fresnel_ddd_attenuation_dddd(
        (cos_phi_sqr + sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr)) +
          MATH_SQRT_2*cos_phi*sqrt(-k_sqr + n_sqr - sin_phi_sqr +
             sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr))));
-    
+
     *attenuation_parallel =
         ((cos_phi_sqr + sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr)) -
        MATH_SQRT_2*cos_phi*sqrt(-k_sqr + n_sqr - sin_phi_sqr +
@@ -134,19 +134,15 @@ void fresnel_ddd_attenuation_dddd(
      (sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr)) +
        MATH_SQRT_2*sin_phi*sqrt(-k_sqr + n_sqr - sin_phi_sqr +
           sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr)))*tan_phi + sin_phi_sqr*M_SQR(tan_phi)));
-    
+
     *retardance_senkrecht =
-        atan2(cos_phi_sqr - sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr)),
-    MATH_SQRT_2*cos_phi*sqrt(k_sqr - n_sqr + sin_phi_sqr +
-       sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr))));
-    
+        atan2(MATH_SQRT_2*cos_phi*sqrt(k_sqr - n_sqr + sin_phi_sqr + sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr))),
+              cos_phi_sqr - sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr)));
+
     *retardance_parallel =
-        atan2(M_SQR(k_sqr + n_sqr)*cos_phi_sqr -
-     sqrt(M_SQR(k_sqr + n_sqr) + 2*(k_sqr - n_sqr)*sin_phi_sqr + M_SQR(sin_phi_sqr)),
-    MATH_SQRT_2*cos_phi*(-2*k*n*sqrt(-k_sqr + n_sqr - sin_phi_sqr +
-          sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr))) +
-       (-k_sqr + n_sqr)*sqrt(k_sqr - n_sqr + sin_phi_sqr +
-          sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr)))));
+        atan2(MATH_SQRT_2*cos_phi*(-2*k*n*sqrt(-k_sqr + n_sqr - sin_phi_sqr + sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr))) +
+                                   (-k_sqr + n_sqr)*sqrt(k_sqr - n_sqr + sin_phi_sqr + sqrt(4*k_sqr*n_sqr + M_SQR(k_sqr - n_sqr + sin_phi_sqr)))),
+              M_SQR(k_sqr + n_sqr)*cos_phi_sqr - sqrt(M_SQR(k_sqr + n_sqr) + 2*(k_sqr - n_sqr)*sin_phi_sqr + M_SQR(sin_phi_sqr)));
 }
 
 void fresnel_dd_attenuation_dddd_birefringent(
