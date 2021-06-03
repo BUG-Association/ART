@@ -35,6 +35,7 @@ ART_MODULE_INITIALISATION_FUNCTION
     ART_PERFORM_MODULE_INIT_FROM_MODULE(ArcInfiniteSphereLightsourceSampling)
     ART_PERFORM_MODULE_INIT_FROM_MODULE(ArcPointLightsourceSampling)
     ART_PERFORM_MODULE_INIT_FROM_MODULE(ArcSkydomeLightsourceSampling)
+    ART_PERFORM_MODULE_INIT_FROM_MODULE(ArcComplexSkydomeLightsourceSampling)
     ART_PERFORM_MODULE_INIT_FROM_MODULE(ArnLightsourceCollectionSampling)
 )
 
@@ -45,6 +46,7 @@ ART_MODULE_SHUTDOWN_FUNCTION
     ART_PERFORM_MODULE_SHUTDOWN(ArcInfiniteSphereLightsourceSampling)
     ART_PERFORM_MODULE_SHUTDOWN(ArcPointLightsourceSampling)
     ART_PERFORM_MODULE_SHUTDOWN(ArcSkydomeLightsourceSampling)
+    ART_PERFORM_MODULE_SHUTDOWN(ArcComplexSkydomeLightsourceSampling)
     ART_PERFORM_MODULE_SHUTDOWN(ArnLightsourceCollectionSampling)
 )
 

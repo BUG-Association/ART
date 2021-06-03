@@ -602,7 +602,12 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
                 removeSource : NO 
             ], 
 
-            STANDARD_GLOBAL_TONEMAPPING_OPERATOR, 
+#ifdef ART_WITH_OPENEXR
+            [ IMAGECONVERSION_ARTCSP_TO_EXR
+                removeSource : YES
+            ],
+#else
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
 
             STANDARD_LUMINANCE_CLIPPING, 
 
@@ -610,7 +615,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
                 removeSource : YES 
                 bitsPerChannel : 8 
             ], 
-            
+#endif
             OPEN_RESULT_IMAGE_IN_EXTERNAL_VIEWER_ACTION,
 
             ACTION_SEQUENCE_END

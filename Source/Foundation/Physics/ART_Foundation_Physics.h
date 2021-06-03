@@ -32,6 +32,7 @@
 ART_LIBRARY_INTERFACE(ART_Foundation_Physics)
 
 #include "ArHosekSkyModel_ART_frontend.h"
+#include "ArPragueSkyModel_ART_frontend.h"
 #include "Astro.h"
 #include "FresnelTermsPlain.h"
 #include "FresnelTermsPolarising.h"

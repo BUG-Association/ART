@@ -159,5 +159,27 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @end
 
+@implementation ArnPragueSkyModel ( ARM_Interface )
+
+- elevation
+                    : (double) newElevation
+        azimuth     : (double) newAzimuth
+        turbidity   : (double) newTurbidity
+        groundAlbedo: (ArNode <ArpSpectrum> *) newGroundAlbedo
+{
+    [ self init
+        :   newElevation
+        :   newAzimuth
+        :   newTurbidity
+        :   NO
+        :   newGroundAlbedo
+        :   0
+        ];
+
+    return self;
+}
+
+@end
+
 
 // ===========================================================================

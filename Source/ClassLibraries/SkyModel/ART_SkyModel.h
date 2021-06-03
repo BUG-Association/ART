@@ -30,5 +30,6 @@ ART_LIBRARY_INTERFACE(ART_SkyModel)
 
 #import "ArnPreethamSkyModel.h"
 #import "ArnHosekSkyModel.h"
+#import "ArnPragueSkyModel.h"
 
 // ===========================================================================

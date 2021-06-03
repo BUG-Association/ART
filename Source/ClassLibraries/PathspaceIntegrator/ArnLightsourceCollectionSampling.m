@@ -34,8 +34,8 @@ ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 #define RANDOM_GENERATOR samplingContext->randomGenerator
-#define LIGHTSOURCE(__i) \
-    ((id <ArpLightsourceSampling>)LSC_LIGHT(__i).source)
+#define LIGHTSOURCE(__a,__i) \
+    ((id <ArpLightsourceSampling>)LSC_LIGHT((__a),(__i)).source)
 
 @implementation ArnLightsourceCollection ( RaySampling )
 
@@ -53,8 +53,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     double  percentileThreshold = [ RANDOM_GENERATOR valueFromNewSequence ];
 
     int  i = -1;
+    int  a = 0;
 
-
+    if ( complexSkydomePresent )
+    {
+        i = 0;
+    }
+    else
+    {
     ArSpectralSample percentile;
     do
     {
@@ -69,17 +75,17 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         // (as spc_sd_value_at_wavelength behaves differently)
         sps_s500w_init_s(
               art_gv,
-              LSC_LIGHT(i).overallSpectralPowerPercentile,
+              LSC_LIGHT(a,i).overallSpectralPowerPercentile,
               wavelength,
             & percentile
             );
     }
     while ( SPS_CI(percentile, 0)  // decide based on the hero wavelength only
             < percentileThreshold);
-    
+    }    
     
     BOOL result =
-        [ LIGHTSOURCE(i) sampleLightsource
+        [ LIGHTSOURCE(a,i) sampleLightsource
             : illuminatedPoint
             : samplingContext
             : wavelength
@@ -99,7 +105,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             
             sps_s500w_init_s(
                   art_gv,
-                  LSC_LIGHT(i).percentOfOverallSpectralPower,
+                  LSC_LIGHT(a,i).percentOfOverallSpectralPower,
                   wavelength,
                 & pdf
                 );
@@ -132,15 +138,16 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (      ArPDFValue *)                   emissionProbability /* optional */
 {
     int  i = 0;
+    int  a = 0;
 
     while ( i < numberOfLights
-           && (id)[ LSC_LIGHT(i).source shape ] != (id)emissiveObject )
+           && (id)[ LSC_LIGHT(a,i).source shape ] != (id)emissiveObject )
         i++;
 
     if(i >= numberOfLights)
         return NO;
 
-    [ LIGHTSOURCE(i) sampleProbability
+    [ LIGHTSOURCE(a,i) sampleProbability
         : illuminatedPoint
         : lightSamplePoint
         : lightSampleDirection
@@ -156,7 +163,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         
         sps_s500w_init_s(
               art_gv,
-              LSC_LIGHT(i).percentOfOverallSpectralPower,
+              LSC_LIGHT(a,i).percentOfOverallSpectralPower,
               wavelength,
             & pdf
             );
@@ -186,17 +193,17 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 {
     double  powerThreshold = [ RANDOM_GENERATOR valueFromNewSequence ];
     int  i = 0;
-
-    while( LSC_LIGHT(i).overallRadiantPowerPercentile < powerThreshold )
+    int  a = 0;
+    while( LSC_LIGHT(a,i).overallRadiantPowerPercentile < powerThreshold )
         i++;
 
     arpdfvalue_dd_init_p(
-        LSC_LIGHT(i).percentOfOverallRadiantPower,
-        LSC_LIGHT(i).percentOfOverallRadiantPower,
+        LSC_LIGHT(a,i).percentOfOverallRadiantPower,
+        LSC_LIGHT(a,i).percentOfOverallRadiantPower,
         selectionProbability
       );
     
-    return LIGHTSOURCE(i);
+    return LIGHTSOURCE(a,i);
 }
 
 - (id <ArpLightsourceSampling>) getLightsource
@@ -205,19 +212,20 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (      ArPDFValue *)                   selectionProbability
 {
     int  i = 0;
+    int  a = 0;
 
     while ( i < ( numberOfLights - 1 )
-           && (id)[ LSC_LIGHT(i).source shape ] != (id)emissiveObject )
+           && (id)[ LSC_LIGHT(a,i).source shape ] != (id)emissiveObject )
         i++;
 
     if(selectionProbability)
         arpdfvalue_dd_init_p(
-            LSC_LIGHT(i).percentOfOverallRadiantPower,
-            LSC_LIGHT(i).percentOfOverallRadiantPower,
+            LSC_LIGHT(a,i).percentOfOverallRadiantPower,
+            LSC_LIGHT(a,i).percentOfOverallRadiantPower,
             selectionProbability
           );
 
-    return LIGHTSOURCE(i);
+    return LIGHTSOURCE(a,i);
 }
 
 @end

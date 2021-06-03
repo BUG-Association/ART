@@ -51,6 +51,20 @@ ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_SHIFTING_SURFACETYPE_IMPLEMENTATION(
     YES
     )
 
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) location
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    [ SUB_COLOUR getSpectralSample
+        :   location
+        :   wavelength
+        :   albedo
+        ];
+
+    return YES;
+}
+
 - (BOOL) sampleWavelengthShift
         : (      ArcIntersection               *) incomingDirectionAndLocation
         : (      ArPathDirection                ) pathDirection

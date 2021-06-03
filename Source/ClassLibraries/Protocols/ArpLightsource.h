@@ -129,6 +129,11 @@ ArLightsourceType;
         : ( ArSamplingRegion *)  lightsourceSamplingRegion
         ;
 
+- (double) selectionProbabilityOfRegion
+        : ( ArSamplingRegion *)  lightsourceSamplingRegion
+        : (const Pnt3D *) queryLocationWorldspace
+        ;
+
 /* ---------------------------------------------------------------------------
     'getSampleProbability'
     Some lightsources (e.g. skydomes) provide the probability of sampling
@@ -171,6 +176,13 @@ ArLightsourceType;
         ;
 
 - (double) selectionProbabilityOfSource
+        : ( ArNode *)               emissiveObject
+        : ( ArSamplingRegion *)     samplingRegionOnEmissiveObject
+        : ( id <ArpLightsource> *)  lightsource
+        ;
+
+- (double) selectionProbabilityOfSource
+        : (const Pnt3D *)           queryLocationWorldspace
         : ( ArNode *)               emissiveObject
         : ( ArSamplingRegion *)     samplingRegionOnEmissiveObject
         : ( id <ArpLightsource> *)  lightsource

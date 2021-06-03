@@ -87,7 +87,13 @@ void arwavelength_sd_init_w(
         const double                      unitRandomValue,
               ArWavelength              * wavelength_r
         );
-
+        
+void arwavelength_i_deterministic_init_w(
+        const ART_GV        * art_gv,
+        const int             wavelengthStartIndex,
+              ArWavelength  * wavelength_r
+        );
+        
 unsigned int arwavelength_w_valid(
         const ART_GV        * art_gv,
         const ArWavelength  * w0
