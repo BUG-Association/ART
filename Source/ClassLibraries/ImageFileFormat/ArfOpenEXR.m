@@ -105,7 +105,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
     _spectralChannels = 0;
 
     _isSpectral = NO;
-    _containsPolarisationData = NO;
+    fileContainsPolarisationData = NO;
     
     _bufferRGBA = NULL;
     _bufferGrey = NULL;
@@ -141,9 +141,9 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
     }
 
     if (isPolarised) {
-        _containsPolarisationData = YES;
+        fileContainsPolarisationData = YES;
     } else {
-        _containsPolarisationData = NO;
+        fileContainsPolarisationData = NO;
     }
 
     XC(_size) = width;
@@ -162,17 +162,17 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
     {
         case 0:
             if ( _bufferRGBA != NULL ) {
-                _dataType = ardt_rgba;
+                fileDataType = ardt_rgba;
             } else if (_bufferGrey != NULL) {
-                _dataType = ardt_grey;
+                fileDataType = ardt_grey;
             } else {
                 ART_ERRORHANDLING_FATAL_ERROR("This image does not provide usable color information");
             }
             break;
-        case 8:   _dataType = ardt_spectrum8; break;
-        case 11:  _dataType = ardt_spectrum11; break;
-        case 18:  _dataType = ardt_spectrum18; break;
-        case 46:  _dataType = ardt_spectrum46; break;
+        case 8:   fileDataType = ardt_spectrum8; break;
+        case 11:  fileDataType = ardt_spectrum11; break;
+        case 18:  fileDataType = ardt_spectrum18; break;
+        case 46:  fileDataType = ardt_spectrum46; break;
         default:  ART_ERRORHANDLING_FATAL_ERROR("Unrecognised spectrum type");
     }
 
@@ -182,9 +182,9 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
     ------------------------------------------------------------------ */
 
     if (    LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE
-         && _containsPolarisationData )
+         && fileContainsPolarisationData )
     {
-        _dataType = _dataType | ardt_polarisable;
+        fileDataType = fileDataType | ardt_polarisable;
         ARREFFRAME_RF_I( _referenceFrame, 0 ) = VEC3D( 1.0, 0.0, 0.0 );
         ARREFFRAME_RF_I( _referenceFrame, 1 ) = VEC3D( 0.0, 1.0, 0.0 );
     }
@@ -198,8 +198,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
     _imageInfo =
         [ ALLOC_INIT_OBJECT(ArnImageInfo)
             :   _size
-            :   _dataType
-            :   _dataType
+            :   fileDataType
+            :   fileDataType
             :   resolution
             ];
 
@@ -328,7 +328,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
                     :   colBufS0
                     ];
                 
-                if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE && _containsPolarisationData ) {
+                if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE && fileContainsPolarisationData ) {
                     [ self _convertPixelToCol
                         :   &_bufferS1[_spectralChannels * (y * XC(image->size) + x)]
                         :   colBufS1
@@ -391,7 +391,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
         spc_free(art_gv, colBufS1);
         spc_free(art_gv, colBufS2);
         spc_free(art_gv, colBufS3);
-    } else if (_dataType == ardt_rgba) {
+    } else if (fileDataType == ardt_rgba) {
         printf("Read RGBA Region\n");
         ArRGBA * scanline = ALLOC_ARRAY(ArRGBA, XC(image->size));
 
@@ -412,7 +412,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
         }
 
         FREE_ARRAY(scanline);
-    } else if (_dataType == ardt_grey) {
+    } else if (fileDataType == ardt_grey) {
         ArGrey * scanline = ALLOC_ARRAY(ArGrey, XC(image->size));
 
         for ( long y = 0; y < YC(image->size); y++ ) {
@@ -447,7 +447,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
     _imageInfo = [imageInfo retain];
 
     _size = [ _imageInfo size ];
-    _dataType = [ imageInfo dataType ];
+    fileDataType = [ imageInfo dataType ];
 
     const int width = XC(_size);
     const int height = YC(_size);
@@ -461,23 +461,23 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
     
     // Memory allocation
 
-    if (   _dataType == ardt_rgb
-        || _dataType == ardt_rgba
-        || _dataType == ardt_xyz
-        || _dataType == ardt_xyza) {
-        _dataType = ardt_rgba;
+    if (   fileDataType == ardt_rgb
+        || fileDataType == ardt_rgba
+        || fileDataType == ardt_xyz
+        || fileDataType == ardt_xyza) {
+        fileDataType = ardt_rgba;
         _isSpectral = NO;
-        _containsPolarisationData = NO;
+        fileContainsPolarisationData = NO;
         _bufferRGBA = ALLOC_ARRAY(float, 4 * width * height);
-    } else if (_dataType == ardt_grey) {
+    } else if (fileDataType == ardt_grey) {
         _isSpectral = NO;
-        _containsPolarisationData = NO;
+        fileContainsPolarisationData = NO;
         _bufferGrey = ALLOC_ARRAY(float, width * height);
     } else {
         _isSpectral = YES;
-        _containsPolarisationData = (LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE) ? YES : NO;
+        fileContainsPolarisationData = (LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE) ? YES : NO;
         
-        switch (_dataType) {
+        switch (fileDataType) {
             case ardt_spectrum8:
             case ardt_spectrum8_polarisable:  _spectralChannels = 8; break;
             case ardt_spectrum11:
@@ -489,7 +489,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
             default:
                 ART_ERRORHANDLING_FATAL_ERROR(
                       "unsupported EXR colour type %d requested",
-                      _dataType
+                      fileDataType
                 );
         }
 
@@ -547,7 +547,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
             :   0 ];
     
         
-        if ( _containsPolarisationData ) {
+        if ( fileContainsPolarisationData ) {
             ARREFFRAME_RF_I( _referenceFrame, 0 ) = VEC3D( 1.0, 0.0, 0.0 );
             ARREFFRAME_RF_I( _referenceFrame, 1 ) = VEC3D( 0.0, 1.0, 0.0 );
                         
@@ -590,7 +590,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
             for (long x = 0; x < XC(image->size); x++) {
                 const long targetX = x + XC(start);
 
-                if ( _dataType == ardt_rgba ) { // art_foundation_isr(art_gv) ?
+                if ( fileDataType == ardt_rgba ) { // art_foundation_isr(art_gv) ?
                     ArRGBA  rgba;
 
                     arlightalpha_to_spc(

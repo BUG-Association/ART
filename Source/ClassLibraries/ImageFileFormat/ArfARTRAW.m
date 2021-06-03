@@ -310,14 +310,6 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,artraw)
         :   channels * 4 \
         ];
 
-- (ArDataType) fileDataType
-{
-    if ( fileContainsPolarisationData )
-        return fileDataType | ardt_polarisable;
-    else
-        return fileDataType;
-}
-
 - (void) _extractPixelChannelToD
         : (int) c
         : (double *) d

@@ -25,42 +25,34 @@
 =========================================================================== */
 
 #include "ART_Foundation.h"
-#include <OpenEXRSettings.h>
 
-ART_MODULE_INTERFACE(ArfOpenEXR)
+ART_MODULE_INTERFACE(ArfRAWRasterImage)
 
-#ifdef ART_WITH_OPENEXR
-#define WRITE_RGB_VERSION
-
-#import "ArfRAWRasterImage.h"
-
-#define ARFOPENEXR_EXTENSION     "exr"
+#import "ArfRasterImage.h"
 
 
-@interface ArfOpenEXR
-           : ArfRAWRasterImage
+/* --------------------------------------------------------------------------
+    'ArfRAWRasterImage' class
+
+    Generic superclass for spectral image filetypes such as ARTRAW or EXR.
+    This class should never be directly instantiated - only its
+    derivatives do anything useful.
+-------------------------------------------------------------------------- */
+
+
+@interface ArfRAWRasterImage
+           : ArfRasterImage
 {
-    BOOL                        _writtingMode;
-    ArnImageInfo              * _imageInfo;
-    IVec2D                      _size;
-    int                         _spectralChannels;
-    BOOL                        _isSpectral;
-    
-    float                      * _bufferRGBA;
-    float                      * _bufferGrey;
-
-    float                      * _bufferS0;
-    float                      * _bufferS1;
-    float                      * _bufferS2;
-    float                      * _bufferS3;
-
-    ArReferenceFrame             _referenceFrame;
-    
-    ArLightAlpha              ** _scanline; // More convenient to have a single allocation
+    BOOL             fileContainsPolarisationData;
+    ArDataType       fileDataType;
 }
+
+
+- (ArDataType) fileDataType
+        ;
+
 
 @end
 
 
-#endif // ART_WITH_OPENEXR
 // ===========================================================================

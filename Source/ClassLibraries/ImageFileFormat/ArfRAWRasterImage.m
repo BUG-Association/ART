@@ -24,43 +24,24 @@
 
 =========================================================================== */
 
-#include "ART_Foundation.h"
-#include <OpenEXRSettings.h>
-
-ART_MODULE_INTERFACE(ArfOpenEXR)
-
-#ifdef ART_WITH_OPENEXR
-#define WRITE_RGB_VERSION
+#define ART_MODULE_NAME     ArfRAWRasterImage
 
 #import "ArfRAWRasterImage.h"
 
-#define ARFOPENEXR_EXTENSION     "exr"
+ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
+ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-@interface ArfOpenEXR
-           : ArfRAWRasterImage
+@implementation ArfRAWRasterImage
+
+- (ArDataType) fileDataType
 {
-    BOOL                        _writtingMode;
-    ArnImageInfo              * _imageInfo;
-    IVec2D                      _size;
-    int                         _spectralChannels;
-    BOOL                        _isSpectral;
-    
-    float                      * _bufferRGBA;
-    float                      * _bufferGrey;
-
-    float                      * _bufferS0;
-    float                      * _bufferS1;
-    float                      * _bufferS2;
-    float                      * _bufferS3;
-
-    ArReferenceFrame             _referenceFrame;
-    
-    ArLightAlpha              ** _scanline; // More convenient to have a single allocation
+    if ( fileContainsPolarisationData )
+        return fileDataType | ardt_polarisable;
+    else
+        return fileDataType;
 }
 
 @end
 
-
-#endif // ART_WITH_OPENEXR
 // ===========================================================================
