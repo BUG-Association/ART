@@ -476,7 +476,7 @@ int readEXR(
         for (size_t s = 0; s < n_stokes_components; s++) {
             for (size_t wl_idx = 0; wl_idx < (*n_spectralBands); wl_idx++) {
                 char* ptrS = (char*)(&_spectral_buffers[s][wl_idx]);
-                Imf::Slice slice = Imf::Slice::Make(compType, ptrS, exrDataWindow);
+                Imf::Slice slice = Imf::Slice::Make(compType, ptrS, exrDataWindow, xStride, yStride);
 
                 exrFrameBuffer.insert(wavelengths_nm_S[s][wl_idx].second, slice);
             }
