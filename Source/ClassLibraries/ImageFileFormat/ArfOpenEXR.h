@@ -49,6 +49,8 @@ ART_MODULE_INTERFACE(ArfOpenEXR)
     float                      * _bufferRGBA;
     float                      * _bufferGrey;
 
+    double                     * _wavelengths_nm;
+
     float                      * _bufferS0;
     float                      * _bufferS1;
     float                      * _bufferS2;

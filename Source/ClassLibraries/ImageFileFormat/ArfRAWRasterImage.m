@@ -42,6 +42,11 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         return fileDataType;
 }
 
+- (BOOL) isEmissive
+{
+    return _isEmissive;
+}
+
 @end
 
 // ===========================================================================

@@ -111,6 +111,10 @@ void saveEXR(
  *  Number of spectral bands of spectral image. (# elements of
  *  `wavelenth_nm`). Sets to 0 if non spectral. 
  * @param isPolarised 
+ *  Sets to 1 if polarised, 0 otherwise
+ * @param isEmissive
+ *  Sets to 1 if the emissive layers were considered 0 if it was the reflective
+ *  ones
  * @return int 
  */
 int readEXR(
@@ -121,7 +125,8 @@ int readEXR(
     float** spectral_buffers[4],
     double* wavelengths_nm[],
     int* n_spectralBands,
-    int* isPolarised);
+    int* isPolarised,
+    int* isEmissive);
 
 #ifdef __cplusplus
 }

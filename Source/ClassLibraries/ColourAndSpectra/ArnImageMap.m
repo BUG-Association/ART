@@ -49,11 +49,17 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 #define RGBA32_SOURCE_BUFFER(_x) \
     (((ArnRGBA32Image*)sourceImageBuffer)->data[(_x)])
 
+#define SPECTRAL_SOURCE_BUFFER(_x) \
+    (((ArnLightAlphaImage*)sourceImageBuffer)->data[(_x)])
+
 #define IMAGE_DATA_C3(_p2d) \
     (imageDataC3[((int)(XC(sourceImageSize)*XC(_p2d)))+((int)(YC(sourceImageSize)*YC(_p2d)))*XC(sourceImageSize)])
 
 #define IMAGE_DATA_RGB(_p2d) \
-    (imageData[((int)(XC(sourceImageSize)*XC(_p2d)))+((int)(YC(sourceImageSize)*YC(_p2d)))*XC(sourceImageSize)])
+    (imageRGBData[((int)(XC(sourceImageSize)*XC(_p2d)))+((int)(YC(sourceImageSize)*YC(_p2d)))*XC(sourceImageSize)])
+
+#define IMAGE_DATA_SPECTRAL(_p2d) \
+    (imageSpectralData[((int)(XC(sourceImageSize)*XC(_p2d)))+((int)(YC(sourceImageSize)*YC(_p2d)))*XC(sourceImageSize)])
 
 
 @implementation ArnImageMap
@@ -63,8 +69,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
 - (void) _setup
 {
     sourceImageSize = [ IMAGE_FILE size ];
-
-    ucc = ucc_srgb( art_gv );
 
     Class  sourceImageBufferClass =
         [ IMAGE_FILE nativeContentClass ];
@@ -86,17 +90,29 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
         ArNode
         );
     
-    BOOL  sourceRGB = FALSE;
-    BOOL  sourceRGBA = FALSE;
+    BOOL  sourceRGB = NO;
+    BOOL  sourceRGBA = NO;
+
+    isSpectral = NO;
 
     if ( [ sourceImageBuffer isMemberOfClass: [ ArnRGBImage class ] ] )
     {
-        sourceRGB = TRUE;
+        sourceRGB = YES;
     }
-
-    if ( [ sourceImageBuffer isMemberOfClass: [ ArnRGBAImage class ] ] )
+    else if ( [ sourceImageBuffer isMemberOfClass: [ ArnRGBAImage class ] ] )
     {
-        sourceRGBA = TRUE;
+        sourceRGBA = YES;
+    }
+    else if ( [ sourceImageBuffer isMemberOfClass: [ ArnLightAlphaImage class ] ] )
+    {
+        // No need for uplifting
+        isSpectral = YES;
+
+        // TODO: Sanity check, show a warning if the image is emissive
+        // ART_ERRORHANDLING_WARNING(
+        //     "You are using an emissive image as a texture."
+        //     );
+        // }
     }
 
     [ IMAGE_FILE getPlainImage
@@ -104,24 +120,36 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
         :   ((ArnPlainImage *)sourceImageBuffer)
         ];
 
-    int  sourceImageDataSize =
+    const int sourceImageDataSize =
         XC(sourceImageSize) * YC(sourceImageSize);
 
-    imageData = ALLOC_ARRAY( ArRGB, sourceImageDataSize );
+    if (isSpectral) {
+        imageSpectralData = ALLOC_ARRAY( ArSpectrum*, sourceImageDataSize );
 
-    double  max;
-    
-    for ( int i = 0; i < sourceImageDataSize; i++)
-    {
-        ArRGB  pixelRGB;
-        
-        if ( sourceRGB )
-        {
-            pixelRGB = RGB_SOURCE_BUFFER(i);
+        for (int i = 0; i < sourceImageDataSize; i++) {
+            imageSpectralData[i] = spc_alloc(art_gv);
+
+            arlightalpha_to_spc(
+                art_gv,
+                SPECTRAL_SOURCE_BUFFER(i),
+                imageSpectralData[i]
+            );
         }
-        else
+    } else {
+        ucc = ucc_srgb( art_gv );
+        imageRGBData = ALLOC_ARRAY( ArRGB, sourceImageDataSize );
+
+        double  max;
+        
+        for ( int i = 0; i < sourceImageDataSize; i++)
         {
-            if ( sourceRGBA )
+            ArRGB  pixelRGB;
+            
+            if ( sourceRGB )
+            {
+                pixelRGB = RGB_SOURCE_BUFFER(i);
+            }
+            else if ( sourceRGBA )
             {
                 pixelRGB = RGBA_SOURCE_BUFFER(i);
             }
@@ -134,28 +162,28 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
                 GC(pixelRGB) = ARCSR_INV_GAMMAFUNCTION(DEFAULT_RGB_SPACE_REF,GC(pixelRGB));
                 BC(pixelRGB) = ARCSR_INV_GAMMAFUNCTION(DEFAULT_RGB_SPACE_REF,BC(pixelRGB));
             }
+            
+            if ( RC(pixelRGB) > max ) max = RC(pixelRGB);
+            if ( GC(pixelRGB) > max ) max = GC(pixelRGB);
+            if ( BC(pixelRGB) > max ) max = BC(pixelRGB);
+            
+            imageRGBData[i] = pixelRGB;
         }
         
-        if ( RC(pixelRGB) > max ) max = RC(pixelRGB);
-        if ( GC(pixelRGB) > max ) max = GC(pixelRGB);
-        if ( BC(pixelRGB) > max ) max = BC(pixelRGB);
+        //   If the maximum RGB component of any pixel in the texture is > 1.,
+        //   we force the entire texture down the hard way so that this component
+        //   gets a value of 1. That is probably not what the person who
+        //   modelled the scene intended - but reflectance values have to be <= 1,
+        //   no exceptions.
         
-        imageData[i] = pixelRGB;
-    }
-    
-    //   If the maximum RGB component of any pixel in the texture is > 1.,
-    //   we force the entire texture down the hard way so that this component
-    //   gets a value of 1. That is probably not what the person who
-    //   modelled the scene intended - but reflectance values have to be <= 1,
-    //   no exceptions.
-    
-    if ( max > 1.0 )
-    {
-        double  scale_factor = 1. / max;
-
-        for ( int i = 0; i < sourceImageDataSize; i++)
+        if ( max > 1.0 )
         {
-            rgb_d_mul_s( art_gv, scale_factor, & imageData[i] );
+            double  scale_factor = 1. / max;
+
+            for ( int i = 0; i < sourceImageDataSize; i++)
+            {
+                rgb_d_mul_s( art_gv, scale_factor, & imageRGBData[i] );
+            }
         }
     }
     
@@ -179,6 +207,11 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
     if ( self )
     {
         scaleFactor = newScaleFactor;
+        
+        imageRGBData = NULL;
+        imageSpectralData = NULL;
+
+        isSpectral = NO;
 
         [ self _setup ];
     }
@@ -186,25 +219,75 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
     return self;
 }
 
+- (void) dealloc
+{
+    if (imageRGBData) {
+        FREE_ARRAY(imageRGBData);
+    }
+
+    if (imageSpectralData) {
+        const int sourceImageDataSize = XC(sourceImageSize) * YC(sourceImageSize);
+        for (int i = 0; i < sourceImageDataSize; i++) {
+            spc_free(art_gv, imageSpectralData[i]);
+        }
+
+        FREE_ARRAY(imageSpectralData);
+    }
+
+    [ super dealloc ];
+}
+
 - (void) getSpectrum
         : (ArcPointContext *) locationInfo
         : (ArSpectrum *) outSpectrum
 {
-    spc_d_init_s(
-        art_gv,
-        0.2,
-        outSpectrum
-        );
+    // if (isSpectral) {
+    //     //   Casting this is safe insofar as something is very, very wrong
+    //     //   if this gets called in a situation where anything except an
+    //     //   ArcSurfacePoint (a specific subclass of ArcPointContext ) is
+    //     //   being passed down to us.
+
+    //    const Pnt2D  * p2d =
+    //         [ (const ArcSurfacePoint *) locationInfo getTextureCoords ];
+
+    //     spc_s_init_s(
+    //         art_gv,
+    //         IMAGE_DATA_SPECTRAL(*p2d),
+    //         outSpectrum
+    //     );
+    // } else {
+        spc_d_init_s(
+            art_gv,
+            0.2,
+            outSpectrum
+            );
+    // }
 }
 - (void) getHiresSpectrum
         : (ArcPointContext *) locationInfo
         : (ArSpectrum500 *) outSpectrum
-{
-    s500_d_init_s(
-        art_gv,
-        0.2,
-        outSpectrum
-        );
+{    
+    // if (isSpectral) {
+    //     //   Casting this is safe insofar as something is very, very wrong
+    //     //   if this gets called in a situation where anything except an
+    //     //   ArcSurfacePoint (a specific subclass of ArcPointContext ) is
+    //     //   being passed down to us.
+
+    //    const Pnt2D  * p2d =
+    //         [ (const ArcSurfacePoint *) locationInfo getTextureCoords ];
+
+    //     s500_s_init_s(
+    //         art_gv,
+    //         IMAGE_DATA_SPECTRAL(*p2d),
+    //         outSpectrum
+    //     );
+    // } else {
+        s500_d_init_s(
+            art_gv,
+            0.2,
+            outSpectrum
+            );
+    // }
 }
 
 - (void) getSpectralSample
@@ -220,13 +303,25 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
     const Pnt2D  * p2d =
         [ (const ArcSurfacePoint *) locationInfo getTextureCoords ];
     
-    ucc_rgb_to_sps(
-          art_gv,
-          ucc,
-        & IMAGE_DATA_RGB(*p2d),
-          wavelength,
-          outSpectralSample
-        );
+
+    if (isSpectral) {
+        for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++) {
+            SPS_CI(*outSpectralSample, i) =    
+                spc_sd_value_at_wavelength(
+                    art_gv,
+                    IMAGE_DATA_SPECTRAL(*p2d),
+                    ARWL_WI(*wavelength, i)
+                );
+        }
+    } else {
+        ucc_rgb_to_sps(
+            art_gv,
+            ucc,
+          & IMAGE_DATA_RGB(*p2d),
+            wavelength,
+            outSpectralSample
+            );
+    }
 }
 
 - (void) getAttenuation

@@ -116,7 +116,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
     _bufferS3 = NULL;
 
     float** spectral_buffers[4] = { &_bufferS0, &_bufferS1, &_bufferS2, &_bufferS3};
-    double* wavelengths_nm = NULL;
+    _wavelengths_nm = NULL;
 
     /* ------------------------------------------------------------------
         Read info from the EXR file.
@@ -131,9 +131,10 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
         & _bufferRGBA,
         & _bufferGrey,
         spectral_buffers,
-        & wavelengths_nm,
+        & _wavelengths_nm,
         & _spectralChannels,
-        & isPolarised
+        & isPolarised,
+        & _isEmissive
     );
 
     if (read_error != 0) {
@@ -150,30 +151,19 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
     YC(_size) = height;
     FVec2D  resolution = FVEC2D(72.0, 72.0);
 
-    // TODO: use this information to check constistency with internal
-    // ART wavelengths.
-    FREE_ARRAY(wavelengths_nm);
-
     /* ------------------------------------------------------------------
-        Set the datatype according to the number of channels.
+        Set the datatype to ArSpectrum500 since we have no waranty
+        that the spectral sample matches the native ART datatypes
     ------------------------------------------------------------------ */
 
-    switch ( _spectralChannels )
-    {
-        case 0:
-            if ( _bufferRGBA != NULL ) {
-                fileDataType = ardt_rgba;
-            } else if (_bufferGrey != NULL) {
-                fileDataType = ardt_grey;
-            } else {
-                ART_ERRORHANDLING_FATAL_ERROR("This image does not provide usable color information");
-            }
-            break;
-        case 8:   fileDataType = ardt_spectrum8; break;
-        case 11:  fileDataType = ardt_spectrum11; break;
-        case 18:  fileDataType = ardt_spectrum18; break;
-        case 46:  fileDataType = ardt_spectrum46; break;
-        default:  ART_ERRORHANDLING_FATAL_ERROR("Unrecognised spectrum type");
+    if (_spectralChannels > 0) {
+        fileDataType = ardt_spectrum500;
+    } else if (_bufferRGBA) {
+        fileDataType = ardt_rgba;
+    } else if (_bufferGrey) {
+        fileDataType = ardt_grey;
+    } else {
+        ART_ERRORHANDLING_FATAL_ERROR("This image does not provide any usable color information");
     }
 
     /* ------------------------------------------------------------------
@@ -189,7 +179,6 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
         ARREFFRAME_RF_I( _referenceFrame, 1 ) = VEC3D( 0.0, 1.0, 0.0 );
     }
 
-   
     /* ------------------------------------------------------------------
             Create ImageInfo instance for the image, and allocate memory
             for scanlines and individual pixels.
@@ -212,7 +201,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
                 0.0
                 );
     }
-    
+
     return _imageInfo;
 }
 
@@ -221,131 +210,25 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
         : (float *)          vals
         : (ArSpectrum *)     outBuf
 {
-    switch (_spectralChannels)
-    {
-        case 8:
-        {
-            ArSpectrum8 inSpec;
+    ArPSSpectrum psspectrum;
 
-            for (int i = 0; i < 8; i++)
-            {
-                s8_set_sid(
-                    art_gv,
-                  & inSpec,
-                    i,
-                    vals[i]
-                );
-            }
-                
-            s8_to_spc(
-                  art_gv,
-                & inSpec,
-                  outBuf
-                );
-            break;
-        }
-        case 11:
-        {
-            ArSpectrum11 inSpec;
-
-            for (int i = 0; i < 11; i++)
-            {
-                s11_set_sid(
-                    art_gv,
-                  & inSpec,
-                    i,
-                    vals[i]
-                );
-            }
-                
-            s11_to_spc(
-                  art_gv,
-                & inSpec,
-                  outBuf
-                );
-            break;
-        }
-        case 18:
-        {
-            ArSpectrum18 inSpec;
-
-            for (int i = 0; i < 18; i++)
-            {
-                s18_set_sid(
-                    art_gv,
-                  & inSpec,
-                    i,
-                    vals[i]
-                );
-            }
-                
-            s18_to_spc(
-                  art_gv,
-                & inSpec,
-                  outBuf
-                );
-            break;
-        }
-        case 46:
-        {
-            ArSpectrum46 inSpec;
-
-            for (int i = 0; i < 46; i++)
-            {
-                s46_set_sid(
-                    art_gv,
-                  & inSpec,
-                    i,
-                    vals[i]
-                );
-            }
-                
-            s46_to_spc(
-                  art_gv,
-                & inSpec,
-                  outBuf
-                );
-            break;
-        }
+    ARPSS_SIZE(psspectrum) = _spectralChannels;
+    ARPSS_SCALE(psspectrum) = 1.0;
+    ARPSS_ARRAY(psspectrum) = ALLOC_ARRAY(Pnt2D, _spectralChannels);
+    
+    for (int i = 0; i < _spectralChannels; i++) {
+        ARPSS_ARRAY_I(psspectrum, i) = PNT2D(_wavelengths_nm[i] NM, vals[i]);
     }
+
+    pss_to_spc(art_gv, &psspectrum, outBuf);
+
+    FREE_ARRAY(ARPSS_ARRAY(psspectrum));
 }
 
 - (void) getPlainImage
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {     
-    // TODO:
-    // =====
-    // Note, this piece of code shall be beter handled in the future.
-    // Now, we are using this hack to allow retro compatibility with 
-    // IMAGE_MAP feature.
-    // Uplifting shall be done here instead of within IMAGE_MAP
-    // Now, keeping the old behaviour to not break anything.
-    // rgb_to_spc(
-    //     art_gv,
-    //     & rgb,
-    //     colBufS0
-    //     ) ;
-
-    // arlight_s_init_unpolarised_l(
-    //         art_gv,
-    //         colBufS0,
-    //         ARLIGHTALPHA_LIGHT( *_scanline[x] )
-    //         );
-
-    // [ ((ArnLightAlphaImage*)image) setLightAlphaRegion
-    //     :   IPNT2D(0, y)
-    //     :   IVEC2D(XC(image->size), 1)
-    //     :   _scanline
-    //     :   0
-    //     ];
-
-    // [ (ArNode <ArpSetRGBARegion> *)image setRGBARegion
-    //     :   IPNT2D(0, y)
-    //     :   IVEC2D(XC(image->size), 1)
-    //     :   _scanline
-    //     :   0 ];
-
     if (_spectralChannels > 0) {
         ArSpectrum *colBufS0 = spc_d_alloc_init( art_gv, 0.0 );
         ArSpectrum *colBufS1 = spc_d_alloc_init( art_gv, 0.0 );
@@ -474,6 +357,10 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
         : (ArnImageInfo *) imageInfo
 {
     _writtingMode = YES;
+    
+    // ART only write emissive images
+    _isEmissive = YES;
+
     _imageInfo = [imageInfo retain];
 
     _size = [ _imageInfo size ];
@@ -537,6 +424,36 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
 #endif // WRITE_RGB_VERSION
     }
     
+
+    // Retrieve wavelengths
+    _wavelengths_nm = ALLOC_ARRAY(double, _spectralChannels);
+
+    for (int i = 0; i < _spectralChannels; i++) {
+        double central = 0.;
+        
+        switch(_spectralChannels) {
+            case 8:
+                central = s8_channel_center( art_gv, i );
+                break;
+            case 11:
+                central = s11_channel_center( art_gv, i );
+                break;
+            case 18:
+                central = s18_channel_center( art_gv, i );
+                break;
+            case 46:
+                central = s46_channel_center( art_gv, i );
+                break;
+            default:
+                ART_ERRORHANDLING_FATAL_ERROR(
+                        "Unrecognised number of spectral channels %d requested",
+                        _spectralChannels
+                );
+        }
+
+        _wavelengths_nm[i] = central * 1e9;
+    }
+
     _scanline = ALLOC_ARRAY( ArLightAlpha *, XC(_size) );
 
     for ( unsigned int i = 0; i < XC(_size); i++ ) {
@@ -549,15 +466,15 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
 }
 
 
-- (void) _getPixelValue
-        : (ArSpectrum *) colour
-        : (float *) buffer
-{
-    for ( int c = 0; c < _spectralChannels; c++ )
-    {
-        buffer[c] = spc_si( art_gv, colour, c );
-    }
-}
+// - (void) _getPixelValue
+//         : (ArSpectrum *) colour
+//         : (float *) buffer
+// {
+//     for ( int c = 0; c < _spectralChannels; c++ )
+//     {
+//         buffer[c] = spc_si( art_gv, colour, c );
+//     }
+// }
 
 
 - (void) setPlainImage
@@ -730,35 +647,6 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
             samplesPerPixels
         };
 
-        // Retrieve wavelengths
-        double * wavelengths = ALLOC_ARRAY(double, _spectralChannels);
-
-        for (int i = 0; i < _spectralChannels; i++) {
-            double central = 0.;
-            
-            switch(_spectralChannels) {
-                case 8:
-                    central = s8_channel_center( art_gv, i );
-                    break;
-                case 11:
-                    central = s11_channel_center( art_gv, i );
-                    break;
-                case 18:
-                    central = s18_channel_center( art_gv, i );
-                    break;
-                case 46:
-                    central = s46_channel_center( art_gv, i );
-                    break;
-                default:
-                    ART_ERRORHANDLING_FATAL_ERROR(
-                            "Unrecognised number of spectral channels %d requested",
-                            _spectralChannels
-                    );
-            }
-
-            wavelengths[i] = central * 1e9;
-        }
-
         const float* spectralBuffers[] = {
             _bufferS0, _bufferS1, _bufferS2, _bufferS3
         };
@@ -785,7 +673,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
             chromaticities,
             _bufferGrey,
             spectralBuffers,
-            wavelengths,
+            _wavelengths_nm,
             _spectralChannels,
             metadata_keys,
             metadata_values,
@@ -794,7 +682,6 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
 
         FREE(createdByString);
         FREE(creationDateStr);
-        FREE_ARRAY(wavelengths);
         FREE_ARRAY(chromaticities);
     }
 }
@@ -804,8 +691,14 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
     self = [ super init ];
 
     if (self) {
+        _spectralChannels = 0;
+        _isSpectral = NO;
+        _isEmissive = YES;
+
         _bufferRGBA = NULL;
         _bufferGrey = NULL;
+
+        _wavelengths_nm = NULL;
 
         _bufferS0 = NULL;
         _bufferS1 = NULL;
@@ -823,11 +716,14 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
     FREE_ARRAY(_bufferRGBA);
     FREE_ARRAY(_bufferGrey);
 
+    FREE_ARRAY(_wavelengths_nm);
+
     FREE_ARRAY(_bufferS0);
     FREE_ARRAY(_bufferS1);
     FREE_ARRAY(_bufferS2);
     FREE_ARRAY(_bufferS3);
     
+
     // if (_scanline) {
     //     for ( unsigned int i = 0; i < XC(_size); i++ ) {
     //         arlightalpha_free(art_gv, _scanline[i]);

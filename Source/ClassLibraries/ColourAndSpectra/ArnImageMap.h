@@ -40,7 +40,12 @@ ART_MODULE_INTERFACE(ArnImageMap)
 {
     double       scaleFactor;
     IVec2D       sourceImageSize;
-    ArRGB      * imageData;
+    
+    ArRGB      * imageRGBData;
+    ArSpectrum **imageSpectralData;
+    
+    BOOL         isSpectral;
+
     const UCC  * ucc;
 }
 

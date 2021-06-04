@@ -45,12 +45,13 @@ ART_MODULE_INTERFACE(ArfRAWRasterImage)
 {
     BOOL             fileContainsPolarisationData;
     ArDataType       fileDataType;
+    BOOL             _isEmissive;
 }
 
 
-- (ArDataType) fileDataType
-        ;
+- (ArDataType) fileDataType;
 
+- (BOOL) isEmissive;
 
 @end
 
