@@ -32,6 +32,7 @@
 #include "ArSpectrum11.h"
 #include "ArSpectrum18.h"
 #include "ArSpectrum46.h"
+#include "ArSpectrum500.h"
 
 typedef struct ArDataTypeMap
 {
@@ -100,6 +101,7 @@ const ArDataTypeMap spectrumTypeMap[] =
     { ardt_spectrum46            , "ardt_spectrum46" },
     { ardt_spectrum46_polarisable, "ardt_spectrum46_polarisable" },
     { ardt_spectrum500           , "ardt_spectrum500" },
+    { ardt_spectrum500_polarisable, "ardt_spectrum500_polarisable" },
 
     { ardt_unknown               , "ardt_unknown" }  /* must be last */
 };
@@ -150,6 +152,12 @@ const char * ardatatype_long_name_string(
         case ardt_spectrum46_polarisable:
             return s46_typename_string(art_gv);
             break;
+
+        case ardt_spectrum500:
+        case ardt_spectrum500_polarisable:
+            return s500_typename_string(art_gv);
+            break;
+
 
         default:
             ART_ERRORHANDLING_FATAL_ERROR(
