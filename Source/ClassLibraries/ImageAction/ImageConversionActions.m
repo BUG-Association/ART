@@ -83,7 +83,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
         :   [ ArfARTCSP class ]
         ];
 
@@ -226,7 +226,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
         :   [ ArfARTCSP class ]
         ];
 
@@ -863,7 +863,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
         :   [ ArfOpenEXR class ]
         ];
 
@@ -1666,7 +1666,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
         :   [ ArfARTGSC class ]
         ];
 
@@ -1994,7 +1994,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
         :   [ ArfARTGSC class ]
         ];
 

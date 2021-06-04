@@ -78,11 +78,11 @@ int art_imagesnr(
             :   inputFileNameReference
             ];
     
-    if ( ! (   ( [ inputFileImageReference dataImageClass ] == [ ArfARTRAW class ] )
+    if ( ! (   ( [ inputFileImageReference imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
             || ( [ inputFileImageReference dataImageClass ] == [ ArfARTCSP class ] )) ) {
         ART_ERRORHANDLING_FATAL_ERROR(
             "reference file is not an internal ART image file - "
-            "%s instead of ArfARTRAW/CSP"
+            "%s instead of ArfARTRAW/OpenEXR/CSP"
             ,   [ [ inputFileImageReference dataImageClass ] cStringClassName ]
             );
     }
@@ -104,11 +104,11 @@ int art_imagesnr(
              :   inputFileNameCompare
              ];
     
-    if ( ! (   ( [ inputFileImageCompare dataImageClass ] == [ ArfARTRAW class ] )
+    if ( ! (   ( [ inputFileImageCompare imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
             || ( [ inputFileImageCompare dataImageClass ] == [ ArfARTCSP class ] )) ) {
         ART_ERRORHANDLING_FATAL_ERROR(
             "comparison file is not an internal ART image file - "
-            "%s instead of ArfARTRAW/CSP"
+            "%s instead of ArfARTRAW/OpenEXR/CSP"
             ,   [ [ inputFileImageCompare dataImageClass ] cStringClassName ]
             );
     }
@@ -128,13 +128,13 @@ int art_imagesnr(
             );
     }
     
-    if ([ inputFileImageReference dataImageClass ] != [ ArfARTRAW class ]  ||
-        [ inputFileImageCompare   dataImageClass ] != [ ArfARTRAW class ]  ) {
+    if ([ inputFileImageReference imageFileIsKindOf: [ ArfRAWRasterImage class ] ]  ||
+        [ inputFileImageCompare   imageFileIsKindOf: [ ArfRAWRasterImage class ] ]  ) {
         ART_ERRORHANDLING_FATAL_ERROR("this tool currently works only on ARTRAW images");
     }
     
-    ArfARTRAW  * rawImageReference = (ArfARTRAW *) inputFileImageReference->imageFile;
-    ArfARTRAW  * rawImageCompare   = (ArfARTRAW *) inputFileImageCompare->imageFile;
+    ArfRAWRasterImage  * rawImageReference = (ArfRAWRasterImage *) inputFileImageReference->imageFile;
+    ArfRAWRasterImage  * rawImageCompare   = (ArfRAWRasterImage *) inputFileImageCompare->imageFile;
 
     ArDataType  rawContentTypeReference = [ rawImageReference fileDataType ];
     ArDataType  rawContentTypeCompare   = [ rawImageCompare   fileDataType ];

@@ -715,7 +715,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnMonochromeInteractiveCal
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
         :   [ ArfARTCSP class ]
         ];
 

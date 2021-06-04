@@ -170,8 +170,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTRAWLinearPolarisingFi
 
         [ self prepareForImageManipulation
             :   nodeStack
-            :   [ ArfARTRAW class ]
-            :   [ ArfARTRAW class ]
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfRAWRasterImage class ]
             ];
 
         /* ------------------------------------------------------------------
@@ -610,7 +610,7 @@ void  lch_to_lab(
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
         :   [ ArfARTCSP class ]
         ];
 

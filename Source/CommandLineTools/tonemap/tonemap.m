@@ -357,7 +357,7 @@ int tonemap(
 
         BOOL  rawInput = NO;
 
-        if ( [ inputImage imageFileIsMemberOf: [ ArfARTRAW class ] ] )
+        if ( [ inputImage imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
             rawInput = YES;
 
         //   We only adapt the ISR to the contents of the ARTRAW image we
@@ -448,7 +448,7 @@ int tonemap(
 #endif
            )
         {
-            if ( [ inputImage imageFileIsMemberOf: [ ArfARTRAW class ] ] )
+            if ( [ inputImage imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
             {
 #ifdef ART_WITH_OPENEXR
 	      convertToResultFormatActionA =
@@ -502,7 +502,7 @@ int tonemap(
 #endif
            )
         {
-            if ( [ inputImage imageFileIsMemberOf: [ ArfARTRAW class ] ] )
+            if ( [ inputImage imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
             {
                 convertToResultFormatActionA =
                     [ IMAGECONVERSION_ARTRAW_TO_SINGLECHANNEL_ARTGSC
@@ -551,7 +551,7 @@ int tonemap(
 
         BOOL  removeFirstCSP = YES;
 
-        if ( [ inputImage imageFileIsMemberOf: [ ArfARTRAW class ] ] )
+        if ( [ inputImage imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
         {
             BOOL  rawRemoveSource = NO;
             
@@ -569,16 +569,16 @@ int tonemap(
         else
         {
             #ifdef ART_WITH_OPENEXR
-            if (   [ inputImage imageFileIsMemberOf: [ ArfARTCSP class ] ]
-                || [ inputImage imageFileIsMemberOf: [ ArfTIFF class ] ]
-                || [ inputImage imageFileIsMemberOf: [ ArfOpenEXR class ] ] )
+            if (   [ inputImage imageFileIsKindOf: [ ArfARTCSP class ] ]
+                || [ inputImage imageFileIsKindOf: [ ArfTIFF class ] ]
+                || [ inputImage imageFileIsKindOf: [ ArfOpenEXR class ] ] )
             #else
-            if (   [ inputImage imageFileIsMemberOf: [ ArfARTCSP class ] ]
-                || [ inputImage imageFileIsMemberOf: [ ArfTIFF class ] ] )
+            if (   [ inputImage imageFileIsKindOf: [ ArfARTCSP class ] ]
+                || [ inputImage imageFileIsKindOf: [ ArfTIFF class ] ] )
             #endif
             {
                 #ifdef ART_WITH_OPENEXR
-                if ( [ inputImage imageFileIsMemberOf: [ ArfOpenEXR class ] ] )
+                if ( [ inputImage imageFileIsKindOf: [ ArfOpenEXR class ] ] )
                     rawConversionAction =
                         [ IMAGECONVERSION_EXR_TO_ARTCSP
                             removeSource: NO
@@ -586,7 +586,7 @@ int tonemap(
                 else
                 #endif
                 {
-                    if ( [ inputImage imageFileIsMemberOf: [ ArfTIFF class ] ] )
+                    if ( [ inputImage imageFileIsKindOf: [ ArfTIFF class ] ] )
                         rawConversionAction =
                             [ IMAGECONVERSION_TIFF_TO_ARTCSP
                                 removeSource: NO
@@ -598,7 +598,7 @@ int tonemap(
                 //   If the user supplied an ARTCSP as root image, we don't
                 //   delete it after use.
                 
-                if ( [ inputImage imageFileIsMemberOf: [ ArfARTCSP class ] ] )
+                if ( [ inputImage imageFileIsKindOf: [ ArfARTCSP class ] ] )
                     removeFirstCSP = NO;
             }
             else
@@ -833,7 +833,7 @@ actionSequenceAssembly:
                          :   [ ArnNOPAction class ]
                          ] )
                 {
-                    if ( [ inputImage imageFileIsMemberOf: [ ArfARTCSP class ] ] )
+                    if ( [ inputImage imageFileIsKindOf: [ ArfARTCSP class ] ] )
                     {
                         [ (ArnSingleImageManipulationAction*)
                           convertToResultFormatActionA

@@ -58,7 +58,7 @@ ArnFileImageAction;
         : (ArnImageInfo *) newImageInfo
         ;
 
-- (BOOL) imageFileIsMemberOf
+- (BOOL) imageFileIsKindOf
         : (Class) newClass
         ;
 

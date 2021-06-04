@@ -407,7 +407,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
             /* ------------------------------------------------------------------
                 Final step: the ArLight scanline is inserted into the
                 image. The cast is justified since only ArnArLightImages get
-                to interoperate with ArfARTRAW.
+                to interoperate with RAWs.
             ------------------------------------------------------------------ */
 
             [ ((ArnLightAlphaImage*)image) setLightAlphaRegion
