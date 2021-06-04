@@ -799,6 +799,24 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
     }
 }
 
+- (id) init
+{
+    self = [ super init ];
+
+    if (self) {
+        _bufferRGBA = NULL;
+        _bufferGrey = NULL;
+
+        _bufferS0 = NULL;
+        _bufferS1 = NULL;
+        _bufferS2 = NULL;
+        _bufferS3 = NULL;
+
+        _scanline = NULL;
+    }
+    
+    return self;
+}
 
 - (void) dealloc
 {
@@ -810,10 +828,12 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
     FREE_ARRAY(_bufferS2);
     FREE_ARRAY(_bufferS3);
     
-    for ( unsigned int i = 0; i < XC(_size); i++ ) {
-        arlightalpha_free(art_gv, _scanline[i]);
-    }
-    
+    // if (_scanline) {
+    //     for ( unsigned int i = 0; i < XC(_size); i++ ) {
+    //         arlightalpha_free(art_gv, _scanline[i]);
+    //     }
+    // }
+
     FREE_ARRAY(_scanline);
 
     [_imageInfo release];
