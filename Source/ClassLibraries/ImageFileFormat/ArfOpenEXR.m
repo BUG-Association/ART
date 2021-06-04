@@ -66,8 +66,8 @@ ARPFILE_DEFAULT_IMPLEMENTATION(
 // TODO: This shall be less "static"
 // But, we have to say we have an RGBA file for now to ensure
 // compatibity with ImageMap
-// ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
-ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
+ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
+// ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
 
 
 - (void) parseFileGetExternals
@@ -226,53 +226,85 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
         case 8:
         {
             ArSpectrum8 inSpec;
+
             for (int i = 0; i < 8; i++)
-                inSpec.c.x[i] = vals[i];
+            {
+                s8_set_sid(
+                    art_gv,
+                  & inSpec,
+                    i,
+                    vals[i]
+                );
+            }
                 
             s8_to_spc(
                   art_gv,
                 & inSpec,
                   outBuf
-                ) ;
+                );
             break;
         }
         case 11:
         {
             ArSpectrum11 inSpec;
+
             for (int i = 0; i < 11; i++)
-                inSpec.c.x[i] = vals[i];
+            {
+                s11_set_sid(
+                    art_gv,
+                  & inSpec,
+                    i,
+                    vals[i]
+                );
+            }
                 
             s11_to_spc(
                   art_gv,
                 & inSpec,
                   outBuf
-                ) ;
+                );
             break;
         }
         case 18:
         {
             ArSpectrum18 inSpec;
+
             for (int i = 0; i < 18; i++)
-                inSpec.c.x[i] = vals[i];
+            {
+                s18_set_sid(
+                    art_gv,
+                  & inSpec,
+                    i,
+                    vals[i]
+                );
+            }
                 
             s18_to_spc(
                   art_gv,
                 & inSpec,
                   outBuf
-                ) ;
+                );
             break;
         }
         case 46:
         {
             ArSpectrum46 inSpec;
+
             for (int i = 0; i < 46; i++)
-                inSpec.c.x[i] = vals[i];
+            {
+                s46_set_sid(
+                    art_gv,
+                  & inSpec,
+                    i,
+                    vals[i]
+                );
+            }
                 
             s46_to_spc(
                   art_gv,
                 & inSpec,
                   outBuf
-                ) ;
+                );
             break;
         }
     }
@@ -282,7 +314,6 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {     
-
     // TODO:
     // =====
     // Note, this piece of code shall be beter handled in the future.
@@ -392,7 +423,6 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exr)
         spc_free(art_gv, colBufS2);
         spc_free(art_gv, colBufS3);
     } else if (fileDataType == ardt_rgba) {
-        printf("Read RGBA Region\n");
         ArRGBA * scanline = ALLOC_ARRAY(ArRGBA, XC(image->size));
 
         for ( long y = 0; y < YC(image->size); y++ ) {
