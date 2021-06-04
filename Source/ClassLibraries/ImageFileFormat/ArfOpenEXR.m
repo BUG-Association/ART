@@ -156,14 +156,91 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exr)
         that the spectral sample matches the native ART datatypes
     ------------------------------------------------------------------ */
 
-    if (_spectralChannels > 0) {
-        fileDataType = ardt_spectrum500;
-    } else if (_bufferRGBA) {
-        fileDataType = ardt_rgba;
-    } else if (_bufferGrey) {
-        fileDataType = ardt_grey;
-    } else {
-        ART_ERRORHANDLING_FATAL_ERROR("This image does not provide any usable color information");
+    // Try to find if one of the ISR with lower amount of values
+    // matches. s500 shall be the last resort.
+
+    BOOL matchNativeDataType = YES;
+
+    switch(_spectralChannels)
+    {
+        case 8:
+            for (int i = 0; i < _spectralChannels; i++) {              
+                if (round(_wavelengths_nm[i]) 
+                 != round(s8_channel_center( art_gv, i ) * 1e9)) {
+                    matchNativeDataType = NO;
+                    break;
+                }
+            }
+
+            if (matchNativeDataType) {
+                fileDataType = ardt_spectrum8;
+            }
+
+            break;
+
+        case 11:
+            for (int i = 0; i < _spectralChannels; i++) {
+                if (round(_wavelengths_nm[i]) 
+                 != round(s11_channel_center( art_gv, i ) * 1e9)) {
+                    matchNativeDataType = NO;
+                    break;
+                }
+            }
+
+            if (matchNativeDataType) {
+                fileDataType = ardt_spectrum11;
+            }
+
+            break;
+
+        case 18:
+            for (int i = 0; i < _spectralChannels; i++) {
+                if (round(_wavelengths_nm[i]) 
+                 != round(s18_channel_center( art_gv, i ) * 1e9)) {
+                    matchNativeDataType = NO;
+                    break;
+                }
+            }
+
+            if (matchNativeDataType) {
+                fileDataType = ardt_spectrum18;
+            }
+
+            break;
+
+        case 46:
+            for (int i = 0; i < _spectralChannels; i++) {
+                if (round(_wavelengths_nm[i]) 
+                 != round(s46_channel_center( art_gv, i ) * 1e9)) {
+                    matchNativeDataType = NO;
+                    break;
+                }
+            }
+
+            if (matchNativeDataType) {
+                fileDataType = ardt_spectrum46;
+            }
+
+            break;
+
+        default:
+            matchNativeDataType = NO;
+            break;
+    }
+
+    // No native datatype were found... remaining cases:
+    //  - it is a spectral file and we use s500
+    //  - it is a color file and one of the native datatypes can still be used
+    if (!matchNativeDataType) {
+        if (_spectralChannels > 0) {
+            fileDataType = ardt_spectrum500;
+        } else if (_bufferRGBA) {
+            fileDataType = ardt_rgba;
+        } else if (_bufferGrey) {
+            fileDataType = ardt_grey;
+        } else {
+            ART_ERRORHANDLING_FATAL_ERROR("This image does not provide any usable color information");
+        }
     }
 
     /* ------------------------------------------------------------------
