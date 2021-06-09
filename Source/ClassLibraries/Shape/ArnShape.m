@@ -227,24 +227,31 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             :  ARNGT_VERTICES(traversal)
             ];
 
+
 #if defined(ENABLE_EMBREE_SUPPORT)
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
 
+        if (embree->topmostCSGNode && [embree csgNodeIsAdded])
+        {
+            return result;
+        }
+
         ArnVertexSet * vertexSet = (ArnVertexSet *)ARNGT_VERTICES(traversal);
 
-
+        /*
         if([self isKindOfClass: [ArnInfSphere class]]) {
             embreeGeomID = -1;
             embree->environmentLighting = YES;
             embree->environmentLightAttributes = result;
         }
-
-        else {
+        */
+        // else {
             embreeGeomID = [embree initEmbreeGeometry :self : &traversal->state :result :vertexSet :ARNGT_TRAFO(traversal)];
-        }
+        // }
     }
 #endif
+
 
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 

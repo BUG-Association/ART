@@ -475,16 +475,19 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         intersectionList->head->embreeShapeUserGeometry = NO;
     }
     else {
-        // *intersectionList = [embree extractClosestIntersectionList: self];
+        *intersectionList = [embree extractClosestIntersectionList: self];
 
+        /*
         *intersectionList = [embree evaluateIntersectionListsAccordingToCSGTree
                                 : self
                                 : self->scenegraphReference];
+        */
 
+        /*
         if(intersectionList->head)
             intersectionList->head->embreeShapeUserGeometry = YES;
-
-        [embree clearRayCasterIntersectionList: self];
+        */
+        // [embree clearRayCasterIntersectionList: self];
     }
 
     if(!arintersectionlist_is_nonempty(intersectionList))
@@ -495,7 +498,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // triangle meshes, quads) we store surface normal and texture coords.
     // for "user defined geometries", these are getting computed further down
     // the path tracer loop
-    if(intersectionList->head && !geometryData->_isUserGeometry) {
+    if(intersectionList->head && !intersectionList->head->embreeShapeUserGeometry) {
         SET_OBJECTSPACE_NORMAL(intersectionList->head,
                                VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
 
@@ -548,7 +551,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     ArcIntersection * intersection =
             ARINTERSECTIONLIST_HEAD(*intersectionList);
-
 
 #ifdef WITH_RSA_STATISTICS
     intersection->intersectionTests = intersectionList.intersectionTests;

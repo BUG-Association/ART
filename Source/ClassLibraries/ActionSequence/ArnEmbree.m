@@ -34,9 +34,6 @@
 #import <ArnCube.h>
 #import <ArSurfacePointMappingMacros.h>
 
-// TODO delete when not needed anymore
-#import <ArcObjCCoder.h>
-
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
@@ -59,7 +56,7 @@ static BOOL EMBREE_ENABLED = NO;
 static ArnEmbree * embreeManager;
 
 
-// #define EMBREE_DEBUG_PRINT
+#define EMBREE_DEBUG_PRINT
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
@@ -201,6 +198,10 @@ static ArnEmbree * embreeManager;
         isInitialized = YES;
         EMBREE_ENABLED = YES;
 
+        embreeManager->currentlyTraversingCSGSubTree = NO;
+        embreeManager->currentCSGGeometryAdded = NO;
+        embreeManager->topmostCSGNode = NULL;
+
         embreeManager->environmentLighting = NO;
         embreeManager->environmentLightAttributes = NULL;
     }
@@ -220,6 +221,22 @@ static ArnEmbree * embreeManager;
         embree->orgScenegraphReference = csgTree;
 }
 
+- (void) traversingCSGSubtree: (BOOL) b {
+    currentlyTraversingCSGSubTree = b;
+}
+
+- (BOOL)isTraversingCSGSubTree {
+    return currentlyTraversingCSGSubTree;
+}
+
+- (void) addedCSGNodeToEmbree: (BOOL) b {
+    currentCSGGeometryAdded = b;
+}
+
+- (BOOL) csgNodeIsAdded {
+    return currentCSGGeometryAdded;
+}
+
 + (void) commitScene {
     ArnEmbree * embree = [ArnEmbree embreeManager];
 
@@ -231,6 +248,13 @@ static ArnEmbree * embreeManager;
     rtcCommitGeometry(newGeometry);
     unsigned int geomID = rtcAttachGeometry(scene, newGeometry);
     rtcReleaseGeometry(newGeometry);
+
+    /*
+#ifdef EMBREE_DEBUG_PRINT
+    printf("new user geometry with geometry id %d added\n", geomID);
+#endif
+     */
+
     return (int) geomID;
 }
 
@@ -319,9 +343,6 @@ static ArnEmbree * embreeManager;
         indices[i] = (unsigned int) i;
     }
 
-#ifdef EMBREE_DEBUG_PRINT
-    printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
-#endif
     return newGeometry;
 }
 
@@ -400,7 +421,7 @@ static ArnEmbree * embreeManager;
         : (RTCGeometry) thisGeometry
         : (ArNode *) shape
         : (ArTraversalState *) traversalState
-        : (AraCombinedAttributes *) combinedAttributes
+        : (ArNode *) combinedAttributes
 {
     struct UserGeometryData * data = malloc(sizeof(struct UserGeometryData));
 
@@ -420,9 +441,13 @@ static ArnEmbree * embreeManager;
         data->_isUserGeometry = NO;
     }
 
+    else if([combinedAttributes isKindOfClass: [AraBBox class]]) {
+        data->_isUserGeometry = YES;
+    }
+
     data->_shape = shape;
-    data->_traversalState = *traversalState;
-    data->_combinedAttributes = combinedAttributes;
+    if(traversalState) data->_traversalState = *traversalState;
+    data->_combinedAttributes_or_csg_node = combinedAttributes;
 
     [self addToUserGeometryList: data];
 
@@ -438,16 +463,27 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
     struct RTCBounds * bounds_o = args->bounds_o;
 
     // calculate the bounding box
-    // _combinedAttributes is the messenger because information
+    // _combinedAttributes_or_csg_node is the messenger because information
     // about the transl, rot and scale is needed
     Box3D boundingBox;
-    [geometryData->_combinedAttributes getBBoxObjectspace: &boundingBox];
+    [geometryData->_combinedAttributes_or_csg_node getBBoxObjectspace: &boundingBox];
 
     // special case:
     // since embree is working with floats and ART with doubles
     // the infinite sphere can't get hit by an embree way.
     // this is a work-around for now
     if([geometryData->_shape isKindOfClass: [ArnInfSphere class]]) {
+        boundingBox.min.c.x[0] = - MATH_HUGE_FLOAT;
+        boundingBox.min.c.x[1] = - MATH_HUGE_FLOAT;
+        boundingBox.min.c.x[2] = - MATH_HUGE_FLOAT;
+        boundingBox.max.c.x[0] = MATH_HUGE_FLOAT;
+        boundingBox.max.c.x[1] = MATH_HUGE_FLOAT;
+        boundingBox.max.c.x[2] = MATH_HUGE_FLOAT;
+    }
+
+    else if(boundingBox.max.c.x[0] == MATH_HUGE_DOUBLE &&
+            boundingBox.min.c.x[0] == - MATH_HUGE_DOUBLE)
+    {
         boundingBox.min.c.x[0] = - MATH_HUGE_FLOAT;
         boundingBox.min.c.x[1] = - MATH_HUGE_FLOAT;
         boundingBox.min.c.x[2] = - MATH_HUGE_FLOAT;
@@ -586,235 +622,6 @@ static int callCount = 0;
     ];
 
     return list;
-
-
-    /*
-    ArNode * traversal = csgTreeRoot;
-
-    while([traversal isKindOfClass: [ArnUnary class]]
-            && ![traversal isKindOfClass: [AraCombinedAttributes class]]) {
-        // printf("%s\n", [[traversal className] UTF8String]);
-
-        traversal = [(ArnUnary *) traversal getSubnodeRef];
-    }
-
-    if([traversal isKindOfClass: [ArnCSGor class]]
-            || [traversal isKindOfClass: [ArnCSGand class]]
-                    || [traversal isKindOfClass: [ArnCSGsub class]])
-    {
-        // printf("%s\n", [[traversal className] UTF8String]);
-
-        ArNode * leftChild = [(ArnBinary *) traversal getSubnodeRef0];
-        ArNode * rightChild = [(ArnBinary *) traversal getSubnodeRef1];
-
-        ArIntersectionList leftIntersectionList =
-                [self evaluateIntersectionListsAccordingToCSGTree
-                 :rayCaster :leftChild];
-
-        ArIntersectionList rightIntersectionList =
-                [self evaluateIntersectionListsAccordingToCSGTree
-                :rayCaster :rightChild];
-
-        /*
-        if(!leftIntersectionList.head && !leftIntersectionList.tail) {
-            return rightIntersectionList;
-        }
-        else if(!rightIntersectionList.head && !rightIntersectionList.tail) {
-            return leftIntersectionList;
-        }
-
-
-        ArIntersectionList combinedList = ARINTERSECTIONLIST_EMPTY;
-
-        if([traversal isKindOfClass: [ArnCSGor class]] ) {
-
-            // if one of the intersectionlists is empty, return the other one
-            if(leftIntersectionList.head && !rightIntersectionList.head)
-                return leftIntersectionList;
-            else if(!leftIntersectionList.head && rightIntersectionList.head)
-                return rightIntersectionList;
-
-            arintersectionlist_or_void(&leftIntersectionList,
-                                   &rightIntersectionList,
-                                   &combinedList,
-                                   rayCaster->rayIntersectionFreelist,
-                                   ARNRAYCASTER_EPSILON(rayCaster)
-            );
-
-            return combinedList;
-        }
-
-        else if([traversal isKindOfClass: [ArnCSGand class]]) {
-/*
-            if(!arintersectionlist_is_nonempty(&leftIntersectionList)
-               && !arintersectionlist_is_nonempty(&rightIntersectionList))
-            {
-                return ARINTERSECTIONLIST_EMPTY;
-            }
-
-            else if(arintersectionlist_is_nonempty(&leftIntersectionList)
-                    && !arintersectionlist_is_nonempty(&rightIntersectionList))
-            {
-                return rightIntersectionList;
-            }
-
-            else if(!arintersectionlist_is_nonempty(&leftIntersectionList)
-                    && arintersectionlist_is_nonempty(&rightIntersectionList))
-            {
-                return leftIntersectionList;
-            }
-
-
-            arintersectionlist_and(&leftIntersectionList,
-                                   &rightIntersectionList,
-                                   &combinedList,
-                                   rayCaster->rayIntersectionFreelist,
-                                   ARNRAYCASTER_EPSILON(rayCaster)
-            );
-
-            return combinedList;
-        }
-
-        else if([traversal isKindOfClass: [ArnCSGsub class]]) {
-
-            if(!arintersectionlist_is_nonempty(&leftIntersectionList)
-                    && !arintersectionlist_is_nonempty(&rightIntersectionList))
-            {
-                return ARINTERSECTIONLIST_EMPTY;
-            }
-
-            else if(arintersectionlist_is_nonempty(&leftIntersectionList)
-                    && !arintersectionlist_is_nonempty(&rightIntersectionList))
-            {
-                return leftIntersectionList;
-            }
-
-            else if(!arintersectionlist_is_nonempty(&leftIntersectionList)
-                    && arintersectionlist_is_nonempty(&rightIntersectionList))
-            {
-                return ARINTERSECTIONLIST_EMPTY;
-            }
-
-            arintersectionlist_sub(&leftIntersectionList,
-                                   &rightIntersectionList,
-                                   &combinedList,
-                                   rayCaster->rayIntersectionFreelist,
-                                   ARNRAYCASTER_EPSILON(rayCaster)
-            );
-
-            return combinedList;
-        }
-
-    }
-
-    else if([traversal isKindOfClass: [ArnTernary class]]
-            || [traversal isKindOfClass: [ArnQuaternary class]]
-            || [traversal isKindOfClass: [ArnNary class]])
-    {
-        // printf("%s , %p\n", [[traversal className] UTF8String], traversal);
-
-        if([traversal isKindOfClass: [ArnTernary class]])
-        {
-            ArNode * subnode0 = [(ArnTernary *) traversal getSubnodeRef0];
-            ArNode * subnode1 = [(ArnTernary *) traversal getSubnodeRef1];
-            ArNode * subnode2 = [(ArnTernary *) traversal getSubnodeRef2];
-
-            int subnodes_size = 3;
-
-            struct ArIntersectionList subnodes_intersectionlist[subnodes_size];
-
-            subnodes_intersectionlist[0] = [self evaluateIntersectionListsAccordingToCSGTree
-                                              :rayCaster :subnode0];
-
-            subnodes_intersectionlist[1] = [self evaluateIntersectionListsAccordingToCSGTree
-                                              :rayCaster :subnode1];
-
-            subnodes_intersectionlist[2] = [self evaluateIntersectionListsAccordingToCSGTree
-                                              :rayCaster :subnode2];
-
-            for(int i = 0; i < subnodes_size; i++) {
-                if(arintersectionlist_is_nonempty(&subnodes_intersectionlist[i])) {
-                    return subnodes_intersectionlist[i];
-                }
-            }
-            return ARINTERSECTIONLIST_EMPTY;
-        }
-
-        else if([traversal isKindOfClass: [ArnQuaternary class]])
-        {
-            ArNode * subnode0 = [(ArnQuaternary *) traversal getSubnodeRef0];
-            ArNode * subnode1 = [(ArnQuaternary *) traversal getSubnodeRef1];
-            ArNode * subnode2 = [(ArnQuaternary *) traversal getSubnodeRef2];
-            ArNode * subnode3 = [(ArnQuaternary *) traversal getSubnodeRef3];
-
-            int subnodes_size = 4;
-
-            struct ArIntersectionList subnodes_intersectionlist[subnodes_size];
-
-            subnodes_intersectionlist[0] = [self evaluateIntersectionListsAccordingToCSGTree
-                                                 :rayCaster :subnode0];
-
-            subnodes_intersectionlist[1] = [self evaluateIntersectionListsAccordingToCSGTree
-                                                 :rayCaster :subnode1];
-
-            subnodes_intersectionlist[2] = [self evaluateIntersectionListsAccordingToCSGTree
-                                                 :rayCaster :subnode2];
-
-            subnodes_intersectionlist[3] = [self evaluateIntersectionListsAccordingToCSGTree
-                                                 :rayCaster :subnode2];
-
-            for(int i = 0; i < subnodes_size; i++) {
-                if(arintersectionlist_is_nonempty(&subnodes_intersectionlist[i])) {
-                    return subnodes_intersectionlist[i];
-                }
-            }
-            return ARINTERSECTIONLIST_EMPTY;
-        }
-
-        else if([traversal isKindOfClass: [ArnNary class]])
-        {
-            ArNodeRefDynArray subnodes = [(ArnNary *) traversal getSubnodeRefArray];
-
-            int subnodes_size = arnoderefdynarray_size(&subnodes);
-
-            struct ArIntersectionList subnodes_intersectionlist[subnodes_size];
-
-            for(int i = 0; i < subnodes_size; i++) {
-                ArNode * child_i = arnoderefdynarray_i(&subnodes, i).reference;
-                subnodes_intersectionlist[i] = [self evaluateIntersectionListsAccordingToCSGTree
-                                                      :rayCaster :child_i];
-            }
-
-            for(int i = 0; i < subnodes_size; i++) {
-                if(arintersectionlist_is_nonempty(&subnodes_intersectionlist[i])) {
-                    return subnodes_intersectionlist[i];
-                }
-            }
-
-            return ARINTERSECTIONLIST_EMPTY;
-        }
-    }
-
-    else if([traversal isKindOfClass: [AraCombinedAttributes class]]) {
-        // printf("combinedAttr %s , %p\n", [[traversal className] UTF8String], traversal);
-
-        AraCombinedAttributes * combinedAttributes = (AraCombinedAttributes *) traversal;
-        ArNode * shapeNode = [(ArnUnary *) traversal getSubnodeRef];
-        ArnShape * shape = (ArnShape *) shapeNode;
-
-        // printf("shape %s , %p\n", [[shape className] UTF8String], shape);
-
-        ArIntersectionList  list =
-                [self findIntersectionListByShape: shape :combinedAttributes :rayCaster];
-
-        if(!list.head && !list.tail) {
-            return ARINTERSECTIONLIST_EMPTY;
-        }
-
-
-        return list;
-    }
-     */
 }
 
 
@@ -834,9 +641,35 @@ void embree_intersect_geometry(const int * valid,
     ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
     UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
 
+    // debug
+    if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
+        RTCGeometry previouslyHitGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
+
+        if(!rayCaster->intersectionListHead)
+        {
+            ArIntersectionList prevIntersectionList = ARINTERSECTIONLIST_EMPTY;
+            rayCaster->state = geometryData->_traversalState;
+            rayCaster->surfacepoint_test_shape = (ArNode<ArpShape> *)geometryData->_shape;
+
+            arintersectionlist_init_1(
+                    &prevIntersectionList,
+                    rtc_ray->tfar,
+                    0,
+                    arface_on_shape_is_planar,
+                    NULL,
+                    rayCaster);
+
+            prevIntersectionList.head->embreeShapeUserGeometry = NO;
+
+            [rayCaster addIntersectionToIntersectionLinkedList :NULL : prevIntersectionList];
+
+            rayCaster->surfacepoint_test_shape = NULL;
+        }
+    }
+
     // perform the intersection
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
-    [geometryData->_combinedAttributes
+    [geometryData->_combinedAttributes_or_csg_node
             getIntersectionList
             : rayCaster
             : RANGE( ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
@@ -844,8 +677,10 @@ void embree_intersect_geometry(const int * valid,
     ];
 
     // if no intersection is found, return
-    if(!intersectionList.head)
+    if(!intersectionList.head) {
+        // printf("intersectionlist empty...\n");
         return;
+    }
 
     // debug
     [embree increaseCount];
@@ -855,14 +690,9 @@ void embree_intersect_geometry(const int * valid,
     rtc_hit->geomID = geomID;
     rtc_hit->primID = 0;
 
-    /*
-    if([embree getCount] > 1) {
-        if(!rayCaster->intersectionListHead) printf("booom\n");
-    }
-     */
-
     // set intersection list
-    [rayCaster addIntersectionToIntersectionLinkedList :geometryData->_combinedAttributes : intersectionList];
+    intersectionList.head->embreeShapeUserGeometry = YES;
+    [rayCaster addIntersectionToIntersectionLinkedList :geometryData->_combinedAttributes_or_csg_node : intersectionList];
 }
 
 void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {
@@ -909,6 +739,25 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 
 #ifdef EMBREE_DEBUG_PRINT
     printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
+#endif
+    return geomID;
+}
+
+-(unsigned) initEmbreeCSGGeometry
+        : (ArNode *) csgNode
+        : (ArTraversalState *) traversalState
+{
+    RTCGeometry newGeometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_USER);
+    rtcSetGeometryBoundsFunction(newGeometry, embree_bbox, NULL);
+    rtcSetGeometryIntersectFunction(newGeometry, embree_intersect);
+    rtcSetGeometryOccludedFunction(newGeometry, embree_occluded);
+    rtcSetGeometryUserPrimitiveCount(newGeometry, 1);
+
+    int geomID = [self addGeometry: newGeometry];
+    [self setGeometryUserData: newGeometry :NULL :traversalState :csgNode];
+
+#ifdef EMBREE_DEBUG_PRINT
+    printf("CSG node %s initialized with embree geomID: %d\n", [[csgNode className] UTF8String], geomID);
 #endif
     return geomID;
 }

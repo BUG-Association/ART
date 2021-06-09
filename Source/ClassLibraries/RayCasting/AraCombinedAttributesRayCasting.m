@@ -238,6 +238,8 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraCombinedAttributes)
     // we check if there is already an according
     // intersection list present and if so,
     // we take that one
+
+    /*
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
         if(rayCaster->intersectionListHead) {
@@ -250,6 +252,8 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraCombinedAttributes)
             }
         }
     }
+     */
+
 #endif
 
     ArNodeRef  surfaceMaterialStore;

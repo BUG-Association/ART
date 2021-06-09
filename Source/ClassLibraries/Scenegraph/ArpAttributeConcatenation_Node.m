@@ -26,11 +26,13 @@
 
 #define ART_MODULE_NAME     ArpAttributeConcatenation_Node
 
+#import <ArnInfSphere.h> // TODO Sebastian check if this is needed
 #import "ArpAttributeConcatenation_Node.h"
 
 #include "ART_Foundation.h"
 #import "AraCombinedAttributes.h"
 #import "ArnVisitor.h"
+#import "ArnCSG.h"
 
 #define RULES(__visitor) ((ArnNamedNodeSet*) ARNGT_RULES(__visitor) )
 
@@ -73,6 +75,48 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 {
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
+    // debug
+    // printf("node of type %s\n", [[self className] UTF8String]);
+    // printf("subnode 0: %s\n", [[ARNBINARY_SUBNODE_0 className] UTF8String]);
+    // printf("subnode 1: %s\n", [[ARNBINARY_SUBNODE_1 className] UTF8String]);
+
+#if defined(ENABLE_EMBREE_SUPPORT)
+    if([ArnEmbree embreeEnabled]) {
+
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+
+        /*
+        if (([self isKindOfClass:[ArnCSGsub class]] || [self isKindOfClass:[ArnCSGand class]] )
+            && [embree isTraversingCSGSubTree] && ![embree csgNodeIsAdded])
+        {
+
+
+            self->embreeGeomID = [embree initEmbreeCSGGeometry: self : &traversal->state];
+            embree->topmostCSGNode = self;
+        }
+        */
+
+        if (([self isKindOfClass:[ArnCSGsub class]] || [self isKindOfClass:[ArnCSGand class]]
+                || [self isKindOfClass:[ArnCSGor class]])
+                && !embree->topmostCSGNode)
+        {
+            // inf sphere don't care
+            if(![ ARNBINARY_SUBNODE_0 isKindOfClass: [ArnInfSphere class]]
+                   &&  ![ ARNBINARY_SUBNODE_1 isKindOfClass: [ArnInfSphere class]])
+            {
+                self->embreeGeomID = [embree initEmbreeCSGGeometry: self : &traversal->state];
+
+                embree->topmostCSGNode = self;
+                // [embree traversingCSGSubtree: YES];
+                [embree addedCSGNodeToEmbree: YES];
+            }
+
+
+        }
+
+    }
+#endif
+
     ASSIGN_AS_HARD_NODE_REFERENCE_TO_SUBNODE_I(
         0,
         [ ARNBINARY_SUBNODE_0
@@ -92,6 +136,17 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         );
 
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
+
+#if defined(ENABLE_EMBREE_SUPPORT)
+    if([ArnEmbree embreeEnabled]) {
+        ArnEmbree *embree = [ArnEmbree embreeManager];
+        if(embree->topmostCSGNode && embree->topmostCSGNode == self) {
+            embree->topmostCSGNode = NULL;
+            // [embree traversingCSGSubtree: NO];
+            [embree addedCSGNodeToEmbree: NO];
+        }
+    }
+#endif
 
     return self;
 }
@@ -181,17 +236,56 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 {
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
+    // debug
+    // printf("node of type %s\n", [[self className] UTF8String]);
+
     unsigned int numberOfSubnodes =
         arnoderefdynarray_size( & subnodeRefArray );
 
-    for ( unsigned int i = 0; i < numberOfSubnodes; i++ )
-        ASSIGN_AS_HARD_NODE_REFERENCE_TO_NARY_SUBNODE(
-            i,
-            [ ARNARY_SUBNODE_I(i) pushAttributesToLeafNodes
-                :   traversal
-                ]
+    /*
+#if defined(ENABLE_EMBREE_SUPPORT)
+    if([ArnEmbree embreeEnabled])
+    {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+
+        for (unsigned int i = 0; i < numberOfSubnodes; i++) {
+
+            if(!embree->topmostCSGNode) {
+                [embree traversingCSGSubtree: YES];
+                [embree addedCSGNodeToEmbree: NO];
+                embree->topmostCSGNode = self;
+            }
+
+            ASSIGN_AS_HARD_NODE_REFERENCE_TO_NARY_SUBNODE(
+                    i,
+                    [ARNARY_SUBNODE_I(i) pushAttributesToLeafNodes
+                    :traversal
+                    ]
             );
 
+            if(embree->topmostCSGNode && embree->topmostCSGNode == self) {
+                [embree traversingCSGSubtree: NO];
+                [embree addedCSGNodeToEmbree: NO];
+                embree->topmostCSGNode = NULL;
+            }
+        }
+    }
+    else
+    {
+#endif
+    */
+        for (unsigned int i = 0; i < numberOfSubnodes; i++)
+            ASSIGN_AS_HARD_NODE_REFERENCE_TO_NARY_SUBNODE(
+                    i,
+                    [ARNARY_SUBNODE_I(i) pushAttributesToLeafNodes
+                    :traversal
+                    ]
+            );
+/*
+#if defined(ENABLE_EMBREE_SUPPORT)
+    }
+#endif
+*/
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
     return self;
@@ -272,6 +366,9 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 - (ArNode *) pushAttributesToLeafNodes
         : (ArnGraphTraversal *) traversal
 {
+    // debug
+    // printf("node of type %s\n", [[self className] UTF8String]);
+
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
     ArNodeRef  nodeRefStore;
@@ -306,6 +403,9 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 - (ArNode *) pushAttributesToLeafNodes
         : (ArnGraphTraversal *) traversal
 {
+    // debug
+    // printf("node of type %s\n", [[self className] UTF8String]);
+
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
     ArNodeRef  nodeRefStore;

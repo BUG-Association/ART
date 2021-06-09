@@ -136,6 +136,10 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
 @interface ArnBinary
         : ArNode
 {
+#if defined(ENABLE_EMBREE_SUPPORT)
+    unsigned int embreeGeomID;
+#endif
+
     ArNodeRef  subnodeRefArray[2];
 }
 

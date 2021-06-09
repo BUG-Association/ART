@@ -143,8 +143,6 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraWorld)
             :   intersectionList
             ];
 
-
-
     INTERSECTION_TEST_DEBUG_OUTPUT_RESULT_LIST_WITH_COMMENT(
         "(before processing)"
         );

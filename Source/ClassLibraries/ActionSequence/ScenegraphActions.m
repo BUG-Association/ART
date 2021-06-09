@@ -520,22 +520,25 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
         :   "building embree ray acceleration structure"
         ];
          */
-        // debug
-        arcobjccoder_write_file( art_gv, & ARNODEREF_POINTER(node_Ref_Scene), "csgdebug.art" );
 
-        [ArnEmbree setCSGTreeNode: sceneGeometry];
+        // [ArnEmbree setCSGTreeNode: sceneGeometry];
+
 
         [ArnEmbree commitScene];
 
         // [ REPORTER endAction];
 
+        /*
         [ nodeStack push
         :   node_Ref_Scene
         ];
 
         RELEASE_NODE_REF( node_Ref_Scene );
 
-        return;
+        // TODO: [Sebastian] check if native bsp tree has to be build or not
+        // return;
+
+         */
     }
 #endif
 

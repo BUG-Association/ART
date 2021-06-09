@@ -45,7 +45,7 @@ ART_MODULE_INTERFACE(ArnEmbree)
 typedef struct UserGeometryData {
     ArNode * _shape;
     ArTraversalState _traversalState;
-    AraCombinedAttributes * _combinedAttributes;
+    ArNode * _combinedAttributes_or_csg_node;
     BOOL _isUserGeometry;
 }
 UserGeometryData;
@@ -71,11 +71,15 @@ UserGeometryDataList;
     ArnRayCaster * rayCasterArray[THREAD_MAX];
     int numRayCaster;
 
+    BOOL currentlyTraversingCSGSubTree;
+    BOOL currentCSGGeometryAdded;
+
 @public
     ArNode * orgScenegraphReference;
-
     BOOL environmentLighting;
     AraCombinedAttributes * environmentLightAttributes;
+
+    ArNode * topmostCSGNode;
 }
 
 // returning the singleton object
@@ -94,6 +98,12 @@ UserGeometryDataList;
 + (void) commitScene;
 
 + (void) setCSGTreeNode : (ArNode *) csgTree;
+
+- (void) traversingCSGSubtree: (BOOL) b;
+- (BOOL) isTraversingCSGSubTree;
+
+- (void) addedCSGNodeToEmbree: (BOOL) b;
+- (BOOL) csgNodeIsAdded;
 
 - (int) getRayCasterCount;
 - (int) setRayCasterCount : (int) value;
@@ -142,6 +152,11 @@ UserGeometryDataList;
         : (ArNode *) trafo
         ;
 
+- (unsigned) initEmbreeCSGGeometry
+        : (ArNode *) csgNode
+        : (ArTraversalState *) traversalState
+        ;
+
 - (RTCGeometry) initEmbreeTriangleMeshGeometry
         : (ArNode *) shape
         : (ArnVertexSet *) vertexSet
@@ -149,11 +164,12 @@ UserGeometryDataList;
         ;
 
 - (int) addGeometry: (RTCGeometry) newGeometry;
+
 - (void) setGeometryUserData
         : (RTCGeometry) newGeometry
         : (ArNode *) shape
         : (ArTraversalState *) traversalState
-        : (AraCombinedAttributes *) combinedAttributes
+        : (ArNode *) combinedAttributes
         ;
 
 - (ArnRayCaster *) getRayCasterFromRayCasterArray;
