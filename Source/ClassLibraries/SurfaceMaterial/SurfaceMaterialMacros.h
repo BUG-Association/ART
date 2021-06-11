@@ -193,6 +193,7 @@
 //  handles the singular situation when the generated point on
 //  the sphere is identical to the point of interest.
 
+/*
 #define SAMPLE_HEMISPHERE_COSINE_WEIGHTED(_localVec, _worldVec) \
 do { \
     double  sqrlen; \
@@ -219,6 +220,28 @@ do { \
     vec3d_d_mul_v( len_inv, & (_localVec) ); \
     vec3d_d_mul_v( len_inv, & (_worldVec) ); \
 } while (0)
+*/
+
+#define SAMPLE_HEMISPHERE_COSINE_WEIGHTED(_localVec, _worldVec) \
+    double  sqrlen; \
+    \
+        double  phi, z, r; \
+        \
+        [ RANDOM_GENERATOR getValuesFromNewSequences: & z : & phi ]; \
+        \
+        phi *= MATH_2_MUL_PI; \
+        z = 1.0 - 2.0 * z; \
+        r = sqrt ( M_MAX( 1.0 - z * z, 0.0 ) ); \
+        (_localVec) = VEC3D(r * cos(phi), r * sin(phi), z + 1.0); \
+        \
+        TRANSFORM_V_FROM_LOCAL_TO_WORLD_V( (_localVec), (_worldVec) ); \
+        \
+        sqrlen = vec3d_v_sqrlen(&(_worldVec)); \
+    \
+    const double len_inv = 1.0 / sqrt(sqrlen); \
+    \
+    vec3d_d_mul_v( len_inv, & (_localVec) ); \
+    vec3d_d_mul_v( len_inv, & (_worldVec) );
 
 /* -----------------------------------------------------
         Miscellaneous Macros

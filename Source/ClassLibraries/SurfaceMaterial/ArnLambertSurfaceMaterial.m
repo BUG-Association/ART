@@ -266,6 +266,9 @@ ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_SHIFTING_SURFACETYPE_IMPLEMENTATION(
         );
 
     Vec3D  localO;
+
+    // debug
+    // printf("sampled direction cosine: %f \n", sampledDirection->cosine);
     
     SAMPLE_HEMISPHERE_COSINE_WEIGHTED(
         localO,

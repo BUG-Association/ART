@@ -641,7 +641,7 @@ void embree_intersect_geometry(const int * valid,
     ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
     UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
 
-    // debug
+    // handling prior non-user-geometry intersections
     if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
         RTCGeometry previouslyHitGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
 
@@ -666,6 +666,15 @@ void embree_intersect_geometry(const int * valid,
             rayCaster->surfacepoint_test_shape = NULL;
         }
     }
+
+    /*
+    // print shape
+    printf("current node: %s\n", [[geometryData->_combinedAttributes_or_csg_node className] UTF8String]);
+
+    if([geometryData->_combinedAttributes_or_csg_node isKindOfClass: [ArnCSGsub class]]) {
+        printf("break\n");
+    }
+     */
 
     // perform the intersection
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;

@@ -302,6 +302,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (      ArPDFValue *) reverseSampleProbability
         : (      ArAttenuationSample *) attenuationSample
 {
+
     BOOL sampleValid =
         [ ARCINTERSECTION_SURFACE_MATERIAL(self) calculateSingleBSDFSample
             : self

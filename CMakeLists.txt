@@ -61,7 +61,7 @@ find_package( LCMS2 REQUIRED )
 find_package( GSL )
 find_package( OPENEXR )
 
-option(ENABLE_EMBREE_SUPPORT  "Use Embree for ray tracing operations?" ON)
+option(ENABLE_EMBREE_SUPPORT  "Use Embree for ray tracing operations?" OFF)
 if( ENABLE_EMBREE_SUPPORT )
 	find_package( EMBREE 3.0 )
 endif( ENABLE_EMBREE_SUPPORT )

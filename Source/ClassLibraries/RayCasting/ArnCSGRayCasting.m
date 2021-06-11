@@ -344,6 +344,7 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(ArnCSGor)
             :   surfacePoint
             ];
 }
+static int count = 0;
 
 - (void) getIntersectionList
         : (ArnRayCaster *) rayCaster
@@ -353,6 +354,9 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(ArnCSGor)
 #ifdef ART_WITH_INTERSECTION_STATISTICS
     arnraycaster_count_test(rayCaster, ArnCSGor);
 #endif
+
+    // debug
+    // printf("visited ArnCSGRayCasting getIntersectionList %d time(s)\n", count++);
 
     *intersectionList = ARINTERSECTIONLIST_EMPTY;
 

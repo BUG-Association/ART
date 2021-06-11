@@ -2224,7 +2224,7 @@ void flagDebugPrint(ArnRayCaster* rayCaster, long size)
 #define INFSPHERE_TRAFO   ARLNBBC_INFSPHERE_TRAFO( LEAFNODE_BBOXES )
 #define INFSPHERE_STATE   ARLNBBC_INFSPHERE_STATE( LEAFNODE_BBOXES )
 
-//#define USE_ORIGINAL_SCENEGRAPH_FOR_RAYCASTING
+// #define USE_ORIGINAL_SCENEGRAPH_FOR_RAYCASTING
 
 - (void) getIntersectionList
 :       (ArnRayCaster *) rayCaster
@@ -2298,6 +2298,7 @@ void flagDebugPrint(ArnRayCaster* rayCaster, long size)
     }
     else
     {
+
     // if there is no operation tree the basic intersection method is called
     // this combines all intersections with the or operator.
 #ifdef WITH_RSA_STATISTICS
@@ -2316,7 +2317,7 @@ void flagDebugPrint(ArnRayCaster* rayCaster, long size)
 #endif
               intersectionList
             );
-    }
+   }
 
     if ( !ARINTERSECTIONLIST_HEAD(*intersectionList) && INFSPHERE )
     {
