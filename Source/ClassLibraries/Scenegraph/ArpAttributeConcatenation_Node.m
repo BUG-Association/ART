@@ -85,7 +85,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
         ArnEmbree * embree = [ArnEmbree embreeManager];
 
-        /*
         if (([self isKindOfClass:[ArnCSGsub class]] || [self isKindOfClass:[ArnCSGand class]]
                 || [self isKindOfClass:[ArnCSGor class]])
                 && !embree->topmostCSGNode)
@@ -101,8 +100,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
                 [embree addedCSGNodeToEmbree: YES];
             }
         }
-         */
-
     }
 #endif
 
