@@ -87,7 +87,6 @@ endif()
 find_package( LCMS2 REQUIRED )
 #find_package( JPEG REQUIRED )
 find_package( GSL )
-find_package( OPENEXR )
 
 option(ENABLE_EMBREE_SUPPORT  "Use Embree for ray tracing operations?" OFF)
 if( ENABLE_EMBREE_SUPPORT )
