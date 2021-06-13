@@ -237,18 +237,15 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
             return result;
         }
 
-        ArnVertexSet * vertexSet = (ArnVertexSet *)ARNGT_VERTICES(traversal);
-
-        /*
         if([self isKindOfClass: [ArnInfSphere class]]) {
             embreeGeomID = -1;
             embree->environmentLighting = YES;
             embree->environmentLightAttributes = result;
         }
-        */
-        // else {
+        else {
+            ArnVertexSet * vertexSet = (ArnVertexSet *)ARNGT_VERTICES(traversal);
             embreeGeomID = [embree initEmbreeGeometry :self : &traversal->state :result :vertexSet :ARNGT_TRAFO(traversal)];
-        // }
+        }
     }
 #endif
 

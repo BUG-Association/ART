@@ -344,7 +344,6 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(ArnCSGor)
             :   surfacePoint
             ];
 }
-static int count = 0;
 
 - (void) getIntersectionList
         : (ArnRayCaster *) rayCaster
@@ -448,6 +447,7 @@ static int count = 0;
             arnraycaster_count_intersection(rayCaster, ArnCSGor);
 #endif
             *intersectionList = rightIntersectionList;
+
         }
 
         INTERSECTION_TEST_DEBUG_OUTPUT_RESULT_LIST_WITH_COMMENT(
@@ -860,6 +860,8 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(ArnCSGsub)
           ARNRAYCASTER_INTERSECTION_FREELIST(rayCaster),
           ARNRAYCASTER_EPSILON(rayCaster)
         );
+
+
 
 #ifdef ART_WITH_INTERSECTION_STATISTICS
      if (arintersectionlist_is_nonempty(intersectionList))

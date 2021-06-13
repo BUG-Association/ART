@@ -56,7 +56,7 @@ static BOOL EMBREE_ENABLED = NO;
 static ArnEmbree * embreeManager;
 
 
-#define EMBREE_DEBUG_PRINT
+// #define EMBREE_DEBUG_PRINT
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
@@ -421,7 +421,7 @@ static ArnEmbree * embreeManager;
         : (RTCGeometry) thisGeometry
         : (ArNode *) shape
         : (ArTraversalState *) traversalState
-        : (ArNode *) combinedAttributes
+        : (ArNode *) combinedAttributesOrCSGNode
 {
     struct UserGeometryData * data = malloc(sizeof(struct UserGeometryData));
 
@@ -441,13 +441,16 @@ static ArnEmbree * embreeManager;
         data->_isUserGeometry = NO;
     }
 
-    else if([combinedAttributes isKindOfClass: [AraBBox class]]) {
+    else if([combinedAttributesOrCSGNode isKindOfClass:[ArnCSGsub class]]
+            || [combinedAttributesOrCSGNode isKindOfClass:[ArnCSGand class]]
+             || [combinedAttributesOrCSGNode isKindOfClass:[ArnCSGor class]])
+    {
         data->_isUserGeometry = YES;
     }
 
     data->_shape = shape;
     if(traversalState) data->_traversalState = *traversalState;
-    data->_combinedAttributes_or_csg_node = combinedAttributes;
+    data->_combinedAttributes_or_csg_node = combinedAttributesOrCSGNode;
 
     [self addToUserGeometryList: data];
 
@@ -528,11 +531,11 @@ static int callCount = 0;
     IntersectionLinkedListNode * next;
     while( iteratorNode ) {
         next = iteratorNode->next;
-        // if(ptr->head != minimumListPtr->head)
-        /*
+        if(rayCaster->intersectionListHead != minimumListPtr->head)
+
         arintersectionlist_free_contents(&iteratorNode->intersectionList,
                                          rayCaster->rayIntersectionFreelist);
-                                         */
+
 
         free(iteratorNode);
         iteratorNode = next;
@@ -579,6 +582,7 @@ static int callCount = 0;
         : (AraCombinedAttributes *) combinedAttributes
         : (ArnRayCaster *) rayCaster
 {
+    /*
     IntersectionLinkedListNode * iterator = rayCaster->intersectionListHead;
 
     while(iterator) {
@@ -596,7 +600,7 @@ static int callCount = 0;
                 iterator->next = NULL;
                 free(iterator);
             }
-             */
+
 
             return thisIntersectionList;
         }
@@ -605,6 +609,7 @@ static int callCount = 0;
     }
 
     return ARINTERSECTIONLIST_EMPTY;
+     */
 }
 
 - (struct ArIntersectionList) evaluateIntersectionListsAccordingToCSGTree

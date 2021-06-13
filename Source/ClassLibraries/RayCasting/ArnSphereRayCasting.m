@@ -52,7 +52,7 @@ ARPRAYCASTING_SHAPE_IMPLEMENTATION
     else
         return 0;
 }
-static int sphereCount = 0;
+
 - (void) getIntersectionList
         : (ArnRayCaster *) rayCaster
         : (Range) range_of_t
@@ -167,7 +167,6 @@ static int sphereCount = 0;
 #ifdef ART_WITH_INTERSECTION_STATISTICS
     arnraycaster_count_intersection(rayCaster, ArnSphere);
 #endif
-    // printf("sphere count: %d\n", ++sphereCount);
 }
 
 

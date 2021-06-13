@@ -458,6 +458,8 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
            rayhit.ray.tfar);
     */
 
+
+
     // ... and store intersection information in an
     // ArIntersectionList
     if(!geometryData->_isUserGeometry) {
@@ -763,7 +765,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 }
 
 - (void) addIntersectionToIntersectionLinkedList
-        : (AraCombinedAttributes *) combinedAttributes
+        : (ArNode *) combinedAttributesOrCSGNode
         : (struct ArIntersectionList) list
 {
     IntersectionLinkedListNode * newNode =
@@ -775,7 +777,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     }
 
     newNode->intersectionList = list;
-    newNode->combinedAttributes = combinedAttributes;
+    // newNode->combinedAttributes = combinedAttributes;
     newNode->next = NULL;
 
     if( !self->intersectionListHead ) {

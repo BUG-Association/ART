@@ -56,7 +56,7 @@ ArHashedMailboxEntry;
 
 typedef struct IntersectionLinkedListNode {
     struct ArIntersectionList intersectionList;
-    AraCombinedAttributes * combinedAttributes;
+    // AraCombinedAttributes * combinedAttributes;
     struct IntersectionLinkedListNode * next;
 }
 IntersectionLinkedListNode;
@@ -152,7 +152,7 @@ IntersectionLinkedListNode;
         ;
 
 - (void) addIntersectionToIntersectionLinkedList
-        : (AraCombinedAttributes *) combinedAttributes
+        : (ArNode *) combinedAttributesOrCSGNode
         : (struct ArIntersectionList) list
                 ;
 
