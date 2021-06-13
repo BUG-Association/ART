@@ -526,17 +526,17 @@ static int callCount = 0;
 }
 
 - (void) clearRayCasterIntersectionList: (ArnRayCaster *) rayCaster {
+
+    if(!rayCaster->intersectionListHead)
+        return;
+
     // delete linked list entries
     IntersectionLinkedListNode * iteratorNode = rayCaster->intersectionListHead;
     IntersectionLinkedListNode * next;
     while( iteratorNode ) {
         next = iteratorNode->next;
-        if(rayCaster->intersectionListHead != minimumListPtr->head)
-
         arintersectionlist_free_contents(&iteratorNode->intersectionList,
                                          rayCaster->rayIntersectionFreelist);
-
-
         free(iteratorNode);
         iteratorNode = next;
     }
@@ -551,20 +551,49 @@ static int callCount = 0;
         return ARINTERSECTIONLIST_EMPTY;
 
     ArIntersectionList minimumList;
-    ArIntersectionList * minimumListPtr = &minimumList;
     double min_t = MATH_HUGE_DOUBLE;
+
+    IntersectionLinkedListNode * minIntersectionNode = NULL;
 
     // find minimum
     IntersectionLinkedListNode * iteratorNode = rayCaster->intersectionListHead;
-    while( iteratorNode ) {
+    IntersectionLinkedListNode * prevIntersectionNode = NULL;
+
+    if(iteratorNode == rayCaster->intersectionListHead) {
 
         if(iteratorNode->intersectionList.head->t <= min_t) {
             minimumList = iteratorNode->intersectionList;
             min_t = iteratorNode->intersectionList.head->t;
+            minIntersectionNode = iteratorNode;
+            prevIntersectionNode = NULL;
+        }
+
+    }
+
+    while( iteratorNode->next ) {
+
+        if(iteratorNode->next->intersectionList.head->t <= min_t) {
+            minimumList = iteratorNode->next->intersectionList;
+            min_t = iteratorNode->next->intersectionList.head->t;
+            minIntersectionNode = iteratorNode->next;
+            prevIntersectionNode = iteratorNode;
         }
 
         iteratorNode = iteratorNode->next;
     }
+
+    // extract minimum node from linked list
+    if(minIntersectionNode == rayCaster->intersectionListHead) {
+        minimumList = rayCaster->intersectionListHead->intersectionList;
+        rayCaster->intersectionListHead = rayCaster->intersectionListHead->next;
+    }
+    else {
+        prevIntersectionNode->next = minIntersectionNode->next;
+    }
+
+    // free node
+    free(minIntersectionNode);
+
 
     [self clearRayCasterIntersectionList: rayCaster];
 
