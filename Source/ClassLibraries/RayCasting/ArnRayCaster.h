@@ -107,14 +107,7 @@ IntersectionLinkedListNode;
 
     BOOL rayCasterAddedToEmbreeArray;
 
-    // struct ArIntersectionList * embreeIntersectionList;
-
     IntersectionLinkedListNode * intersectionListHead;
-
-    int intersectionList_size;
-
-    ArNode * scenegraphReference;
-
 #endif
 }
 
@@ -145,6 +138,7 @@ IntersectionLinkedListNode;
         : (ArUnionOptions) unionoptions_store
         ;
 
+#if defined(ENABLE_EMBREE_SUPPORT)
 // if embree support is enabled, this function calculates
 // intersections with geometry with the help of Embree API calls
 - (void) getIntersectionListWithEmbree
@@ -155,6 +149,8 @@ IntersectionLinkedListNode;
         : (ArNode *) combinedAttributesOrCSGNode
         : (struct ArIntersectionList) list
                 ;
+
+#endif
 
 @end
 

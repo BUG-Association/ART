@@ -1372,27 +1372,7 @@ void arintersectionlist_append(
             }
             else if (ARCINTERSECTION_T(tail) == ARCINTERSECTION_T(head))
             {
-                if (ARCINTERSECTION_NEXT(head))
-                {
-                    ARCINTERSECTION_NEXT_PTR(tail) = ARCINTERSECTION_NEXT_PTR(head);
-                    releaseIntersections(head, intersection_freelist);
-                    head = ARCINTERSECTION_NEXT(tail);
-                    ARCINTERSECTION_PREV_PTR(head) = tail;
-                    COPY_OBJECT_REF(
-                        ARCINTERSECTION_VOLUME_MATERIAL_INTO_REF(tail),
-                        ARCINTERSECTION_VOLUME_MATERIAL_FROM_REF(head)
-                        );
-                    ARINTERSECTIONLIST_TAIL(*left_list) = ARINTERSECTIONLIST_TAIL(*right_list);
-                    COPY_OBJECT_REF(
-                        ARINTERSECTIONLIST_TAIL_VOLUME_MATERIAL_REF(*right_list),
-                        ARINTERSECTIONLIST_TAIL_VOLUME_MATERIAL_REF(*left_list)
-                        );
-                }
-            }
-            else
-            {
-                if(![ArnEmbree embreeEnabled])
-                    ART_ERRORHANDLING_WARNING("appended overlapping hitlists!\n");
+                ART_ERRORHANDLING_WARNING("appended overlapping hitlists!\n");
             }
         }
     }

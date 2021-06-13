@@ -376,11 +376,10 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 }
 
 
+#if defined(ENABLE_EMBREE_SUPPORT)
 - (void) getIntersectionListWithEmbree
         : (struct ArIntersectionList *) intersectionList
 {
-#if defined(ENABLE_EMBREE_SUPPORT)
-
     // we must have an RTCScene associated with this ray caster
     if(!embreeRTCSceneCopy) {
         ART_ERRORHANDLING_FATAL_ERROR(
@@ -512,13 +511,8 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         TEXTURE_COORDS(intersectionList->head) = PNT2D(rayhit.hit.v, rayhit.hit.u);
         ARCSURFACEPOINT_FLAG_TEXTURE_COORDS_AS_VALID(intersectionList->head);
     }
-#else
-    ART_ERRORHANDLING_FATAL_ERROR(
-                "method [ArnRayCaster intersectWithEmbree:::] called, without Embree being initialized"
-        );
-
-#endif
 }
+#endif
 
 - (ArcIntersection *) firstRayObjectIntersection
         : (ArNode <ArpRayCasting> *) geometryToIntersectRayWith
@@ -608,8 +602,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         embreeRTCSceneCopy = [embree getScene];
         self->rayCasterAddedToEmbreeArray = NO;
         self->intersectionListHead = NULL;
-        self->intersectionList_size = 0;
-        self->scenegraphReference = embree->orgScenegraphReference;
         [embree increaseRayCasterCount];
     }
 #endif
@@ -764,6 +756,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     intersection_test_ray3de = *temporaryRay3DEStore;
 }
 
+#if defined(ENABLE_EMBREE_SUPPORT)
 - (void) addIntersectionToIntersectionLinkedList
         : (ArNode *) combinedAttributesOrCSGNode
         : (struct ArIntersectionList) list
@@ -782,7 +775,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 
     if( !self->intersectionListHead ) {
         self->intersectionListHead = newNode;
-        self->intersectionList_size += 1;
         return;
     }
 
@@ -791,16 +783,12 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     while( true ) {
         if (!iteratorNode->next) {
             iteratorNode->next = newNode;
-            self->intersectionList_size += 1;
-            if(iteratorNode != head && iteratorNode->intersectionList.tail->t == head->intersectionList.head->t) {
-                // printf("smth is wrong\n");
-            }
-
             break;
         }
         iteratorNode = iteratorNode->next;
     }
 }
+#endif
 
 @end
 

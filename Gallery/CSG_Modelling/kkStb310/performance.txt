@@ -1,0 +1,40 @@
+sebastian@sebastian-N551JX ~/ART/Gallery/CSG_Modelling/kkStb310 (2.0.4dev_embree_csg_alternative)$ artist LocomotiveScene.arm -o normal_orgscenegraph -j1 -DSAMPLES=16
+
+artist - photorealistic renderer
+ART version 2.0.4-dev, 8 cores detected
+(c) 1996-2020 by the ART development team 
+
+Using 1 core of 8
+
+reading scene description                                           1.50 sec
+optimising scene graph for raycasting                               0.21 sec
+identifying and analysing lightsources                              1.02 sec
+---   interactive mode on, goal are 16 spp   ---
+image sampling: path tracing, 16 spp                              302.62 sec
+---   interactive mode off   ---
+converting raw image to colour space                                0.30 sec
+applying interactive calibration tone mapping operator              0.38 sec
+luminance and chroma reduction for L > 100.0                        0.35 sec
+converting to 8 bpc sRGB TIFF                                       0.26 sec
+opening result image in external viewer 
+
+sebastian@sebastian-N551JX ~/ART/Gallery/CSG_Modelling/kkStb310 (2.0.4dev_embree_csg_alternative)$ artist LocomotiveScene.arm -o embree -e -j1 -DSAMPLES=16
+
+artist - photorealistic renderer
+ART version 2.0.4-dev, 8 cores detected
+(c) 1996-2020 by the ART development team 
+
+Using 1 core of 8
+
+embree support enabled
+reading scene description                                           1.47 sec
+optimising scene graph for raycasting                               0.35 sec
+identifying and analysing lightsources                              1.02 sec
+---   interactive mode on, goal are 16 spp   ---
+image sampling: path tracing, 16 spp                              214.53 sec
+---   interactive mode off   ---
+converting raw image to colour space                                0.29 sec
+applying interactive calibration tone mapping operator              0.39 sec
+luminance and chroma reduction for L > 100.0                        0.35 sec
+converting to 8 bpc sRGB TIFF                                       0.26 sec
+opening result image in external viewer 

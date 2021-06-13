@@ -210,7 +210,16 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(ArnCSGand)
 
     [ rayCaster popDecision ];
 
+
     if ( arintersectionlist_is_empty( & leftIntersectionList ) )
+        return;
+
+    // [Sebastian here] I can't explain why, but the "arintersectionlist_is_empty"-
+    // function above sometimes returns false results, and its giving me troubles when
+    // rendering the advanced CSG scenes with Embree or natively by using the original
+    // scene graph.
+    // This is why I added this extra if-statement
+    if(!leftIntersectionList.head && !leftIntersectionList.tail)
         return;
 
     if ( ! INTERSECTIONLIST_HEAD_MATERIAL(leftIntersectionList) )

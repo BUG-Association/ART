@@ -97,10 +97,6 @@ UserGeometryDataList;
 - (RTCScene) getScene;
 + (void) commitScene;
 
-+ (void) setCSGTreeNode : (ArNode *) csgTree;
-
-- (void) traversingCSGSubtree: (BOOL) b;
-- (BOOL) isTraversingCSGSubTree;
 
 - (void) addedCSGNodeToEmbree: (BOOL) b;
 - (BOOL) csgNodeIsAdded;
@@ -109,7 +105,7 @@ UserGeometryDataList;
 - (int) setRayCasterCount : (int) value;
 
 - (void) initializeEmptyGeometryList;
-- (void) freeGeometryList;
+- (void) freeGeometryDataList;
 
 - (void) increaseRayCasterCount;
 
@@ -125,14 +121,6 @@ UserGeometryDataList;
         : (ArnRayCaster *) rayCaster
         : (ArNode *) csgTreeRoot
         ;
-
-/*
-- (void) addIntersectionToIntersectionLinkedList
-        : (ArnRayCaster *) rayCaster
-        : (AraCombinedAttributes *) combinedAttributes
-        : (struct ArIntersectionList) list
-                ;
-                */
 
 - (struct ArIntersectionList) extractClosestIntersectionList
         : (ArnRayCaster *) rayCaster
@@ -177,9 +165,6 @@ UserGeometryDataList;
 
 + (void) cleanUp;
 
-- (void) resetCount;
-- (int) getCount;
-- (void) increaseCount;
 
 @end
 

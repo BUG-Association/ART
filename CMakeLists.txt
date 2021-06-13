@@ -413,14 +413,9 @@ if( ENABLE_EMBREE_SUPPORT )
 		)
 		add_definitions(-DENABLE_EMBREE_SUPPORT=1)
 		
-	else ( EMBREE_FOUND ) 
-		add_definitions(-DENABLE_EMBREE_SUPPORT=0)
-		
 
 	endif( EMBREE_FOUND )
 
-else( ENABLE_EMBREE_SUPPORT )
-	add_definitions(-DENABLE_EMBREE_SUPPORT=0)
 
 endif( ENABLE_EMBREE_SUPPORT )
 

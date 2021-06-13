@@ -31,15 +31,10 @@
 #import <RayCastingCommonMacros.h>
 #import <ARM_RayCasting.h>
 #import <unistd.h>
-#import <ArnCube.h>
-#import <ArSurfacePointMappingMacros.h>
 
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
-
-
-// ARLIST_IMPLEMENTATION_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
 
 void errorFunction(void* userPtr, enum RTCError error, const char* str) {
     printf("\nembree error %d: %s\n", error, str);
@@ -133,8 +128,7 @@ static ArnEmbree * embreeManager;
 
 }
 
-- (void) freeGeometryList {
-    // arlist_free_userGeometryDataptr_entries(&userGeometryList);
+- (void) freeGeometryDataList {
 
     UserGeometryDataList * iteratorNode = userGeometryListHead;
     UserGeometryDataList * next;
@@ -154,7 +148,7 @@ static ArnEmbree * embreeManager;
     if(!embree)
         return;
 
-    [embree freeGeometryList];
+    [embree freeGeometryDataList];
 
     rtcReleaseScene([embree getScene]);
     rtcReleaseDevice([embree getDevice]);
@@ -198,8 +192,6 @@ static ArnEmbree * embreeManager;
         isInitialized = YES;
         EMBREE_ENABLED = YES;
 
-        embreeManager->currentlyTraversingCSGSubTree = NO;
-        embreeManager->currentCSGGeometryAdded = NO;
         embreeManager->topmostCSGNode = NULL;
 
         embreeManager->environmentLighting = NO;
@@ -212,21 +204,6 @@ static ArnEmbree * embreeManager;
 }
 - (RTCScene) getScene {
     return scene;
-}
-
-+ (void) setCSGTreeNode : (ArNode *) csgTree {
-    ArnEmbree * embree = [ArnEmbree embreeManager];
-
-    if( !embree->orgScenegraphReference )
-        embree->orgScenegraphReference = csgTree;
-}
-
-- (void) traversingCSGSubtree: (BOOL) b {
-    currentlyTraversingCSGSubTree = b;
-}
-
-- (BOOL)isTraversingCSGSubTree {
-    return currentlyTraversingCSGSubTree;
 }
 
 - (void) addedCSGNodeToEmbree: (BOOL) b {
@@ -248,12 +225,6 @@ static ArnEmbree * embreeManager;
     rtcCommitGeometry(newGeometry);
     unsigned int geomID = rtcAttachGeometry(scene, newGeometry);
     rtcReleaseGeometry(newGeometry);
-
-    /*
-#ifdef EMBREE_DEBUG_PRINT
-    printf("new user geometry with geometry id %d added\n", geomID);
-#endif
-     */
 
     return (int) geomID;
 }
@@ -541,7 +512,6 @@ static int callCount = 0;
         iteratorNode = next;
     }
     rayCaster->intersectionListHead = NULL;
-    rayCaster->intersectionList_size = 0;
 }
 
 - (struct ArIntersectionList) extractClosestIntersectionList

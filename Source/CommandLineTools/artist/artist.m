@@ -254,21 +254,19 @@ int artist(
     if ( [ monoOpt hasBeenSpecified ] )
         art_set_hero_samples_to_splat( art_gv, 1 );
 
-    // [Sebastian] TODO remove this block, once embree parsing works
+
     if ( [ embreeOpt hasBeenSpecified ]) {
 #if defined(ENABLE_EMBREE_SUPPORT)
         [ArnEmbree enableEmbree: YES];
         [ArnEmbree initialize];
         printf("embree support enabled\n");
 #else
-        printf("error: embree support enabled without embree being installed...\n");
-        exit(0);
+        printf("Warning: The scene cannot be rendered with Embree support since it seems that Embree is not installed.\n");
+        printf("Continuing without Embree support.\n");
 #endif
     }
-    // else {
-       //  [ArnEmbree enableEmbree: NO];
-    // }
-    // END -- [Sebastian] TODO remove this block, once embree parsing works
+    //
+
 
 
 // =============================   PHASE 4   =================================
