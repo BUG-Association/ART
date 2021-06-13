@@ -26,52 +26,34 @@
 
 #include "ART_Foundation.h"
 
-ART_MODULE_INTERFACE(ArnFileImage)
+ART_MODULE_INTERFACE(ArfRAWRasterImage)
 
-#import "ART_Scenegraph.h"
+#import "ArfRasterImage.h"
 
-typedef enum ArnFileImageAction
+
+/* --------------------------------------------------------------------------
+    'ArfRAWRasterImage' class
+
+    Generic superclass for spectral image filetypes such as ARTRAW or EXR.
+    This class should never be directly instantiated - only its
+    derivatives do anything useful.
+-------------------------------------------------------------------------- */
+
+
+@interface ArfRAWRasterImage
+           : ArfRasterImage
 {
-    arnfileimage_idle    = 0,
-    arnfileimage_reading = 1,
-    arnfileimage_writing = 2
-}
-ArnFileImageAction;
-
-@interface ArnFileImage
-        : ArNode < ArpConcreteClass, ArpImage >
-{
-@public
-    ArNode <ArpImageFile>  * imageFile;
-    ArnImageInfo           * imageInfo;
-    unsigned int             action;
-    int                      y;
-    char                   * fileName;
+    BOOL             fileContainsPolarisationData;
+    ArDataType       fileDataType;
+    BOOL             _isEmissive;
 }
 
-- init
-        : (const char *) newFileName
-        ;
 
-- init
-        : (const char *) newFileName
-        : (ArnImageInfo *) newImageInfo
-        ;
+- (ArDataType) fileDataType;
 
-- (BOOL) imageFileIsKindOf
-        : (Class) newClass
-        ;
-
-- (const char *) fileName
-        ;
-
-- (void) changeFileNameTo
-        : (const char *) newFileName
-        ;
-
-- (Class) nativeContentClass
-        ;
+- (BOOL) isEmissive;
 
 @end
+
 
 // ===========================================================================

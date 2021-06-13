@@ -33,7 +33,7 @@ ART_MODULE_INTERFACE(ArfARTRAW)
         comments in the accompanying implementation file (.m)!
     ---------------------------------------------------------------aw- */
 
-#import "ArfRasterImage.h"
+#import "ArfRAWRasterImage.h"
 
 #define ARFARTRAW_VERSION       2.5
 #define ARFARTRAW_EXTENSION     "artraw"
@@ -63,7 +63,7 @@ ART_MODULE_INTERFACE(ArfARTRAW)
     ---------------------------------------------------------------aw- */
 
 @interface ArfARTRAW
-           : ArfRasterImage
+           : ArfRAWRasterImage
 {
     ArLightAlpha      ** scanline;
     double             * bufferA;
@@ -79,12 +79,8 @@ ART_MODULE_INTERFACE(ArfARTRAW)
     ArReferenceFrame     referenceFrame;
     unsigned char      * charBuffer;
     int                  channels;
-    BOOL                 fileContainsPolarisationData;
-    ArDataType       fileDataType;
-}
 
-- (ArDataType) fileDataType
-        ;
+}
 
 @end
 

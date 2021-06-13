@@ -144,13 +144,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     [ super dealloc ];
 }
 
-- (BOOL) imageFileIsMemberOf
+- (BOOL) imageFileIsKindOf
         : (Class) newClass
 {
     return
-        [ imageFile isMemberOfClass: newClass ];
+        [ imageFile isKindOfClass: newClass ];
 }
-
 
 - (const char *) fileName
 {
@@ -314,7 +313,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
 
 - (void) prepareForISRChange
 {
-    if ( [ imageFile class ] == [ ArfARTRAW class ] )
+    if ( [ imageFile class ] == [ ArfRAWRasterImage class ] )
     {
         if (action == arnfileimage_writing)
             [ imageFile close ];

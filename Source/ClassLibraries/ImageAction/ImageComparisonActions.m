@@ -104,8 +104,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_Add_ARTRAW)
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
+        :   [ ArfRAWRasterImage class ]
         ];
 
 
@@ -731,7 +731,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_To_ARTGSC_DifferenceImage)
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
         :   [ ArfARTGSC class ]
         ];
 
@@ -942,7 +942,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_SNR)
 {
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
         ];
 
     /* ------------------------------------------------------------------

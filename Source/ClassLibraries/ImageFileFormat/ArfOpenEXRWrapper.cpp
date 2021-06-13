@@ -35,14 +35,15 @@
 #include <string>
 #include <array>
 
-#include <OpenEXR/ImathBox.h>
-#include <OpenEXR/ImathHalfLimits.h>
-#include <OpenEXR/ImfArray.h>
-#include <OpenEXR/ImfChannelList.h>
-#include <OpenEXR/ImfInputFile.h>
-#include <OpenEXR/ImfOutputFile.h>
-#include <OpenEXR/ImfStandardAttributes.h>
-#include <OpenEXR/half.h>
+//#include <ImathBox.h>
+//#include <ImathHalfLimits.h>
+#include <ImfArray.h>
+#include <ImfChannelList.h>
+#include <ImfInputFile.h>
+#include <ImfOutputFile.h>
+#include <ImfFrameBuffer.h>
+#include <ImfStandardAttributes.h>
+#include <half.h>
 
 #define INTERNAL_ERROR -1
 
@@ -145,6 +146,7 @@ SpectrumType getSpectralChannelType(
     const bool matched = std::regex_search(channelName, matches, expr);
 
     SpectrumType channelType = SpectrumType::UNDEFINED;
+    polarisationComponent = 0;
 
     if (matched) {
         if (matches.size() != 8) {
@@ -238,6 +240,18 @@ void saveEXR(
     // Write metadata
     // -----------------------------------------------------------------------
 
+    // Format version
+    exrHeader.insert("spectralLayoutVersion", Imf::StringAttribute("1.0"));
+    
+    // Units
+    exrHeader.insert("emissiveUnits", Imf::StringAttribute("W.m^-2.sr^-1"));
+
+    // If it is a polarised image, specify its handedness
+    if (spectral_buffers[1] != NULL) {
+        exrHeader.insert("polarisationHandedness", Imf::StringAttribute("right"));
+    }
+
+    // ART metadata
     for (size_t i = 0; i < n_metadata; i++) {
         if (metadata_values[i] != NULL) {
             exrHeader.insert(metadata_keys[i], Imf::StringAttribute(metadata_values[i]));
@@ -316,10 +330,13 @@ int readEXR(
     float** spectral_buffers[4],
     double* wavelengths_nm[],
     int* n_spectralBands,
-    int* isPolarised)
+    int* isPolarised,
+    int* isEmissive)
 {
     // We ignore the reflective part for now since ART does not support it for
     // now.
+
+    // TODO: Check for polarisation handedness
 
     Imf::InputFile exrIn(filename);
     const Imf::Header& exrHeader = exrIn.header();
@@ -342,17 +359,50 @@ int readEXR(
         // Check if the channel is spectral or one of the RGBA channel
         int polarisationComponent;
         double wavelength_nm;
-        SpectrumType spectralChanel = getSpectralChannelType(channel.name(), polarisationComponent, wavelength_nm);
+        SpectrumType spectralChannel = getSpectralChannelType(channel.name(), polarisationComponent, wavelength_nm);
 
-        if (spectralChanel != SpectrumType::UNDEFINED) {
-            spectrumType = spectrumType | spectralChanel;
+        if (spectralChannel != SpectrumType::UNDEFINED) {
 
-            if (isEmissiveSpectrum(spectralChanel)) {
-                wavelengths_nm_S[polarisationComponent].push_back(
-                    std::make_pair(
-                        wavelength_nm,
-                        channel.name()));
+            // Now, we support either emissive or reflective images, not both
+            if (spectrumType != SpectrumType::UNDEFINED) {
+                if (isEmissiveSpectrum(spectrumType) && isEmissiveSpectrum(spectralChannel)) {
+                    spectrumType = spectrumType | spectralChannel;
+
+                    wavelengths_nm_S[polarisationComponent].push_back(
+                        std::make_pair(
+                            wavelength_nm,
+                            channel.name()));
+                } else if (isReflectiveSpectrum(spectrumType) && isReflectiveSpectrum(spectralChannel)) {
+                    spectrumType = spectrumType | spectralChannel;
+
+                    wavelengths_nm_S[polarisationComponent].push_back(
+                        std::make_pair(
+                            wavelength_nm,
+                            channel.name()));
+                } else {
+                    /* Do nothing, ignore the channel */
+                }
+            } else {
+                spectrumType = spectralChannel;
+
+                if (isEmissiveSpectrum(spectralChannel) || isReflectiveSpectrum(spectralChannel)) {
+                    wavelengths_nm_S[polarisationComponent].push_back(
+                        std::make_pair(
+                            wavelength_nm,
+                            channel.name()));
+                }
             }
+
+            // spectrumType = spectrumType | spectralChannel;
+
+            // Later, we might want to support both channel types at the
+            // same time
+            // if (isEmissiveSpectrum(spectralChannel)) {
+            //     wavelengths_nm_S[polarisationComponent].push_back(
+            //         std::make_pair(
+            //             wavelength_nm,
+            //             channel.name()));
+            // }
         } else {
             if (strcmp(channel.name(), "R") == 0) {
                 hasRGBAChannel[0] = true;
@@ -379,7 +429,7 @@ int readEXR(
     // Sanity check
     // -------------------------------------------------------------------------
 
-    if (isEmissiveSpectrum(spectrumType)) {
+    if (isEmissiveSpectrum(spectrumType) || isReflectiveSpectrum(spectrumType)) {
         // Sort by ascending wavelengths
         for (size_t s = 0; s < n_stokes_components; s++) {
             std::sort(wavelengths_nm_S[s].begin(), wavelengths_nm_S[s].end());
@@ -406,6 +456,7 @@ int readEXR(
     *width = exrDataWindow.max.x - exrDataWindow.min.x + 1;
     *height = exrDataWindow.max.y - exrDataWindow.min.y + 1;
     *isPolarised = isPolarisedSpectrum(spectrumType) ? 1 : 0;
+    *isEmissive = isEmissiveSpectrum(spectrumType) ? 1 : 0;
     *n_spectralBands = wavelengths_nm_S[0].size();
 
     // -----------------------------------------------------------------------
@@ -421,7 +472,7 @@ int readEXR(
     const size_t n_pixels = (*width) * (*height);
 
     // Now, we can populate the local wavelength vector
-    if (isEmissiveSpectrum(spectrumType)) {
+    if (isEmissiveSpectrum(spectrumType) || isReflectiveSpectrum(spectrumType)) {
         *wavelengths_nm = (double*)calloc(wavelengths_nm_S[0].size(), sizeof(double));
 
         for (size_t i = 0; i < wavelengths_nm_S[0].size(); i++) {
@@ -454,16 +505,16 @@ int readEXR(
     const Imf::PixelType compType = Imf::FLOAT;
 
     // Spectral channels
-    if (isEmissiveSpectrum(spectrumType)) {
+    if (isEmissiveSpectrum(spectrumType) || isReflectiveSpectrum(spectrumType)) {
         const size_t xStride = sizeof(float) * (*n_spectralBands);
         const size_t yStride = xStride * (*width);
 
         for (size_t s = 0; s < n_stokes_components; s++) {
             for (size_t wl_idx = 0; wl_idx < (*n_spectralBands); wl_idx++) {
                 char* ptrS = (char*)(&_spectral_buffers[s][wl_idx]);
-                exrFrameBuffer.insert(
-                    wavelengths_nm_S[s][wl_idx].second,
-                    Imf::Slice(compType, ptrS, xStride, yStride));
+                Imf::Slice slice = Imf::Slice::Make(compType, ptrS, exrDataWindow, xStride, yStride);
+
+                exrFrameBuffer.insert(wavelengths_nm_S[s][wl_idx].second, slice);
             }
         }
     }
@@ -478,9 +529,9 @@ int readEXR(
 
             if (hasRGBAChannel[c]) {
                 char* ptrC = (char*)(&_rgba_buffer[c]);
-                exrFrameBuffer.insert(
-                    rgbaChannels[c],
-                    Imf::Slice(compType, ptrC, xStride, yStride));
+                Imf::Slice slice = Imf::Slice::Make(compType, ptrC, exrDataWindow, xStride, yStride);
+
+                exrFrameBuffer.insert(rgbaChannels[c], slice);
             }
         }
     }
@@ -489,7 +540,9 @@ int readEXR(
     if (hasYChannel) {
         const size_t xStride = sizeof(float);
         const size_t yStride = xStride * (*width);
-        exrFrameBuffer.insert("Y", Imf::Slice(compType, (char*)_grey_buffer, xStride, yStride));
+        Imf::Slice slice = Imf::Slice::Make(compType, (char*)_grey_buffer, exrDataWindow, xStride, yStride);
+
+        exrFrameBuffer.insert("Y", slice);
     }
 
     exrIn.setFrameBuffer(exrFrameBuffer);

@@ -52,18 +52,18 @@ void imageProbe(
                 , YC(queryPoint)
                 );
         
-        if ( ! (   ( [ inputFileImage dataImageClass ] == [ ArfARTRAW class ] )
+        if ( ! (   ( [ inputFileImage dataImageClass ] == [ ArfRAWRasterImage class ] )
                 || ( [ inputFileImage dataImageClass ] == [ ArfARTCSP class ] )) )
             ART_ERRORHANDLING_FATAL_ERROR(
                 "file is not an internal ART image file - "
-                "%s instead of ArfARTRAW/CSP"
+                "%s instead of RAW/CSP"
                 ,   [ [ inputFileImage dataImageClass ] cStringClassName ]
                 );
 
-        if ( [ inputFileImage dataImageClass ] == [ ArfARTRAW class ] )
+        if ( [ inputFileImage dataImageClass ] == [ ArfRAWRasterImage class ] )
         {
-            ArfARTRAW  * rawImage =
-                (ArfARTRAW *) inputFileImage->imageFile;
+            ArfRAWRasterImage  * rawImage =
+                (ArfRAWRasterImage *) inputFileImage->imageFile;
 
             ArDataType  rawContentType = [ rawImage fileDataType ];
 
@@ -531,7 +531,7 @@ ArnFileImage  * readInputImage(
     {
         *imageSize = [ originalInputImage size ];
 
-        if ( [ originalInputImage imageFileIsMemberOf: expectedClass ] )
+        if ( [ originalInputImage imageFileIsKindOf: expectedClass ] )
         {
             [ ART_GLOBAL_REPORTER beginTimedAction
                 :   "reading %s input image %s of size %d x %d"
@@ -744,7 +744,7 @@ int art_imagetool(
     }
     else
     {
-        expectedClass = [ ArfARTRAW class ];
+        expectedClass = [ ArfRAWRasterImage class ];
         abbreviation = "RAW";
     }
     

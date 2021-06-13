@@ -78,6 +78,13 @@ void art_foundation_set_isr(
             art_gv->arspectrum_gv->current_isr = isr;
             break;
 
+        // Usefull for Spectral EXRs
+        case ardt_spectrum500:
+        case ardt_spectrum500_polarisable:
+            switch_isr_to_s500( art_gv );
+            art_gv->arspectrum_gv->current_isr = isr;
+            break;
+
         default:
             ART_ERRORHANDLING_FATAL_ERROR(
                 "invalid ISR"

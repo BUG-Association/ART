@@ -24,53 +24,28 @@
 
 =========================================================================== */
 
-#include "ART_Foundation.h"
+#define ART_MODULE_NAME     ArfRAWRasterImage
 
-ART_MODULE_INTERFACE(ArnFileImage)
+#import "ArfRAWRasterImage.h"
 
-#import "ART_Scenegraph.h"
+ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
-typedef enum ArnFileImageAction
+ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
+
+@implementation ArfRAWRasterImage
+
+- (ArDataType) fileDataType
 {
-    arnfileimage_idle    = 0,
-    arnfileimage_reading = 1,
-    arnfileimage_writing = 2
-}
-ArnFileImageAction;
-
-@interface ArnFileImage
-        : ArNode < ArpConcreteClass, ArpImage >
-{
-@public
-    ArNode <ArpImageFile>  * imageFile;
-    ArnImageInfo           * imageInfo;
-    unsigned int             action;
-    int                      y;
-    char                   * fileName;
+    if ( fileContainsPolarisationData )
+        return fileDataType | ardt_polarisable;
+    else
+        return fileDataType;
 }
 
-- init
-        : (const char *) newFileName
-        ;
-
-- init
-        : (const char *) newFileName
-        : (ArnImageInfo *) newImageInfo
-        ;
-
-- (BOOL) imageFileIsKindOf
-        : (Class) newClass
-        ;
-
-- (const char *) fileName
-        ;
-
-- (void) changeFileNameTo
-        : (const char *) newFileName
-        ;
-
-- (Class) nativeContentClass
-        ;
+- (BOOL) isEmissive
+{
+    return _isEmissive;
+}
 
 @end
 

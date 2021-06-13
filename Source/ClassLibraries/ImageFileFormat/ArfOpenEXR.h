@@ -32,24 +32,24 @@ ART_MODULE_INTERFACE(ArfOpenEXR)
 #ifdef ART_WITH_OPENEXR
 #define WRITE_RGB_VERSION
 
-#import "ArfRasterImage.h"
+#import "ArfRAWRasterImage.h"
 
 #define ARFOPENEXR_EXTENSION     "exr"
 
 
 @interface ArfOpenEXR
-           : ArfRasterImage
+           : ArfRAWRasterImage
 {
     BOOL                        _writtingMode;
     ArnImageInfo              * _imageInfo;
     IVec2D                      _size;
-    ArDataType                  _dataType;
     int                         _spectralChannels;
     BOOL                        _isSpectral;
-    BOOL                        _containsPolarisationData;
     
     float                      * _bufferRGBA;
     float                      * _bufferGrey;
+
+    double                     * _wavelengths_nm;
 
     float                      * _bufferS0;
     float                      * _bufferS1;
