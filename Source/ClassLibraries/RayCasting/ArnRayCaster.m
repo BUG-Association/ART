@@ -422,8 +422,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     rtcIntersect1(embreeRTCSceneCopy, &context, &rayhit);
 
     ArnEmbree * embree = [ArnEmbree embreeManager];
-    // debug
-    [embree resetCount];
 
     // if we did not hit anything and we do not have environment lighting, we are done here
     if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID && !embree->environmentLighting) {
@@ -457,8 +455,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
            rayhit.ray.tfar);
     */
 
-
-
     // ... and store intersection information in an
     // ArIntersectionList
     if(!geometryData->_isUserGeometry) {
@@ -477,18 +473,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     }
     else {
         *intersectionList = [embree extractClosestIntersectionList: self];
-
-        /*
-        *intersectionList = [embree evaluateIntersectionListsAccordingToCSGTree
-                                : self
-                                : self->scenegraphReference];
-        */
-
-        /*
-        if(intersectionList->head)
-            intersectionList->head->embreeShapeUserGeometry = YES;
-        */
-        // [embree clearRayCasterIntersectionList: self];
     }
 
     if(!arintersectionlist_is_nonempty(intersectionList))

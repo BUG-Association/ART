@@ -570,64 +570,6 @@ static int callCount = 0;
     return minimumList;
 }
 
-- (struct ArIntersectionList) getClosestIntersectionListFromArray
-        : (ArnRayCaster *) rayCaster
-{
-
-}
-
-- (struct ArIntersectionList) findIntersectionListByShapeAttributes
-        // : (ArnShape *) shape
-        : (AraCombinedAttributes *) combinedAttributes
-        : (ArnRayCaster *) rayCaster
-{
-    /*
-    IntersectionLinkedListNode * iterator = rayCaster->intersectionListHead;
-
-    while(iterator) {
-        if(combinedAttributes == iterator->combinedAttributes) {
-            // printf("found it, embree geom id:%d\n", shape->embreeGeomID);
-            ArIntersectionList thisIntersectionList = iterator->intersectionList;
-
-            /*
-            if(iterator == rayCaster->intersectionListHead) {
-                iterator->next = NULL;
-                free(iterator);
-            }
-            else if(prev) {
-                prev->next = iterator->next;
-                iterator->next = NULL;
-                free(iterator);
-            }
-
-
-            return thisIntersectionList;
-        }
-
-        iterator = iterator->next;
-    }
-
-    return ARINTERSECTIONLIST_EMPTY;
-     */
-}
-
-- (struct ArIntersectionList) evaluateIntersectionListsAccordingToCSGTree
-        : (ArnRayCaster *) rayCaster
-        : (ArNode *) csgTreeRoot
-{
-    struct ArIntersectionList list;
-
-    AraBBox * rootBox = (AraBBox *) csgTreeRoot;
-
-    [rootBox getIntersectionList
-           : rayCaster
-            : RANGE(ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
-            : &list
-    ];
-
-    return list;
-}
-
 
 // intersection callback function
 void embree_intersect_geometry(const int * valid,
@@ -646,6 +588,7 @@ void embree_intersect_geometry(const int * valid,
     UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
 
     // handling prior non-user-geometry intersections
+    /*
     if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
         RTCGeometry previouslyHitGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
 
@@ -670,14 +613,6 @@ void embree_intersect_geometry(const int * valid,
             rayCaster->surfacepoint_test_shape = NULL;
         }
     }
-
-    /*
-    // print shape
-    printf("current node: %s\n", [[geometryData->_combinedAttributes_or_csg_node className] UTF8String]);
-
-    if([geometryData->_combinedAttributes_or_csg_node isKindOfClass: [ArnCSGsub class]]) {
-        printf("break\n");
-    }
      */
 
     // perform the intersection
@@ -691,12 +626,8 @@ void embree_intersect_geometry(const int * valid,
 
     // if no intersection is found, return
     if(!intersectionList.head) {
-        // printf("intersectionlist empty...\n");
         return;
     }
-
-    // debug
-    [embree increaseCount];
 
     // update embree components
     rtc_ray->tfar = (float) intersectionList.head->t;

@@ -75,11 +75,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 {
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
-    // debug
-    // printf("node of type %s\n", [[self className] UTF8String]);
-    // printf("subnode 0: %s\n", [[ARNBINARY_SUBNODE_0 className] UTF8String]);
-    // printf("subnode 1: %s\n", [[ARNBINARY_SUBNODE_1 className] UTF8String]);
-
 #if defined(ENABLE_EMBREE_SUPPORT)
     if([ArnEmbree embreeEnabled]) {
 
@@ -89,14 +84,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
                 || [self isKindOfClass:[ArnCSGor class]])
                 && !embree->topmostCSGNode)
         {
-            // inf sphere don't care
+            // if an inf sphere is a sub node, we do not add that node to embree
+            // since inf sphere raycasting is done outside Embree
             if(![ ARNBINARY_SUBNODE_0 isKindOfClass: [ArnInfSphere class]]
                    &&  ![ ARNBINARY_SUBNODE_1 isKindOfClass: [ArnInfSphere class]])
             {
                 self->embreeGeomID = [embree initEmbreeCSGGeometry: self : &traversal->state];
 
                 embree->topmostCSGNode = self;
-                // [embree traversingCSGSubtree: YES];
                 [embree addedCSGNodeToEmbree: YES];
             }
         }
@@ -128,7 +123,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         ArnEmbree *embree = [ArnEmbree embreeManager];
         if(embree->topmostCSGNode && embree->topmostCSGNode == self) {
             embree->topmostCSGNode = NULL;
-            // [embree traversingCSGSubtree: NO];
             [embree addedCSGNodeToEmbree: NO];
         }
     }

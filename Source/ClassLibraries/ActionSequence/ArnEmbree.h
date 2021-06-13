@@ -29,27 +29,24 @@
 #include "ArNode.h"
 #include <embree3/rtcore.h>
 
-@class ArnShape;
-@class ArnSimpleIndexedShape;
 @class AraCombinedAttributes;
-@class ArcSurfacePoint;
 @class ArnVertexSet;
-@class ArcInteger;
-@class ArnTriangleMesh;
-@class ArnInfSphere;
-@class ArnCube;
 
 ART_MODULE_INTERFACE(ArnEmbree)
 
-
+// each geometry in the scene is associated with
+// one of this stuct, it is needed for embree to
+// perform user defined geometry intersection
+// calculations
 typedef struct UserGeometryData {
     ArNode * _shape;
     ArTraversalState _traversalState;
-    ArNode * _combinedAttributes_or_csg_node;
+    ArNode<ArpRayCasting> * _combinedAttributes_or_csg_node;
     BOOL _isUserGeometry;
 }
 UserGeometryData;
 
+// linked list node for user geometry data
 typedef struct UserGeometryDataList {
     UserGeometryData * data;
     struct UserGeometryDataList * next;
@@ -63,22 +60,30 @@ UserGeometryDataList;
 #define THREAD_MAX 25
 
 @interface ArnEmbree : ArcObject {
-    RTCDevice device;
-    RTCScene scene;
+    RTCDevice device; // Embree device
+    RTCScene scene; // Embree scene
 
+    // head of linked list in which the ArIntersectionlists
+    // are stored after intersecting the scene with embree
     UserGeometryDataList * userGeometryListHead;
 
+    // predefined array of ArnRayCaster in which the multiple
+    // ArnRayCaster objects are stored during rendering
     ArnRayCaster * rayCasterArray[THREAD_MAX];
     int numRayCaster;
 
-    BOOL currentlyTraversingCSGSubTree;
     BOOL currentCSGGeometryAdded;
 
 @public
-    ArNode * orgScenegraphReference;
+
+    // we exclude the raycasting of an infinite sphere from Embree
+    // (for reasons of efficiency) and intersect it only if the ray
+    // doesn't hit anything else
     BOOL environmentLighting;
     AraCombinedAttributes * environmentLightAttributes;
 
+    // storing a reference of a top-most CSG node from the
+    // scenegraph when rendering CSG geometry
     ArNode * topmostCSGNode;
 }
 
@@ -88,50 +93,47 @@ UserGeometryDataList;
 + (BOOL) embreeEnabled;
 + (void) enableEmbree: (BOOL) enabled;
 
+
 - (void) addToUserGeometryList : (UserGeometryData *) data;
 
-
+// getter and setter
 - (void) setDevice: (RTCDevice) newDevice;
 - (RTCDevice) getDevice;
 - (void) setScene: (RTCScene) newScene;
 - (RTCScene) getScene;
+- (int) getRayCasterCount;
+- (int) setRayCasterCount : (int) value;
+
+// commits the scene during BSP tree creation
 + (void) commitScene;
 
 
 - (void) addedCSGNodeToEmbree: (BOOL) b;
 - (BOOL) csgNodeIsAdded;
 
-- (int) getRayCasterCount;
-- (int) setRayCasterCount : (int) value;
+
 
 - (void) initializeEmptyGeometryList;
 - (void) freeGeometryDataList;
 
-- (void) increaseRayCasterCount;
-
-- (struct ArIntersectionList) findIntersectionListByShapeAttributes
-       //  : (ArnShape *) shape
-        : (AraCombinedAttributes *) combinedAttributes
-        : (ArnRayCaster *) rayCaster
-        ;
 
 - (void) clearRayCasterIntersectionList: (ArnRayCaster *) rayCaster;
-
-- (struct ArIntersectionList) evaluateIntersectionListsAccordingToCSGTree
-        : (ArnRayCaster *) rayCaster
-        : (ArNode *) csgTreeRoot
-        ;
 
 - (struct ArIntersectionList) extractClosestIntersectionList
         : (ArnRayCaster *) rayCaster
         ;
 
+// adds an RTCGeometry associated with a geometry to Embree
+- (int) addGeometry: (RTCGeometry) newGeometry;
+
+// initializes a simple indexed shape for Embree
 - (RTCGeometry) initEmbreeSimpleIndexedGeometry
         : (ArNode *) shape
         : (ArnVertexSet *) vertexSet
         : (ArNode *) trafo
         ;
 
+// initializes a user defined geometry for Embree
 - (int) initEmbreeGeometry
         : (ArNode *) shape
         : (ArTraversalState *) traversalState
@@ -140,19 +142,19 @@ UserGeometryDataList;
         : (ArNode *) trafo
         ;
 
+// initializes a CSG geometry for Embree
 - (unsigned) initEmbreeCSGGeometry
         : (ArNode *) csgNode
         : (ArTraversalState *) traversalState
         ;
-
+// initializes triangle mesh for Embree
 - (RTCGeometry) initEmbreeTriangleMeshGeometry
         : (ArNode *) shape
         : (ArnVertexSet *) vertexSet
         : (ArNode *) trafo
         ;
 
-- (int) addGeometry: (RTCGeometry) newGeometry;
-
+// creates a UserGeometryDataList for a geometry in question
 - (void) setGeometryUserData
         : (RTCGeometry) newGeometry
         : (ArNode *) shape
@@ -160,9 +162,13 @@ UserGeometryDataList;
         : (ArNode *) combinedAttributes
         ;
 
+// retrieves and add a ArnRaycaster object to the raycaster array by
+// simple hashing
+- (void) increaseRayCasterCount;
 - (ArnRayCaster *) getRayCasterFromRayCasterArray;
 - (void) addRayCasterToRayCasterArray : (ArnRayCaster *) rayCaster;
 
+// cleans up and shuts down Embree-related stuff
 + (void) cleanUp;
 
 
