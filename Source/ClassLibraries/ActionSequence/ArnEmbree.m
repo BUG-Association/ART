@@ -36,10 +36,157 @@
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
+// print embree-related errors
 void errorFunction(void* userPtr, enum RTCError error, const char* str) {
     printf("\nembree error %d: %s\n", error, str);
 }
 
+
+void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
+
+    if(!args->geometryUserPtr)
+        return;
+
+    const UserGeometryData * geometryData = (const UserGeometryData *) args->geometryUserPtr;
+    struct RTCBounds * bounds_o = args->bounds_o;
+
+    // calculate the bounding box
+    // _combinedAttributes_or_csg_node is the messenger because information
+    // about the transl, rot and scale is needed
+    Box3D boundingBox;
+    [geometryData->_combinedAttributes_or_csg_node getBBoxObjectspace: &boundingBox];
+
+    // special case:
+    // since embree is working with floats and ART with doubles
+    // the infinite sphere can't get hit by an embree way.
+    // this is a work-around for now
+    if([geometryData->_shape isKindOfClass: [ArnInfSphere class]]) {
+        boundingBox.min.c.x[0] = - MATH_HUGE_FLOAT;
+        boundingBox.min.c.x[1] = - MATH_HUGE_FLOAT;
+        boundingBox.min.c.x[2] = - MATH_HUGE_FLOAT;
+        boundingBox.max.c.x[0] = MATH_HUGE_FLOAT;
+        boundingBox.max.c.x[1] = MATH_HUGE_FLOAT;
+        boundingBox.max.c.x[2] = MATH_HUGE_FLOAT;
+    }
+
+    else if(boundingBox.max.c.x[0] == MATH_HUGE_DOUBLE &&
+            boundingBox.min.c.x[0] == - MATH_HUGE_DOUBLE)
+    {
+        boundingBox.min.c.x[0] = - MATH_HUGE_FLOAT;
+        boundingBox.min.c.x[1] = - MATH_HUGE_FLOAT;
+        boundingBox.min.c.x[2] = - MATH_HUGE_FLOAT;
+        boundingBox.max.c.x[0] = MATH_HUGE_FLOAT;
+        boundingBox.max.c.x[1] = MATH_HUGE_FLOAT;
+        boundingBox.max.c.x[2] = MATH_HUGE_FLOAT;
+    }
+
+    bounds_o->lower_x = (float) boundingBox.min.c.x[0];
+    bounds_o->lower_y = (float) boundingBox.min.c.x[1];
+    bounds_o->lower_z = (float) boundingBox.min.c.x[2];
+    bounds_o->upper_x = (float) boundingBox.max.c.x[0];
+    bounds_o->upper_y = (float) boundingBox.max.c.x[1];
+    bounds_o->upper_z = (float) boundingBox.max.c.x[2];
+
+#ifdef EMBREE_DEBUG_PRINT
+    printf("added bounding box to embree\n");
+    printf("object box - min x: %f\n", bounds_o->lower_x);
+    printf("object box - min y: %f\n", bounds_o->lower_y);
+    printf("object box - min z: %f\n", bounds_o->lower_z);
+    printf("object box - max x: %f\n", bounds_o->upper_x);
+    printf("object box - max y: %f\n", bounds_o->upper_y);
+    printf("object box - max z: %f\n", bounds_o->upper_z);
+#endif
+}
+
+
+
+
+// ================================================================ //
+//              Embree callback functions                           //
+// ================================================================ //
+
+// intersection callback function
+void embree_intersect_geometry(const int * valid,
+                               void * geometryUserPtr,
+                               unsigned int geomID,
+                               unsigned int instID,
+                               struct RTCRay * rtc_ray,
+                               struct RTCHit * rtc_hit)
+{
+    if(!valid[0])
+        return;
+
+    // retreive raycaster and geometry data
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+    ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
+    UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
+
+    // handling prior non-user-geometry intersections
+    /*
+    if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
+        RTCGeometry previouslyHitGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
+
+        if(!rayCaster->intersectionListHead)
+        {
+            ArIntersectionList prevIntersectionList = ARINTERSECTIONLIST_EMPTY;
+            rayCaster->state = geometryData->_traversalState;
+            rayCaster->surfacepoint_test_shape = (ArNode<ArpShape> *)geometryData->_shape;
+
+            arintersectionlist_init_1(
+                    &prevIntersectionList,
+                    rtc_ray->tfar,
+                    0,
+                    arface_on_shape_is_planar,
+                    NULL,
+                    rayCaster);
+
+            prevIntersectionList.head->embreeShapeUserGeometry = NO;
+
+            [rayCaster addIntersectionToIntersectionLinkedList :NULL : prevIntersectionList];
+
+            rayCaster->surfacepoint_test_shape = NULL;
+        }
+    }
+     */
+
+    // perform the intersection
+    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
+    [geometryData->_combinedAttributes_or_csg_node
+            getIntersectionList
+            : rayCaster
+            : RANGE( ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
+            : &intersectionList
+    ];
+
+    // if no intersection is found, return
+    if(!intersectionList.head) {
+        return;
+    }
+
+    // update embree components
+    rtc_ray->tfar = (float) intersectionList.head->t;
+    rtc_hit->geomID = geomID;
+    rtc_hit->primID = 0;
+
+    // set intersection list
+    intersectionList.head->embreeShapeUserGeometry = YES;
+    [rayCaster addIntersectionToIntersectionLinkedList :geometryData->_combinedAttributes_or_csg_node : intersectionList];
+}
+
+void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {
+    struct RTCRayHit * rayHit = (struct RTCRayHit *) args->rayhit;
+    embree_intersect_geometry(
+            args->valid, args->geometryUserPtr, args->geomID,
+            args->context->instID[0], &rayHit->ray,
+            &rayHit->hit);
+}
+
+void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
+    embree_intersect_geometry(
+            args->valid, args->geometryUserPtr, args->geomID,
+            args->context->instID[0], (struct RTCRay *) args->ray,
+            NULL);
+}
 
 @implementation ArnEmbree
 
@@ -61,8 +208,69 @@ static ArnEmbree * embreeManager;
     return EMBREE_ENABLED;
 }
 
+// return the ArnEmbree singleton
 + (ArnEmbree *) embreeManager {
     return embreeManager;
+}
+
+- (RTCDevice) getDevice {
+    return device;
+}
+- (RTCScene) getScene {
+    return scene;
+}
+- (void) setDevice: (RTCDevice) newDevice {
+    device = newDevice;
+}
+
+- (void) setScene: (RTCScene) newScene {
+    scene = newScene;
+}
+
+- (void) increaseRayCasterCount {
+    numRayCaster++;
+}
+
+- (int) getRayCasterCount {
+    return numRayCaster;
+}
+
+- (int) setRayCasterCount : (int) value {
+    numRayCaster = value;
+}
+
+// commiting the embree scene and triggering
+// the build of embree's built-in BVHs
++ (void) commitScene {
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+
+    rtcCommitScene([embree getScene]);
+    rtcSetSceneFlags([embree getScene], RTC_SCENE_FLAG_COMPACT);
+}
+
+- (void) addedCSGNodeToEmbree: (BOOL) b {
+    currentCSGGeometryAdded = b;
+}
+
+- (BOOL) csgNodeIsAdded {
+    return currentCSGGeometryAdded;
+}
+
+- (void) initializeEmptyGeometryList {
+    userGeometryListHead = NULL;
+}
+
+- (void) freeGeometryDataList {
+
+    UserGeometryDataList * iteratorNode = userGeometryListHead;
+    UserGeometryDataList * next;
+
+    while( iteratorNode ) {
+        next = iteratorNode->next;
+        free(iteratorNode->data);
+        free(iteratorNode);
+        iteratorNode = next;
+    }
 }
 
 - (void) addToUserGeometryList : (UserGeometryData *) data {
@@ -95,65 +303,6 @@ static ArnEmbree * embreeManager;
         }
         iteratorNode = iteratorNode->next;
     }
-}
-
-- (void) setDevice: (RTCDevice) newDevice {
-    device = newDevice;
-}
-
-- (void) setScene: (RTCScene) newScene {
-    scene = newScene;
-}
-
-- (void) increaseRayCasterCount {
-    numRayCaster++;
-}
-
-- (int) getRayCasterCount {
-    return numRayCaster;
-}
-
-- (int) setRayCasterCount : (int) value {
-    numRayCaster = value;
-}
-
-- (void) initializeEmptyGeometryList {
-    // userGeometryList = ARLIST_EMPTY;
-    userGeometryListHead = NULL;
-}
-
-- (void) initRayCasterIntersectionArray
-        : (ArnRayCaster *) rayCaster
-{
-
-}
-
-- (void) freeGeometryDataList {
-
-    UserGeometryDataList * iteratorNode = userGeometryListHead;
-    UserGeometryDataList * next;
-
-    while( iteratorNode ) {
-        next = iteratorNode->next;
-        free(iteratorNode->data);
-        free(iteratorNode);
-        iteratorNode = next;
-    }
-}
-
-
-+ (void) cleanUp {
-    ArnEmbree * embree = [ArnEmbree embreeManager];
-
-    if(!embree)
-        return;
-
-    [embree freeGeometryDataList];
-
-    rtcReleaseScene([embree getScene]);
-    rtcReleaseDevice([embree getDevice]);
-
-    [embree release];
 }
 
 // initialize singleton ArnEmbree object
@@ -199,26 +348,78 @@ static ArnEmbree * embreeManager;
     }
 }
 
-- (RTCDevice) getDevice {
-    return device;
-}
-- (RTCScene) getScene {
-    return scene;
+- (void) clearRayCasterIntersectionList: (ArnRayCaster *) rayCaster {
+
+    if(!rayCaster->intersectionListHead)
+        return;
+
+    // delete linked list entries
+    IntersectionLinkedListNode * iteratorNode = rayCaster->intersectionListHead;
+    IntersectionLinkedListNode * next;
+    while( iteratorNode ) {
+        next = iteratorNode->next;
+        arintersectionlist_free_contents(&iteratorNode->intersectionList,
+                                         rayCaster->rayIntersectionFreelist);
+        free(iteratorNode);
+        iteratorNode = next;
+    }
+    rayCaster->intersectionListHead = NULL;
 }
 
-- (void) addedCSGNodeToEmbree: (BOOL) b {
-    currentCSGGeometryAdded = b;
-}
+- (struct ArIntersectionList) extractClosestIntersectionList
+        : (ArnRayCaster *) rayCaster
+{
+    if( !rayCaster->intersectionListHead )
+        return ARINTERSECTIONLIST_EMPTY;
 
-- (BOOL) csgNodeIsAdded {
-    return currentCSGGeometryAdded;
-}
+    ArIntersectionList minimumList;
+    double min_t = MATH_HUGE_DOUBLE;
 
-+ (void) commitScene {
-    ArnEmbree * embree = [ArnEmbree embreeManager];
+    IntersectionLinkedListNode * minIntersectionNode = NULL;
 
-    rtcCommitScene([embree getScene]);
-    rtcSetSceneFlags([embree getScene], RTC_SCENE_FLAG_COMPACT);
+    // find minimum
+    IntersectionLinkedListNode * iteratorNode = rayCaster->intersectionListHead;
+    IntersectionLinkedListNode * prevIntersectionNode = NULL;
+
+    if(iteratorNode == rayCaster->intersectionListHead) {
+
+        if(iteratorNode->intersectionList.head->t <= min_t) {
+            minimumList = iteratorNode->intersectionList;
+            min_t = iteratorNode->intersectionList.head->t;
+            minIntersectionNode = iteratorNode;
+            prevIntersectionNode = NULL;
+        }
+
+    }
+
+    while( iteratorNode->next ) {
+
+        if(iteratorNode->next->intersectionList.head->t <= min_t) {
+            minimumList = iteratorNode->next->intersectionList;
+            min_t = iteratorNode->next->intersectionList.head->t;
+            minIntersectionNode = iteratorNode->next;
+            prevIntersectionNode = iteratorNode;
+        }
+
+        iteratorNode = iteratorNode->next;
+    }
+
+    // extract minimum node from linked list
+    if(minIntersectionNode == rayCaster->intersectionListHead) {
+        minimumList = rayCaster->intersectionListHead->intersectionList;
+        rayCaster->intersectionListHead = rayCaster->intersectionListHead->next;
+    }
+    else {
+        prevIntersectionNode->next = minIntersectionNode->next;
+    }
+
+    // free node
+    free(minIntersectionNode);
+
+
+    [self clearRayCasterIntersectionList: rayCaster];
+
+    return minimumList;
 }
 
 - (int) addGeometry: (RTCGeometry) newGeometry  {
@@ -227,6 +428,49 @@ static ArnEmbree * embreeManager;
     rtcReleaseGeometry(newGeometry);
 
     return (int) geomID;
+}
+
+// create a struct containing all the information that is needed
+// for user geometry ray casting and pass it as
+// user geometry pointer to the corresponding embree geometry
+- (void) setGeometryUserData
+        : (RTCGeometry) thisGeometry
+        : (ArNode *) shape
+        : (ArTraversalState *) traversalState
+        : (ArNode *) combinedAttributesOrCSGNode
+{
+    struct UserGeometryData * data = malloc(sizeof(struct UserGeometryData));
+
+    if( !data ) {
+        fprintf(stderr, "Unable to allocate memory for new user geometry data struct\n");
+        exit(-1);
+    }
+
+    if([shape isKindOfClass: [ArnShape class]]) {
+        if([shape isKindOfClass: [ArnTriangleMesh class]])
+            data->_isUserGeometry = NO;
+        else
+            data->_isUserGeometry = YES;
+    }
+
+    else if(([shape isKindOfClass: [ArnSimpleIndexedShape class]])) {
+        data->_isUserGeometry = NO;
+    }
+
+    else if([combinedAttributesOrCSGNode isKindOfClass:[ArnCSGsub class]]
+            || [combinedAttributesOrCSGNode isKindOfClass:[ArnCSGand class]]
+            || [combinedAttributesOrCSGNode isKindOfClass:[ArnCSGor class]])
+    {
+        data->_isUserGeometry = YES;
+    }
+
+    data->_shape = shape;
+    if(traversalState) data->_traversalState = *traversalState;
+    data->_combinedAttributes_or_csg_node = combinedAttributesOrCSGNode;
+
+    [self addToUserGeometryList: data];
+
+    rtcSetGeometryUserData(thisGeometry, (void *) data);
 }
 
 - (RTCGeometry) initEmbreeSimpleIndexedGeometry
@@ -385,275 +629,6 @@ static ArnEmbree * embreeManager;
     return embreeMesh;
 }
 
-// create a struct containing all the information that is needed
-// for user geometry ray casting and pass it as
-// user geometry pointer to the corresponding embree geometry
-- (void) setGeometryUserData
-        : (RTCGeometry) thisGeometry
-        : (ArNode *) shape
-        : (ArTraversalState *) traversalState
-        : (ArNode *) combinedAttributesOrCSGNode
-{
-    struct UserGeometryData * data = malloc(sizeof(struct UserGeometryData));
-
-    if( !data ) {
-        fprintf(stderr, "Unable to allocate memory for new user geometry data struct\n");
-        exit(-1);
-    }
-
-    if([shape isKindOfClass: [ArnShape class]]) {
-        if([shape isKindOfClass: [ArnTriangleMesh class]])
-            data->_isUserGeometry = NO;
-        else
-            data->_isUserGeometry = YES;
-    }
-
-    else if(([shape isKindOfClass: [ArnSimpleIndexedShape class]])) {
-        data->_isUserGeometry = NO;
-    }
-
-    else if([combinedAttributesOrCSGNode isKindOfClass:[ArnCSGsub class]]
-            || [combinedAttributesOrCSGNode isKindOfClass:[ArnCSGand class]]
-             || [combinedAttributesOrCSGNode isKindOfClass:[ArnCSGor class]])
-    {
-        data->_isUserGeometry = YES;
-    }
-
-    data->_shape = shape;
-    if(traversalState) data->_traversalState = *traversalState;
-    data->_combinedAttributes_or_csg_node = combinedAttributesOrCSGNode;
-
-    [self addToUserGeometryList: data];
-
-    rtcSetGeometryUserData(thisGeometry, (void *) data);
-}
-
-void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
-
-    if(!args->geometryUserPtr)
-        return;
-
-    const UserGeometryData * geometryData = (const UserGeometryData *) args->geometryUserPtr;
-    struct RTCBounds * bounds_o = args->bounds_o;
-
-    // calculate the bounding box
-    // _combinedAttributes_or_csg_node is the messenger because information
-    // about the transl, rot and scale is needed
-    Box3D boundingBox;
-    [geometryData->_combinedAttributes_or_csg_node getBBoxObjectspace: &boundingBox];
-
-    // special case:
-    // since embree is working with floats and ART with doubles
-    // the infinite sphere can't get hit by an embree way.
-    // this is a work-around for now
-    if([geometryData->_shape isKindOfClass: [ArnInfSphere class]]) {
-        boundingBox.min.c.x[0] = - MATH_HUGE_FLOAT;
-        boundingBox.min.c.x[1] = - MATH_HUGE_FLOAT;
-        boundingBox.min.c.x[2] = - MATH_HUGE_FLOAT;
-        boundingBox.max.c.x[0] = MATH_HUGE_FLOAT;
-        boundingBox.max.c.x[1] = MATH_HUGE_FLOAT;
-        boundingBox.max.c.x[2] = MATH_HUGE_FLOAT;
-    }
-
-    else if(boundingBox.max.c.x[0] == MATH_HUGE_DOUBLE &&
-            boundingBox.min.c.x[0] == - MATH_HUGE_DOUBLE)
-    {
-        boundingBox.min.c.x[0] = - MATH_HUGE_FLOAT;
-        boundingBox.min.c.x[1] = - MATH_HUGE_FLOAT;
-        boundingBox.min.c.x[2] = - MATH_HUGE_FLOAT;
-        boundingBox.max.c.x[0] = MATH_HUGE_FLOAT;
-        boundingBox.max.c.x[1] = MATH_HUGE_FLOAT;
-        boundingBox.max.c.x[2] = MATH_HUGE_FLOAT;
-    }
-
-    bounds_o->lower_x = (float) boundingBox.min.c.x[0];
-    bounds_o->lower_y = (float) boundingBox.min.c.x[1];
-    bounds_o->lower_z = (float) boundingBox.min.c.x[2];
-    bounds_o->upper_x = (float) boundingBox.max.c.x[0];
-    bounds_o->upper_y = (float) boundingBox.max.c.x[1];
-    bounds_o->upper_z = (float) boundingBox.max.c.x[2];
-
-#ifdef EMBREE_DEBUG_PRINT
-    printf("added bounding box to embree\n");
-    printf("object box - min x: %f\n", bounds_o->lower_x);
-    printf("object box - min y: %f\n", bounds_o->lower_y);
-    printf("object box - min z: %f\n", bounds_o->lower_z);
-    printf("object box - max x: %f\n", bounds_o->upper_x);
-    printf("object box - max y: %f\n", bounds_o->upper_y);
-    printf("object box - max z: %f\n", bounds_o->upper_z);
-#endif
-}
-static int callCount = 0;
-
-- (void) resetCount {
-    callCount = 0;
-}
-- (int) getCount {
-    return callCount;
-}
-
-- (void) increaseCount {
-    callCount += 1;
-}
-
-- (void) clearRayCasterIntersectionList: (ArnRayCaster *) rayCaster {
-
-    if(!rayCaster->intersectionListHead)
-        return;
-
-    // delete linked list entries
-    IntersectionLinkedListNode * iteratorNode = rayCaster->intersectionListHead;
-    IntersectionLinkedListNode * next;
-    while( iteratorNode ) {
-        next = iteratorNode->next;
-        arintersectionlist_free_contents(&iteratorNode->intersectionList,
-                                         rayCaster->rayIntersectionFreelist);
-        free(iteratorNode);
-        iteratorNode = next;
-    }
-    rayCaster->intersectionListHead = NULL;
-}
-
-- (struct ArIntersectionList) extractClosestIntersectionList
-        : (ArnRayCaster *) rayCaster
-{
-    if( !rayCaster->intersectionListHead )
-        return ARINTERSECTIONLIST_EMPTY;
-
-    ArIntersectionList minimumList;
-    double min_t = MATH_HUGE_DOUBLE;
-
-    IntersectionLinkedListNode * minIntersectionNode = NULL;
-
-    // find minimum
-    IntersectionLinkedListNode * iteratorNode = rayCaster->intersectionListHead;
-    IntersectionLinkedListNode * prevIntersectionNode = NULL;
-
-    if(iteratorNode == rayCaster->intersectionListHead) {
-
-        if(iteratorNode->intersectionList.head->t <= min_t) {
-            minimumList = iteratorNode->intersectionList;
-            min_t = iteratorNode->intersectionList.head->t;
-            minIntersectionNode = iteratorNode;
-            prevIntersectionNode = NULL;
-        }
-
-    }
-
-    while( iteratorNode->next ) {
-
-        if(iteratorNode->next->intersectionList.head->t <= min_t) {
-            minimumList = iteratorNode->next->intersectionList;
-            min_t = iteratorNode->next->intersectionList.head->t;
-            minIntersectionNode = iteratorNode->next;
-            prevIntersectionNode = iteratorNode;
-        }
-
-        iteratorNode = iteratorNode->next;
-    }
-
-    // extract minimum node from linked list
-    if(minIntersectionNode == rayCaster->intersectionListHead) {
-        minimumList = rayCaster->intersectionListHead->intersectionList;
-        rayCaster->intersectionListHead = rayCaster->intersectionListHead->next;
-    }
-    else {
-        prevIntersectionNode->next = minIntersectionNode->next;
-    }
-
-    // free node
-    free(minIntersectionNode);
-
-
-    [self clearRayCasterIntersectionList: rayCaster];
-
-    return minimumList;
-}
-
-
-// intersection callback function
-void embree_intersect_geometry(const int * valid,
-                               void * geometryUserPtr,
-                               unsigned int geomID,
-                               unsigned int instID,
-                               struct RTCRay * rtc_ray,
-                               struct RTCHit * rtc_hit)
-{
-    if(!valid[0])
-        return;
-
-    // retreive raycaster and geometry data
-    ArnEmbree * embree = [ArnEmbree embreeManager];
-    ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
-    UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
-
-    // handling prior non-user-geometry intersections
-    /*
-    if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
-        RTCGeometry previouslyHitGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
-
-        if(!rayCaster->intersectionListHead)
-        {
-            ArIntersectionList prevIntersectionList = ARINTERSECTIONLIST_EMPTY;
-            rayCaster->state = geometryData->_traversalState;
-            rayCaster->surfacepoint_test_shape = (ArNode<ArpShape> *)geometryData->_shape;
-
-            arintersectionlist_init_1(
-                    &prevIntersectionList,
-                    rtc_ray->tfar,
-                    0,
-                    arface_on_shape_is_planar,
-                    NULL,
-                    rayCaster);
-
-            prevIntersectionList.head->embreeShapeUserGeometry = NO;
-
-            [rayCaster addIntersectionToIntersectionLinkedList :NULL : prevIntersectionList];
-
-            rayCaster->surfacepoint_test_shape = NULL;
-        }
-    }
-     */
-
-    // perform the intersection
-    ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
-    [geometryData->_combinedAttributes_or_csg_node
-            getIntersectionList
-            : rayCaster
-            : RANGE( ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
-            : &intersectionList
-    ];
-
-    // if no intersection is found, return
-    if(!intersectionList.head) {
-        return;
-    }
-
-    // update embree components
-    rtc_ray->tfar = (float) intersectionList.head->t;
-    rtc_hit->geomID = geomID;
-    rtc_hit->primID = 0;
-
-    // set intersection list
-    intersectionList.head->embreeShapeUserGeometry = YES;
-    [rayCaster addIntersectionToIntersectionLinkedList :geometryData->_combinedAttributes_or_csg_node : intersectionList];
-}
-
-void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {
-    struct RTCRayHit * rayHit = (struct RTCRayHit *) args->rayhit;
-    embree_intersect_geometry(
-            args->valid, args->geometryUserPtr, args->geomID,
-            args->context->instID[0], &rayHit->ray,
-            &rayHit->hit);
-}
-
-void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
-    embree_intersect_geometry(
-            args->valid, args->geometryUserPtr, args->geomID,
-            args->context->instID[0], (struct RTCRay *) args->ray,
-            NULL);
-}
-
 // initialization of an embree geometry
 - (int) initEmbreeGeometry
         : (ArNode *) shape
@@ -706,6 +681,8 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     return geomID;
 }
 
+
+
 // does a linear search in the static raycaster array
 // and returns the raycaster object with the matching pthread id
 - (ArnRayCaster *) getRayCasterFromRayCasterArray {
@@ -718,7 +695,19 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
     rayCasterArray[key] = rayCaster;
 }
 
++ (void) cleanUp {
+    ArnEmbree * embree = [ArnEmbree embreeManager];
 
+    if(!embree)
+        return;
+
+    [embree freeGeometryDataList];
+
+    rtcReleaseScene([embree getScene]);
+    rtcReleaseDevice([embree getDevice]);
+
+    [embree release];
+}
 
 @end // ArnEmbree
 

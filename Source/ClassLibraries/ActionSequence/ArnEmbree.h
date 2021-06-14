@@ -107,15 +107,11 @@ UserGeometryDataList;
 // commits the scene during BSP tree creation
 + (void) commitScene;
 
-
 - (void) addedCSGNodeToEmbree: (BOOL) b;
 - (BOOL) csgNodeIsAdded;
 
-
-
 - (void) initializeEmptyGeometryList;
 - (void) freeGeometryDataList;
-
 
 - (void) clearRayCasterIntersectionList: (ArnRayCaster *) rayCaster;
 
@@ -125,6 +121,14 @@ UserGeometryDataList;
 
 // adds an RTCGeometry associated with a geometry to Embree
 - (int) addGeometry: (RTCGeometry) newGeometry;
+
+// creates a UserGeometryDataList for a geometry in question
+- (void) setGeometryUserData
+        : (RTCGeometry) newGeometry
+        : (ArNode *) shape
+        : (ArTraversalState *) traversalState
+        : (ArNode *) combinedAttributes
+;
 
 // initializes a simple indexed shape for Embree
 - (RTCGeometry) initEmbreeSimpleIndexedGeometry
@@ -154,13 +158,7 @@ UserGeometryDataList;
         : (ArNode *) trafo
         ;
 
-// creates a UserGeometryDataList for a geometry in question
-- (void) setGeometryUserData
-        : (RTCGeometry) newGeometry
-        : (ArNode *) shape
-        : (ArTraversalState *) traversalState
-        : (ArNode *) combinedAttributes
-        ;
+
 
 // retrieves and add a ArnRaycaster object to the raycaster array by
 // simple hashing
