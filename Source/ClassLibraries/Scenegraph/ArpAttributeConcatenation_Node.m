@@ -89,8 +89,10 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             if(![ ARNBINARY_SUBNODE_0 isKindOfClass: [ArnInfSphere class]]
                    &&  ![ ARNBINARY_SUBNODE_1 isKindOfClass: [ArnInfSphere class]])
             {
+                // feed CSG geometry to Embree
                 self->embreeGeomID = [embree initEmbreeCSGGeometry: self : &traversal->state];
 
+                // set flag to avoid feeding primitives of CSG geometry to Embree
                 embree->topmostCSGNode = self;
                 [embree addedCSGNodeToEmbree: YES];
             }
@@ -119,6 +121,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
 #if defined(ENABLE_EMBREE_SUPPORT)
+
+    // clear flags
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree *embree = [ArnEmbree embreeManager];
         if(embree->topmostCSGNode && embree->topmostCSGNode == self) {

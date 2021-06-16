@@ -632,9 +632,6 @@ int artist(
         }
     }
 
-    // debug
-    arcobjccoder_write_file( art_gv, &sceneGraph, "scenegraph_artist_m.art" );
-
 
 // =============================   PHASE 5   =================================
 //

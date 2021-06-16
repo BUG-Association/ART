@@ -390,10 +390,10 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // at the first call of 'getIntersectionListWithEmbree'
     // add this ray caster object to the static ray caster array
     // using gettid() as key
-    if(!self->rayCasterAddedToEmbreeArray) {
+    if(!self->addedToEmbreeArray) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
         [embree addRayCasterToRayCasterArray :self];
-        self->rayCasterAddedToEmbreeArray = YES;
+        self->addedToEmbreeArray = YES;
     }
 
     // self->embreeIntersectionList = &ARINTERSECTIONLIST_EMPTY;
@@ -584,7 +584,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
         embreeRTCSceneCopy = [embree getScene];
-        self->rayCasterAddedToEmbreeArray = NO;
+        self->addedToEmbreeArray = NO;
         self->intersectionListHead = NULL;
         [embree increaseRayCasterCount];
     }

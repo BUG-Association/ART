@@ -138,6 +138,7 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
 {
 #if defined(ENABLE_EMBREE_SUPPORT)
     unsigned int embreeGeomID;
+    ArNode * internalBSPTree;
 #endif
 
     ArNodeRef  subnodeRefArray[2];

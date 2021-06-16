@@ -54,6 +54,9 @@ ArHashedMailboxEntry;
 
 #if defined(ENABLE_EMBREE_SUPPORT)
 
+// linked list node struct. the linked list is used
+// to store collected intersection list optained via
+// embree
 typedef struct IntersectionLinkedListNode {
     struct ArIntersectionList intersectionList;
     // AraCombinedAttributes * combinedAttributes;
@@ -105,7 +108,7 @@ IntersectionLinkedListNode;
 //----------------------------------------------------------------//
     RTCScene embreeRTCSceneCopy;
 
-    BOOL rayCasterAddedToEmbreeArray;
+    BOOL addedToEmbreeArray;
 
     IntersectionLinkedListNode * intersectionListHead;
 #endif

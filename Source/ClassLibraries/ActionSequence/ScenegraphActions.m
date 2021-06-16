@@ -417,6 +417,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetISRAction)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCollectLeafNodeBBoxesAction)
 
+
 - (void) performOn
         : (ArNode <ArpNodeStack> *) nodeStack
 {
@@ -496,6 +497,20 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
 - (void) performOn
         : (ArNode <ArpNodeStack> *) nodeStack
 {
+#if defined(ENABLE_EMBREE_SUPPORT)
+    // if embree is enabled, all we have to do is
+    // to commit the embree-scene containing the
+    // embree-geometries (which should be done until
+    // now), so embree builds its own internal
+    // ray-acceleration-structures and we are done ...
+    if([ArnEmbree embreeEnabled]) {
+
+        [ArnEmbree commitScene];
+
+        return;
+    }
+#endif
+
     ArNodeRef  node_Ref_Scene  = [ nodeStack pop ];
 
     ART_ERRORHANDLING_MANDATORY_ARPROTOCOL_CHECK(
@@ -507,40 +522,6 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
         (ArNode <ArpWorld> *)ARNODEREF_POINTER(node_Ref_Scene);
 
     ArNode  * sceneGeometry = [ worldNode scene ];
-
-#if defined(ENABLE_EMBREE_SUPPORT)
-    // if embree is enabled, all we have to do is
-    // to commit the embree-scene containing the
-    // embree-geometries (which should be done until
-    // now), so embree builds its own internal
-    // ray-acceleration-structures and we are done ...
-    if([ArnEmbree embreeEnabled]) {
-        /*
-        [ REPORTER beginTimedAction
-        :   "building embree ray acceleration structure"
-        ];
-         */
-
-        // [ArnEmbree setCSGTreeNode: sceneGeometry];
-
-
-        [ArnEmbree commitScene];
-
-        // [ REPORTER endAction];
-
-        /*
-        [ nodeStack push
-        :   node_Ref_Scene
-        ];
-
-        RELEASE_NODE_REF( node_Ref_Scene );
-
-        // TODO: [Sebastian] check if native bsp tree has to be build or not
-        // return;
-
-         */
-    }
-#endif
 
     ArNodeRef  node_Ref_BBoxes  = [ nodeStack pop ];
 

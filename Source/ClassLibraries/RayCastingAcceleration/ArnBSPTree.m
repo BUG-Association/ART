@@ -1621,7 +1621,6 @@ void getLeafArrayIntersectionList_UseOpTree(
         )
 {
     // mark the leaf nodes for the operation tree.
-
     for( int i = 0; i < SGLPARRAY_N(*leafArray); i++ )
     {
         setActive(
@@ -1629,6 +1628,9 @@ void getLeafArrayIntersectionList_UseOpTree(
               rayCaster->activeNodes,
               opArray
             );
+
+        // debug
+        printf("shape ref is %s\n", [[SGLPARRAY_I(*leafArray,i)->shapeRef.reference className] UTF8String]);
     }
 }
 
@@ -1996,6 +1998,10 @@ void intersectRayWithBSPTree_UseOpTree(
         Range range_of_t
         )
 {
+    // debug
+    // _bspTree_debugprintf(bspTree, bspTree, 1);
+
+
 #ifdef WITH_RSA_STATISTICS
     *traversalSteps = 0;
     *intersectionTests = 0;
@@ -2091,6 +2097,7 @@ void intersectRayWithBSPTree_UseOpTree(
         
         ArSGLPArray  * leafNodeShapeArray =
             & scenegraphLeafArray[ BSP_NODE_LEAF_INDEX(*node) ];
+
 
         if ( SGLPARRAY_N(*leafNodeShapeArray) > 0 )
         {

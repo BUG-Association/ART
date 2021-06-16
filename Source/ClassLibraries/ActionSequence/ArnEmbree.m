@@ -662,7 +662,7 @@ static ArnEmbree * embreeManager;
     return geomID;
 }
 
--(unsigned) initEmbreeCSGGeometry
+- (unsigned) initEmbreeCSGGeometry
         : (ArNode *) csgNode
         : (ArTraversalState *) traversalState
 {
@@ -671,6 +671,8 @@ static ArnEmbree * embreeManager;
     rtcSetGeometryIntersectFunction(newGeometry, embree_intersect);
     rtcSetGeometryOccludedFunction(newGeometry, embree_occluded);
     rtcSetGeometryUserPrimitiveCount(newGeometry, 1);
+
+    
 
     int geomID = [self addGeometry: newGeometry];
     [self setGeometryUserData: newGeometry :NULL :traversalState :csgNode];
