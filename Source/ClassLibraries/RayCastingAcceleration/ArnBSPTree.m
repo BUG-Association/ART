@@ -1426,7 +1426,6 @@ void bspTree_debugprintf(
             :   HARD_NODE_REFERENCE(operationTree)
             ];
 
-
     if ( self )
     {
         //   Fail if we are not given something that we could
@@ -1628,9 +1627,6 @@ void getLeafArrayIntersectionList_UseOpTree(
               rayCaster->activeNodes,
               opArray
             );
-
-        // debug
-        printf("shape ref is %s\n", [[SGLPARRAY_I(*leafArray,i)->shapeRef.reference className] UTF8String]);
     }
 }
 
@@ -2249,8 +2245,57 @@ void flagDebugPrint(ArnRayCaster* rayCaster, long size)
 
 #else // USE_ORIGINAL_SCENEGRAPH_FOR_RAYCASTING
 
+
     if( OPERATION_TREE )
     {
+
+
+#if defined(ENABLE_EMBREE_SUPPORT)
+
+        // If BSP ray casting is used with embree,
+        // there exist multiple bsp trees and multiple operation trees.
+        // So we have set up the active node flag array in the raycaster
+        // everytime we enter this function.
+        if([ArnEmbree embreeEnabled])
+        {
+            if( OPERATION_TREE )
+            {
+                // debug
+                // printf("OPERATION TREE is %p\n", OPERATION_TREE);
+
+                long size = [ OPERATION_TREE getOpNodeCount ];
+
+                if(rayCaster->activeNodes)
+                    FREE_ARRAY(rayCaster->activeNodes);
+
+                rayCaster->activeNodes = ALLOC_ARRAY( BOOL, size );
+
+                for( int i = 0; i < size; ++i)
+                {
+                    rayCaster->activeNodes[i] = NO;
+                }
+
+            }
+        }
+
+        else
+        {
+            //set up the active node flag array in the raycaster. If is not done jet.
+            if( !rayCaster->activeNodes )
+            {
+                long size = [ OPERATION_TREE getOpNodeCount ];
+
+                rayCaster->activeNodes = ALLOC_ARRAY( BOOL, size );
+
+                for( int i = 0; i < size; ++i)
+                {
+                    rayCaster->activeNodes[i] = NO;
+                }
+            }
+        }
+
+#else
+
         //set up the active node flag array in the raycaster. If is not done jet.
         if( !rayCaster->activeNodes )
         {
@@ -2263,6 +2308,11 @@ void flagDebugPrint(ArnRayCaster* rayCaster, long size)
                 rayCaster->activeNodes[i] = NO;
             }
         }
+
+#endif // ENABLE_EMBREE_SUPPORT
+
+        // debug
+        // printf("operation tree active nodes: %ld for bsp tree %p\n with raycaster %p\n", rayCaster->activeNodesSize, self, rayCaster);
 
         // if there is an operation tree to aid in combining the intersection
         // the slightly different intersection method gets called. Note that

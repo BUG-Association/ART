@@ -45,11 +45,6 @@ ART_MODULE_INTERFACE(ArnShape)
 {
 @public
     ArShapeGeometry  shapeGeometry;
-
-    // if embree is installed, this ID is needed
-    // to retrieve the embree geometry corresponding
-    // to this shape
-    int embreeGeomID;
 }
 
 

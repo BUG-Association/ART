@@ -31,6 +31,8 @@
 #import <RayCastingCommonMacros.h>
 #import <ARM_RayCasting.h>
 #import <unistd.h>
+#import "ArnLeafNodeBBoxCollection.h"
+#import "ArnBSPTree.h"
 
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
@@ -151,12 +153,32 @@ void embree_intersect_geometry(const int * valid,
 
     // perform the intersection
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
-    [geometryData->_combinedAttributes_or_csg_node
-            getIntersectionList
-            : rayCaster
-            : RANGE( ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
-            : &intersectionList
-    ];
+
+    if(!geometryData->_isCSGGeometry)
+    {
+        [geometryData->_combinedAttributes_or_csg_node
+                getIntersectionList
+                :rayCaster
+                :RANGE(ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
+                :&intersectionList
+        ];
+    }
+    else
+    {
+        ArnBinary * csgNode =
+                (ArnBinary *) geometryData->_combinedAttributes_or_csg_node;
+
+        ArnBSPTree * internalBSPTree = (ArnBSPTree *) csgNode->internalBSPTree;
+
+        [internalBSPTree
+                getIntersectionList
+                :rayCaster
+                :RANGE(ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
+                :&intersectionList
+        ];
+    }
+
+
 
     // if no intersection is found, return
     if(!intersectionList.head) {
@@ -213,6 +235,16 @@ static ArnEmbree * embreeManager;
     return embreeManager;
 }
 
++ (void) setArtGvForEmbree :(ART_GV *) pArtGv {
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+    embree->art_gv = pArtGv;
+}
+
++ (ART_GV *) getArtGvForEmbree {
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+    return embree->art_gv;
+}
+
 - (RTCDevice) getDevice {
     return device;
 }
@@ -256,6 +288,71 @@ static ArnEmbree * embreeManager;
     return currentCSGGeometryAdded;
 }
 
+- (void) createInternalBSPTreeForSingleCSGGeometry: (ArNode *) csgNode {
+
+    ArnBinary * csgNodeBinary = (ArnBinary *) csgNode;
+
+    // traversal
+    ArnGraphTraversal  * traversal =
+            [ ALLOC_INIT_OBJECT(ArnGraphTraversal) ];
+
+    //   Collect the BBoxes for the leaves.
+    ArnLeafNodeBBoxCollection  * leafNodeBBoxCollection =
+            [ ALLOC_INIT_OBJECT(ArnLeafNodeBBoxCollection) ];
+
+    ArnOperationTree  * operationTree =
+            [ ALLOC_INIT_OBJECT(ArnOperationTree) ];
+
+    // debug
+    // printf("created operation tree %p\n", operationTree);
+
+    [ csgNodeBinary collectLeafBBoxes
+            :   traversal
+            :   leafNodeBBoxCollection
+            :   operationTree
+    ];
+
+    //   Insert the bsp-tree
+    csgNodeBinary->internalBSPTree =
+            [ ALLOC_INIT_OBJECT(ArnBSPTree)
+                    :   HARD_NODE_REFERENCE(csgNodeBinary)
+                    :   leafNodeBBoxCollection
+                    :   operationTree
+            ];
+
+    csgNodeBinary->internalOpTree = operationTree;
+
+
+    //   Since the leafBBoxes node gets copied into the internal tree by
+    //   the bsp tree it can be released here.
+    RELEASE_OBJECT(leafNodeBBoxCollection);
+
+    RELEASE_OBJECT(traversal);
+}
+
++ (void) createInternalBSPTreeForAllCSGGeometries {
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+
+    UserGeometryDataList * iteratorNode = embree->userGeometryListHead;
+
+    while(iteratorNode) {
+        ArNode * combinedAttributes_or_csg_node =
+                iteratorNode->data->_combinedAttributes_or_csg_node;
+
+        if([combinedAttributes_or_csg_node isKindOfClass: [ArnBinary class]])
+        {
+            ArnBinary * topCSGNode = (ArnBinary *) combinedAttributes_or_csg_node;
+            if(!topCSGNode->internalBSPTree)
+            {
+                [embree createInternalBSPTreeForSingleCSGGeometry : topCSGNode];
+            }
+        }
+
+        iteratorNode = iteratorNode->next;
+    }
+
+}
+
 - (void) initializeEmptyGeometryList {
     userGeometryListHead = NULL;
 }
@@ -267,6 +364,16 @@ static ArnEmbree * embreeManager;
 
     while( iteratorNode ) {
         next = iteratorNode->next;
+
+        if([iteratorNode->data->_combinedAttributes_or_csg_node isKindOfClass: [ArnBinary class]]) {
+
+            ArnBinary * topMostCSGNode =
+                    (ArnBinary *) iteratorNode->data->_combinedAttributes_or_csg_node;
+
+            if (topMostCSGNode->internalBSPTree)
+                RELEASE_OBJECT(topMostCSGNode->internalBSPTree);
+        }
+
         free(iteratorNode->data);
         free(iteratorNode);
         iteratorNode = next;
@@ -306,7 +413,7 @@ static ArnEmbree * embreeManager;
 }
 
 // initialize singleton ArnEmbree object
-+ (void) initialize {
++ (void) initialize : (ART_GV *) newART_GV {
     if(!EMBREE_ENABLED)
         return;
 
@@ -314,6 +421,7 @@ static ArnEmbree * embreeManager;
     if(!isInitialized) {
         // create singleton object
         embreeManager = [[ArnEmbree alloc] init];
+        embreeManager->art_gv = newART_GV;
 
         // set up embree device
         if(![embreeManager getDevice]) {
@@ -447,14 +555,19 @@ static ArnEmbree * embreeManager;
     }
 
     if([shape isKindOfClass: [ArnShape class]]) {
-        if([shape isKindOfClass: [ArnTriangleMesh class]])
+        if([shape isKindOfClass: [ArnTriangleMesh class]]) {
             data->_isUserGeometry = NO;
-        else
+            data->_isCSGGeometry = NO;
+        }
+        else {
             data->_isUserGeometry = YES;
+            data->_isCSGGeometry = NO;
+        }
     }
 
     else if(([shape isKindOfClass: [ArnSimpleIndexedShape class]])) {
         data->_isUserGeometry = NO;
+        data->_isCSGGeometry = NO;
     }
 
     else if([combinedAttributesOrCSGNode isKindOfClass:[ArnCSGsub class]]
@@ -462,6 +575,7 @@ static ArnEmbree * embreeManager;
             || [combinedAttributesOrCSGNode isKindOfClass:[ArnCSGor class]])
     {
         data->_isUserGeometry = YES;
+        data->_isCSGGeometry = YES;
     }
 
     data->_shape = shape;
@@ -672,7 +786,7 @@ static ArnEmbree * embreeManager;
     rtcSetGeometryOccludedFunction(newGeometry, embree_occluded);
     rtcSetGeometryUserPrimitiveCount(newGeometry, 1);
 
-    
+    // printf("CSG geometry %p fed to Embree\n", csgNode);
 
     int geomID = [self addGeometry: newGeometry];
     [self setGeometryUserData: newGeometry :NULL :traversalState :csgNode];

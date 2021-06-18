@@ -69,6 +69,14 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
         : ArcObject
         < ArpNode >
 {
+#if defined(ENABLE_EMBREE_SUPPORT)
+@public
+    // if embree is installed, this ID is needed
+    // to retrieve the embree geometry corresponding
+    // to this shape
+    unsigned int embreeGeomID;
+#endif
+
     long  instanceID;
 }
 
@@ -137,10 +145,12 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
         : ArNode
 {
 #if defined(ENABLE_EMBREE_SUPPORT)
-    unsigned int embreeGeomID;
+@public
+    // internal bsp tree for CSG node
     ArNode * internalBSPTree;
-#endif
 
+    ArNode * internalOpTree;
+#endif
     ArNodeRef  subnodeRefArray[2];
 }
 

@@ -43,6 +43,7 @@ typedef struct UserGeometryData {
     ArTraversalState _traversalState;
     ArNode<ArpRayCasting> * _combinedAttributes_or_csg_node;
     BOOL _isUserGeometry;
+    BOOL _isCSGGeometry;
 }
 UserGeometryData;
 
@@ -93,8 +94,10 @@ UserGeometryDataList;
 + (BOOL) embreeEnabled;
 + (void) enableEmbree: (BOOL) enabled;
 
-
 - (void) addToUserGeometryList : (UserGeometryData *) data;
+
+// setup embree singleton
++ (void) initialize : (ART_GV *) newART_GV;
 
 // getter and setter
 - (void) setDevice: (RTCDevice) newDevice;
@@ -109,6 +112,8 @@ UserGeometryDataList;
 
 - (void) addedCSGNodeToEmbree: (BOOL) b;
 - (BOOL) csgNodeIsAdded;
+- (void) createInternalBSPTreeForSingleCSGGeometry: (ArNode *) csgNode;
++ (void) createInternalBSPTreeForAllCSGGeometries;
 
 - (void) initializeEmptyGeometryList;
 - (void) freeGeometryDataList;

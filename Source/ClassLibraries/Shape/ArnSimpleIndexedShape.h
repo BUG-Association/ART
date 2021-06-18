@@ -39,11 +39,6 @@ ART_MODULE_INTERFACE(ArnSimpleIndexedShape)
 
 @public
     ArLongArray indexTable;
-
-    // if embree is installed, this ID is needed
-    // to retrieve the embree geometry corresponding
-    // to this shape
-    int embreeGeomID;
 }
 
 - init

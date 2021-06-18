@@ -122,9 +122,10 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 #if defined(ENABLE_EMBREE_SUPPORT)
 
-    // clear flags
+    // add geometry to embree and clear flags
     if([ArnEmbree embreeEnabled]) {
-        ArnEmbree *embree = [ArnEmbree embreeManager];
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+
         if(embree->topmostCSGNode && embree->topmostCSGNode == self) {
             embree->topmostCSGNode = NULL;
             [embree addedCSGNodeToEmbree: NO];

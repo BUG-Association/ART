@@ -505,6 +505,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
     // ray-acceleration-structures and we are done ...
     if([ArnEmbree embreeEnabled]) {
 
+        // if there is any csg geometry in the scene
+        // create internal bsp trees for them
+        [ArnEmbree createInternalBSPTreeForAllCSGGeometries];
+
+        // commit the embree scene
         [ArnEmbree commitScene];
 
         return;

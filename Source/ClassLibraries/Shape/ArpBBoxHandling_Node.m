@@ -154,6 +154,10 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 :       (ArnLeafNodeBBoxCollection *) bboxCollection
 :       (ArnOperationTree*) opTree
 {
+
+        // debug
+        printf("this node is a %s\n", [[self className] UTF8String]);
+
         ART_ERRORHANDLING_FATAL_ERROR
         ( "collectLeafBBoxes called for abstract superclass ArNode" );
     //   Does nothing - as it should. Additions to the leaf node

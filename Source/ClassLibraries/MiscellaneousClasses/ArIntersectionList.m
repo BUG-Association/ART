@@ -847,7 +847,7 @@ void arintersectionlist_or_void(
     ARINTERSECTIONLIST_VALIDATE(combined_list);
 }
 
-static int count = 0;
+
 void arintersectionlist_and(
         ArIntersectionList  * left_list,
         ArIntersectionList  * right_list,

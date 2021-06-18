@@ -82,7 +82,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnActionSequence)
     return copiedInstance;
 }
 
-#define ACTIONSEQUENCE_DEBUGPRINTF
+// #define ACTIONSEQUENCE_DEBUGPRINTF
 
 - (void) performOn
         : (ArNode <ArpNodeStack> *) nodeStack

@@ -102,6 +102,9 @@ IntersectionLinkedListNode;
 
     BOOL                   * activeNodes;
 
+    // debug
+    long                     activeNodesSize;
+
 #if defined(ENABLE_EMBREE_SUPPORT)
 //----------------------------------------------------------------//
 //              embree related stuff                              //

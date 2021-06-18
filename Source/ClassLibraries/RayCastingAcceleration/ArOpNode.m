@@ -103,7 +103,8 @@ void intersect_sub(
         );
 
     // As said before leaving the method must set the active flag to false.
-    
+    // if(myId > rayCaster->activeNodesSize)
+       // printf("out of bounds - intersect_sub\n");
     rayCaster->activeNodes[myId] = NO;
 }
 
@@ -139,6 +140,11 @@ void intersect_and(
 
         // Get intersection list from right subnode, but only if it´s active
     ArIntersectionList rightIntersectionList = ARINTERSECTIONLIST_EMPTY;
+        /*
+        if( !rayCaster->activeNodes[second]) {
+            printf("actives nodes is null at index %d\n", second);
+        }
+        */
         if( rayCaster->activeNodes[second] )
         {
                 opNodeArray[second].intersectFunction(second,
@@ -170,6 +176,9 @@ void intersect_and(
                                                    );
 
         // As said before leaving the method must set the active flag to false.
+        // if(myId > rayCaster->activeNodesSize)
+           // printf("out of bounds - intersect_and\n");
+
         rayCaster->activeNodes[myId] = NO;
 }
 
@@ -238,6 +247,8 @@ void intersect_or(
                                                   );
 
         // As said before leaving the method must set the active flag to false.
+        // if(myId > rayCaster->activeNodesSize)
+           // printf("out of bounds - intersect_or\n");
         rayCaster->activeNodes[myId] = NO;
 }
 
@@ -282,6 +293,8 @@ void intersect_union(
         }
 
         // As said before leaving the method must set the active flag to false.
+        //if(myId > rayCaster->activeNodesSize)
+          //  printf("out of bounds - intersect_union\n");
         rayCaster->activeNodes[myId] = NO;
 }
 
@@ -331,6 +344,9 @@ void intersect_leaf(
         );
 
     // As said before leaving the method must set the active flag to false.
+    // if(myId > rayCaster->activeNodesSize)
+       // printf("out of bounds - intersect_leaf\n");
+
     rayCaster->activeNodes[myId] = NO;
 }
 

@@ -258,7 +258,7 @@ int artist(
     if ( [ embreeOpt hasBeenSpecified ]) {
 #if defined(ENABLE_EMBREE_SUPPORT)
         [ArnEmbree enableEmbree: YES];
-        [ArnEmbree initialize];
+        [ArnEmbree initialize: art_gv];
         printf("embree support enabled\n");
 #else
         printf("Warning: The scene cannot be rendered with Embree support since it seems that Embree is not installed.\n");
