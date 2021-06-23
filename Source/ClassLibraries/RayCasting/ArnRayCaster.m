@@ -754,7 +754,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     }
 
     newNode->intersectionList = list;
-    // newNode->combinedAttributes = combinedAttributes;
     newNode->next = NULL;
 
     if( !self->intersectionListHead ) {
@@ -762,6 +761,11 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         return;
     }
 
+    IntersectionLinkedListNode * previousHead = self->intersectionListHead;
+    newNode->next = previousHead;
+    self->intersectionListHead = newNode;
+
+    /*
     IntersectionLinkedListNode * head = self->intersectionListHead;
     IntersectionLinkedListNode * iteratorNode = head;
     while( true ) {
@@ -771,6 +775,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         }
         iteratorNode = iteratorNode->next;
     }
+     */
 }
 #endif
 

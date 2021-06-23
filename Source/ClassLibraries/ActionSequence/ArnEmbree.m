@@ -123,46 +123,24 @@ void embree_intersect_geometry(const int * valid,
     ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
     UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
 
-    // handling prior non-user-geometry intersections
-    /*
-    if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
-        RTCGeometry previouslyHitGeometry = rtcGetGeometry([embree getScene], rtc_hit->geomID);
-
-        if(!rayCaster->intersectionListHead)
-        {
-            ArIntersectionList prevIntersectionList = ARINTERSECTIONLIST_EMPTY;
-            rayCaster->state = geometryData->_traversalState;
-            rayCaster->surfacepoint_test_shape = (ArNode<ArpShape> *)geometryData->_shape;
-
-            arintersectionlist_init_1(
-                    &prevIntersectionList,
-                    rtc_ray->tfar,
-                    0,
-                    arface_on_shape_is_planar,
-                    NULL,
-                    rayCaster);
-
-            prevIntersectionList.head->embreeShapeUserGeometry = NO;
-
-            [rayCaster addIntersectionToIntersectionLinkedList :NULL : prevIntersectionList];
-
-            rayCaster->surfacepoint_test_shape = NULL;
-        }
-    }
-     */
-
     // perform the intersection
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
-    if(!geometryData->_isCSGGeometry)
-    {
+    // IMPORTANT: this is rendering the csg gemetry by using the original
+    // scene graph
+    // If rendering with the individual csg kd trees is desired,
+    // uncomment the if statement and the else body
+
+    // if(!geometryData->_isCSGGeometry)
+    // {
         [geometryData->_combinedAttributes_or_csg_node
                 getIntersectionList
                 :rayCaster
                 :RANGE(ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
                 :&intersectionList
         ];
-    }
+    // }
+    /*
     else
     {
         ArnBinary * csgNode =
@@ -177,8 +155,7 @@ void embree_intersect_geometry(const int * valid,
                 :&intersectionList
         ];
     }
-
-
+     */
 
     // if no intersection is found, return
     if(!intersectionList.head) {
@@ -372,6 +349,9 @@ static ArnEmbree * embreeManager;
 
             if (topMostCSGNode->internalBSPTree)
                 RELEASE_OBJECT(topMostCSGNode->internalBSPTree);
+
+            if (topMostCSGNode->internalOpTree)
+                RELEASE_OBJECT(topMostCSGNode->internalOpTree);
         }
 
         free(iteratorNode->data);
