@@ -568,17 +568,16 @@ int tonemap(
         }
         else
         {
-            #ifdef ART_WITH_OPENEXR
             if (   [ inputImage imageFileIsKindOf: [ ArfARTCSP class ] ]
                 || [ inputImage imageFileIsKindOf: [ ArfTIFF class ] ]
-                || [ inputImage imageFileIsKindOf: [ ArfOpenEXR class ] ] )
-            #else
-            if (   [ inputImage imageFileIsKindOf: [ ArfARTCSP class ] ]
-                || [ inputImage imageFileIsKindOf: [ ArfTIFF class ] ] )
-            #endif
+                #warning Handle properly different EXR formats
+            #ifdef ART_WITH_OPENEXR
+                || [ inputImage imageFileIsKindOf: [ ArfOpenEXRSpectral class ] ] 
+            #endif    
+            )
             {
                 #ifdef ART_WITH_OPENEXR
-                if ( [ inputImage imageFileIsKindOf: [ ArfOpenEXR class ] ] )
+                if ( [ inputImage imageFileIsKindOf: [ ArfOpenEXRSpectral class ] ] )
                     rawConversionAction =
                         [ IMAGECONVERSION_EXR_TO_ARTCSP
                             removeSource: NO

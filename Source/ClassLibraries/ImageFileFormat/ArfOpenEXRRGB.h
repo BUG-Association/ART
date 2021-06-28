@@ -27,38 +27,26 @@
 #include "ART_Foundation.h"
 #include <OpenEXRSettings.h>
 
-ART_MODULE_INTERFACE(ArfOpenEXR)
+ART_MODULE_INTERFACE(ArfOpenEXRRGB)
 
 #ifdef ART_WITH_OPENEXR
-#define WRITE_RGB_VERSION
 
 #import "ArfRAWRasterImage.h"
 
-#define ARFOPENEXR_EXTENSION     "exr"
+#define ARFOPENEXRRGB_EXTENSION     "exr"
 
 
-@interface ArfOpenEXR
-           : ArfRAWRasterImage
+@interface ArfOpenEXRRGB
+           : ArfRasterImage
 {
-    BOOL                        _writtingMode;
-    ArnImageInfo              * _imageInfo;
-    IVec2D                      _size;
-    int                         _spectralChannels;
-    BOOL                        _isSpectral;
+    BOOL                  _writtingMode;
+    ArnImageInfo        * _imageInfo;
+    IVec2D                _size;
+    ArDataType            _fileDataType;
     
-    float                      * _bufferRGBA;
-    float                      * _bufferGrey;
-
-    double                     * _wavelengths_nm;
-
-    float                      * _bufferS0;
-    float                      * _bufferS1;
-    float                      * _bufferS2;
-    float                      * _bufferS3;
-
-    ArReferenceFrame             _referenceFrame;
-    
-    ArLightAlpha              ** _scanline; // More convenient to have a single allocation
+    float               * _bufferRGB;
+    float               * _bufferGrey;
+    float               * _bufferAlpha;    
 }
 
 @end

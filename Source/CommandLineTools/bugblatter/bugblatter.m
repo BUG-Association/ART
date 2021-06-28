@@ -92,7 +92,8 @@ void readInputImageAndPlaceOnNodeStack(
         inputImage = (ArnFileImage *)imageFromStack;
     }
 #ifdef ART_WITH_OPENEXR
-    else if ( [ originalInputImage imageFileIsKindOf: [ArfOpenEXR class ] ] )
+#warning handle properly different OpenEXR files
+    else if ( [ originalInputImage imageFileIsKindOf: [ArfOpenEXRSpectral class ] ] )
     {
         char  * conversionMasterFilename = 0;
 

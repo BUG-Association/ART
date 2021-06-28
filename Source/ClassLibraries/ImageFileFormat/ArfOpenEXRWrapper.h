@@ -36,97 +36,193 @@ extern "C" {
 
 #include <unistd.h>
 
-/**
- * @brief Saves buffers to an EXR file.
- * 
- * @param filename Path the the file to save to.
- * @param width Image width.
- * @param height Image height.
- * @param rgba_buffer 
- *  RGBA buffer with channel for pixel `x`, `y` is at
- *  `rgba_buffer[4 * (y * width + x) + channel]`. If `NULL`, no RGBA data are
- *  written.
- * @param gray_buffer
- *  Luminance channel that may be contained in the EXR file.
- *  If `NULL`, no luminance data will be written.
- * @param spectral_buffers
- *  Array of 4 buffers, each carrying the values of a given Stokes vector.
- *  For RGBA only images, an array of NULL points can be set.
- *  For spectral non polarised image, the first buffer can be set, and the
- *  others set to `NULL`.
- *  The pixel x, y for s^th Stokes component at the n^th wavelength is at
- *  `spectral_buffers[s][n_spectralBands * (y * width + x) + n]`.
- * @param wavelengths_nm
- *  Sets the wavelengths values in nanometers corresponding to the spectral
- *  buffer provided.
- * @param n_spectralBands
- *  Number of spectral bands for spectral images. (# elements of
- *  `wavelenth_nm`).
- * @param metadata_keys Field neames for metadata.
- * @param metadata_values Field values for metadata.
- * @param n_metadata Number of metadata fields.
- */
-void saveEXR(
-    const char* filename,
-    int width, int height,
-    const float* rgba_buffer,
-    const float* chromaticities,
-    const float* gray_buffer,
-    const float* spectral_buffers[4],
-    const double wavelengths_nm[],
-    int n_spectralBands,
-    const char* metadata_keys[],
-    const char* metadata_values[],
-    size_t n_metadata);
+int isSpectralEXR(const char* filename);
+int isRGBEXR(const char* filename);
 
+/* ===========================================================================
+   OpenEXR RGB Read / Write wrapper functions
+   ======================================================================== */
 
 /**
- * @brief Read buffers from an EXR file.
+ * @brief Read buffers from a RGB OpenEXR file.
  * 
- * @param filename Path the the file to read from.
- * @param width Image width.
- * @param height Image height.
- * @param rgba_buffer 
- *  RGBA buffer with channel for pixel `x`, `y` is at
- *  `rgba_buffer[4 * (y * width + x) + channel]`. If `NULL`, no RGBA data were
- *  present.
- *  This is allocated by the function and shall then be freed by the caller.
- * @param gray_buffer
- *  Luminance channel that may be contained in the EXR file.
- *  If `NULL`, no luminance data yere present.
- *  This is allocated by the function and shall then be freed by the caller.
- * @param spectral_buffers
- *  Array of 4 buffers, each carrying the values of a given Stokes vector.
- *  For RGBA only images, an array of NULL points is set.
- *  For spectral non polarised image, the first buffer is set, and the
- *  others set to `NULL`.
- *  The pixel x, y for s^th Stokes component at the n^th wavelength is at
- *  `spectral_buffers[s][n_spectralBands * (y * width + x) + n]`.
- *  This is allocated by the function and shall then be freed by the caller.
- * @param wavelengths_nm
- *  Provides the wavelengths values in nanometers corresponding to the spectral
- *  buffer.
- *  This is allocated by the function and shall then be freed by the caller.
- * @param n_spectralBands
- *  Number of spectral bands of spectral image. (# elements of
- *  `wavelenth_nm`). Sets to 0 if non spectral. 
- * @param isPolarised 
- *  Sets to 1 if polarised, 0 otherwise
- * @param isEmissive
- *  Sets to 1 if the emissive layers were considered 0 if it was the reflective
- *  ones
- * @return int 
+ * @param filename 
+ *    Path the the file to save to.
+ * @param width 
+ *    Image width.
+ * @param height 
+ *    Image height.
+ * @param chromaticities
+ *     Chromaticities for the RGB values to write. Can be `NULL` if using the
+ *     default OpenEXR chromaticities (Rec. 709 a.k.a. sRGB).
+ * @param rgb_buffer 
+ *     RGB buffer with channel for pixel `x`, `y` is at
+ *     `rgb_buffer[3 * (y * width + x) + channel]`. 
+ *     This is allocated by the function and shall then be freed by the caller.
+ * @param gray_buffer 
+ *     Luminance (Y) buffer with channel for pixel `x`, `y` is at
+ *     `gray_buffer[y * width + x]`. 
+ *     This is allocated by the function and shall then be freed by the caller.
+ * @param alpha_buffer 
+ *     Alpha buffer with channel for pixel `x`, `y` is at
+ *     `alpha_buffer[y * width + x]`. 
+ *     This is allocated by the function and shall then be freed by the caller.
  */
-int readEXR(
+int readRGBOpenEXR(
     const char* filename,
     int* width, int* height,
-    float** rgb_buffer,
-    float** gray_buffer,
-    float** spectral_buffers[4],
-    double* wavelengths_nm[],
+    const float* chromaticities,
+    float** rgb_buffer,             // 3 float / px: R, G, B
+    float** gray_buffer,            // 1 float / px: Y
+    float** alpha_buffer            // 1 float / px: A
+);
+
+/**
+ * @brief Saves buffers to a RGB OpenEXR file.
+ * 
+ * @param filename
+ *    Path the the file to save to.
+ * @param width
+ *    Image width.
+ * @param height
+ *    Image height.
+ * @param metadata_keys
+ *     Field neames for metadata.
+ * @param metadata_values
+ *     Field values for metadata.
+ * @param n_metadata
+ *     Number of metadata fields.
+ * @param chromaticities
+ *     Chromaticities for the RGB values to be converted to. Can be `NULL` if
+ *     using the default OpenEXR chromaticities (Rec. 709 a.k.a. sRGB).
+ * @param rgb_buffer
+ *     RGB buffer with channel for pixel `x`, `y` is at
+ *     `rgb_buffer[3 * (y * width + x) + channel]`.
+ *     Set to `NULL` if no RGB data are provided in the file.
+ *     This is allocated by the function and shall then be freed by the caller.
+ * @param gray_buffer
+ *     Luminance (Y) buffer with channel for pixel `x`, `y` is at
+ *     `gray_buffer[y * width + x]`. 
+ *     Set to `NULL` if no luminance data are provided in the file.
+ *     This is allocated by the function and shall then be freed by the caller.
+ * @param alpha_buffer
+ *     Alpha buffer with channel for pixel `x`, `y` is at
+ *     `alpha_buffer[y * width + x]`. 
+ *     Set to `NULL` if no alpha data are provided in the file.
+ *     This is allocated by the function and shall then be freed by the caller.
+ */
+void writeRGBOpenEXR(
+    const char* filename,
+    int width, int height,
+    const char* metadata_keys[],
+    const char* metadata_values[],
+    size_t n_metadata,
+    const float* chromaticities,
+    const float* rgb_buffer,        // 3 float / px: R, G, B
+    const float* gray_buffer,       // 1 float / px: Y
+    const float* alpha_buffer       // 1 float / px: A
+);
+
+
+/* ===========================================================================
+   OpenEXR spectral Read / Write wrapper functions
+   ======================================================================== */
+
+/**
+ * @brief Read buffers from a spectral OpenEXR file.
+ * 
+ * @param filename
+ *     Path the the file to read from.
+ * @param width
+ *     Image width.
+ * @param height
+ *     Image height.
+ * @param n_spectralBands
+ *     Number of spectral bands of spectral image. (# elements of
+ *     `wavelenth_nm`). Sets to 0 if non spectral. 
+ * @param wavelengths_nm
+ *     Provides the wavelengths values in nanometers corresponding to the spectral
+ *     buffer.
+ *     This is allocated by the function and shall then be freed by the caller.
+ * @param isPolarised
+ *     Sets to 1 if polarised, 0 otherwise
+ * @param isEmissive
+ *     Sets to 1 if the emissive layers were considered 0 if it was the reflective
+ *     ones
+ * @param spectral_buffers
+ *     Array of 4 buffers, each carrying the values of a given Stokes vector.
+ *     For spectral non polarised image, the first buffer is set, and the
+ *     others set to `NULL`.
+ *     The pixel x, y for s^th Stokes component at the n^th wavelength is at
+ *     `spectral_buffers[s][n_spectralBands * (y * width + x) + n]`.
+ *     This is allocated by the function and shall then be freed by the caller.
+ * @return 1 if the operation succeed, 0 otherwise 
+ */
+int readSpectralOpenEXR(
+    const char* filename,
+    int* width, int* height,
     int* n_spectralBands,
+    double* wavelengths_nm[],
     int* isPolarised,
-    int* isEmissive);
+    int* isEmissive,
+    float** spectral_buffers[4], // {S0, S1, S2, S3}
+    float** alpha_buffer
+);
+
+/**
+ * @brief Saves buffers to a spectral OpenEXR file.
+ * 
+ * @param filename
+ *    Path the the file to save to.
+ * @param width
+ *    Image width.
+ * @param height
+ *    Image height.
+ * @param metadata_keys
+ *     Field neames for metadata.
+ * @param metadata_values
+ *     Field values for metadata.
+ * @param n_metadata
+ *     Number of metadata fields.
+ * @param wavelengths_nm
+ *     Sets the wavelengths values in nanometers corresponding to the spectral
+ *     buffer provided.
+ * @param n_spectralBands
+ *    Number of spectral bands for spectral images. 
+ *    (# elements of `wavelenth_nm`).
+  * @param chromaticities
+ *     Chromaticities for the RGB values to write. Can be `NULL` if using the
+ *     default OpenEXR chromaticities (Rec. 709 a.k.a. sRGB) or if no RGB
+ *     values are provided.
+ * @param spectral_buffers
+ *     Array of 4 buffers, each carrying the values of a given Stokes vector.
+ *     For spectral non polarised image, the first buffer can be set, and the
+ *     others set to `NULL`.
+ *     The pixel x, y for s^th Stokes component at the n^th wavelength is at
+ *     `spectral_buffers[s][n_spectralBands * (y * width + x) + n]`.
+ * @param rgb_buffer
+ *     RGB buffer with channel for pixel `x`, `y` is at
+ *     `rgb_buffer[3 * (y * width + x) + channel]`. 
+ *     If `NULL`, no RGB data are written.
+ * @param alpha_buffer
+ *     Alpha buffer with channel for pixel `x`, `y` is at
+ *     `alpha_buffer[y * width + x]`. 
+ *     If `NULL`, no alpha data are written.
+ */
+void writeSpectralOpenEXR(
+    const char* filename,
+    int width, int height,
+    const char* metadata_keys[],
+    const char* metadata_values[],
+    size_t n_metadata,
+    const double wavelengths_nm[],
+    int n_spectralBands,
+    const float* chromaticities,
+    const float* spectral_buffers[4],
+    const float* rgb_buffer,
+    const float* alpha_buffer
+);
+
 
 #ifdef __cplusplus
 }

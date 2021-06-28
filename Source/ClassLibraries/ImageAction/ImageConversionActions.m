@@ -864,7 +864,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
     [ self prepareForImageManipulation
         :   nodeStack
         :   [ ArfRAWRasterImage class ]
-        :   [ ArfOpenEXR class ]
+        :   [ ArfOpenEXRSpectral class ]
         ];
 
     if ( numberOfSourceImages > 1 )
@@ -1036,7 +1036,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
     [ self prepareForImageManipulation
         :   nodeStack
         :   [ ArfARTCSP class ]
-        :   [ ArfOpenEXR class ] ];
+        :   [ ArfOpenEXRRGB class ] ];
 
     if ( numberOfSourceImages > 1 )
         [ REPORTER beginTimedAction
@@ -1201,10 +1201,10 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
          kind of source image to expect, and what kind of result image
          we wish to create (in our case, ArfARTCSP and ArfTIFF).
     ---------------------------------------------------------------aw- */
-
+#warning double check if RGB or Spectral
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfOpenEXR class ]
+        :   [ ArfOpenEXRRGB class ]
         :   [ ArfARTCSP class ]
         ];
 
@@ -1364,7 +1364,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
     [ self prepareForImageManipulation
         :   nodeStack
         :   [ ArfARTGSC class ]
-        :   [ ArfOpenEXR class ]
+        :   [ ArfOpenEXRRGB class ]
         ];
 
     if ( numberOfSourceImages > 1 )

@@ -30,6 +30,9 @@
 #import "ART_ImageData.h"
 #import "ArnColourStandardImplementation.h"
 
+// TODO: remove
+#import "ART_ImageFileFormat.h"
+
 ART_MODULE_INITIALISATION_FUNCTION
 (
     [ ArnImageMap registerWithRuntime ];
@@ -108,13 +111,14 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
         // No need for uplifting
         isSpectral = YES;
 
+
         // TODO: Sanity check, show a warning if the image is emissive
         // ART_ERRORHANDLING_WARNING(
         //     "You are using an emissive image as a texture."
         //     );
         // }
     }
-
+    
     [ IMAGE_FILE getPlainImage
         :   IPNT2D( 0, 0 )
         :   ((ArnPlainImage *)sourceImageBuffer)

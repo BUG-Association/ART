@@ -43,16 +43,18 @@
 #include <ImfOutputFile.h>
 #include <ImfFrameBuffer.h>
 #include <ImfStandardAttributes.h>
+#include <ImfRgba.h>
+#include <ImfRgbaYca.h>
 #include <half.h>
 
 #define INTERNAL_ERROR -1
 
 enum SpectrumType {
-    UNDEFINED = 0, // 0b0000
-    REFLECTIVE = 2, // 0b0001
-    EMISSIVE = 4, // 0b0010
-    BISPECTRAL = 8 | REFLECTIVE, // 0b0101
-    POLARISED = 16 // 0b1000
+    UNDEFINED = 0,                  // 0b0000
+    REFLECTIVE = 2,                 // 0b0001
+    EMISSIVE = 4,                   // 0b0010
+    BISPECTRAL = 8 | REFLECTIVE,    // 0b0101
+    POLARISED = 16                  // 0b1000
 };
 
 inline SpectrumType operator|(SpectrumType a, SpectrumType b)
@@ -221,43 +223,390 @@ std::string getEmissiveChannelName(
 
 extern "C" {
 
-void saveEXR(
+int isSpectralEXR(const char* filename)
+{
+    Imf::InputFile file(filename);
+    const Imf::ChannelList& exrChannels = file.header().channels();
+
+    // Check if there is a spectral channel in the image
+    SpectrumType spectrumType = UNDEFINED;
+
+    for (Imf::ChannelList::ConstIterator channel = exrChannels.begin(); channel != exrChannels.end(); channel++) {
+        // Check if the channel is spectral or one of the RGBA channel
+        int polarisationComponent;
+        double wavelength_nm;
+        SpectrumType spectralChannel = getSpectralChannelType(channel.name(), polarisationComponent, wavelength_nm);
+
+        if (spectralChannel != SpectrumType::UNDEFINED) {
+           return 1;
+        }
+    }
+
+    return 0;
+}
+
+int isRGBEXR(const char* filename)
+{
+    Imf::InputFile file(filename);
+    const Imf::ChannelList& exrChannels = file.header().channels();
+
+    // Check if there is a spectral channel in the image
+    SpectrumType spectrumType = UNDEFINED;
+
+    bool hasR = false;
+    bool hasG = false;
+    bool hasB = false;
+    bool hasY = false;
+
+    for (Imf::ChannelList::ConstIterator channel = exrChannels.begin(); channel != exrChannels.end(); channel++) {
+        if (strcmp(channel.name(), "R") == 0)
+           hasR = true;
+        if (strcmp(channel.name(), "G") == 0)
+           hasG = true;
+        if (strcmp(channel.name(), "B") == 0)
+           hasB = true;
+        if (strcmp(channel.name(), "Y") == 0)
+           hasY = true;
+    }
+
+    return ((hasR && hasG && hasB) || hasY) ? 1 : 0;
+}
+
+
+
+/* ======================================================================== */
+/* OpenEXR RGB Read / Write wrapper functions
+/* ======================================================================== */
+
+
+int readRGBOpenEXR(
+    const char* filename,
+    int* width, int* height,
+    const float* chromaticities,
+    float** rgb_buffer,             // 3 float / px: R, G, B
+    float** gray_buffer,            // 1 float / px: Y
+    float** alpha_buffer)           // 1 float / px: A
+{
+    Imf::InputFile file(filename);
+
+    const Imf::Header& header = file.header();
+    const Imf::ChannelList& channels = header.channels();
+    const Imath::Box2i& dataWindow = header.dataWindow();
+
+    // -----------------------------------------------------------------------
+    // We determine the size of the image
+    // -----------------------------------------------------------------------
+
+    // TODO support for displayWindow
+    *width  = dataWindow.max.x - dataWindow.min.x + 1;
+    *height = dataWindow.max.y - dataWindow.min.y + 1;
+
+    // -----------------------------------------------------------------------
+    // Check if there is specific chromaticities
+    // -----------------------------------------------------------------------
+
+    const Imf::ChromaticitiesAttribute *c 
+        = header.findTypedAttribute<Imf::ChromaticitiesAttribute>(
+            "chromaticities");
+
+    Imf::Chromaticities fileChromaticities;
+
+    if (c != nullptr) {
+        fileChromaticities = c->value();
+    }
+
+    Imf::Chromaticities targetChromaticities;
+
+    if (chromaticities != nullptr) {
+        targetChromaticities = Imf::Chromaticities(
+            Imath::V2f(chromaticities[0], chromaticities[1]),
+            Imath::V2f(chromaticities[2], chromaticities[3]),
+            Imath::V2f(chromaticities[4], chromaticities[5]),
+            Imath::V2f(chromaticities[6], chromaticities[7])
+        );
+    }
+
+    // Handle custom chromaticities
+    Imath::M44f RGB_XYZ = Imf::RGBtoXYZ(fileChromaticities, 1.f);
+    Imath::M44f XYZ_RGB = Imf::XYZtoRGB(targetChromaticities, 1.f);
+
+    Imath::M44f conversionMatrix = RGB_XYZ * XYZ_RGB;
+
+    // -----------------------------------------------------------------------
+    // We determine the colour encoding type
+    // -----------------------------------------------------------------------
+    // Can be of types:
+    // - RGB or RGBA
+    // - Y or YA
+    // - YC or YCA
+
+    const Imf::Channel* channel_r = channels.findChannel("R");
+    const Imf::Channel* channel_g = channels.findChannel("G");
+    const Imf::Channel* channel_b = channels.findChannel("B");
+    const Imf::Channel* channel_a = channels.findChannel("A");
+
+    const Imf::Channel* channel_y = channels.findChannel("Y");
+    
+    const Imf::Channel* channel_ry = channels.findChannel("RY");
+    const Imf::Channel* channel_by = channels.findChannel("BY");
+
+    bool hasRGB = (channel_r != nullptr) && (channel_g != nullptr) && (channel_b != nullptr);
+    bool hasAlpha = (channel_a != nullptr);
+    bool hasLuminance = (channel_y != nullptr);
+    bool hasRYBY = (channel_ry != nullptr && channel_by != nullptr);
+
+    // -----------------------------------------------------------------------
+    // Allocate memory
+    // -----------------------------------------------------------------------
+
+    if (hasRGB || (hasRYBY && hasLuminance)) {
+        *rgb_buffer = (float*)calloc(3 * (*width) * (*height), sizeof(float));
+    } else if (hasLuminance) {
+        *gray_buffer = (float*)calloc((*width) * (*height), sizeof(float));
+    } else {
+        return -1;
+    }
+
+    if (hasAlpha) {
+        *alpha_buffer = (float*)calloc((*width) * (*height), sizeof(float));
+    }
+
+    // -----------------------------------------------------------------------
+    // Read the image
+    // -----------------------------------------------------------------------
+
+    if (hasRGB) {
+        Imf::FrameBuffer framebuffer;
+
+        Imf::Slice rSlice = Imf::Slice::Make(
+            Imf::PixelType::FLOAT,
+            &((*rgb_buffer)[0]),
+            dataWindow,
+            3 * sizeof(float),
+            3 * (*width) * sizeof(float));
+
+        Imf::Slice gSlice = Imf::Slice::Make(
+            Imf::PixelType::FLOAT,
+            &((*rgb_buffer)[1]),
+            dataWindow,
+            3 * sizeof(float),
+            3 * (*width) * sizeof(float));
+
+        Imf::Slice bSlice = Imf::Slice::Make(
+            Imf::PixelType::FLOAT,
+            &((*rgb_buffer)[2]),
+            dataWindow,
+            3 * sizeof(float),
+            3 * (*width) * sizeof(float));
+
+        framebuffer.insert("R", rSlice);
+        framebuffer.insert("G", gSlice);
+        framebuffer.insert("B", bSlice);
+
+        file.setFrameBuffer(framebuffer);
+        file.readPixels(dataWindow.min.y, dataWindow.max.y);
+
+        // Handle custom chromaticities
+        for (int y = 0; y < (*height); y++) {
+            for (int x = 0; x < (*width); x++) {
+                Imath::V3f rgb(
+                    (*rgb_buffer)[3 * (y * (*width) + x) + 0],
+                    (*rgb_buffer)[3 * (y * (*width) + x) + 1],
+                    (*rgb_buffer)[3 * (y * (*width) + x) + 2]);
+
+                rgb = rgb * conversionMatrix;
+
+                (*rgb_buffer)[3 * (y * (*width) + x) + 0] = std::max(0.f, rgb.x);
+                (*rgb_buffer)[3 * (y * (*width) + x) + 1] = std::max(0.f, rgb.y);
+                (*rgb_buffer)[3 * (y * (*width) + x) + 2] = std::max(0.f, rgb.z);
+            }
+        }
+
+    } else if (hasLuminance && !hasRYBY) {
+        Imf::FrameBuffer framebuffer;
+
+        Imf::Slice ySlice = Imf::Slice::Make(
+            Imf::PixelType::FLOAT,
+            &((*gray_buffer)[0]),
+            dataWindow,
+            sizeof(float),
+            (*width) * sizeof(float));
+
+        framebuffer.insert("Y", ySlice);
+
+        file.setFrameBuffer(framebuffer);
+        file.readPixels(dataWindow.min.y, dataWindow.max.y);
+    } else if (hasRYBY && hasLuminance) {
+        Imf::FrameBuffer framebuffer;
+
+        // We have to convert the Luminance Chroma to RGB
+        // This format is a bit perticular since it stores luminance
+        // and chrominance with a different resolution
+        float *yBuffer  = new float[(*width) * (*height)];
+        float *ryBuffer = new float[(*width) / 2 * (*height) / 2];
+        float *byBuffer = new float[(*width) / 2 * (*height) / 2];
+
+        Imf::Rgba *buff1 = new Imf::Rgba[(*width) * (*height)];
+        Imf::Rgba *buff2 = new Imf::Rgba[(*width) * (*height)];
+
+        Imf::Slice ySlice = Imf::Slice::Make(
+            Imf::PixelType::FLOAT,
+            &yBuffer[0],
+            dataWindow,
+            sizeof(float),
+            (*width) * sizeof(float));
+
+        Imf::Slice rySlice = Imf::Slice::Make(
+            Imf::PixelType::FLOAT,
+            &ryBuffer[0],
+            dataWindow,
+            sizeof(float),
+            (*width) / 2 * sizeof(float),
+            2,
+            2);
+
+        Imf::Slice bySlice = Imf::Slice::Make(
+            Imf::PixelType::FLOAT,
+            &byBuffer[0],
+            dataWindow,
+            sizeof(float),
+            (*width) / 2 * sizeof(float),
+            2,
+            2);
+
+        framebuffer.insert("Y", ySlice);
+        framebuffer.insert("RY", rySlice);
+        framebuffer.insert("BY", bySlice);
+
+        file.setFrameBuffer(framebuffer);
+        file.readPixels(dataWindow.min.y, dataWindow.max.y);
+
+        // Now, do the YrYbY -> RGB conversion
+        // Code from openexr-viewer
+
+        // Filling missing values for chroma in the image
+        // TODO: now, naive reconstruction.
+        // Use later Imf::RgbaYca::reconstructChromaHoriz and
+        // Imf::RgbaYca::reconstructChromaVert to reconstruct missing
+        // pixels
+        for (int y = 0; y < (*height); y++) {
+            for (int x = 0; x < (*width); x++) {
+                const float l = yBuffer[y * (*width) + x];
+                const float ry
+                    = ryBuffer[y / 2 * (*width) / 2 + x / 2];
+                const float by
+                    = byBuffer[y / 2 * (*width) / 2 + x / 2];
+
+                buff1[y * (*width) + x].r = ry;
+                buff1[y * (*width) + x].g = l;
+                buff1[y * (*width) + x].b = by;
+            }
+        }
+
+        Imath::V3f yw = Imf::RgbaYca::computeYw(fileChromaticities);
+
+        // Proceed to the YCA -> RGBA conversion
+        for (int y = 0; y < (*height); y++) {
+            Imf::RgbaYca::YCAtoRGBA(
+                yw,
+                (*width),
+                &buff1[y * (*width)],
+                &buff1[y * (*width)]);
+        }
+
+        // Fix over saturated pixels
+        for (int y = 0; y < (*height); y++) {
+            const Imf::Rgba *scanlines[3];
+
+            if (y == 0) {
+                scanlines[0] = &buff1[(y + 1) * (*width)];
+            } else {
+                scanlines[0] = &buff1[(y - 1) * (*width)];
+            }
+
+            scanlines[1] = &buff1[y * (*width)];
+
+            if (y == (*height) - 1) {
+                scanlines[2] = &buff1[(y - 1) * (*width)];
+            } else {
+                scanlines[2] = &buff1[(y + 1) * (*width)];
+            }
+
+            Imf::RgbaYca::fixSaturation(
+                yw,
+                (*width),
+                scanlines,
+                &buff2[y * (*width)]);
+        }
+
+        // Handle custom chromaticities
+        for (int y = 0; y < (*height); y++) {
+            for (int x = 0; x < (*width); x++) {
+                Imath::V3f rgb(
+                    buff2[y * (*width) + x].r,
+                    buff2[y * (*width) + x].g,
+                    buff2[y * (*width) + x].b);
+
+                rgb = rgb * conversionMatrix;
+
+                (*rgb_buffer)[3 * (y * (*width) + x) + 0] = rgb.x;
+                (*rgb_buffer)[3 * (y * (*width) + x) + 1] = rgb.y;
+                (*rgb_buffer)[3 * (y * (*width) + x) + 2] = rgb.z;
+            }
+        }
+
+        delete[] yBuffer;
+        delete[] ryBuffer;
+        delete[] byBuffer;
+        delete[] buff1;
+        delete[] buff2;
+    }
+
+    if (hasAlpha) {
+        Imf::FrameBuffer framebuffer;
+
+        Imf::Slice aSlice = Imf::Slice::Make(
+            Imf::PixelType::FLOAT,
+            &((*alpha_buffer)[0]),
+            dataWindow,
+            sizeof(float),
+            (*width) * sizeof(float));
+
+        framebuffer.insert("A", aSlice);
+
+        file.setFrameBuffer(framebuffer);
+        file.readPixels(dataWindow.min.y, dataWindow.max.y);
+    }
+
+    return 0;
+}
+
+
+void writeRGBOpenEXR(
     const char* filename,
     int width, int height,
-    const float* rgba_buffer,
-    const float* chromaticities,
-    const float* grey_buffer,
-    const float* spectral_buffers[4],
-    const double wavelengths_nm[],
-    int n_spectralBands,
     const char* metadata_keys[],
     const char* metadata_values[],
-    size_t n_metadata)
+    size_t n_metadata,
+    const float* chromaticities,
+    const float* rgb_buffer,        // 3 float / px: R, G, B
+    const float* gray_buffer,       // 1 float / px: Y
+    const float* alpha_buffer)      // 1 float / px: A
 {
-    Imf::Header exrHeader(width, height);
-
     // -----------------------------------------------------------------------
-    // Write metadata
+    // Write the metadata
     // -----------------------------------------------------------------------
 
-    // Format version
-    exrHeader.insert("spectralLayoutVersion", Imf::StringAttribute("1.0"));
-    
-    // Units
-    exrHeader.insert("emissiveUnits", Imf::StringAttribute("W.m^-2.sr^-1"));
-
-    // If it is a polarised image, specify its handedness
-    if (spectral_buffers[1] != NULL) {
-        exrHeader.insert("polarisationHandedness", Imf::StringAttribute("right"));
-    }
+    Imf::Header header(width, height);
 
     // ART metadata
     for (size_t i = 0; i < n_metadata; i++) {
         if (metadata_values[i] != NULL) {
-            exrHeader.insert(metadata_keys[i], Imf::StringAttribute(metadata_values[i]));
+            header.insert(metadata_keys[i], Imf::StringAttribute(metadata_values[i]));
         }
     }
 
+    // Chromaticities
     if (chromaticities != NULL) {
         Imf::Chromaticities exrChr = Imf::Chromaticities(
             Imath::V2f(chromaticities[0], chromaticities[1]),
@@ -265,78 +614,71 @@ void saveEXR(
             Imath::V2f(chromaticities[4], chromaticities[5]),
             Imath::V2f(chromaticities[6], chromaticities[7]));
 
-        addChromaticities(exrHeader, exrChr);
-        addAdoptedNeutral(exrHeader, exrChr.white);
+        addChromaticities(header, exrChr);
+        addAdoptedNeutral(header, exrChr.white);
     }
 
     // -----------------------------------------------------------------------
     // Write the pixel data
     // -----------------------------------------------------------------------
 
-    Imf::ChannelList& exrChannels = exrHeader.channels();
-
+    Imf::ChannelList& channels = header.channels();
+    
     // Layout framebuffer
-    Imf::FrameBuffer exrFrameBuffer;
+    Imf::FrameBuffer framebuffer;
     const Imf::PixelType compType = Imf::FLOAT;
 
     // Write RGB version
-    if (rgba_buffer != NULL) {
-        const std::array<std::string, 4> rgbaChannels = { "R", "G", "B", "A" };
-        const size_t xStrideRGB = sizeof(float) * 4;
+    if (rgb_buffer != NULL) {
+        const std::array<std::string, 4> rgbChannels = { "R", "G", "B" };
+        const size_t xStrideRGB = 3 * sizeof(float);
         const size_t yStrideRGB = xStrideRGB * width;
 
         for (size_t c = 0; c < 4; c++) {
-            exrChannels.insert(rgbaChannels[c], Imf::Channel(compType));
-            exrFrameBuffer.insert(rgbaChannels[c], Imf::Slice(compType, (char*)(&rgba_buffer[c]), xStrideRGB, yStrideRGB));
+            channels.insert(rgbChannels[c], Imf::Channel(compType));
+            framebuffer.insert(rgbChannels[c], Imf::Slice(compType, (char*)(&rgb_buffer[c]), xStrideRGB, yStrideRGB));
         }
     }
 
     // Write grey
-    if (grey_buffer != NULL) {
-        const size_t xStrideRGB = sizeof(float);
-        const size_t yStrideRGB = xStrideRGB * width;
-        exrChannels.insert("Y", Imf::Channel(compType));
-        exrFrameBuffer.insert("Y", Imf::Slice(compType, (char*)(grey_buffer), xStrideRGB, yStrideRGB));
+    if (gray_buffer != NULL) {
+        const size_t xStrideGray = sizeof(float);
+        const size_t yStrideGray = xStrideGray * width;
+        channels.insert("Y", Imf::Channel(compType));
+        framebuffer.insert("Y", Imf::Slice(compType, (char*)(gray_buffer), xStrideGray, yStrideGray));
     }
 
-    // Write spectral version
-    for (size_t s = 0; s < 4; s++) {
-        // We check if the Stokes component is populated
-        if (spectral_buffers[s] != NULL) {
-            const size_t xStride = sizeof(float) * n_spectralBands;
-            const size_t yStride = xStride * width;
-
-            for (size_t wl_idx = 0; wl_idx < n_spectralBands; wl_idx++) {
-                // Populate channel name
-                const std::string channelName = getEmissiveChannelName(s, wavelengths_nm[wl_idx]);
-                char* ptrS = (char*)(&spectral_buffers[s][wl_idx]);
-
-                exrChannels.insert(channelName, Imf::Channel(compType));
-                exrFrameBuffer.insert(channelName, Imf::Slice(compType, ptrS, xStride, yStride));
-            }
-        }
+    // Write Alpha
+    if (alpha_buffer != NULL) {
+        const size_t xStrideAlpha = sizeof(float);
+        const size_t yStrideAlpha = xStrideAlpha * width;
+        channels.insert("A", Imf::Channel(compType));
+        framebuffer.insert("A", Imf::Slice(compType, (char*)(alpha_buffer), xStrideAlpha, yStrideAlpha));
     }
 
-    Imf::OutputFile exrOut(filename, exrHeader);
-    exrOut.setFrameBuffer(exrFrameBuffer);
+    Imf::OutputFile exrOut(filename, header);
+    exrOut.setFrameBuffer(framebuffer);
     exrOut.writePixels(height);
 }
 
-int readEXR(
+
+/* ======================================================================== */
+/* OpenEXR spectral Read / Write wrapper functions
+/* ======================================================================== */
+
+int readSpectralOpenEXR(
     const char* filename,
     int* width, int* height,
-    float** rgba_buffer,
-    float** grey_buffer,
-    float** spectral_buffers[4],
-    double* wavelengths_nm[],
     int* n_spectralBands,
+    double* wavelengths_nm[],
     int* isPolarised,
-    int* isEmissive)
+    int* isEmissive,
+    float** spectral_buffers[4], // {S0, S1, S2, S3}
+    float** alpha_buffer)
 {
     // We ignore the reflective part for now since ART does not support it for
-    // now.
-
-    // TODO: Check for polarisation handedness
+    // now. (af)
+    // TODO: Check for polarisation handedness (af)
 
     Imf::InputFile exrIn(filename);
     const Imf::Header& exrHeader = exrIn.header();
@@ -352,8 +694,8 @@ int readEXR(
 
     std::array<std::vector<std::pair<double, std::string>>, 4> wavelengths_nm_S;
 
-    std::array<bool, 4> hasRGBAChannel = { false, false, false, false };
-    bool hasYChannel = false;
+    // Detect Alpha channel
+    bool hasAlphaChannel = false;
 
     for (Imf::ChannelList::ConstIterator channel = exrChannels.begin(); channel != exrChannels.end(); channel++) {
         // Check if the channel is spectral or one of the RGBA channel
@@ -403,25 +745,10 @@ int readEXR(
             //             wavelength_nm,
             //             channel.name()));
             // }
-        } else {
-            if (strcmp(channel.name(), "R") == 0) {
-                hasRGBAChannel[0] = true;
-            } else if (strcmp(channel.name(), "G") == 0) {
-                hasRGBAChannel[1] = true;
-            } else if (strcmp(channel.name(), "B") == 0) {
-                hasRGBAChannel[2] = true;
-            } else if (strcmp(channel.name(), "A") == 0) {
-                hasRGBAChannel[3] = true;
-            } else if (strcmp(channel.name(), "Y") == 0) {
-                hasYChannel = true;
-            }
+        } else if (strcmp(channel.name(), "A") == 0) {
+            hasAlphaChannel = true;
         }
     }
-
-    const bool hasSomeRGBAChannel = hasRGBAChannel[0]
-        || hasRGBAChannel[1]
-        || hasRGBAChannel[2]
-        || hasRGBAChannel[3];
 
     const int n_stokes_components = isPolarisedSpectrum(spectrumType) ? 4 : 1;
 
@@ -465,9 +792,8 @@ int readEXR(
 
     // Ensures everything is set to NULL: if no information is read, we shall
     // give back NULL pointers.
-    std::array<float*, 4> _spectral_buffers = { NULL, NULL, NULL, NULL };
-    float* _rgba_buffer = NULL;
-    float* _grey_buffer = NULL;
+    std::array<float*, 4> spectral_buffers_local = { NULL, NULL, NULL, NULL };
+    float* alpha_buffer_local = NULL;
 
     const size_t n_pixels = (*width) * (*height);
 
@@ -483,18 +809,13 @@ int readEXR(
         const size_t n_elems = (*n_spectralBands) * n_pixels;
 
         for (size_t s = 0; s < n_stokes_components; s++) {
-            _spectral_buffers[s] = (float*)calloc(n_elems, sizeof(float));
+            spectral_buffers_local[s] = (float*)calloc(n_elems, sizeof(float));
         }
     }
 
-    // Allocation of RGBA buffer if any of the channels is there
-    if (hasSomeRGBAChannel) {
-        const size_t n_elems = 4 * n_pixels;
-        _rgba_buffer = (float*)calloc(n_elems, sizeof(float));
-    }
-
-    if (hasYChannel) {
-        _grey_buffer = (float*)calloc(n_pixels, sizeof(float));
+    // Allocation of alpha buffer if the channels is there
+    if (hasAlphaChannel) {
+        alpha_buffer_local = (float*)calloc(n_pixels, sizeof(float));
     }
 
     // -----------------------------------------------------------------------
@@ -511,7 +832,7 @@ int readEXR(
 
         for (size_t s = 0; s < n_stokes_components; s++) {
             for (size_t wl_idx = 0; wl_idx < (*n_spectralBands); wl_idx++) {
-                char* ptrS = (char*)(&_spectral_buffers[s][wl_idx]);
+                char* ptrS = (char*)(&spectral_buffers_local[s][wl_idx]);
                 Imf::Slice slice = Imf::Slice::Make(compType, ptrS, exrDataWindow, xStride, yStride);
 
                 exrFrameBuffer.insert(wavelengths_nm_S[s][wl_idx].second, slice);
@@ -519,30 +840,13 @@ int readEXR(
         }
     }
 
-    // RGBA channels
-    if (hasSomeRGBAChannel) {
-        const std::array<std::string, 4> rgbaChannels = { "R", "G", "B", "A" };
-
-        for (size_t c = 0; c < 4; c++) {
-            const size_t xStride = 4 * sizeof(float);
-            const size_t yStride = xStride * (*width);
-
-            if (hasRGBAChannel[c]) {
-                char* ptrC = (char*)(&_rgba_buffer[c]);
-                Imf::Slice slice = Imf::Slice::Make(compType, ptrC, exrDataWindow, xStride, yStride);
-
-                exrFrameBuffer.insert(rgbaChannels[c], slice);
-            }
-        }
-    }
-
-    // Grey channel
-    if (hasYChannel) {
+    // Alpha channel
+    if (hasAlphaChannel) {
         const size_t xStride = sizeof(float);
         const size_t yStride = xStride * (*width);
-        Imf::Slice slice = Imf::Slice::Make(compType, (char*)_grey_buffer, exrDataWindow, xStride, yStride);
+        Imf::Slice slice = Imf::Slice::Make(compType, (char*)alpha_buffer_local, exrDataWindow, xStride, yStride);
 
-        exrFrameBuffer.insert("Y", slice);
+        exrFrameBuffer.insert("A", slice);
     }
 
     exrIn.setFrameBuffer(exrFrameBuffer);
@@ -550,14 +854,116 @@ int readEXR(
 
     // Gives back the references to the memory
     for (size_t s = 0; s < 4; s++) {
-        *(spectral_buffers[s]) = _spectral_buffers[s];
+        *(spectral_buffers[s]) = spectral_buffers_local[s];
     }
 
-    *rgba_buffer = _rgba_buffer;
-    *grey_buffer = _grey_buffer;
+    *alpha_buffer = alpha_buffer_local;
 
     return 0;
 }
+
+
+void writeSpectralOpenEXR(
+    const char* filename,
+    int width, int height,
+    const char* metadata_keys[],
+    const char* metadata_values[],
+    size_t n_metadata,
+    const double wavelengths_nm[],
+    int n_spectralBands,
+    const float* chromaticities,
+    const float* spectral_buffers[4],
+    const float* rgb_buffer,
+    const float* alpha_buffer)
+{
+    Imf::Header header(width, height);
+
+    // -----------------------------------------------------------------------
+    // Write metadata
+    // -----------------------------------------------------------------------
+
+    // Format version
+    header.insert("spectralLayoutVersion", Imf::StringAttribute("1.0"));
+    
+    // Units
+    header.insert("emissiveUnits", Imf::StringAttribute("W.m^-2.sr^-1"));
+
+    // If it is a polarised image, specify its handedness
+    if (spectral_buffers[1] != NULL) {
+        header.insert("polarisationHandedness", Imf::StringAttribute("right"));
+    }
+
+    // ART metadata
+    for (size_t i = 0; i < n_metadata; i++) {
+        if (metadata_values[i] != NULL) {
+            header.insert(metadata_keys[i], Imf::StringAttribute(metadata_values[i]));
+        }
+    }
+
+    if (chromaticities != NULL) {
+        Imf::Chromaticities exrChr = Imf::Chromaticities(
+            Imath::V2f(chromaticities[0], chromaticities[1]),
+            Imath::V2f(chromaticities[2], chromaticities[3]),
+            Imath::V2f(chromaticities[4], chromaticities[5]),
+            Imath::V2f(chromaticities[6], chromaticities[7]));
+
+        addChromaticities(header, exrChr);
+        addAdoptedNeutral(header, exrChr.white);
+    }
+
+    // -----------------------------------------------------------------------
+    // Write the pixel data
+    // -----------------------------------------------------------------------
+
+    Imf::ChannelList& channels = header.channels();
+
+    // Layout framebuffer
+    Imf::FrameBuffer framebuffer;
+    const Imf::PixelType compType = Imf::FLOAT;
+
+    // Write spectral version
+    for (size_t s = 0; s < 4; s++) {
+        // We check if the Stokes component is populated
+        if (spectral_buffers[s] != NULL) {
+            const size_t xStride = sizeof(float) * n_spectralBands;
+            const size_t yStride = xStride * width;
+
+            for (size_t wl_idx = 0; wl_idx < n_spectralBands; wl_idx++) {
+                // Populate channel name
+                const std::string channelName = getEmissiveChannelName(s, wavelengths_nm[wl_idx]);
+                char* ptrS = (char*)(&spectral_buffers[s][wl_idx]);
+
+                channels.insert(channelName, Imf::Channel(compType));
+                framebuffer.insert(channelName, Imf::Slice(compType, ptrS, xStride, yStride));
+            }
+        }
+    }
+
+    // Write RGB version
+    if (rgb_buffer != NULL) {
+        const std::array<std::string, 4> rgbChannels = { "R", "G", "B" };
+        const size_t xStrideRGB = sizeof(float) * 3;
+        const size_t yStrideRGB = xStrideRGB * width;
+
+        for (size_t c = 0; c < 4; c++) {
+            channels.insert(rgbChannels[c], Imf::Channel(compType));
+            framebuffer.insert(rgbChannels[c], Imf::Slice(compType, (char*)(&rgb_buffer[c]), xStrideRGB, yStrideRGB));
+        }
+    }
+
+    // Write Alpha
+    if (alpha_buffer != NULL) {
+        const size_t xStrideAlpha = sizeof(float);
+        const size_t yStrideAlpha = xStrideAlpha * width;
+        channels.insert("A", Imf::Channel(compType));
+        framebuffer.insert("A", Imf::Slice(compType, (char*)(alpha_buffer), xStrideAlpha, yStrideAlpha));
+    }
+
+    Imf::OutputFile exrOut(filename, header);
+    exrOut.setFrameBuffer(framebuffer);
+    exrOut.writePixels(height);
+}
+
 }
 
 #endif // ! ART_WITH_OPENEXR
