@@ -74,23 +74,50 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
     // Future shall implement Imf::IStream but try to avoid using
     // Objective-C++. So, a intermediate struct representation
     // shall be used. (af)
-    
-    const char* filename = [stream name];
+    // if ([stream respondToSelector:@selector(name)]) {
+        const char* filename = [stream name];
 
-    if (!filename) {
-        return arfiletypematch_impossible;
-    }
+        if (!filename) {
+            return arfiletypematch_impossible;
+        }
 
-    if (isSpectralEXR(filename) != 0 && isRGBEXR(filename) != 0) {
-        // We have a better option for such type of file
-        return arfiletypematch_weak;
-    } 
-    
-    if (isRGBEXR(filename) != 0) {
-        return arfiletypematch_exact;
-    } else {
-        return arfiletypematch_impossible;
+        if (isSpectralEXR(filename) != 0 && isRGBEXR(filename) != 0) {
+            // We have a better option for such type of file
+            return arfiletypematch_weak;
+        } 
+        
+        if (isRGBEXR(filename) != 0) {
+            return arfiletypematch_exact;
+        } else {
+            return arfiletypematch_impossible;
+        }
+    // } 
+
+    return arfiletypematch_impossible;
+}
+
+
+- (id) init
+{
+    self = [ super init ];
+
+    if (self) {
+        _bufferRGB   = NULL;
+        _bufferGrey  = NULL;
+        _bufferAlpha = NULL;
     }
+    
+    return self;
+}
+
+- (void) dealloc
+{
+    FREE_ARRAY(_bufferRGB);
+    FREE_ARRAY(_bufferGrey);  
+    FREE_ARRAY(_bufferAlpha);
+
+    [_imageInfo release];
+    [ super dealloc ];
 }
 
 
@@ -173,7 +200,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
             _fileDataType = ardt_grey;
         }
     } else {
-        ART_ERRORHANDLING_FATAL_ERROR("Could not read EXR file");
+        ART_ERRORHANDLING_FATAL_ERROR(
+            "No usable colour data is provided in the given OpenEXR file");
     }
 
     XC(_size) = width;
@@ -205,13 +233,13 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
         : (ArnPlainImage *) image
 {     
     if (_fileDataType == ardt_rgb) {
-        ArRGBA * scanline = ALLOC_ARRAY(ArRGB, XC(image->size));
+        ArRGB * scanline = ALLOC_ARRAY(ArRGB, XC(image->size));
 
         for ( long y = 0; y < YC(image->size); y++ ) {
             for ( long x = 0; x < XC(image->size); x++ ) {
-                ARRGBA_R(scanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 0];
-                ARRGBA_G(scanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 1];
-                ARRGBA_B(scanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 2];
+                ARRGB_R(scanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 0];
+                ARRGB_G(scanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 1];
+                ARRGB_B(scanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 2];
             }
 
             [ image setRGBRegion 
@@ -261,16 +289,15 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
 
         FREE_ARRAY(scanline);
     } else if (_fileDataType == ardt_grey_alpha) {
-        ArGrey * scanline = ALLOC_ARRAY(ArGrey, XC(image->size));
+        ArGreyAlpha * scanline = ALLOC_ARRAY(ArGreyAlpha, XC(image->size));
 
         for ( long y = 0; y < YC(image->size); y++ ) {
             for ( long x = 0; x < XC(image->size); x++ ) {
-                ARGREY_G(scanline[x]) = _bufferGrey [y * XC(_size) + x];
-                #warning TODO CHECK
-                // ARGREY_A(scanline[x]) = _bufferAlpha[y * XC(_size) + x];
+                ARGREYALPHA_G(scanline[x]) = _bufferGrey [y * XC(_size) + x];
+                ARGREYALPHA_A(scanline[x]) = _bufferAlpha[y * XC(_size) + x];
             }
 
-            [ image setGreyRegion 
+            [ image setGreyAlphaRegion 
                 :   IPNT2D(0, y)
                 :   IVEC2D(XC(image->size), 1)
                 :   scanline
@@ -333,8 +360,9 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
-    // TODO
     if (_fileDataType == ardt_rgb) {
+        ArRGB * scanline = ALLOC_ARRAY(ArRGB, XC(image->size));
+
         for ( long y = 0; y < YC(image->size); y++ )
         {
             const long targetY = y + YC(start);
@@ -342,11 +370,22 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
             [ image getRGBRegion
                 :   IPNT2D(0, y)
                 :   IVEC2D(XC(image->size), 1)
-                :   &_bufferRGB[3 * XC(image->size) * targetY]
+                :   scanline
                 :   0 ];
+
+            for ( long x = 0; x < XC(image->size); x++ )
+            {
+                _bufferRGB[3 * (XC(image->size) * targetY) + 0] = ARRGB_R(scanline[x]);
+                _bufferRGB[3 * (XC(image->size) * targetY) + 1] = ARRGB_G(scanline[x]);
+                _bufferRGB[3 * (XC(image->size) * targetY) + 2] = ARRGB_B(scanline[x]);
+            }
         }
+
+        FREE_ARRAY(scanline);
     } 
     else if (_fileDataType == ardt_rgba) {
+        ArRGBA * scanline = ALLOC_ARRAY(ArRGBA, XC(image->size));
+
         for ( long y = 0; y < YC(image->size); y++ )
         {
             const long targetY = y + YC(start);
@@ -354,127 +393,64 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
             [ image getRGBARegion
                 :   IPNT2D(0, y)
                 :   IVEC2D(XC(image->size), 1)
-                :   &_bufferRGB[3 * XC(image->size) * targetY]
+                :   scanline
                 :   0 ];
+
+            for ( long x = 0; x < XC(image->size); x++ )
+            {
+                _bufferRGB[3 * (XC(image->size) * targetY) + 0] = ARRGBA_R(scanline[x]);
+                _bufferRGB[3 * (XC(image->size) * targetY) + 1] = ARRGBA_G(scanline[x]);
+                _bufferRGB[3 * (XC(image->size) * targetY) + 2] = ARRGBA_B(scanline[x]);
+
+                _bufferAlpha[XC(image->size) * targetY] = ARRGBA_A(scanline[x]);
+            }
         }
+
+        FREE_ARRAY(scanline);
     }
+    else if (_fileDataType == ardt_grey) {
+        ArGrey * scanline = ALLOC_ARRAY(ArGrey, XC(image->size));
 
+        for ( long y = 0; y < YC(image->size); y++ )
+        {
+            const long targetY = y + YC(start);
 
-    // if ([image isKindOfClass: [ArnRGBImage class]]) {
-    //     printf("Source RGB detected\n");        fflush(stdout);
-    // } else if ([image isKindOfClass: [ArnRGBAImage class]]) {
-    //     printf("Source RGBA detected\n");        fflush(stdout);
-    // } else if ([image isKindOfClass: [ArnLightAlphaImage class]]) {
-    //     printf("Source LightAlpha detected\n");
-    //     fflush(stdout);
-        
-    //     ArSpectrum  * spc = spc_alloc( art_gv );
+            [ image getGreyRegion
+                :   IPNT2D(0, y)
+                :   IVEC2D(XC(image->size), 1)
+                :   scanline
+                :   0 ];
 
-    //     for ( long y = 0; y < YC(image->size); y++ )
-    //     {
-    //         const long targetY = y + YC(start);
+            for ( long x = 0; x < XC(image->size); x++ )
+            {
+                _bufferGrey[XC(image->size) * targetY] = ARGREY_G(scanline[x]);
+            }
+        }
 
-    //         [ ((ArnLightAlphaImage *)image) getLightAlphaRegion
-    //             :   IPNT2D(0, y)
-    //             :   IVEC2D(XC(image->size), 1)
-    //             :   _scanline
-    //             :   0 ];
-        
-            
-    //         if ( fileContainsPolarisationData ) {
-    //             ARREFFRAME_RF_I( _referenceFrame, 0 ) = VEC3D( 1.0, 0.0, 0.0 );
-    //             ARREFFRAME_RF_I( _referenceFrame, 1 ) = VEC3D( 0.0, 1.0, 0.0 );
-                            
-    //             for (long x = 0; x < XC(image->size); x++) {
-    //                 const long targetX = x + XC(start);
+        FREE_ARRAY(scanline);
+    }
+    else if (_fileDataType == ardt_grey_alpha) {  
+        ArGreyAlpha * scanline = ALLOC_ARRAY(ArGreyAlpha, XC(image->size));
 
-    //                 ArStokesVector  * sv = arstokesvector_alloc( art_gv );
+        for ( long y = 0; y < YC(image->size); y++ )
+        {
+            const long targetY = y + YC(start);
 
-    //                 arlightalpha_l_to_sv(
-    //                     art_gv,
-    //                     _scanline[ x ],
-    //                     sv
-    //                     );
+            [ image getGreyAlphaRegion
+                :   IPNT2D(0, y)
+                :   IVEC2D(XC(image->size), 1)
+                :   scanline
+                :   0 ];
 
-    //                 for (int c = 0; c < _spectralChannels; c++) {
-    //                     _bufferS0[_spectralChannels * (targetY * XC(_size) + targetX) + c] = spc_si( art_gv, ARSV_I( *sv, 0), c );
-    //                     _bufferS1[_spectralChannels * (targetY * XC(_size) + targetX) + c] = spc_si( art_gv, ARSV_I( *sv, 1), c );
-    //                     _bufferS2[_spectralChannels * (targetY * XC(_size) + targetX) + c] = spc_si( art_gv, ARSV_I( *sv, 2), c );
-    //                     _bufferS3[_spectralChannels * (targetY * XC(_size) + targetX) + c] = spc_si( art_gv, ARSV_I( *sv, 3), c );
-    //                 }
-                    
-    // #ifdef WRITE_RGB_VERSION
-    //                 ArRGBA  rgba;
-                    
-    //                 spc_to_rgba(
-    //                         art_gv,
-    //                         ARSV_I( *sv, 0),
-    //                     & rgba
-    //                     );
-                    
-    //                 _bufferRGBA[4 * (targetY * XC(_size) + targetX) + 0] = ARRGBA_R(rgba);
-    //                 _bufferRGBA[4 * (targetY * XC(_size) + targetX) + 1] = ARRGBA_G(rgba);
-    //                 _bufferRGBA[4 * (targetY * XC(_size) + targetX) + 2] = ARRGBA_B(rgba);
-    //                 _bufferRGBA[4 * (targetY * XC(_size) + targetX) + 3] = ARRGBA_A(rgba);
-    // #endif // WRITE_RGB_VERSION
-                    
-    //                 arstokesvector_free( art_gv, sv );
-    //             }
-    //         } else {
-    //             for (long x = 0; x < XC(image->size); x++) {
-    //                 const long targetX = x + XC(start);
+            for ( long x = 0; x < XC(image->size); x++ )
+            {
+                _bufferGrey [XC(image->size) * targetY] = ARGREYALPHA_G(scanline[x]);
+                _bufferAlpha[XC(image->size) * targetY] = ARGREYALPHA_A(scanline[x]);
+            }
+        }
 
-    //                 if ( fileDataType == ardt_rgba ) { // art_foundation_isr(art_gv) ?
-    //                     ArRGBA  rgba;
-
-    //                     arlightalpha_to_spc(
-    //                         art_gv,
-    //                         _scanline[x],
-    //                         spc
-    //                         );
-
-    //                     spc_to_rgba(
-    //                         art_gv,
-    //                         spc,
-    //                         & rgba
-    //                         );
-
-    //                     _bufferRGBA[4 * (targetY * XC(_size) + targetX) + 0] = ARRGBA_R(rgba);
-    //                     _bufferRGBA[4 * (targetY * XC(_size) + targetX) + 1] = ARRGBA_G(rgba);
-    //                     _bufferRGBA[4 * (targetY * XC(_size) + targetX) + 2] = ARRGBA_B(rgba);
-    //                     _bufferRGBA[4 * (targetY * XC(_size) + targetX) + 3] = ARRGBA_A(rgba);
-    //                 } else {
-    //                     arlightalpha_to_spc(
-    //                         art_gv,
-    //                         _scanline[x],
-    //                         spc
-    //                         );
-                        
-    //                     for ( int c = 0; c < _spectralChannels; c++ )
-    //                     {
-    //                         _bufferS0[_spectralChannels * (targetY * XC(_size) + targetX) + c] = spc_si( art_gv, spc, c );
-    //                     }
-    // #ifdef WRITE_RGB_VERSION
-    //                     ArRGBA  rgba;
-                        
-    //                     spc_to_rgba(
-    //                         art_gv,
-    //                         spc,
-    //                         & rgba
-    //                         );
-                        
-    //                     _bufferRGBA[4 * (targetY * XC(_size) + targetX) + 0] = ARRGBA_R(rgba);
-    //                     _bufferRGBA[4 * (targetY * XC(_size) + targetX) + 1] = ARRGBA_G(rgba);
-    //                     _bufferRGBA[4 * (targetY * XC(_size) + targetX) + 2] = ARRGBA_B(rgba);
-    //                     _bufferRGBA[4 * (targetY * XC(_size) + targetX) + 3] = ARRGBA_A(rgba);
-    // #endif // WRITE_RGB_VERSION
-    //                 }
-    //             }
-    //         }
-    //     }
-        
-    //     spc_free(art_gv, spc);
-    // }
+        FREE_ARRAY(scanline);
+    }
 }
 
 
@@ -553,42 +529,19 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
         writeRGBOpenEXR(
             [file name], 
             XC(_size), YC(_size), 
+            metadata_keys,
+            metadata_values,
+            6,
             chromaticities,
             _bufferRGB, 
             _bufferGrey,
-            _bufferAlpha,
-            metadata_keys,
-            metadata_values,
-            6
+            _bufferAlpha
             );
 
         FREE(createdByString);
         FREE(creationDateStr);
         FREE_ARRAY(chromaticities);
     }
-}
-
-- (id) init
-{
-    self = [ super init ];
-
-    if (self) {
-        _bufferRGB   = NULL;
-        _bufferGrey  = NULL;
-        _bufferAlpha = NULL;
-    }
-    
-    return self;
-}
-
-- (void) dealloc
-{
-    FREE_ARRAY(_bufferRGB);
-    FREE_ARRAY(_bufferGrey);  
-    FREE_ARRAY(_bufferAlpha);
-
-    [_imageInfo release];
-    [ super dealloc ];
 }
 
 @end

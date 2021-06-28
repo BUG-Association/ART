@@ -343,12 +343,13 @@ int readRGBOpenEXR(
     const Imf::Channel* channel_r = channels.findChannel("R");
     const Imf::Channel* channel_g = channels.findChannel("G");
     const Imf::Channel* channel_b = channels.findChannel("B");
-    const Imf::Channel* channel_a = channels.findChannel("A");
 
     const Imf::Channel* channel_y = channels.findChannel("Y");
     
     const Imf::Channel* channel_ry = channels.findChannel("RY");
     const Imf::Channel* channel_by = channels.findChannel("BY");
+
+    const Imf::Channel* channel_a = channels.findChannel("A");
 
     bool hasRGB = (channel_r != nullptr) && (channel_g != nullptr) && (channel_b != nullptr);
     bool hasAlpha = (channel_a != nullptr);
@@ -630,11 +631,11 @@ void writeRGBOpenEXR(
 
     // Write RGB version
     if (rgb_buffer != NULL) {
-        const std::array<std::string, 4> rgbChannels = { "R", "G", "B" };
+        const std::array<std::string, 3> rgbChannels = { "R", "G", "B" };
         const size_t xStrideRGB = 3 * sizeof(float);
         const size_t yStrideRGB = xStrideRGB * width;
 
-        for (size_t c = 0; c < 4; c++) {
+        for (size_t c = 0; c < rgbChannels.size(); c++) {
             channels.insert(rgbChannels[c], Imf::Channel(compType));
             framebuffer.insert(rgbChannels[c], Imf::Slice(compType, (char*)(&rgb_buffer[c]), xStrideRGB, yStrideRGB));
         }
@@ -941,11 +942,11 @@ void writeSpectralOpenEXR(
 
     // Write RGB version
     if (rgb_buffer != NULL) {
-        const std::array<std::string, 4> rgbChannels = { "R", "G", "B" };
+        const std::array<std::string, 3> rgbChannels = { "R", "G", "B" };
         const size_t xStrideRGB = sizeof(float) * 3;
         const size_t yStrideRGB = xStrideRGB * width;
 
-        for (size_t c = 0; c < 4; c++) {
+        for (size_t c = 0; c < rgbChannels.size(); c++) {
             channels.insert(rgbChannels[c], Imf::Channel(compType));
             framebuffer.insert(rgbChannels[c], Imf::Slice(compType, (char*)(&rgb_buffer[c]), xStrideRGB, yStrideRGB));
         }
