@@ -72,10 +72,10 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
     // TODO: This is temporary!
     // Now, implemented that way to check if this is a spectral EXR
     // Future shall implement Imf::IStream but try to avoid using
-    // Objective-C++. So, a intermediate struct representation
+    // Objective-C++. So, an intermediate struct representation
     // shall be used. (af)
-    // if ([stream respondToSelector:@selector(name)]) {
-        const char* filename = [stream name];
+    if ([stream conformsToProtocol:@protocol(ArpSimpleFile)]) {
+        const char* filename = [(ArcObject <ArpSimpleFile> *)stream name];
 
         if (!filename) {
             return arfiletypematch_impossible;
@@ -88,12 +88,12 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
         
         if (isRGBEXR(filename) != 0) {
             return arfiletypematch_exact;
-        } else {
-            return arfiletypematch_impossible;
         }
-    // } 
 
-    return arfiletypematch_impossible;
+        return arfiletypematch_impossible;
+    } else {
+        return arfiletypematch_exact;
+    }
 }
 
 

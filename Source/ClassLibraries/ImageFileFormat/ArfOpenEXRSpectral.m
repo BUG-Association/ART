@@ -72,21 +72,26 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
     // TODO: This is temporary!
     // Now, implemented that way to check if this is a spectral EXR
     // Future shall implement Imf::IStream but try to avoid using
-    // Objective-C++. So, a intermediate struct representation
+    // Objective-C++. So, an intermediate struct representation
     // shall be used. (af)
     
-    const char* filename = [stream name];
-    
-    if (!filename) {
-        return arfiletypematch_impossible;
-    }
+    if ([stream conformsToProtocol:@protocol(ArpSimpleFile)]) {
+        const char* filename = [(ArcObject <ArpSimpleFile> *)stream name];
+        
+        if (!filename) {
+            return arfiletypematch_impossible;
+        }
 
-    if (isSpectralEXR(filename) != 0) {
-        return arfiletypematch_exact;
+        if (isSpectralEXR(filename) != 0) {
+            return arfiletypematch_exact;
+        } else {
+            return arfiletypematch_impossible;
+        }
     } else {
-        return arfiletypematch_impossible;
+        return arfiletypematch_exact;
     }
 }
+
 
 - (id) init
 {
@@ -180,7 +185,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
     // -----------------------------------------------------------------------
 
     int width, height;
-    int isPolarised;
+    int isPolarised, isEmissive;
     
     const int read_error = readSpectralOpenEXR(
         [ self->file name ],
@@ -188,7 +193,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
         & _nSpectralChannels,
         & _wavelengths_nm,
         & isPolarised,
-        & _isEmissive,
+        & isEmissive,
         spectral_buffers,
         & _bufferAlpha
     );
@@ -198,6 +203,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
     }
 
     fileContainsPolarisationData = (isPolarised) ? YES : NO;
+    _isEmissive = (isEmissive) ? YES : NO;
 
     XC(_size) = width;
     YC(_size) = height;
