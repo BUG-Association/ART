@@ -1296,13 +1296,13 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
     'ArnImageConverter_ARTGSC_To_EXR'
 =========================================================================== */
 
-#define DESTINATION_COLOURSPACE \
-((ArnColourSpace *) ARNODEREF_POINTER(subnodeRefArray[0]))
-#define COLOUR_TRANSFORM \
-((ArnColourTransform *) ARNODEREF_POINTER(subnodeRefArray[1]))
+// #define DESTINATION_COLOURSPACE \
+// ((ArnColourSpace *) ARNODEREF_POINTER(subnodeRefArray[0]))
+// #define COLOUR_TRANSFORM \
+// ((ArnColourTransform *) ARNODEREF_POINTER(subnodeRefArray[1]))
 
-#define DESTINATION_COLOURSPACE_REF     [ DESTINATION_COLOURSPACE colourSpaceRef ]
-#define COLOUR_TRANSFORM_REF            [ COLOUR_TRANSFORM transformRef ]
+// #define DESTINATION_COLOURSPACE_REF     [ DESTINATION_COLOURSPACE colourSpaceRef ]
+// #define COLOUR_TRANSFORM_REF            [ COLOUR_TRANSFORM transformRef ]
 
 @implementation ArnImageConverter_ARTGSC_To_EXR
 
@@ -1347,9 +1347,11 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
          content of TIFF files) for us.
     ---------------------------------------------------------------aw- */
 
+    // destinationImageDataType = ardt_grey_alpha;
+    // destinationFileDataType  = ardt_grey_alpha;
+
     destinationImageDataType = ardt_rgba;
     destinationFileDataType  = ardt_rgba;
-
 
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
@@ -1409,6 +1411,9 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
 
             for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
+                // GREYALPHA_DESTINATION_BUFFER_G(x) = GREYALPHA_SOURCE_BUFFER_G(x);
+                // GREYALPHA_DESTINATION_BUFFER_A(x) = GREYALPHA_SOURCE_BUFFER_A(x);
+
                 double  channelValue = GREYALPHA_SOURCE_BUFFER_G(x);
 
                 if ( imageHasOnlyPositiveValues[i] )
@@ -1437,8 +1442,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
                         0.0;
                 }
 
-                //   Copy the alpha channel from the source image
-
+                // Copy the alpha channel from the source image
                 RGBA_DESTINATION_BUFFER_ALPHA(x) = GREYALPHA_SOURCE_BUFFER_A(x);
             }
 

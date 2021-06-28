@@ -331,29 +331,33 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
     const int height = YC(_size);
 
     // Memory allocation
+    switch (_fileDataType) {
+        case ardt_rgb:
+        case ardt_xyz:
+            _fileDataType = ardt_rgb;
+            
+            _bufferRGB = ALLOC_ARRAY(float, 3 * width * height);
+            break;
 
-    if (   _fileDataType == ardt_rgb
-        || _fileDataType == ardt_xyz) {
-        _fileDataType = ardt_rgb;
-        
-        _bufferRGB = ALLOC_ARRAY(float, 3 * width * height);
-    }
-    else if (
-           _fileDataType == ardt_rgba
-        || _fileDataType == ardt_xyza) {
-        _fileDataType = ardt_rgba;
+        case ardt_rgba:
+        case ardt_xyza:
+            _fileDataType = ardt_rgba;
 
-        _bufferRGB   = ALLOC_ARRAY(float, 3 * width * height);
-        _bufferAlpha = ALLOC_ARRAY(float, width * height);
-    } 
-    else if (_fileDataType == ardt_grey) {
-        _bufferGrey = ALLOC_ARRAY(float, width * height);
-    } 
-    else if (_fileDataType == ardt_grey_alpha) {
-        _bufferGrey  = ALLOC_ARRAY(float, width * height);
-        _bufferAlpha = ALLOC_ARRAY(float, width * height);
-    } else {
-        ART_ERRORHANDLING_FATAL_ERROR("Unkown fileDataType");
+            _bufferRGB   = ALLOC_ARRAY(float, 3 * width * height);
+            _bufferAlpha = ALLOC_ARRAY(float, width * height);
+            break;
+
+        case ardt_grey:
+            _bufferGrey = ALLOC_ARRAY(float, width * height);
+            break;
+
+        case ardt_grey_alpha:
+            _bufferGrey  = ALLOC_ARRAY(float, width * height);
+            _bufferAlpha = ALLOC_ARRAY(float, width * height);
+            break;
+
+        default:
+            ART_ERRORHANDLING_FATAL_ERROR("Unknown fileDataType");
     }
 }
 
@@ -362,96 +366,108 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
-    if (_fileDataType == ardt_rgb) {
-        ArRGB * scanline = ALLOC_ARRAY(ArRGB, XC(image->size));
+    switch (_fileDataType) {
+        case ardt_rgb: {
+            ArRGB * scanline = ALLOC_ARRAY(ArRGB, XC(image->size));
 
-        for ( long y = 0; y < YC(image->size); y++ )
-        {
-            const long targetY = y + YC(start);
-
-            [ image getRGBRegion
-                :   IPNT2D(0, y)
-                :   IVEC2D(XC(image->size), 1)
-                :   scanline
-                :   0 ];
-
-            for ( long x = 0; x < XC(image->size); x++ )
+            for ( long y = 0; y < YC(image->size); y++ )
             {
-                _bufferRGB[3 * (XC(image->size) * targetY + x) + 0] = ARRGB_R(scanline[x]);
-                _bufferRGB[3 * (XC(image->size) * targetY + x) + 1] = ARRGB_G(scanline[x]);
-                _bufferRGB[3 * (XC(image->size) * targetY + x) + 2] = ARRGB_B(scanline[x]);
+                const long targetY = y + YC(start);
+
+                [ image getRGBRegion
+                    :   IPNT2D(0, y)
+                    :   IVEC2D(XC(image->size), 1)
+                    :   scanline
+                    :   0 ];
+
+                for ( long x = 0; x < XC(image->size); x++ )
+                {
+                    _bufferRGB[3 * (XC(image->size) * targetY + x) + 0] = ARRGB_R(scanline[x]);
+                    _bufferRGB[3 * (XC(image->size) * targetY + x) + 1] = ARRGB_G(scanline[x]);
+                    _bufferRGB[3 * (XC(image->size) * targetY + x) + 2] = ARRGB_B(scanline[x]);
+                }
             }
+
+            FREE_ARRAY(scanline);
         }
+        break;
 
-        FREE_ARRAY(scanline);
-    } 
-    else if (_fileDataType == ardt_rgba) {
-        ArRGBA * scanline = ALLOC_ARRAY(ArRGBA, XC(image->size));
+        case ardt_rgba: {
+            ArRGBA * scanline = ALLOC_ARRAY(ArRGBA, XC(image->size));
 
-        for ( long y = 0; y < YC(image->size); y++ )
-        {
-            const long targetY = y + YC(start);
-
-            [ image getRGBARegion
-                :   IPNT2D(0, y)
-                :   IVEC2D(XC(image->size), 1)
-                :   scanline
-                :   0 ];
-
-            for ( long x = 0; x < XC(image->size); x++ )
+            for ( long y = 0; y < YC(image->size); y++ )
             {
-                _bufferRGB[3 * (XC(image->size) * targetY + x) + 0] = ARRGBA_R(scanline[x]);
-                _bufferRGB[3 * (XC(image->size) * targetY + x) + 1] = ARRGBA_G(scanline[x]);
-                _bufferRGB[3 * (XC(image->size) * targetY + x) + 2] = ARRGBA_B(scanline[x]);
+                const long targetY = y + YC(start);
 
-                _bufferAlpha[XC(image->size) * targetY + x] = ARRGBA_A(scanline[x]);
+                [ image getRGBARegion
+                    :   IPNT2D(0, y)
+                    :   IVEC2D(XC(image->size), 1)
+                    :   scanline
+                    :   0 ];
+
+                for ( long x = 0; x < XC(image->size); x++ )
+                {
+                    _bufferRGB[3 * (XC(image->size) * targetY + x) + 0] = ARRGBA_R(scanline[x]);
+                    _bufferRGB[3 * (XC(image->size) * targetY + x) + 1] = ARRGBA_G(scanline[x]);
+                    _bufferRGB[3 * (XC(image->size) * targetY + x) + 2] = ARRGBA_B(scanline[x]);
+
+                    _bufferAlpha[XC(image->size) * targetY + x] = ARRGBA_A(scanline[x]);
+                }
             }
+
+            FREE_ARRAY(scanline);
         }
+        break;
 
-        FREE_ARRAY(scanline);
-    }
-    else if (_fileDataType == ardt_grey) {
-        ArGrey * scanline = ALLOC_ARRAY(ArGrey, XC(image->size));
+        case ardt_grey: {
+            ArGrey * scanline = ALLOC_ARRAY(ArGrey, XC(image->size));
 
-        for ( long y = 0; y < YC(image->size); y++ )
-        {
-            const long targetY = y + YC(start);
-
-            [ image getGreyRegion
-                :   IPNT2D(0, y)
-                :   IVEC2D(XC(image->size), 1)
-                :   scanline
-                :   0 ];
-
-            for ( long x = 0; x < XC(image->size); x++ )
+            for ( long y = 0; y < YC(image->size); y++ )
             {
-                _bufferGrey[XC(image->size) * targetY + x] = ARGREY_G(scanline[x]);
+                const long targetY = y + YC(start);
+
+                [ image getGreyRegion
+                    :   IPNT2D(0, y)
+                    :   IVEC2D(XC(image->size), 1)
+                    :   scanline
+                    :   0 ];
+
+                for ( long x = 0; x < XC(image->size); x++ )
+                {
+                    _bufferGrey[XC(image->size) * targetY + x] = ARGREY_G(scanline[x]);
+                }
             }
+
+            FREE_ARRAY(scanline);
         }
+        break;
 
-        FREE_ARRAY(scanline);
-    }
-    else if (_fileDataType == ardt_grey_alpha) {  
-       ArGreyAlpha * scanline = ALLOC_ARRAY(ArGreyAlpha, XC(image->size));
+        case ardt_grey_alpha: {  
+            ArGreyAlpha * scanline = ALLOC_ARRAY(ArGreyAlpha, XC(image->size));
 
-        for ( long y = 0; y < YC(image->size); y++ )
-        {
-            const long targetY = y + YC(start);
-
-            [ image getGreyAlphaRegion
-                :   IPNT2D(0, y)
-                :   IVEC2D(XC(image->size), 1)
-                :   scanline
-                :   0 ];
-
-            for ( long x = 0; x < XC(image->size); x++ )
+            for ( long y = 0; y < YC(image->size); y++ )
             {
-                _bufferGrey [XC(image->size) * targetY + x] = ARGREYALPHA_G(scanline[x]);
-                _bufferAlpha[XC(image->size) * targetY + x] = ARGREYALPHA_A(scanline[x]);
-            }
-        }
+                const long targetY = y + YC(start);
 
-        FREE_ARRAY(scanline);
+                [ image getGreyAlphaRegion
+                    :   IPNT2D(0, y)
+                    :   IVEC2D(XC(image->size), 1)
+                    :   scanline
+                    :   0 ];
+
+                for ( long x = 0; x < XC(image->size); x++ )
+                {
+                    _bufferGrey [XC(image->size) * targetY + x] = ARGREYALPHA_G(scanline[x]);
+                    _bufferAlpha[XC(image->size) * targetY + x] = ARGREYALPHA_A(scanline[x]);
+                }
+            }
+
+            FREE_ARRAY(scanline);
+        }
+        break;
+
+        default:
+            ART_ERRORHANDLING_FATAL_ERROR("Unknown fileDataType");
     }
 }
 
