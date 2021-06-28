@@ -352,6 +352,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
     else if (_fileDataType == ardt_grey_alpha) {
         _bufferGrey  = ALLOC_ARRAY(float, width * height);
         _bufferAlpha = ALLOC_ARRAY(float, width * height);
+    } else {
+        ART_ERRORHANDLING_FATAL_ERROR("Unkown fileDataType");
     }
 }
 
@@ -375,9 +377,9 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
 
             for ( long x = 0; x < XC(image->size); x++ )
             {
-                _bufferRGB[3 * (XC(image->size) * targetY) + 0] = ARRGB_R(scanline[x]);
-                _bufferRGB[3 * (XC(image->size) * targetY) + 1] = ARRGB_G(scanline[x]);
-                _bufferRGB[3 * (XC(image->size) * targetY) + 2] = ARRGB_B(scanline[x]);
+                _bufferRGB[3 * (XC(image->size) * targetY + x) + 0] = ARRGB_R(scanline[x]);
+                _bufferRGB[3 * (XC(image->size) * targetY + x) + 1] = ARRGB_G(scanline[x]);
+                _bufferRGB[3 * (XC(image->size) * targetY + x) + 2] = ARRGB_B(scanline[x]);
             }
         }
 
@@ -398,11 +400,11 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
 
             for ( long x = 0; x < XC(image->size); x++ )
             {
-                _bufferRGB[3 * (XC(image->size) * targetY) + 0] = ARRGBA_R(scanline[x]);
-                _bufferRGB[3 * (XC(image->size) * targetY) + 1] = ARRGBA_G(scanline[x]);
-                _bufferRGB[3 * (XC(image->size) * targetY) + 2] = ARRGBA_B(scanline[x]);
+                _bufferRGB[3 * (XC(image->size) * targetY + x) + 0] = ARRGBA_R(scanline[x]);
+                _bufferRGB[3 * (XC(image->size) * targetY + x) + 1] = ARRGBA_G(scanline[x]);
+                _bufferRGB[3 * (XC(image->size) * targetY + x) + 2] = ARRGBA_B(scanline[x]);
 
-                _bufferAlpha[XC(image->size) * targetY] = ARRGBA_A(scanline[x]);
+                _bufferAlpha[XC(image->size) * targetY + x] = ARRGBA_A(scanline[x]);
             }
         }
 
@@ -423,14 +425,14 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
 
             for ( long x = 0; x < XC(image->size); x++ )
             {
-                _bufferGrey[XC(image->size) * targetY] = ARGREY_G(scanline[x]);
+                _bufferGrey[XC(image->size) * targetY + x] = ARGREY_G(scanline[x]);
             }
         }
 
         FREE_ARRAY(scanline);
     }
     else if (_fileDataType == ardt_grey_alpha) {  
-        ArGreyAlpha * scanline = ALLOC_ARRAY(ArGreyAlpha, XC(image->size));
+       ArGreyAlpha * scanline = ALLOC_ARRAY(ArGreyAlpha, XC(image->size));
 
         for ( long y = 0; y < YC(image->size); y++ )
         {
@@ -444,8 +446,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
 
             for ( long x = 0; x < XC(image->size); x++ )
             {
-                _bufferGrey [XC(image->size) * targetY] = ARGREYALPHA_G(scanline[x]);
-                _bufferAlpha[XC(image->size) * targetY] = ARGREYALPHA_A(scanline[x]);
+                _bufferGrey [XC(image->size) * targetY + x] = ARGREYALPHA_G(scanline[x]);
+                _bufferAlpha[XC(image->size) * targetY + x] = ARGREYALPHA_A(scanline[x]);
             }
         }
 
