@@ -112,6 +112,39 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     return self;
 }
 
+- init
+        : (const char *) newFileName
+        : (Class) instanceOf
+        : (ArnImageInfo *) newImageInfo
+{
+    self = [super init];
+
+    if ( self )
+    {
+        fileName = ALLOC_ARRAY(char,strlen(newFileName)+1);
+        strcpy(fileName,newFileName);
+
+        ArcFile  * file =
+            [ ArcFile new
+                :   art_gv
+                :   fileName
+                ];
+
+        imageFile = 
+            [ [ [ instanceOf alloc] init_ART_GV
+                    : art_gv 
+                ] initWithFile
+                    : file 
+                ];
+
+        imageInfo = RETAIN_OBJECT(newImageInfo);
+        [ imageFile useImageInfo: imageInfo ];
+        action = arnfileimage_idle;
+    }
+    
+    return self;
+}
+
 - copy
 {
     ArnFileImage * copiedInstance = [ super copy ];

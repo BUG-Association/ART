@@ -594,10 +594,11 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
             ,   destinationFilename[i]
             );
         #endif
-
+#warning this has to be fixed. We shall use directly the provided class
         destinationImage[i] =
             [ ALLOC_INIT_OBJECT(ArnFileImage)
                 :   destinationFilename[i]
+                :   destinationImageClass
                 :   destinationImageInfo
                 ];
 
