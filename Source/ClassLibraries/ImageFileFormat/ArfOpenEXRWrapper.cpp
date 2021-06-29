@@ -35,8 +35,6 @@
 #include <string>
 #include <array>
 
-//#include <ImathBox.h>
-//#include <ImathHalfLimits.h>
 #include <ImfArray.h>
 #include <ImfChannelList.h>
 #include <ImfInputFile.h>

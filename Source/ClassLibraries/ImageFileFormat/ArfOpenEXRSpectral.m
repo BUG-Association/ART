@@ -77,7 +77,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
     
     if ([stream conformsToProtocol:@protocol(ArpSimpleFile)]) {
         const char* filename = [(ArcObject <ArpSimpleFile> *)stream name];
-        
+
         if (!filename) {
             return arfiletypematch_impossible;
         }

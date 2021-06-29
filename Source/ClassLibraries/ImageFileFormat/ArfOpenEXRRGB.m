@@ -111,7 +111,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
 
         if (isSpectralEXR(filename) != 0 && isRGBEXR(filename) != 0) {
             // We have a better alternative for such type of files: 
-            // ArnOpenEXRSpectral
+            // ArfOpenEXRSpectral
             return arfiletypematch_weak;
         } 
         
