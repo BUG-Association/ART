@@ -49,6 +49,12 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 #define RGBA_SOURCE_BUFFER(_x) \
     ARRGBA_C((((ArnRGBAImage*)sourceImageBuffer)->data[(_x)]))
 
+#define GREY_SOURCE_BUFFER(_x) \
+    (((ArnGreyImage*)sourceImageBuffer)->data[(_x)])
+
+#define GREYALPHA_SOURCE_BUFFER_G(_x) \
+    (((ArnGreyAlphaImage*)sourceImageBuffer)->data[(_x)])
+
 #define RGBA32_SOURCE_BUFFER(_x) \
     (((ArnRGBA32Image*)sourceImageBuffer)->data[(_x)])
 
@@ -93,18 +99,28 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
         ArNode
         );
     
-    BOOL  sourceRGB = NO;
-    BOOL  sourceRGBA = NO;
+    BOOL sourceRGB       = NO;
+    BOOL sourceRGBA      = NO;
+    BOOL sourceGrey      = NO;
+    BOOL sourceGreyAlpha = NO; 
 
     isSpectral = NO;
 
-    if ( [ sourceImageBuffer isMemberOfClass: [ ArnRGBImage class ] ] )
+    if ( [ sourceImageBuffer isMemberOfClass: [ ArnRGBImage class ] ] ) 
     {
         sourceRGB = YES;
     }
-    else if ( [ sourceImageBuffer isMemberOfClass: [ ArnRGBAImage class ] ] )
+    else if ( [ sourceImageBuffer isMemberOfClass: [ ArnRGBAImage class ] ] ) 
     {
         sourceRGBA = YES;
+    }
+    else if ( [ sourceImageBuffer isMemberOfClass: [ ArnGreyImage class ] ] ) 
+    {
+        sourceGrey = YES;
+    }
+    else if ( [ sourceImageBuffer isMemberOfClass: [ ArnGreyAlphaImage class ] ] ) 
+    {
+        sourceGreyAlpha = YES;
     }
     else if ( [ sourceImageBuffer isMemberOfClass: [ ArnLightAlphaImage class ] ] )
     {
@@ -156,6 +172,22 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
             else if ( sourceRGBA )
             {
                 pixelRGB = RGBA_SOURCE_BUFFER(i);
+            }
+            else if ( sourceGrey )
+            {
+                g_to_rgb(
+                      art_gv,
+                    & GREY_SOURCE_BUFFER(i),
+                    & pixelRGB
+                );
+            }
+            else if ( sourceGreyAlpha )
+            {
+                ga_to_rgb(
+                      art_gv,
+                    & GREYALPHA_SOURCE_BUFFER_G(i),
+                    & pixelRGB
+                );
             }
             else
             {
