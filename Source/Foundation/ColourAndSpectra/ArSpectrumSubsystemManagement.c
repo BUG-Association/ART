@@ -40,6 +40,7 @@ SWITCHING_INTERFACE_FOR_ISR( ArSpectrum8, s8 );
 SWITCHING_INTERFACE_FOR_ISR( ArSpectrum11, s11 );
 SWITCHING_INTERFACE_FOR_ISR( ArSpectrum18, s18 );
 SWITCHING_INTERFACE_FOR_ISR( ArSpectrum46, s46 );
+SWITCHING_INTERFACE_FOR_ISR( ArSpectrum500, s500 );
 
 void art_foundation_set_isr(
         ART_GV          * art_gv,
