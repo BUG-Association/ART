@@ -28,6 +28,11 @@
 
 #ifdef ART_WITH_OPENEXR
 
+// For displaying error and warnings
+extern "C" {
+    #include "ART_ErrorHandling.h"
+}
+
 #include <algorithm>
 #include <cassert>
 #include <map>
@@ -290,6 +295,19 @@ int readRGBOpenEXR(
     const Imf::Header& header = file.header();
     const Imf::ChannelList& channels = header.channels();
     const Imath::Box2i& dataWindow = header.dataWindow();
+    // TODO
+    // const Imath::Box2i& displayWindow = header.displayWindow();
+
+    // Now just check this header info and raise a warning if != 1
+    const float pixelAspectRatio = header.pixelAspectRatio();
+
+    if (pixelAspectRatio != 1.f) {
+        ART_ERRORHANDLING_WARNING(
+            "File %s has %f pixel aspect ratio. "
+            "Pixel aspect ratio is currently ignored.",
+            filename, pixelAspectRatio
+        );
+    }
 
     // -----------------------------------------------------------------------
     // We determine the size of the image
@@ -682,6 +700,19 @@ int readSpectralOpenEXR(
     Imf::InputFile exrIn(filename);
     const Imf::Header& exrHeader = exrIn.header();
     const Imath::Box2i& exrDataWindow = exrHeader.dataWindow();
+    // TODO
+    // const Imath::Box2i& displayWindow = exrHeader.displayWindow();
+
+    // Now just check this header info and raise a warning if != 1
+    const float pixelAspectRatio = exrHeader.pixelAspectRatio();
+
+    if (pixelAspectRatio != 1.f) {
+        ART_ERRORHANDLING_WARNING(
+            "File %s has %f pixel aspect ratio. "
+            "Pixel aspect ratio is currently ignored.",
+            filename, pixelAspectRatio
+        );
+    }
 
     SpectrumType spectrumType = UNDEFINED;
 
