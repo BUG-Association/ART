@@ -538,7 +538,7 @@ int readRGBOpenEXR(
                 &buff2[y * (*width)]);
         }
 
-        // Handle custom chromaticities
+        // Handle custom chromaticities and clamp negative values
         for (int y = 0; y < (*height); y++) {
             for (int x = 0; x < (*width); x++) {
                 Imath::V3f rgb(
@@ -548,9 +548,9 @@ int readRGBOpenEXR(
 
                 rgb = rgb * conversionMatrix;
 
-                (*rgb_buffer)[3 * (y * (*width) + x) + 0] = rgb.x;
-                (*rgb_buffer)[3 * (y * (*width) + x) + 1] = rgb.y;
-                (*rgb_buffer)[3 * (y * (*width) + x) + 2] = rgb.z;
+                (*rgb_buffer)[3 * (y * (*width) + x) + 0] = std::max(0.f, rgb.x);
+                (*rgb_buffer)[3 * (y * (*width) + x) + 1] = std::max(0.f, rgb.y);
+                (*rgb_buffer)[3 * (y * (*width) + x) + 2] = std::max(0.f, rgb.z);
             }
         }
 
