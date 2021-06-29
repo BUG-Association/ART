@@ -66,13 +66,14 @@ ARPFILE_DEFAULT_IMPLEMENTATION(
 
 ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
 
+
 - (Class) nativeContentClass 
 {
     switch (_fileDataType) {
         case ardt_rgb:
             return [ArnRGBImage class];
         case ardt_rgba:
-            return [ArnRGBImage class];
+            return [ArnRGBAImage class];
         case ardt_grey:
             return [ArnGreyImage class];
         case ardt_grey_alpha:
@@ -140,6 +141,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
     
     return self;
 }
+
 
 - (void) dealloc
 {
@@ -354,6 +356,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
             ART_ERRORHANDLING_FATAL_ERROR("Unknown fileDataType");
     }
 }
+
 
 /* ----------------------------------------------------------------------
 
