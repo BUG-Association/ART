@@ -64,7 +64,35 @@ ARPFILE_DEFAULT_IMPLEMENTATION(
     arfiletypecapabilites_write
     )
 
-ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
+ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
+
+- (Class) nativeContentClass 
+{
+    switch (_fileDataType) {
+        case ardt_rgb:
+            return [ArnRGBImage class];
+        case ardt_rgba:
+            return [ArnRGBImage class];
+        case ardt_grey:
+            return [ArnGreyImage class];
+        case ardt_grey_alpha:
+            return [ArnGreyAlphaImage class];
+        default:
+            ART_ERRORHANDLING_FATAL_ERROR(
+                "No suitable image data format"
+                );
+    }
+}
+
+
+- (void) useImageInfo
+        : (ArnImageInfo *) imageInfo
+{
+    if (_fileDataType == ardt_unknown) {
+        _fileDataType = [imageInfo dataType];
+    }
+}
+
 
 + (ArFiletypeMatch) matchWithStream
         : (ArcObject <ArpStream> *) stream
@@ -82,7 +110,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
         }
 
         if (isSpectralEXR(filename) != 0 && isRGBEXR(filename) != 0) {
-            // We have a better option for such type of file
+            // We have a better alternative for such type of files: 
+            // ArnOpenEXRSpectral
             return arfiletypematch_weak;
         } 
         
@@ -102,6 +131,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
     self = [ super init ];
 
     if (self) {
+        _fileDataType = ardt_unknown;
+
         _bufferRGB   = NULL;
         _bufferGrey  = NULL;
         _bufferAlpha = NULL;
@@ -231,81 +262,96 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(RGBA,exrrgb)
 - (void) getPlainImage
         : (IPnt2D) start
         : (ArnPlainImage *) image
-{     
-    if (_fileDataType == ardt_rgb) {
-        ArRGB * scanline = ALLOC_ARRAY(ArRGB, XC(image->size));
+{    
+    switch (_fileDataType) {
+        case ardt_rgb: {
+            ArRGB * outScanline = ALLOC_ARRAY(ArRGB, XC(image->size));
 
-        for ( long y = 0; y < YC(image->size); y++ ) {
-            for ( long x = 0; x < XC(image->size); x++ ) {
-                ARRGB_R(scanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 0];
-                ARRGB_G(scanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 1];
-                ARRGB_B(scanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 2];
+            for ( long y = 0; y < YC(image->size); y++ ) {
+                for ( long x = 0; x < XC(image->size); x++ ) {
+                    ARRGB_R(outScanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 0];
+                    ARRGB_G(outScanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 1];
+                    ARRGB_B(outScanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 2];
+                }
+
+                [ image setRGBRegion 
+                    :   IPNT2D(0, y)
+                    :   IVEC2D(XC(image->size), 1)
+                    :   outScanline
+                    :   0
+                    ];
             }
 
-            [ image setRGBRegion 
-                :   IPNT2D(0, y)
-                :   IVEC2D(XC(image->size), 1)
-                :   scanline
-                :   0
-                ];
+            FREE_ARRAY(outScanline);
         }
+        break;
 
-        FREE_ARRAY(scanline);
-    } else if (_fileDataType == ardt_rgba) {
-        ArRGBA * scanline = ALLOC_ARRAY(ArRGBA, XC(image->size));
+        case ardt_rgba: {
+            ArRGBA * outScanline = ALLOC_ARRAY(ArRGBA, XC(image->size));
 
-        for ( long y = 0; y < YC(image->size); y++ ) {
-            for ( long x = 0; x < XC(image->size); x++ ) {
-                ARRGBA_R(scanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 0];
-                ARRGBA_G(scanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 1];
-                ARRGBA_B(scanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 2];
-                ARRGBA_A(scanline[x]) = _bufferAlpha[y * XC(_size) + x];
+            for ( long y = 0; y < YC(image->size); y++ ) {
+                for ( long x = 0; x < XC(image->size); x++ ) {
+                    ARRGBA_R(outScanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 0];
+                    ARRGBA_G(outScanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 1];
+                    ARRGBA_B(outScanline[x]) = _bufferRGB[3 * (y * XC(_size) + x) + 2];
+                    ARRGBA_A(outScanline[x]) = _bufferAlpha[y * XC(_size) + x];
+                }
+
+                [ image setRGBARegion 
+                    :   IPNT2D(0, y)
+                    :   IVEC2D(XC(image->size), 1)
+                    :   outScanline
+                    :   0
+                    ];
             }
 
-            [ image setRGBARegion 
-                :   IPNT2D(0, y)
-                :   IVEC2D(XC(image->size), 1)
-                :   scanline
-                :   0
-                ];
+            FREE_ARRAY(outScanline);
         }
+        break;
 
-        FREE_ARRAY(scanline);
-    } else if (_fileDataType == ardt_grey) {
-        ArGrey * scanline = ALLOC_ARRAY(ArGrey, XC(image->size));
+        case ardt_grey: {
+            ArGrey * outScanline = ALLOC_ARRAY(ArGrey, XC(image->size));
 
-        for ( long y = 0; y < YC(image->size); y++ ) {
-            for ( long x = 0; x < XC(image->size); x++ ) {
-                ARGREY_G(scanline[x]) = _bufferGrey [y * XC(_size) + x];
+            for ( long y = 0; y < YC(image->size); y++ ) {
+                for ( long x = 0; x < XC(image->size); x++ ) {
+                    ARGREY_G(outScanline[x]) = _bufferGrey[y * XC(_size) + x];
+                }
+
+               [ image setGreyRegion 
+                    :   IPNT2D(0, y)
+                    :   IVEC2D(XC(image->size), 1)
+                    :   outScanline
+                    :   0
+                    ];
             }
 
-            [ image setGreyRegion 
-                :   IPNT2D(0, y)
-                :   IVEC2D(XC(image->size), 1)
-                :   scanline
-                :   0
-                ];
-        }
+            FREE_ARRAY(outScanline);
+        }    
+        break;
 
-        FREE_ARRAY(scanline);
-    } else if (_fileDataType == ardt_grey_alpha) {
-        ArGreyAlpha * scanline = ALLOC_ARRAY(ArGreyAlpha, XC(image->size));
+        case ardt_grey_alpha: {
+            ArGreyAlpha * outScanline = ALLOC_ARRAY(ArGreyAlpha, XC(image->size));
 
-        for ( long y = 0; y < YC(image->size); y++ ) {
-            for ( long x = 0; x < XC(image->size); x++ ) {
-                ARGREYALPHA_G(scanline[x]) = _bufferGrey [y * XC(_size) + x];
-                ARGREYALPHA_A(scanline[x]) = _bufferAlpha[y * XC(_size) + x];
+            for ( long y = 0; y < YC(image->size); y++ ) {
+                for ( long x = 0; x < XC(image->size); x++ ) {
+                    ARGREYALPHA_G(outScanline[x]) = _bufferGrey [y * XC(_size) + x];
+                    ARGREYALPHA_A(outScanline[x]) = _bufferAlpha[y * XC(_size) + x];
+                }
+
+               [ image setGreyAlphaRegion
+                    :   IPNT2D(0, y)
+                    :   IVEC2D(XC(image->size), 1)
+                    :   outScanline
+                    :   0
+                    ];
             }
 
-            [ image setGreyAlphaRegion 
-                :   IPNT2D(0, y)
-                :   IVEC2D(XC(image->size), 1)
-                :   scanline
-                :   0
-                ];
+            FREE_ARRAY(outScanline);
         }
+        break;
 
-        FREE_ARRAY(scanline);
+        default:
+            ART_ERRORHANDLING_FATAL_ERROR("Unknown fileDataType");
     }
 }
 

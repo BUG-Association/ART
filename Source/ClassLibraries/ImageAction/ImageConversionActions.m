@@ -1347,11 +1347,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
          content of TIFF files) for us.
     ---------------------------------------------------------------aw- */
 
-    // destinationImageDataType = ardt_grey_alpha;
-    // destinationFileDataType  = ardt_grey_alpha;
-
-    destinationImageDataType = ardt_rgba;
-    destinationFileDataType  = ardt_rgba;
+    destinationImageDataType = ardt_grey_alpha;
+    destinationFileDataType  = ardt_grey_alpha;
 
     /* ------------------------------------------------------------------
          Activation of the framework common to all image manipulation
@@ -1411,39 +1408,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
 
             for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
-                // GREYALPHA_DESTINATION_BUFFER_G(x) = GREYALPHA_SOURCE_BUFFER_G(x);
-                // GREYALPHA_DESTINATION_BUFFER_A(x) = GREYALPHA_SOURCE_BUFFER_A(x);
-
-                double  channelValue = GREYALPHA_SOURCE_BUFFER_G(x);
-
-                if ( imageHasOnlyPositiveValues[i] )
-                {
-                    ARCIEXYZ_X( XYZA_DESTINATION_BUFFER_XYZ(x) ) =
-                        channelValue;
-                    ARCIEXYZ_Y( XYZA_DESTINATION_BUFFER_XYZ(x) ) =
-                        channelValue;
-                    ARCIEXYZ_Z( XYZA_DESTINATION_BUFFER_XYZ(x) ) =
-                        channelValue;
-                }
-                else
-                {
-                    double  xval = 0.0, yval = 0.0;
-                    
-                    if ( channelValue < 0.0 )
-                        xval = -channelValue;
-                    else
-                        yval =  channelValue;
-                        
-                    ARCIEXYZ_X( XYZA_DESTINATION_BUFFER_XYZ(x) ) =
-                        xval;
-                    ARCIEXYZ_Y( XYZA_DESTINATION_BUFFER_XYZ(x) ) =
-                        yval;
-                    ARCIEXYZ_Z( XYZA_DESTINATION_BUFFER_XYZ(x) ) =
-                        0.0;
-                }
-
-                // Copy the alpha channel from the source image
-                RGBA_DESTINATION_BUFFER_ALPHA(x) = GREYALPHA_SOURCE_BUFFER_A(x);
+                GREYALPHA_DESTINATION_BUFFER_G(x) = GREYALPHA_SOURCE_BUFFER_G(x);
+                GREYALPHA_DESTINATION_BUFFER_A(x) = GREYALPHA_SOURCE_BUFFER_A(x);
             }
 
             //   Write the destination scanline buffer to disk for this line
