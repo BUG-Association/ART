@@ -87,6 +87,10 @@ UserGeometryDataList;
     // storing a reference of a top-most CSG node from the
     // scenegraph when rendering CSG geometry
     ArNode * topmostCSGNode;
+
+    // variable to temporarily save whether a csg node is associated
+    // with a triangle mesh
+    BOOL temporaryVariableTriangleMeshContained;
 }
 
 // returning the singleton object

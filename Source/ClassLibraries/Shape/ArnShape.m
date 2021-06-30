@@ -245,6 +245,10 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
         if (embree->topmostCSGNode && [embree csgNodeIsAdded])
         {
+            if([self isKindOfClass: [ArnTriangleMesh class]]) {
+                embree->temporaryVariableTriangleMeshContained = YES;
+            }
+
             return result;
         }
 

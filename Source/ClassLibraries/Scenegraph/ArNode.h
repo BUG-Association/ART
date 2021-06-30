@@ -150,6 +150,8 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
     ArNode * internalBSPTree;
 
     ArNode * internalOpTree;
+
+    BOOL containsTriangleMesh;
 #endif
     ArNodeRef  subnodeRefArray[2];
 }

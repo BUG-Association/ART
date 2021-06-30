@@ -163,36 +163,49 @@ void embree_intersect_geometry(const int * valid,
     // perform the intersection
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
-    // IMPORTANT: this is rendering the csg gemetry by using the original
-    // scene graph
-    // If rendering with the individual csg kd trees is desired,
-    // uncomment the if statement and the else body
+    // If the geometry about to be ray cast is a csg geometry ...
+    if(geometryData->_isCSGGeometry)
+    {
+        ArnBinary * csgNode =
+                (ArnBinary *) geometryData->_combinedAttributes_or_csg_node;
 
-    // if(!geometryData->_isCSGGeometry)
-    // {
+        // ... we check whether a triangle mesh is associated with it,
+        // and not, we determine the intersection list by traversing the original
+        // scene graph (faster)
+        if(!csgNode->containsTriangleMesh)
+        {
+            [geometryData->_combinedAttributes_or_csg_node
+                    getIntersectionList
+                    :rayCaster
+                    :RANGE(ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
+                    :&intersectionList
+            ];
+        }
+        // .. and if not, we use the internal kd-trees associated with the csg geometry
+        // (faster)
+        else
+        {
+            ArnBSPTree * internalBSPTree = (ArnBSPTree *) csgNode->internalBSPTree;
+            [internalBSPTree
+                    getIntersectionList
+                    :rayCaster
+                    :RANGE(ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
+                    :&intersectionList
+            ];
+        }
+    }
+    // for non-csg geometry, we determine the intersection list by traversing the original
+    // scene graph
+    else
+    {
         [geometryData->_combinedAttributes_or_csg_node
                 getIntersectionList
                 :rayCaster
                 :RANGE(ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
                 :&intersectionList
         ];
-    // }
-    /*
-    else
-    {
-        ArnBinary * csgNode =
-                (ArnBinary *) geometryData->_combinedAttributes_or_csg_node;
-
-        ArnBSPTree * internalBSPTree = (ArnBSPTree *) csgNode->internalBSPTree;
-
-        [internalBSPTree
-                getIntersectionList
-                :rayCaster
-                :RANGE(ARNRAYCASTER_EPSILON(rayCaster), MATH_HUGE_DOUBLE)
-                :&intersectionList
-        ];
     }
-     */
+    //*/
 
     // if no intersection is found, return
     if(!intersectionList.head) {
@@ -482,6 +495,7 @@ static ArnEmbree * embreeManager;
         EMBREE_ENABLED = YES;
 
         embreeManager->topmostCSGNode = NULL;
+        embreeManager->temporaryVariableTriangleMeshContained = NO;
 
         embreeManager->environmentLighting = NO;
         embreeManager->environmentLightAttributes = NULL;

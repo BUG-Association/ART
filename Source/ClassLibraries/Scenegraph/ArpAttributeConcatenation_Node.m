@@ -127,6 +127,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         ArnEmbree * embree = [ArnEmbree embreeManager];
 
         if(embree->topmostCSGNode && embree->topmostCSGNode == self) {
+
+            if(embree->temporaryVariableTriangleMeshContained) {
+                ArnBinary * csgNode = (ArnBinary *) embree->topmostCSGNode;
+                csgNode->containsTriangleMesh =
+                        embree->temporaryVariableTriangleMeshContained;
+                embree->temporaryVariableTriangleMeshContained = NO;
+            }
+
             embree->topmostCSGNode = NULL;
             [embree addedCSGNodeToEmbree: NO];
         }
