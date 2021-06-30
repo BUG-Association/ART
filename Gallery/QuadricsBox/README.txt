@@ -1,1 +1,0 @@
-This scene converges extremely slowly with the path tracer of version 2.0.0. There are obvious optimisations one can make to the path tracer (not switch to monochrome at non-dispersive interfaces, and others), they just need to be done.

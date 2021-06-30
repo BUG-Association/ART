@@ -6,4 +6,4 @@ There are three scenes in this folder:
 
 - A fairly detailed model of an Austrian steam locomotive from around 1910. All this model is missing to be quite a nice looking thing are better materials: the large scale geometry is already reasonably detailed.
 
-Note that the biplane and locomotive scenes are broken down into several smaller sub-files: for the plane, the scene to render is 'ParkedPlane.arm', while the other one is 'LocomotiveScene.arm'.
+Note that the biplane and locomotive scenes are broken down into several smaller sub-files: for the plane, the scene to render is `ParkedPlane.arm`, while the other one is `LocomotiveScene.arm`.
