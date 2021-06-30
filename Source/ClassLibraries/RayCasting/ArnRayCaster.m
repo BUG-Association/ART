@@ -485,9 +485,9 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // the path tracer loop
     if(intersectionList->head && !intersectionList->head->embreeShapeUserGeometry) {
         SET_OBJECTSPACE_NORMAL(intersectionList->head,
-                               VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
+                                 VEC3D(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
 
-        ARCINTERSECTION_FLAG_OBJECTSPACE_NORMAL_AS_VALID(intersectionList->head);
+        // ARCINTERSECTION_FLAG_OBJECTSPACE_NORMAL_AS_VALID(intersectionList->head);
 
         // texture coordinates
         // for some reason, the UV coordinates need to be switched for ART to map the

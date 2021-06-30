@@ -54,7 +54,10 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     if ( self )
     {
         indexTable = newIndexTable;
+
+#if defined(ENABLE_EMBREE_SUPPORT)
         embreeGeomID = EMBREE_INVALID_GEOMETRY_ID;
+#endif
     }
 
     return self;
@@ -66,7 +69,9 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
     copiedInstance->indexTable = arlongarray_copy_by_reference(&indexTable);
 
+#if defined(ENABLE_EMBREE_SUPPORT)
     copiedInstance->embreeGeomID = embreeGeomID;
+#endif
 
     return copiedInstance;
 }
@@ -81,7 +86,9 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
     copiedInstance->indexTable = arlongarray_copy_by_reference(&indexTable);
 
+#if defined(ENABLE_EMBREE_SUPPORT)
     copiedInstance->embreeGeomID = embreeGeomID;
+#endif
 
     return copiedInstance;
 }

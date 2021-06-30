@@ -42,7 +42,7 @@ ART_MODULE_INITIALISATION_FUNCTION
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-#define EMBREE_INVALID_GEMOETRY_ID (-1)
+#define EMBREE_INVALID_GEMOETRY_ID -1
 
 /* ===========================================================================
     'ArnShape'
@@ -60,7 +60,10 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
     if ( self )
     {
         shapeGeometry = newGeometry;
+
+#if defined(ENABLE_EMBREE_SUPPORT)
         embreeGeomID = EMBREE_INVALID_GEMOETRY_ID;
+#endif
     }
     
     return self;
@@ -71,6 +74,10 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
     ArnShape  * copiedInstance = [ super copy ];
 
     copiedInstance->shapeGeometry = shapeGeometry;
+
+#if defined(ENABLE_EMBREE_SUPPORT)
+    copiedInstance->embreeGeomID = embreeGeomID;
+#endif
 
     return copiedInstance;
 }
@@ -84,6 +91,10 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
             ];
 
     copiedInstance->shapeGeometry = shapeGeometry;
+
+#if defined(ENABLE_EMBREE_SUPPORT)
+    copiedInstance->embreeGeomID = embreeGeomID;
+#endif
 
     return copiedInstance;
 }
