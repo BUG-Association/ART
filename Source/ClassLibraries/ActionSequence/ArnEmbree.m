@@ -123,6 +123,43 @@ void embree_intersect_geometry(const int * valid,
     ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
     UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
 
+    // handling prior non-user-geometry intersections
+    if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
+
+        if(!rayCaster->intersectionListHead)
+        {
+            // retreive the geometry data associated with the previous hit
+            UserGeometryData * previouslyHitGeometryData =
+                                [embree getFromUserGeometryList: rtc_hit->geomID];
+
+            if(!previouslyHitGeometryData) {
+                ART_ERRORHANDLING_FATAL_ERROR("embree error: previous intersection found on geometry that is not present in the geometry list");
+            }
+
+            // set up ray caster with info from prev hit
+            ArIntersectionList prevIntersectionList = ARINTERSECTIONLIST_EMPTY;
+            rayCaster->state = previouslyHitGeometryData->_traversalState;
+            rayCaster->surfacepoint_test_shape = (ArNode<ArpShape> *)previouslyHitGeometryData->_shape;
+
+            // init intersection list
+            arintersectionlist_init_1(
+                    &prevIntersectionList,
+                    rtc_ray->tfar,
+                    0,
+                    arface_on_shape_is_planar,
+                    NULL,
+                    rayCaster);
+            prevIntersectionList.head->embreeShapeUserGeometry = NO;
+
+            // add intersection list to linked list
+            [rayCaster addIntersectionToIntersectionLinkedList :NULL : prevIntersectionList];
+
+            // reset ray caster
+            rayCaster->surfacepoint_test_shape = NULL;
+            rayCaster->state = geometryData->_traversalState;
+        }
+    }
+
     // perform the intersection
     ArIntersectionList intersectionList = ARINTERSECTIONLIST_EMPTY;
 
@@ -392,6 +429,21 @@ static ArnEmbree * embreeManager;
     }
 }
 
+- (UserGeometryData *) getFromUserGeometryList : (int) geomID {
+
+    UserGeometryData * found = NULL;
+
+    UserGeometryDataList * traversalNode = userGeometryListHead;
+    while(traversalNode->next) {
+        if(traversalNode->data->_embreeGeomID == geomID) {
+            found = traversalNode->data;
+            break;
+        }
+    }
+
+    return found;
+}
+
 // initialize singleton ArnEmbree object
 + (void) initialize : (ART_GV *) newART_GV {
     if(!EMBREE_ENABLED)
@@ -526,6 +578,7 @@ static ArnEmbree * embreeManager;
         : (ArNode *) shape
         : (ArTraversalState *) traversalState
         : (ArNode *) combinedAttributesOrCSGNode
+        : (unsigned int) embreeGeomID;
 {
     struct UserGeometryData * data = malloc(sizeof(struct UserGeometryData));
 
@@ -558,6 +611,7 @@ static ArnEmbree * embreeManager;
         data->_isCSGGeometry = YES;
     }
 
+    data->_embreeGeomID = embreeGeomID;
     data->_shape = shape;
     if(traversalState) data->_traversalState = *traversalState;
     data->_combinedAttributes_or_csg_node = combinedAttributesOrCSGNode;
@@ -748,7 +802,7 @@ static ArnEmbree * embreeManager;
     }
 
     int geomID = [self addGeometry: newGeometry];
-    [self setGeometryUserData :newGeometry :shape :traversalState :combinedAttributes];
+    [self setGeometryUserData :newGeometry :shape :traversalState :combinedAttributes :geomID];
 
 #ifdef EMBREE_DEBUG_PRINT
     printf("Shape %s initialized with embree geomID: %d\n", [[shape className] UTF8String], geomID);
@@ -769,7 +823,7 @@ static ArnEmbree * embreeManager;
     // printf("CSG geometry %p fed to Embree\n", csgNode);
 
     int geomID = [self addGeometry: newGeometry];
-    [self setGeometryUserData: newGeometry :NULL :traversalState :csgNode];
+    [self setGeometryUserData: newGeometry :NULL :traversalState :csgNode :geomID];
 
 #ifdef EMBREE_DEBUG_PRINT
     printf("CSG node %s initialized with embree geomID: %d\n", [[csgNode className] UTF8String], geomID);

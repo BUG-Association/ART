@@ -39,6 +39,7 @@ ART_MODULE_INTERFACE(ArnEmbree)
 // perform user defined geometry intersection
 // calculations
 typedef struct UserGeometryData {
+    unsigned int _embreeGeomID;
     ArNode * _shape;
     ArTraversalState _traversalState;
     ArNode<ArpRayCasting> * _combinedAttributes_or_csg_node;
@@ -95,6 +96,7 @@ UserGeometryDataList;
 + (void) enableEmbree: (BOOL) enabled;
 
 - (void) addToUserGeometryList : (UserGeometryData *) data;
+- (UserGeometryData *) getFromUserGeometryList : (int) geomID;
 
 // setup embree singleton
 + (void) initialize : (ART_GV *) newART_GV;
@@ -133,7 +135,8 @@ UserGeometryDataList;
         : (ArNode *) shape
         : (ArTraversalState *) traversalState
         : (ArNode *) combinedAttributes
-;
+        : (unsigned int) embreeGeomID;
+        ;
 
 // initializes a simple indexed shape for Embree
 - (RTCGeometry) initEmbreeSimpleIndexedGeometry
@@ -162,7 +165,6 @@ UserGeometryDataList;
         : (ArnVertexSet *) vertexSet
         : (ArNode *) trafo
         ;
-
 
 
 // retrieves and add a ArnRaycaster object to the raycaster array by
