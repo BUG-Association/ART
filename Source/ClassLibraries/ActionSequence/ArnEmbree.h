@@ -38,7 +38,7 @@ ART_MODULE_INTERFACE(ArnEmbree)
 // one of this stuct, it is needed for embree to
 // perform user defined geometry intersection
 // calculations
-typedef struct UserGeometryData {
+typedef struct GeometryData {
     unsigned int _embreeGeomID;
     ArNode * _shape;
     ArTraversalState _traversalState;
@@ -46,18 +46,18 @@ typedef struct UserGeometryData {
     BOOL _isUserGeometry;
     BOOL _isCSGGeometry;
 }
-UserGeometryData;
+GeometryData;
 
 // linked list node for user geometry data
-typedef struct UserGeometryDataList {
-    UserGeometryData * data;
-    struct UserGeometryDataList * next;
+typedef struct GeometryDataList {
+    GeometryData * data;
+    struct GeometryDataList * next;
 }
-UserGeometryDataList;
+GeometryDataList;
 
 
 
-// ARLIST_INTERFACE_FOR_PTR_TYPE(UserGeometryData, userGeometryData)
+// ARLIST_INTERFACE_FOR_PTR_TYPE(GeometryData, GeometryData)
 
 #define THREAD_MAX 25
 
@@ -67,7 +67,7 @@ UserGeometryDataList;
 
     // head of linked list in which the ArIntersectionlists
     // are stored after intersecting the scene with embree
-    UserGeometryDataList * userGeometryListHead;
+    GeometryDataList * userGeometryListHead;
 
     // predefined array of ArnRayCaster in which the multiple
     // ArnRayCaster objects are stored during rendering
@@ -99,8 +99,8 @@ UserGeometryDataList;
 + (BOOL) embreeEnabled;
 + (void) enableEmbree: (BOOL) enabled;
 
-- (void) addToUserGeometryList : (UserGeometryData *) data;
-- (UserGeometryData *) getFromUserGeometryList : (int) geomID;
+- (void) addToUserGeometryList : (GeometryData *) data;
+- (GeometryData *) getFromUserGeometryList : (int) geomID;
 
 // setup embree singleton
 + (void) initialize : (ART_GV *) newART_GV;
@@ -133,7 +133,7 @@ UserGeometryDataList;
 // adds an RTCGeometry associated with a geometry to Embree
 - (int) addGeometry: (RTCGeometry) newGeometry;
 
-// creates a UserGeometryDataList for a geometry in question
+// creates a GeometryDataList for a geometry in question
 - (void) setGeometryUserData
         : (RTCGeometry) newGeometry
         : (ArNode *) shape

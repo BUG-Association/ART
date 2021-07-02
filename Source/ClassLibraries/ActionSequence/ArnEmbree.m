@@ -49,7 +49,7 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
     if(!args->geometryUserPtr)
         return;
 
-    const UserGeometryData * geometryData = (const UserGeometryData *) args->geometryUserPtr;
+    const GeometryData * geometryData = (const GeometryData *) args->geometryUserPtr;
     struct RTCBounds * bounds_o = args->bounds_o;
 
     // calculate the bounding box
@@ -121,7 +121,7 @@ void embree_intersect_geometry(const int * valid,
     // retreive raycaster and geometry data
     ArnEmbree * embree = [ArnEmbree embreeManager];
     ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
-    UserGeometryData * geometryData = (UserGeometryData *) geometryUserPtr;
+    GeometryData * geometryData = (GeometryData *) geometryUserPtr;
 
     // handling prior non-user-geometry intersections
     if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
@@ -129,7 +129,7 @@ void embree_intersect_geometry(const int * valid,
         if(!rayCaster->intersectionListHead)
         {
             // retreive the geometry data associated with the previous hit
-            UserGeometryData * previouslyHitGeometryData =
+            GeometryData * previouslyHitGeometryData =
                                 [embree getFromUserGeometryList: rtc_hit->geomID];
 
             if(!previouslyHitGeometryData) {
@@ -244,7 +244,7 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 // embreeManager is the singleton object dealing with things like
 // initializing embree geometries and such
 static BOOL EMBREE_ENABLED = NO;
-static ArnEmbree * embreeManager;
+static ArnEmbree * embreeManager = NULL;
 
 
 // #define EMBREE_DEBUG_PRINT
@@ -360,7 +360,7 @@ static ArnEmbree * embreeManager;
 + (void) createInternalBSPTreeForAllCSGGeometries {
     ArnEmbree * embree = [ArnEmbree embreeManager];
 
-    UserGeometryDataList * iteratorNode = embree->userGeometryListHead;
+    GeometryDataList * iteratorNode = embree->userGeometryListHead;
 
     while(iteratorNode) {
         ArNode * combinedAttributes_or_csg_node =
@@ -386,8 +386,8 @@ static ArnEmbree * embreeManager;
 
 - (void) freeGeometryDataList {
 
-    UserGeometryDataList * iteratorNode = userGeometryListHead;
-    UserGeometryDataList * next;
+    GeometryDataList * iteratorNode = userGeometryListHead;
+    GeometryDataList * next;
 
     while( iteratorNode ) {
         next = iteratorNode->next;
@@ -410,14 +410,14 @@ static ArnEmbree * embreeManager;
     }
 }
 
-- (void) addToUserGeometryList : (UserGeometryData *) data {
-    // arlist_add_userGeometryDataptr_at_tail( &userGeometryList, data );
+- (void) addToUserGeometryList : (GeometryData *) data {
+    // arlist_add_GeometryDataptr_at_tail( &userGeometryList, data );
 
 
     // code is based on this stack-overflow answer:
     // https://stackoverflow.com/questions/5797548/c-linked-list-inserting-node-at-the-end
-    UserGeometryDataList * newNode =
-            (UserGeometryDataList *) malloc(sizeof(UserGeometryDataList));
+    GeometryDataList * newNode =
+            (GeometryDataList *) malloc(sizeof(GeometryDataList));
 
     if( !newNode ) {
         fprintf(stderr, "Unable to allocate memory for new user geometry list node\n");
@@ -432,7 +432,7 @@ static ArnEmbree * embreeManager;
         return;
     }
 
-    UserGeometryDataList * iteratorNode = userGeometryListHead;
+    GeometryDataList * iteratorNode = userGeometryListHead;
     while( true ) {
         if (!iteratorNode->next) {
             iteratorNode->next = newNode;
@@ -442,11 +442,11 @@ static ArnEmbree * embreeManager;
     }
 }
 
-- (UserGeometryData *) getFromUserGeometryList : (int) geomID {
+- (GeometryData *) getFromUserGeometryList : (int) geomID {
 
-    UserGeometryData * found = NULL;
+    GeometryData * found = NULL;
 
-    UserGeometryDataList * traversalNode = userGeometryListHead;
+    GeometryDataList * traversalNode = userGeometryListHead;
     while(traversalNode->next) {
         if(traversalNode->data->_embreeGeomID == geomID) {
             found = traversalNode->data;
@@ -594,7 +594,7 @@ static ArnEmbree * embreeManager;
         : (ArNode *) combinedAttributesOrCSGNode
         : (unsigned int) embreeGeomID;
 {
-    struct UserGeometryData * data = malloc(sizeof(struct UserGeometryData));
+    struct GeometryData * data = malloc(sizeof(struct GeometryData));
 
     if( !data ) {
         fprintf(stderr, "Unable to allocate memory for new user geometry data struct\n");

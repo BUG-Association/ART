@@ -444,7 +444,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // retrieve further information about the intersected shape ...
     unsigned int geomID = rayhit.hit.geomID;
     RTCGeometry intersectedRTCGeometry = rtcGetGeometry(embreeRTCSceneCopy, geomID);
-    UserGeometryData * geometryData = (UserGeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
+    GeometryData * geometryData = (GeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
 
     /*
     // debug
