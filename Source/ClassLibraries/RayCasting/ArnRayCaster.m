@@ -380,12 +380,15 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 - (void) getIntersectionListWithEmbree
         : (struct ArIntersectionList *) intersectionList
 {
+    ArnEmbree * embree = [ArnEmbree embreeManager];
+
     // we must have an RTCScene associated with this ray caster
-    if(!embreeRTCSceneCopy) {
+    if(![embree getDevice] || ![embree getScene]) {
         ART_ERRORHANDLING_FATAL_ERROR(
-                "method [ArnRayCaster intersectWithEmbree:::] called, without member variable RTCScene being initialized"
+                "method [ArnRayCaster intersectWithEmbree:::] called, without RTCDevice or RTCScene being initialized"
         );
     }
+
 
     // at the first call of 'getIntersectionListWithEmbree'
     // add this ray caster object to the static ray caster array
@@ -419,9 +422,8 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
 
     // do the intersection
-    rtcIntersect1(embreeRTCSceneCopy, &context, &rayhit);
+    rtcIntersect1([embree getScene], &context, &rayhit);
 
-    ArnEmbree * embree = [ArnEmbree embreeManager];
 
     // if we did not hit anything and we do not have environment lighting, we are done here
     if(rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID && !embree->environmentLighting) {
@@ -443,7 +445,7 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
     // else:
     // retrieve further information about the intersected shape ...
     unsigned int geomID = rayhit.hit.geomID;
-    RTCGeometry intersectedRTCGeometry = rtcGetGeometry(embreeRTCSceneCopy, geomID);
+    RTCGeometry intersectedRTCGeometry = rtcGetGeometry([embree getScene], geomID);
     GeometryData * geometryData = (GeometryData *) rtcGetGeometryUserData(intersectedRTCGeometry);
 
     /*
@@ -583,7 +585,6 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 #if defined(ENABLE_EMBREE_SUPPORT)
     if([ArnEmbree embreeEnabled]) {
         ArnEmbree * embree = [ArnEmbree embreeManager];
-        embreeRTCSceneCopy = [embree getScene];
         self->addedToEmbreeArray = NO;
         self->intersectionListHead = NULL;
         [embree increaseRayCasterCount];

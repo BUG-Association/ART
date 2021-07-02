@@ -109,7 +109,7 @@ IntersectionLinkedListNode;
 //----------------------------------------------------------------//
 //              embree related stuff                              //
 //----------------------------------------------------------------//
-    RTCScene embreeRTCSceneCopy;
+    // RTCScene embreeRTCSceneCopy;
 
     BOOL addedToEmbreeArray;
 
