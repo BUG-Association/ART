@@ -40,6 +40,7 @@ extern "C" {
 #include <string>
 #include <array>
 #include <exception>
+#include <vector>
 
 #include <ImfArray.h>
 #include <ImfChannelList.h>
@@ -317,13 +318,6 @@ int readRGBOpenEXR(
     *gray_buffer  = NULL;
     *alpha_buffer = NULL;
 
-    float *yBuffer  = nullptr;
-    float *ryBuffer = nullptr;
-    float *byBuffer = nullptr;
-
-    Imf::Rgba *buff1 = nullptr;
-    Imf::Rgba *buff2 = nullptr;
-
     try {
         Imf::InputFile file(filename);
 
@@ -494,12 +488,12 @@ int readRGBOpenEXR(
             // We have to convert the Luminance Chroma to RGB
             // This format is a bit perticular since it stores luminance
             // and chrominance with a different resolution
-            yBuffer  = new float[(*width) * (*height)];
-            ryBuffer = new float[(*width) / 2 * (*height) / 2];
-            byBuffer = new float[(*width) / 2 * (*height) / 2];
+            std::vector<float> yBuffer  ((*width) * (*height));
+            std::vector<float> ryBuffer ((*width) / 2 * (*height) / 2);
+            std::vector<float> byBuffer ((*width) / 2 * (*height) / 2);
 
-            buff1 = new Imf::Rgba[(*width) * (*height)];
-            buff2 = new Imf::Rgba[(*width) * (*height)];
+            std::vector<Imf::Rgba> buff1 ((*width) * (*height));
+            std::vector<Imf::Rgba> buff2 ((*width) * (*height));
 
             Imf::Slice ySlice = Imf::Slice::Make(
                 Imf::PixelType::FLOAT,
@@ -606,12 +600,6 @@ int readRGBOpenEXR(
                     (*rgb_buffer)[3 * (y * (*width) + x) + 2] = std::max(0.f, rgb.z);
                 }
             }
-
-            delete[] yBuffer;  yBuffer  = nullptr;
-            delete[] ryBuffer; ryBuffer = nullptr;
-            delete[] byBuffer; byBuffer = nullptr;
-            delete[] buff1;    buff1    = nullptr;
-            delete[] buff2;    buff2    = nullptr;
         }
 
         if (hasAlpha) {
@@ -641,13 +629,6 @@ int readRGBOpenEXR(
 
         *width  = 0;
         *height = 0;
-
-        delete[] yBuffer;
-        delete[] ryBuffer;
-        delete[] byBuffer;
-
-        delete[] buff1;
-        delete[] buff2;
 
         return -1;
     }
