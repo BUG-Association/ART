@@ -284,7 +284,7 @@ int isRGBEXR(const char* filename)
             hasY = true;
         }
 
-        return ((hasR && hasG && hasB) || hasY) ? 1 : 0;
+        return ((hasR || hasG || hasB) || hasY) ? 1 : 0;
     } catch (std::exception &e) {
         ART_ERRORHANDLING_WARNING(
             "Error while loading OpenEXR file %s: %s",
@@ -324,8 +324,7 @@ int readRGBOpenEXR(
         const Imf::Header& header = file.header();
         const Imf::ChannelList& channels = header.channels();
         const Imath::Box2i& dataWindow = header.dataWindow();
-        // TODO
-        // const Imath::Box2i& displayWindow = header.displayWindow();
+        const Imath::Box2i& displayWindow = header.displayWindow();
 
         // Now just check this header info and raise a warning if != 1
         const float pixelAspectRatio = header.pixelAspectRatio();
@@ -338,17 +337,24 @@ int readRGBOpenEXR(
             );
         }
 
-        // -----------------------------------------------------------------------
-        // We determine the size of the image
-        // -----------------------------------------------------------------------
+        std::vector<float> local_data_rgb;
+        std::vector<float> local_data_gray;
+        std::vector<float> local_data_alpha;
 
-        // TODO support for displayWindow
-        *width  = dataWindow.max.x - dataWindow.min.x + 1;
-        *height = dataWindow.max.y - dataWindow.min.y + 1;
+        // -------------------------------------------------------------------
+        // We determine the size of the data window & display window
+        // -------------------------------------------------------------------
 
-        // -----------------------------------------------------------------------
+        const int data_width  = dataWindow.max.x - dataWindow.min.x + 1;
+        const int data_height = dataWindow.max.y - dataWindow.min.y + 1;
+
+        // Display window gives the effective size of the returned image
+        *width  = displayWindow.max.x - displayWindow.min.x + 1;
+        *height = displayWindow.max.y - displayWindow.min.y + 1;
+
+        // -------------------------------------------------------------------
         // Check if there is specific chromaticities
-        // -----------------------------------------------------------------------
+        // -------------------------------------------------------------------
 
         const Imf::ChromaticitiesAttribute *c 
             = header.findTypedAttribute<Imf::ChromaticitiesAttribute>(
@@ -377,9 +383,9 @@ int readRGBOpenEXR(
 
         Imath::M44f conversionMatrix = RGB_XYZ * XYZ_RGB;
 
-        // -----------------------------------------------------------------------
+        // -------------------------------------------------------------------
         // We determine the colour encoding type
-        // -----------------------------------------------------------------------
+        // -------------------------------------------------------------------
         // Can be of types:
         // - RGB or RGBA
         // - Y or YA
@@ -396,54 +402,57 @@ int readRGBOpenEXR(
 
         const Imf::Channel* channel_a = channels.findChannel("A");
 
-        bool hasRGB = (channel_r != nullptr) && (channel_g != nullptr) && (channel_b != nullptr);
+        bool hasRGB = (channel_r != nullptr) || (channel_g != nullptr) || (channel_b != nullptr);
         bool hasAlpha = (channel_a != nullptr);
         bool hasLuminance = (channel_y != nullptr);
         bool hasRYBY = (channel_ry != nullptr && channel_by != nullptr);
 
-        // -----------------------------------------------------------------------
+        // -------------------------------------------------------------------
         // Allocate memory (C-style: it is going to be freed in Objective-C)
-        // -----------------------------------------------------------------------
+        // -------------------------------------------------------------------
 
         if (hasRGB || (hasRYBY && hasLuminance)) {
+            local_data_rgb.resize(3 * data_width * data_height);
             *rgb_buffer = (float*)calloc(3 * (*width) * (*height), sizeof(float));
         } else if (hasLuminance) {
+            local_data_gray.resize(data_width * data_height);
             *gray_buffer = (float*)calloc((*width) * (*height), sizeof(float));
         } else {
             return -1;
         }
 
         if (hasAlpha) {
+            local_data_alpha.resize(data_width * data_height);
             *alpha_buffer = (float*)calloc((*width) * (*height), sizeof(float));
         }
 
-        // -----------------------------------------------------------------------
+        // -------------------------------------------------------------------
         // Read the image
-        // -----------------------------------------------------------------------
+        // -------------------------------------------------------------------
 
         if (hasRGB) {
             Imf::FrameBuffer framebuffer;
 
             Imf::Slice rSlice = Imf::Slice::Make(
                 Imf::PixelType::FLOAT,
-                &((*rgb_buffer)[0]),
+                &local_data_rgb[0],
                 dataWindow,
                 3 * sizeof(float),
-                3 * (*width) * sizeof(float));
+                3 * data_width * sizeof(float));
 
             Imf::Slice gSlice = Imf::Slice::Make(
                 Imf::PixelType::FLOAT,
-                &((*rgb_buffer)[1]),
+                &local_data_rgb[1],
                 dataWindow,
                 3 * sizeof(float),
-                3 * (*width) * sizeof(float));
+                3 * data_width * sizeof(float));
 
             Imf::Slice bSlice = Imf::Slice::Make(
                 Imf::PixelType::FLOAT,
-                &((*rgb_buffer)[2]),
+                &local_data_rgb[2],
                 dataWindow,
                 3 * sizeof(float),
-                3 * (*width) * sizeof(float));
+                3 * data_width * sizeof(float));
 
             framebuffer.insert("R", rSlice);
             framebuffer.insert("G", gSlice);
@@ -453,30 +462,29 @@ int readRGBOpenEXR(
             file.readPixels(dataWindow.min.y, dataWindow.max.y);
 
             // Handle custom chromaticities
-            for (int y = 0; y < (*height); y++) {
-                for (int x = 0; x < (*width); x++) {
+            for (int y = 0; y < data_height; y++) {
+                for (int x = 0; x < data_width; x++) {
                     Imath::V3f rgb(
-                        (*rgb_buffer)[3 * (y * (*width) + x) + 0],
-                        (*rgb_buffer)[3 * (y * (*width) + x) + 1],
-                        (*rgb_buffer)[3 * (y * (*width) + x) + 2]);
+                        local_data_rgb[3 * (y * data_width + x) + 0],
+                        local_data_rgb[3 * (y * data_width + x) + 1],
+                        local_data_rgb[3 * (y * data_width + x) + 2]);
 
                     rgb = rgb * conversionMatrix;
 
-                    (*rgb_buffer)[3 * (y * (*width) + x) + 0] = std::max(0.f, rgb.x);
-                    (*rgb_buffer)[3 * (y * (*width) + x) + 1] = std::max(0.f, rgb.y);
-                    (*rgb_buffer)[3 * (y * (*width) + x) + 2] = std::max(0.f, rgb.z);
+                    local_data_rgb[3 * (y * data_width + x) + 0] = std::max(0.f, rgb.x);
+                    local_data_rgb[3 * (y * data_width + x) + 1] = std::max(0.f, rgb.y);
+                    local_data_rgb[3 * (y * data_width + x) + 2] = std::max(0.f, rgb.z);
                 }
             }
-
         } else if (hasLuminance && !hasRYBY) {
             Imf::FrameBuffer framebuffer;
 
             Imf::Slice ySlice = Imf::Slice::Make(
                 Imf::PixelType::FLOAT,
-                &((*gray_buffer)[0]),
+                &local_data_gray[0],
                 dataWindow,
                 sizeof(float),
-                (*width) * sizeof(float));
+                data_width * sizeof(float));
 
             framebuffer.insert("Y", ySlice);
 
@@ -488,26 +496,26 @@ int readRGBOpenEXR(
             // We have to convert the Luminance Chroma to RGB
             // This format is a bit perticular since it stores luminance
             // and chrominance with a different resolution
-            std::vector<float> yBuffer  ((*width) * (*height));
-            std::vector<float> ryBuffer ((*width) / 2 * (*height) / 2);
-            std::vector<float> byBuffer ((*width) / 2 * (*height) / 2);
+            std::vector<float> yBuffer  (data_width * data_height);
+            std::vector<float> ryBuffer (data_width / 2 * data_height / 2);
+            std::vector<float> byBuffer (data_width / 2 * data_height / 2);
 
-            std::vector<Imf::Rgba> buff1 ((*width) * (*height));
-            std::vector<Imf::Rgba> buff2 ((*width) * (*height));
+            std::vector<Imf::Rgba> buff1 (data_width * data_height);
+            std::vector<Imf::Rgba> buff2 (data_width * data_height);
 
             Imf::Slice ySlice = Imf::Slice::Make(
                 Imf::PixelType::FLOAT,
                 &yBuffer[0],
                 dataWindow,
                 sizeof(float),
-                (*width) * sizeof(float));
+                data_width * sizeof(float));
 
             Imf::Slice rySlice = Imf::Slice::Make(
                 Imf::PixelType::FLOAT,
                 &ryBuffer[0],
                 dataWindow,
                 sizeof(float),
-                (*width) / 2 * sizeof(float),
+                data_width / 2 * sizeof(float),
                 2,
                 2);
 
@@ -516,7 +524,7 @@ int readRGBOpenEXR(
                 &byBuffer[0],
                 dataWindow,
                 sizeof(float),
-                (*width) / 2 * sizeof(float),
+                data_width / 2 * sizeof(float),
                 2,
                 2);
 
@@ -535,69 +543,69 @@ int readRGBOpenEXR(
             // Use later Imf::RgbaYca::reconstructChromaHoriz and
             // Imf::RgbaYca::reconstructChromaVert to reconstruct missing
             // pixels
-            for (int y = 0; y < (*height); y++) {
-                for (int x = 0; x < (*width); x++) {
-                    const float l = yBuffer[y * (*width) + x];
+            for (int y = 0; y < data_height; y++) {
+                for (int x = 0; x < data_width; x++) {
+                    const float l = yBuffer[y * data_width + x];
                     const float ry
-                        = ryBuffer[y / 2 * (*width) / 2 + x / 2];
+                        = ryBuffer[y / 2 * data_width / 2 + x / 2];
                     const float by
-                        = byBuffer[y / 2 * (*width) / 2 + x / 2];
+                        = byBuffer[y / 2 * data_width / 2 + x / 2];
 
-                    buff1[y * (*width) + x].r = ry;
-                    buff1[y * (*width) + x].g = l;
-                    buff1[y * (*width) + x].b = by;
+                    buff1[y * data_width + x].r = ry;
+                    buff1[y * data_width + x].g = l;
+                    buff1[y * data_width + x].b = by;
                 }
             }
 
             Imath::V3f yw = Imf::RgbaYca::computeYw(fileChromaticities);
 
             // Proceed to the YCA -> RGBA conversion
-            for (int y = 0; y < (*height); y++) {
+            for (int y = 0; y < data_height; y++) {
                 Imf::RgbaYca::YCAtoRGBA(
                     yw,
                     (*width),
-                    &buff1[y * (*width)],
-                    &buff1[y * (*width)]);
+                    &buff1[y * data_width],
+                    &buff1[y * data_width]);
             }
 
             // Fix over saturated pixels
-            for (int y = 0; y < (*height); y++) {
+            for (int y = 0; y < data_height; y++) {
                 const Imf::Rgba *scanlines[3];
 
                 if (y == 0) {
-                    scanlines[0] = &buff1[(y + 1) * (*width)];
+                    scanlines[0] = &buff1[(y + 1) * data_width];
                 } else {
-                    scanlines[0] = &buff1[(y - 1) * (*width)];
+                    scanlines[0] = &buff1[(y - 1) * data_width];
                 }
 
-                scanlines[1] = &buff1[y * (*width)];
+                scanlines[1] = &buff1[y * data_width];
 
-                if (y == (*height) - 1) {
-                    scanlines[2] = &buff1[(y - 1) * (*width)];
+                if (y == data_height - 1) {
+                    scanlines[2] = &buff1[(y - 1) * data_width];
                 } else {
-                    scanlines[2] = &buff1[(y + 1) * (*width)];
+                    scanlines[2] = &buff1[(y + 1) * data_width];
                 }
 
                 Imf::RgbaYca::fixSaturation(
                     yw,
-                    (*width),
+                    data_width,
                     scanlines,
-                    &buff2[y * (*width)]);
+                    &buff2[y * data_width]);
             }
 
             // Handle custom chromaticities and clamp negative values
-            for (int y = 0; y < (*height); y++) {
-                for (int x = 0; x < (*width); x++) {
+            for (int y = 0; y < data_height; y++) {
+                for (int x = 0; x < data_width; x++) {
                     Imath::V3f rgb(
-                        buff2[y * (*width) + x].r,
-                        buff2[y * (*width) + x].g,
-                        buff2[y * (*width) + x].b);
+                        buff2[y * data_width + x].r,
+                        buff2[y * data_width + x].g,
+                        buff2[y * data_width + x].b);
 
                     rgb = rgb * conversionMatrix;
 
-                    (*rgb_buffer)[3 * (y * (*width) + x) + 0] = std::max(0.f, rgb.x);
-                    (*rgb_buffer)[3 * (y * (*width) + x) + 1] = std::max(0.f, rgb.y);
-                    (*rgb_buffer)[3 * (y * (*width) + x) + 2] = std::max(0.f, rgb.z);
+                    local_data_rgb[3 * (y * data_width + x) + 0] = std::max(0.f, rgb.x);
+                    local_data_rgb[3 * (y * data_width + x) + 1] = std::max(0.f, rgb.y);
+                    local_data_rgb[3 * (y * data_width + x) + 2] = std::max(0.f, rgb.z);
                 }
             }
         }
@@ -607,15 +615,73 @@ int readRGBOpenEXR(
 
             Imf::Slice aSlice = Imf::Slice::Make(
                 Imf::PixelType::FLOAT,
-                &((*alpha_buffer)[0]),
+                &local_data_alpha[0],
                 dataWindow,
                 sizeof(float),
-                (*width) * sizeof(float));
+                data_width * sizeof(float));
 
             framebuffer.insert("A", aSlice);
 
             file.setFrameBuffer(framebuffer);
             file.readPixels(dataWindow.min.y, dataWindow.max.y);
+        }
+
+        // -------------------------------------------------------------------
+        // Set the displayWindow data
+        // -------------------------------------------------------------------
+        // Compute offsets
+        const int start_x = dataWindow.min.x - displayWindow.min.x;
+        const int start_y = dataWindow.min.y - displayWindow.min.y;
+
+        if (hasRGB) {
+            memset(&((*rgb_buffer)[0]), 0, 3 * (*width) * (*height) * sizeof(float));
+        } else if (hasLuminance) {
+            memset(&((*gray_buffer)[0]), 0, (*width) * (*height) * sizeof(float));
+        }
+
+        if (hasAlpha) {
+            memset(&((*alpha_buffer)[0]), 0, (*width) * (*height) * sizeof(float));
+        }
+
+        for (int display_y = std::max(0, start_y); display_y < std::min((*height), data_height + start_y); display_y++) {
+            const int data_y = display_y - start_y;
+
+            assert(display_y >= 0);
+            assert(display_y < display_height);
+
+            assert(data_y >= 0);
+            assert(data_y < data_height);
+
+            const int start_display_x = std::max(0, start_x);
+            const int start_data_x    = start_display_x - start_x;
+            const int end_display_x   = std::min((*width), data_width + start_x);
+
+            const int n_pixels = end_display_x - start_display_x;
+
+            assert((n_pixels == 0) || (start_display_x + n_pixels <= (*width)));
+            assert((n_pixels == 0) || (start_data_x    + n_pixels <= data_width));
+
+            if (hasRGB) {
+                memcpy(
+                    &((*rgb_buffer)[3 * (display_y * (*width)   + start_display_x)]), 
+                    &local_data_rgb[3 * (data_y    * data_width + start_data_x)],
+                    3 * sizeof(float) * n_pixels
+                    );
+            } else if (hasLuminance) {
+                memcpy(
+                    &((*gray_buffer)[display_y * (*width)   + start_display_x]), 
+                    &local_data_gray[data_y    * data_width + start_data_x],
+                    sizeof(float) * n_pixels
+                    );
+            }
+
+            if (hasAlpha) {
+                memcpy(
+                    &((*alpha_buffer)[display_y * (*width)   + start_display_x]), 
+                    &local_data_alpha[data_y    * data_width + start_data_x],
+                    sizeof(float) * n_pixels
+                    );
+            }
         }
     } catch (std::exception& e) {
         ART_ERRORHANDLING_WARNING(
