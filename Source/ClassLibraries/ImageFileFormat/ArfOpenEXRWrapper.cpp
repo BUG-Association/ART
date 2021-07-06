@@ -400,10 +400,7 @@ int readRGBOpenEXR(
         const Imf::Channel* channel_ry = channels.findChannel("RY");
         const Imf::Channel* channel_by = channels.findChannel("BY");
 
-        const Imf::Channel* channel_a = channels.findChannel("A");
-
         bool hasRGB = (channel_r != nullptr) || (channel_g != nullptr) || (channel_b != nullptr);
-        bool hasAlpha = (channel_a != nullptr);
         bool hasLuminance = (channel_y != nullptr);
         bool hasRYBY = (channel_ry != nullptr && channel_by != nullptr);
 
@@ -421,10 +418,8 @@ int readRGBOpenEXR(
             return -1;
         }
 
-        if (hasAlpha) {
-            local_data_alpha.resize(data_width * data_height);
-            *alpha_buffer = (float*)calloc((*width) * (*height), sizeof(float));
-        }
+        local_data_alpha.resize(data_width * data_height);
+        *alpha_buffer = (float*)calloc((*width) * (*height), sizeof(float));
 
         // -------------------------------------------------------------------
         // Read the image
@@ -610,21 +605,20 @@ int readRGBOpenEXR(
             }
         }
 
-        if (hasAlpha) {
-            Imf::FrameBuffer framebuffer;
+        Imf::FrameBuffer framebuffer;
 
-            Imf::Slice aSlice = Imf::Slice::Make(
-                Imf::PixelType::FLOAT,
-                &local_data_alpha[0],
-                dataWindow,
-                sizeof(float),
-                data_width * sizeof(float));
+        Imf::Slice aSlice = Imf::Slice::Make(
+            Imf::PixelType::FLOAT,
+            &local_data_alpha[0],
+            dataWindow,
+            sizeof(float),
+            data_width * sizeof(float),
+            1, 1, 1.f);
 
-            framebuffer.insert("A", aSlice);
+        framebuffer.insert("A", aSlice);
 
-            file.setFrameBuffer(framebuffer);
-            file.readPixels(dataWindow.min.y, dataWindow.max.y);
-        }
+        file.setFrameBuffer(framebuffer);
+        file.readPixels(dataWindow.min.y, dataWindow.max.y);
 
         // -------------------------------------------------------------------
         // Set the displayWindow data
@@ -639,9 +633,7 @@ int readRGBOpenEXR(
             memset(&((*gray_buffer)[0]), 0, (*width) * (*height) * sizeof(float));
         }
 
-        if (hasAlpha) {
-            memset(&((*alpha_buffer)[0]), 0, (*width) * (*height) * sizeof(float));
-        }
+        memset(&((*alpha_buffer)[0]), 0, (*width) * (*height) * sizeof(float));
 
         for (int display_y = std::max(0, start_y); display_y < std::min((*height), data_height + start_y); display_y++) {
             const int data_y = display_y - start_y;
@@ -675,13 +667,11 @@ int readRGBOpenEXR(
                     );
             }
 
-            if (hasAlpha) {
-                memcpy(
-                    &((*alpha_buffer)[display_y * (*width)   + start_display_x]), 
-                    &local_data_alpha[data_y    * data_width + start_data_x],
-                    sizeof(float) * n_pixels
-                    );
-            }
+            memcpy(
+                &((*alpha_buffer)[display_y * (*width)   + start_display_x]), 
+                &local_data_alpha[data_y    * data_width + start_data_x],
+                sizeof(float) * n_pixels
+                );
         }
     } catch (std::exception& e) {
         ART_ERRORHANDLING_WARNING(
