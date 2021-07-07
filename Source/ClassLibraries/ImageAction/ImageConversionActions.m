@@ -858,7 +858,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
-         we wish to create (in our case, ArfARTRAW and ArfARTCSP).
+         we wish to create.
     ---------------------------------------------------------------aw- */
 
     [ self prepareForImageManipulation
@@ -875,20 +875,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
         [ REPORTER beginTimedAction
             :   "converting raw image to spectral EXR"
             ];
-
-    /* ------------------------------------------------------------------
-         Spectral EXRs are weird. They expect all the image data in
-         one huge block, so they get what they want - the source image
-         raw data in one huge block, which they then have to make sense
-         of somehow.
-    ---------------------------------------------------------------aw- */
-
-    int  nc = spc_channels(art_gv);
-    
-    float  * imagebuffer = ALLOC_ARRAY(float, XC(destinationImageSize)*YC(destinationImageSize)*nc);
-    
-    ArSpectrum  * temp_spc = spc_alloc(art_gv);
-    
+        
     for ( int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( int y = 0; y < YC(destinationImageSize); y++ )
@@ -897,28 +884,13 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
             for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
-                arlightalpha_to_spc(
-                      art_gv,
-                      LIGHTALPHA_SOURCE_BUFFER(x),
-                      temp_spc
-                    );
-
-                for ( int j = 0; j < nc; j++ )
-                {
-                    imagebuffer[ y * XC(destinationImageSize) * nc + x * nc + j ] =
-                        spc_si( art_gv, temp_spc, j );
-                }
+                LIGHTALPHA_DESTINATION_BUFFER_LIGHT(x) = LIGHTALPHA_SOURCE_BUFFER_LIGHT(x);
+                LIGHTALPHA_DESTINATION_BUFFER_ALPHA(x) = LIGHTALPHA_SOURCE_BUFFER_ALPHA(x);
             }
+
+            [ self writeDestinationScanlineBuffer: i : y ];
         }
-#warning update: Now OpenEXR have the same interface as ARTRAW
-//        [ (ArfOpenEXR*)(destinationImage[i]->imageFile)
-//            setFloatImageBuffer
-//            :   imagebuffer
-//            ];
     }
-    
-    spc_free(art_gv, temp_spc);
-    FREE_ARRAY(imagebuffer);
 
     /* ------------------------------------------------------------------
          Free the image manipulation infrastructure and end the action;

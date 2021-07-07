@@ -64,7 +64,7 @@ int tonemap(
         [ FLAG_OPTION
             :   "directSpectralEXR"
             :   "dse"
-            :   "no tone mapping, direct RAW -> Mitsuba-style spectral EXR conversion"
+            :   "no tone mapping, direct RAW -> Spectral EXR conversion"
             ];
 #endif // ART_WITH_OPENEXR
 
