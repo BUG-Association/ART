@@ -405,7 +405,9 @@ int readRGBOpenEXR(
         bool hasRYBY = (channel_ry != nullptr && channel_by != nullptr);
 
         // -------------------------------------------------------------------
-        // Allocate memory (C-style: it is going to be freed in Objective-C)
+        // Allocate memory 
+        // The returned pointers use C-style: they are going to be freed in 
+        // Objective-C
         // -------------------------------------------------------------------
 
         if (hasRGB || (hasRYBY && hasLuminance)) {
@@ -605,6 +607,8 @@ int readRGBOpenEXR(
             }
         }
 
+        // Alpha channel: default to 1.f if no value are provided
+        // i.e. full opacity
         Imf::FrameBuffer framebuffer;
 
         Imf::Slice aSlice = Imf::Slice::Make(
@@ -623,10 +627,12 @@ int readRGBOpenEXR(
         // -------------------------------------------------------------------
         // Set the displayWindow data
         // -------------------------------------------------------------------
+        
         // Compute offsets
         const int start_x = dataWindow.min.x - displayWindow.min.x;
         const int start_y = dataWindow.min.y - displayWindow.min.y;
 
+        // Initialize memory: 0 for colours, 0 for alpha (full transparency)
         if (hasRGB) {
             memset(&((*rgb_buffer)[0]), 0, 3 * (*width) * (*height) * sizeof(float));
         } else if (hasLuminance) {
@@ -635,6 +641,7 @@ int readRGBOpenEXR(
 
         memset(&((*alpha_buffer)[0]), 0, (*width) * (*height) * sizeof(float));
 
+        // Copy the datawindow at the appropriate position in the display window
         for (int display_y = std::max(0, start_y); display_y < std::min((*height), data_height + start_y); display_y++) {
             const int data_y = display_y - start_y;
 
@@ -674,17 +681,17 @@ int readRGBOpenEXR(
                 );
         }
     } catch (std::exception& e) {
-        ART_ERRORHANDLING_WARNING(
-            "Error while loading OpenEXR file %s: %s",
-            filename, e.what()
-        );
-
         free(*rgb_buffer);   *rgb_buffer   = NULL;
         free(*gray_buffer);  *gray_buffer  = NULL;
         free(*alpha_buffer); *alpha_buffer = NULL;
 
         *width  = 0;
         *height = 0;
+
+        ART_ERRORHANDLING_WARNING(
+            "Error while loading OpenEXR file %s: %s",
+            filename, e.what()
+        );
 
         return -1;
     }
@@ -814,13 +821,12 @@ int readSpectralOpenEXR(
         // TODO: Check for polarisation handedness (af)
 
         Imf::InputFile exrIn(filename);
-        const Imf::Header& exrHeader = exrIn.header();
-        const Imath::Box2i& exrDataWindow = exrHeader.dataWindow();
-        // TODO
-        // const Imath::Box2i& displayWindow = exrHeader.displayWindow();
+        const Imf::Header& header = exrIn.header();
+        const Imath::Box2i& dataWindow    = header.dataWindow();
+        const Imath::Box2i& displayWindow = header.displayWindow();
 
         // Now just check this header info and raise a warning if != 1
-        const float pixelAspectRatio = exrHeader.pixelAspectRatio();
+        const float pixelAspectRatio = header.pixelAspectRatio();
 
         if (pixelAspectRatio != 1.f) {
             ART_ERRORHANDLING_WARNING(
@@ -836,12 +842,9 @@ int readSpectralOpenEXR(
         // Determine spectral channels' position
         // -----------------------------------------------------------------------
 
-        const Imf::ChannelList& exrChannels = exrHeader.channels();
+        const Imf::ChannelList& exrChannels = header.channels();
 
         std::array<std::vector<std::pair<double, std::string>>, 4> wavelengths_nm_S;
-
-        // Detect Alpha channel
-        bool hasAlphaChannel = false;
 
         for (Imf::ChannelList::ConstIterator channel = exrChannels.begin(); channel != exrChannels.end(); channel++) {
             // Check if the channel is spectral or one of the RGBA channel
@@ -891,8 +894,6 @@ int readSpectralOpenEXR(
                 //             wavelength_nm,
                 //             channel.name()));
                 // }
-            } else if (strcmp(channel.name(), "A") == 0) {
-                hasAlphaChannel = true;
             }
         }
 
@@ -926,17 +927,31 @@ int readSpectralOpenEXR(
             }
         }
 
-        *width = exrDataWindow.max.x - exrDataWindow.min.x + 1;
-        *height = exrDataWindow.max.y - exrDataWindow.min.y + 1;
-        *isPolarised = isPolarisedSpectrum(spectrumType) ? 1 : 0;
-        *isEmissive = isEmissiveSpectrum(spectrumType) ? 1 : 0;
+        // Width and height may be different for data window and display window
+        // The data window is read locally and the display window returned
+        const int data_width  = dataWindow.max.x - dataWindow.min.x + 1;
+        const int data_height = dataWindow.max.x - dataWindow.min.x + 1;
+
+        *width  = displayWindow.max.x - displayWindow.min.x + 1;
+        *height = displayWindow.max.y - displayWindow.min.y + 1;
         *n_spectralBands = wavelengths_nm_S[0].size();
 
-        // -----------------------------------------------------------------------
-        // Allocate memory (C-style: it is going to be freed in Objective-C)
-        // -----------------------------------------------------------------------
+        *isPolarised = isPolarisedSpectrum(spectrumType) ? 1 : 0;
+        *isEmissive  = isEmissiveSpectrum(spectrumType) ? 1 : 0;
 
+        // -------------------------------------------------------------------
+        // Allocate memory 
+        // The returned pointers use C-style: they are going to be freed in 
+        // Objective-C
+        // -------------------------------------------------------------------
+        
+        const size_t n_data_pixels = data_width * data_height;
         const size_t n_pixels = (*width) * (*height);
+
+        // We first read data window and populate the display window
+        // so we keep the data window local
+        std::vector<float> local_alpha_buffer;
+        std::array<std::vector<float>, 4> local_data_spectral_buffers;
 
         // Now, we can populate the local wavelength vector
         if (isEmissiveSpectrum(spectrumType) || isReflectiveSpectrum(spectrumType)) {
@@ -950,14 +965,14 @@ int readSpectralOpenEXR(
             const size_t n_elems = (*n_spectralBands) * n_pixels;
 
             for (size_t s = 0; s < n_stokes_components; s++) {
+                local_data_spectral_buffers[s].resize((*n_spectralBands) * n_data_pixels);
                 (*spectral_buffers)[s] = (float*)calloc(n_elems, sizeof(float));
             }
         }
 
-        // Allocation of alpha buffer if the channels is there
-        if (hasAlphaChannel) {
-            *alpha_buffer = (float*)calloc(n_pixels, sizeof(float));
-        }
+        // Allocation of alpha buffer
+        local_alpha_buffer.resize(n_data_pixels);
+        *alpha_buffer = (float*)calloc(n_pixels, sizeof(float));
 
         // -----------------------------------------------------------------------
         // Read the pixel data
@@ -969,29 +984,89 @@ int readSpectralOpenEXR(
         // Spectral channels
         if (isEmissiveSpectrum(spectrumType) || isReflectiveSpectrum(spectrumType)) {
             const size_t xStride = sizeof(float) * (*n_spectralBands);
-            const size_t yStride = xStride * (*width);
+            const size_t yStride = xStride * data_width;
 
             for (size_t s = 0; s < n_stokes_components; s++) {
                 for (size_t wl_idx = 0; wl_idx < (*n_spectralBands); wl_idx++) {
-                    char* ptrS = (char*)(&(*spectral_buffers)[s][wl_idx]);
-                    Imf::Slice slice = Imf::Slice::Make(compType, ptrS, exrDataWindow, xStride, yStride);
+                    char* ptrS = (char*)(&local_data_spectral_buffers[s][wl_idx]);
+                    
+                    Imf::Slice slice = Imf::Slice::Make(
+                        compType, 
+                        ptrS, 
+                        dataWindow, 
+                        xStride, yStride);
 
                     exrFrameBuffer.insert(wavelengths_nm_S[s][wl_idx].second, slice);
                 }
             }
         }
 
-        // Alpha channel
-        if (hasAlphaChannel) {
-            const size_t xStride = sizeof(float);
-            const size_t yStride = xStride * (*width);
-            Imf::Slice slice = Imf::Slice::Make(compType, (char*)(*alpha_buffer), exrDataWindow, xStride, yStride);
+        // Alpha channel: default to 1.f if no value are provided
+        // i.e. full opacity
+        const size_t xStrideAlpha = sizeof(float);
+        const size_t yStrideAlpha = xStrideAlpha * data_width;
 
-            exrFrameBuffer.insert("A", slice);
-        }
+        Imf::Slice slice = Imf::Slice::Make(
+            compType, 
+            (char*)&local_alpha_buffer[0], 
+            dataWindow, 
+            xStrideAlpha, yStrideAlpha,
+            1, 1, 1.f);
+
+        exrFrameBuffer.insert("A", slice);
 
         exrIn.setFrameBuffer(exrFrameBuffer);
-        exrIn.readPixels(exrDataWindow.min.y, exrDataWindow.max.y);
+        exrIn.readPixels(dataWindow.min.y, dataWindow.max.y);
+
+        // -------------------------------------------------------------------
+        // Set the displayWindow data
+        // -------------------------------------------------------------------
+
+        // Compute offsets
+        const int start_x = dataWindow.min.x - displayWindow.min.x;
+        const int start_y = dataWindow.min.y - displayWindow.min.y;
+
+        // Initialize memory: 0 for intensity, 0 for alpha (full transparency)
+        for (int s = 0; s < n_stokes_components; s++) {
+            memset(&((*spectral_buffers)[s][0]), 0, (*n_spectralBands) * (*width) * (*height) * sizeof(float));
+        }
+        
+        memset(&((*alpha_buffer)[0]), 0, (*width) * (*height) * sizeof(float));
+
+        // Copy the datawindow at the appropriate position in the display window
+        for (int display_y = std::max(0, start_y); display_y < std::min((*height), data_height + start_y); display_y++) {
+            const int data_y = display_y - start_y;
+
+            assert(display_y >= 0);
+            assert(display_y < display_height);
+
+            assert(data_y >= 0);
+            assert(data_y < data_height);
+
+            const int start_display_x = std::max(0, start_x);
+            const int start_data_x    = start_display_x - start_x;
+            const int end_display_x   = std::min((*width), data_width + start_x);
+
+            const int n_pixels = end_display_x - start_display_x;
+
+            assert((n_pixels == 0) || (start_display_x + n_pixels <= (*width)));
+            assert((n_pixels == 0) || (start_data_x    + n_pixels <= data_width));
+
+            for (int s = 0; s < n_stokes_components; s++) {
+                memcpy(
+                    &((*spectral_buffers)       [s][(*n_spectralBands) * (display_y * (*width)   + start_display_x)]), 
+                    &local_data_spectral_buffers[s][(*n_spectralBands) * (data_y    * data_width + start_data_x)],
+                    (*n_spectralBands) * sizeof(float) * n_pixels
+                    );
+            }
+
+            memcpy(
+                &((*alpha_buffer)[display_y * (*width)   + start_display_x]), 
+                &local_alpha_buffer[data_y    * data_width + start_data_x],
+                sizeof(float) * n_pixels
+                );
+        }
+
     } catch (std::exception& e) {
         for (int i = 0; i < 4; i++) {
             free((*spectral_buffers)[i]);
@@ -1009,6 +1084,8 @@ int readSpectralOpenEXR(
             "Error while reading OpenEXR file %s: %s",
             filename, e.what()
         );
+
+        return -1;
     }
 
     return 0;
