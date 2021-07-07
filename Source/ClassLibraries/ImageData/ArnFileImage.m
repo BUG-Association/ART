@@ -112,6 +112,39 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     return self;
 }
 
+- init
+        : (const char *) newFileName
+        : (Class) instanceOf
+        : (ArnImageInfo *) newImageInfo
+{
+    self = [super init];
+
+    if ( self )
+    {
+        fileName = ALLOC_ARRAY(char,strlen(newFileName)+1);
+        strcpy(fileName,newFileName);
+
+        ArcFile  * file =
+            [ ArcFile new
+                :   art_gv
+                :   fileName
+                ];
+
+        imageFile = 
+            [ [ [ instanceOf alloc] init_ART_GV
+                    : art_gv 
+                ] initWithFile
+                    : file 
+                ];
+
+        imageInfo = RETAIN_OBJECT(newImageInfo);
+        [ imageFile useImageInfo: imageInfo ];
+        action = arnfileimage_idle;
+    }
+    
+    return self;
+}
+
 - copy
 {
     ArnFileImage * copiedInstance = [ super copy ];
@@ -144,13 +177,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     [ super dealloc ];
 }
 
-- (BOOL) imageFileIsMemberOf
+- (BOOL) imageFileIsKindOf
         : (Class) newClass
 {
     return
-        [ imageFile isMemberOfClass: newClass ];
+        [ imageFile isKindOfClass: newClass ];
 }
-
 
 - (const char *) fileName
 {
@@ -314,7 +346,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
 
 - (void) prepareForISRChange
 {
-    if ( [ imageFile class ] == [ ArfARTRAW class ] )
+    if ( [ imageFile class ] == [ ArfRAWRasterImage class ] )
     {
         if (action == arnfileimage_writing)
             [ imageFile close ];

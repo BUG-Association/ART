@@ -137,7 +137,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(tiff)
 }
 
 unsigned int arftifftype(
-        uint16 photometricType,
+        uint16_t photometricType,
         unsigned short bitsPerSample,
         unsigned short samplesPerPixel
         )
@@ -241,11 +241,11 @@ unsigned int arftifftype(
 {
     IVec2D              size;
     FVec2D              resolution;
-    uint16              photometricType;
+    uint16_t            photometricType;
     unsigned short      bitsPerSample;
     unsigned short      samplesPerPixel;
-    uint16              compression;
-    uint16              planarconfig;
+    uint16_t            compression;
+    uint16_t            planarconfig;
     ArnImageInfo *      imageInfo;
 
     if ((tiffFile = TIFFOpen([file name], "r")) == NULL)
@@ -485,13 +485,13 @@ unsigned int arftifftype(
     FVec2D resolution = [imageInfo resolution];
     unsigned int        fileDataType;
 
-    uint16              photometricType = PHOTOMETRIC_RGB;   // default type
+    uint16_t            photometricType = PHOTOMETRIC_RGB;   // default type
     unsigned short      bitsPerSample = (unsigned short) 8;  //  colour32
     unsigned short      samplesPerPixel = (unsigned short) 4;
 
-    uint16              compression = COMPRESSION_NONE;
-    uint16              planarconfig = PLANARCONFIG_CONTIG;
-    uint16              resolutionUnit = RESUNIT_INCH;
+    uint16_t            compression = COMPRESSION_NONE;
+    uint16_t            planarconfig = PLANARCONFIG_CONTIG;
+    uint16_t            resolutionUnit = RESUNIT_INCH;
     int                 rowsPerStrip;
     int                 bytesPerRow;
 
@@ -753,7 +753,7 @@ unsigned int arftifftype(
     TIFFSetField(tiffFile, TIFFTAG_XRESOLUTION, (float) XC(resolution));
     TIFFSetField(tiffFile, TIFFTAG_YRESOLUTION, (float) YC(resolution));
     TIFFSetField(tiffFile, TIFFTAG_RESOLUTIONUNIT,      resolutionUnit);
-    TIFFSetField(tiffFile, TIFFTAG_ROWSPERSTRIP, (uint32) rowsPerStrip);
+    TIFFSetField(tiffFile, TIFFTAG_ROWSPERSTRIP, (uint32_t)rowsPerStrip);
 
     if ( imageInfo->destinationCSR )
     {

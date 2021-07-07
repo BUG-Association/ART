@@ -25,16 +25,46 @@
 =========================================================================== */
 
 #include "ART_Foundation.h"
+#include <OpenEXRSettings.h>
 
-ART_LIBRARY_INTERFACE(ART_ImageFileFormat)
+ART_MODULE_INTERFACE(ArfOpenEXRSpectral)
 
-#import "ArfARTRAW.h"
-#import "ArfARTCSP.h"
-#import "ArfARTGSC.h"
-#import "ArfGreyCSV.h"
-#import "ArfTIFF.h"
-#import "ArfJPEG.h"
-#import "ArfOpenEXRSpectral.h"
-#import "ArfOpenEXRRGB.h"
+#ifdef ART_WITH_OPENEXR
+#define WRITE_RGB_VERSION
 
+#import "ArfRAWRasterImage.h"
+
+#define ARFOPENEXR_EXTENSION     "exr"
+
+
+@interface ArfOpenEXRSpectral
+           : ArfRAWRasterImage
+{
+    BOOL                _writtingMode;
+    ArnImageInfo       * _imageInfo;
+    IVec2D               _size;
+    int                  _nSpectralChannels;
+    double             * _wavelengths_nm;
+
+    float              * _bufferS0;
+    float              * _bufferS1;
+    float              * _bufferS2;
+    float              * _bufferS3;
+    
+    float              * _bufferAlpha;
+
+    // This buffer is used when writing an image:
+    // OpenEXR supports multiple layers and adding R, G, B layers ensures
+    // backward compatibility with software supporting the format.
+    float               * _bufferRGB;
+
+    ArReferenceFrame      _referenceFrame;
+    
+    ArLightAlpha       ** _scanline; // More convenient to have a single allocation
+}
+
+@end
+
+
+#endif // ART_WITH_OPENEXR
 // ===========================================================================

@@ -79,11 +79,11 @@ int art_imagediff(
             :   inputFileNameReference
             ];
     
-    if ( ! (   ( [ inputFileImageReference dataImageClass ] == [ ArfARTRAW class ] )
+    if ( ! (   ( [ inputFileImageReference imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
             || ( [ inputFileImageReference dataImageClass ] == [ ArfARTCSP class ] )) ) {
         ART_ERRORHANDLING_FATAL_ERROR(
             "reference file is not an internal ART image file - "
-            "%s instead of ArfARTRAW/CSP"
+            "%s instead of ArfARTRAW/OpenEXR/CSP"
             ,   [ [ inputFileImageReference dataImageClass ] cStringClassName ]
             );
     }
@@ -92,7 +92,7 @@ int art_imagediff(
     if ( ! (   ( [ inputFileImageReference dataImageClass ] == [ ArfARTCSP class ] )) ) {
         ART_ERRORHANDLING_FATAL_ERROR(
             "currently, supporting only ARTCSP - "
-            "%s instead of ArfARTRAW/CSP"
+            "%s instead of ArfARTRAW/OpenEXR"
             ,   [ [ inputFileImageReference dataImageClass ] cStringClassName ]
             );
     }
@@ -114,11 +114,11 @@ int art_imagediff(
              :   inputFileNameCompare
              ];
     
-    if ( ! (   ( [ inputFileImageCompare dataImageClass ] == [ ArfARTRAW class ] )
+    if ( ! (   ( [ inputFileImageCompare imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
             || ( [ inputFileImageCompare dataImageClass ] == [ ArfARTCSP class ] )) ) {
         ART_ERRORHANDLING_FATAL_ERROR(
             "comparison file is not an internal ART image file - "
-            "%s instead of ArfARTRAW/CSP"
+            "%s instead of ArfARTRAW/OpenEXR/CSP"
             ,   [ [ inputFileImageCompare dataImageClass ] cStringClassName ]
             );
     }

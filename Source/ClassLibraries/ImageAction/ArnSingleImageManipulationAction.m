@@ -147,7 +147,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
                  :   ARPROTOCOL(ArpBasicImage)
                  ] )
         {
-            if (( [ (ArnFileImage <ArpImage> *) ARNODEREF_POINTER(refFromStack) dataImageClass ] == sourceImageClass ) )
+            ArnFileImage  * fileImageToAdaptTo = (ArnFileImage <ArpImage> *) ARNODEREF_POINTER(refFromStack);
+            if ( [ fileImageToAdaptTo imageFileIsKindOf: sourceImageClass ] )
             {
                 arlist_add_noderef_at_tail( & sourceImageRefList, refFromStack );
             }
@@ -593,10 +594,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
             ,   destinationFilename[i]
             );
         #endif
-
         destinationImage[i] =
             [ ALLOC_INIT_OBJECT(ArnFileImage)
                 :   destinationFilename[i]
+                :   destinationImageClass
                 :   destinationImageInfo
                 ];
 

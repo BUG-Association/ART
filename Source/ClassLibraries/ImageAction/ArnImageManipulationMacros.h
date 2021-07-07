@@ -105,6 +105,9 @@
 #define XYZA_SOURCE_BUFFER_ALPHA(_x) \
     ARCIEXYZA_A(((ArnCIEXYZAImage*)sourceScanlineBuffer[0])->data[(_x)])
 
+#define RGB_SOURCE_BUFFER(_x) \
+    (((ArnRGBImage*)sourceScanlineBuffer[0])->data[(_x)])
+
 #define RGBA_SOURCE_BUFFER(_x) \
     (((ArnRGBAImage*)sourceScanlineBuffer[0])->data[(_x)])
 

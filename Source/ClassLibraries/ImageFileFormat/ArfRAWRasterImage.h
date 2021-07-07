@@ -26,15 +26,34 @@
 
 #include "ART_Foundation.h"
 
-ART_LIBRARY_INTERFACE(ART_ImageFileFormat)
+ART_MODULE_INTERFACE(ArfRAWRasterImage)
 
-#import "ArfARTRAW.h"
-#import "ArfARTCSP.h"
-#import "ArfARTGSC.h"
-#import "ArfGreyCSV.h"
-#import "ArfTIFF.h"
-#import "ArfJPEG.h"
-#import "ArfOpenEXRSpectral.h"
-#import "ArfOpenEXRRGB.h"
+#import "ArfRasterImage.h"
+
+
+/* --------------------------------------------------------------------------
+    'ArfRAWRasterImage' class
+
+    Generic superclass for spectral image filetypes such as ARTRAW or EXR.
+    This class should never be directly instantiated - only its
+    derivatives do anything useful.
+-------------------------------------------------------------------------- */
+
+
+@interface ArfRAWRasterImage
+           : ArfRasterImage
+{
+    BOOL             fileContainsPolarisationData;
+    ArDataType       fileDataType;
+    BOOL             _isEmissive;
+}
+
+
+- (ArDataType) fileDataType;
+
+- (BOOL) isEmissive;
+
+@end
+
 
 // ===========================================================================

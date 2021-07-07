@@ -46,7 +46,7 @@ void readInputImageAndPlaceOnNodeStack(
 
     ArnFileImage  * inputImage = 0;
 
-    if ( [ originalInputImage imageFileIsMemberOf: [ ArfTIFF class ] ] )
+    if ( [ originalInputImage imageFileIsKindOf: [ ArfTIFF class ] ] )
     {
         char  * conversionMasterFilename = 0;
 
@@ -92,7 +92,8 @@ void readInputImageAndPlaceOnNodeStack(
         inputImage = (ArnFileImage *)imageFromStack;
     }
 #ifdef ART_WITH_OPENEXR
-    else if ( [ originalInputImage imageFileIsMemberOf: [ArfOpenEXR class ] ] )
+#warning handle properly different OpenEXR files
+    else if ( [ originalInputImage imageFileIsKindOf: [ArfOpenEXRSpectral class ] ] )
     {
         char  * conversionMasterFilename = 0;
 
@@ -147,7 +148,7 @@ void readInputImageAndPlaceOnNodeStack(
     {
         *imageSize = [ inputImage size ];
 
-        if ( [ inputImage imageFileIsMemberOf: [ ArfARTCSP class ] ] )
+        if ( [ inputImage imageFileIsKindOf: [ ArfARTCSP class ] ] )
         {
             [ ART_GLOBAL_REPORTER beginTimedAction
                 :   "reading colourspace input image %s of size %d x %d"
@@ -160,11 +161,11 @@ void readInputImageAndPlaceOnNodeStack(
         }
         else
         {
-            if ( [ inputImage imageFileIsMemberOf: [ ArfARTRAW class ] ] )
+            if ( [ inputImage imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
             {
                 *imageIsRaw = YES;
 
-//                ArfARTRAW  * rawImage = (ArfARTRAW *) inputImage->imageFile;
+//                ArfRAWRasterImage  * rawImage = (ArfRAWRasterImage *) inputImage->imageFile;
 //
 //                ArDataType  rawContentType = [ rawImage fileDataType ];
 //

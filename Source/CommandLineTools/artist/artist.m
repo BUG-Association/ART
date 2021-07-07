@@ -855,11 +855,27 @@ int artist(
     }
     else
     {
-        arstring_pe_copy_add_extension_p(
-              ART_APPLICATION_MAIN_FILENAME,
-              ARFARTRAW_EXTENSION,
-            & imageFileName
-            );
+        // We need first to determine if a known extension is present
+        char * p_artraw = strstr(ART_APPLICATION_MAIN_FILENAME, ".artraw");
+        char * p_exr    = strstr(ART_APPLICATION_MAIN_FILENAME, ".exr");
+        
+        if (   (p_artraw == NULL || strlen(p_artraw) != 7)
+            && (p_exr    == NULL || strlen(p_exr)    != 4))
+        {
+            // We add artraw extension
+            arstring_pe_copy_add_extension_p(
+                  ART_APPLICATION_MAIN_FILENAME,
+                  ARFARTRAW_EXTENSION,
+                & imageFileName
+                );
+        }
+        else
+        {
+            arstring_s_copy_s(
+                  ART_APPLICATION_MAIN_FILENAME,
+                & imageFileName
+                );
+        }
     }
     
     //   As always with ART images, the two colour types one specifies when

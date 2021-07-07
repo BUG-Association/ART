@@ -260,6 +260,27 @@ static const char * arfartraw_extension[] = { ARFARTRAW_EXTENSION, 0 };
 ARPFILE_DEFAULT_IMPLEMENTATION( ArfARTRAW, arfiletypecapabilites_read | arfiletypecapabilites_write )
 ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,artraw)
 
+- (void) parseFileGetExternals
+        : (ArNode **) objectPtr
+        : (ArList *) externals
+{
+    *objectPtr =
+        [ ALLOC_INIT_OBJECT(ArnFileImage)
+            :   [ file name ]
+            ];
+}
+
+
+- (void) parseFile
+        : (ArNode **) objectPtr
+{
+    [ self parseFileGetExternals
+        :   objectPtr
+        :   0
+        ];
+}
+
+
 #define ARFARTRAW_ALLOC_BUFFER_ARRAY(__variable,__number) \
     switch (channels) \
     { \
@@ -309,14 +330,6 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,artraw)
         :   1 \
         :   channels * 4 \
         ];
-
-- (ArDataType) fileDataType
-{
-    if ( fileContainsPolarisationData )
-        return fileDataType | ardt_polarisable;
-    else
-        return fileDataType;
-}
 
 - (void) _extractPixelChannelToD
         : (int) c
@@ -606,6 +619,9 @@ while (0);
 
 - (ArnImageInfo *) open
 {
+    // ARTRAWs are always emissive images
+    _isEmissive = YES;
+
     //   For the various scanf operations
     
     int  scanf_success = 0;
@@ -1089,6 +1105,9 @@ while (0);
 - (void) open
         : (ArnImageInfo *) imageInfo
 {
+    // ARTRAWs are always emissive images
+    _isEmissive = YES;
+
     IVec2D size = [ imageInfo size ];
     time_t timer;
     struct tm *tblock;

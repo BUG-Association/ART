@@ -40,6 +40,7 @@ SWITCHING_INTERFACE_FOR_ISR( ArSpectrum8, s8 );
 SWITCHING_INTERFACE_FOR_ISR( ArSpectrum11, s11 );
 SWITCHING_INTERFACE_FOR_ISR( ArSpectrum18, s18 );
 SWITCHING_INTERFACE_FOR_ISR( ArSpectrum46, s46 );
+SWITCHING_INTERFACE_FOR_ISR( ArSpectrum500, s500 );
 
 void art_foundation_set_isr(
         ART_GV          * art_gv,
@@ -75,6 +76,13 @@ void art_foundation_set_isr(
         case ardt_spectrum46:
         case ardt_spectrum46_polarisable:
             switch_isr_to_s46( art_gv );
+            art_gv->arspectrum_gv->current_isr = isr;
+            break;
+
+        // Usefull for Spectral EXRs
+        case ardt_spectrum500:
+        case ardt_spectrum500_polarisable:
+            switch_isr_to_s500( art_gv );
             art_gv->arspectrum_gv->current_isr = isr;
             break;
 

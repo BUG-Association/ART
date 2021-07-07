@@ -356,10 +356,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDualImageManipulationAction)
             ardatatype_name(destinationFileDataType)
             );
     #endif
-
         destinationImage =
             [ ALLOC_INIT_OBJECT(ArnFileImage)
                 :   destinationFilename
+                :   destinationImageClass
                 :   destinationImageInfo
                 ];
 

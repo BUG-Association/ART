@@ -24,35 +24,29 @@
 
 =========================================================================== */
 
-#include "ART_Foundation.h"
-#include <OpenEXRSettings.h>
+#define ART_MODULE_NAME     ArfRAWRasterImage
 
-// temporarily moved to the library file for ObjC/C++ crosslinking reasons
-//ART_MODULE_INTERFACE(ArfOpenEXR)
+#import "ArfRAWRasterImage.h"
 
-#ifdef ART_WITH_OPENEXR
+ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
-#import "ArfRasterImage.h"
+ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-#define ARFOPENEXR_EXTENSION     "exr"
+@implementation ArfRAWRasterImage
 
-/// Member vars are in an opaque struct to hide C++ member vars
-
-@interface ArfOpenEXR
-           : ArfRasterImage
+- (ArDataType) fileDataType
 {
-    struct ArfOpenEXR_members  * member_vars;
+    if ( fileContainsPolarisationData )
+        return fileDataType | ardt_polarisable;
+    else
+        return fileDataType;
 }
 
-//  Used to pass an entire spectral image buffer to OpenEXR for writing
-
-- (void) setFloatImageBuffer
-        : (float *) imagebuffer
-        ;
+- (BOOL) isEmissive
+{
+    return _isEmissive;
+}
 
 @end
-
-
-#endif // ART_WITH_OPENEXR
 
 // ===========================================================================

@@ -194,6 +194,7 @@ typedef enum ArDataType
     ardt_spectrum46             = C_46  | NOINFO | DBL | SPC,
     ardt_spectrum46_polarisable = C_46  | NOINFO | DBL | SPC | POL,
     ardt_spectrum500            = C_500 | NOINFO | DBL | SPC,
+    ardt_spectrum500_polarisable= C_500 | NOINFO | DBL | SPC | POL,
 
     ardt_all_bits_set           = 0xffffffff,
 }

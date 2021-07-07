@@ -58,7 +58,13 @@ ArnFileImageAction;
         : (ArnImageInfo *) newImageInfo
         ;
 
-- (BOOL) imageFileIsMemberOf
+- init
+        : (const char *) newFileName
+        : (Class) instanceOf
+        : (ArnImageInfo *) newImageInfo
+        ;
+
+- (BOOL) imageFileIsKindOf
         : (Class) newClass
         ;
 

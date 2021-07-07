@@ -49,10 +49,6 @@ ART_MODULE_INITIALISATION_FUNCTION
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-
-#define XYZ_EXT "artxyz"
-#define ARTRAW_EXT "artraw"
-
 /* ===========================================================================
     'ArnImageFractionDitherer'
 =========================================================================== */
@@ -571,16 +567,17 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnChangeISR_to_Match_ARTRAW_Contents)
             ,   [ [ nodeFromStack class ] cStringClassName ]
             );
 
-    ArfARTRAW  * rawImage = 0;
+    ArfRAWRasterImage  * rawImage = NULL;
 
-    if ( ! ( [ fileImageToAdaptTo dataImageClass ] == [ ArfARTRAW class ] ) )
+    if ( ! [ fileImageToAdaptTo->imageFile isKindOfClass:[ ArfRAWRasterImage class ] ] ) {
         ART_ERRORHANDLING_FATAL_ERROR(
             "wrong type of image found on stack - "
-            "%s instead of ArfARTRAW"
+            "%s instead of a RAW image"
             ,   [ [ fileImageToAdaptTo dataImageClass ] cStringClassName ]
             );
-    else
-        rawImage = (ArfARTRAW *) fileImageToAdaptTo->imageFile;
+    } else {
+        rawImage = (ArfRAWRasterImage *) fileImageToAdaptTo->imageFile;
+    }
 
     ArDataType  rawContentType = [ rawImage fileDataType ];
 
@@ -818,8 +815,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTRAW_Double_Mul_ARTRAW
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
+        :   [ ArfRAWRasterImage class ]
         ];
 
     /* ------------------------------------------------------------------
@@ -974,8 +971,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyARTRAWValues)
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
+        :   [ ArfRAWRasterImage class ]
         ];
 
     /* ------------------------------------------------------------------
@@ -1109,8 +1106,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleARTRAW)
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
+        :   [ ArfRAWRasterImage class ]
         :   downscaleFactor
         ];
 
@@ -1316,8 +1313,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopARTRAWValue
 
     [ self prepareForImageManipulation
         :   nodeStack
-        :   [ ArfARTRAW class ]
-        :   [ ArfARTRAW class ]
+        :   [ ArfRAWRasterImage class ]
+        :   [ ArfRAWRasterImage class ]
         ];
 
     /* ------------------------------------------------------------------

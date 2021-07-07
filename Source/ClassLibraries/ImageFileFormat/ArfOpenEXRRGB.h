@@ -25,16 +25,32 @@
 =========================================================================== */
 
 #include "ART_Foundation.h"
+#include <OpenEXRSettings.h>
 
-ART_LIBRARY_INTERFACE(ART_ImageFileFormat)
+ART_MODULE_INTERFACE(ArfOpenEXRRGB)
 
-#import "ArfARTRAW.h"
-#import "ArfARTCSP.h"
-#import "ArfARTGSC.h"
-#import "ArfGreyCSV.h"
-#import "ArfTIFF.h"
-#import "ArfJPEG.h"
-#import "ArfOpenEXRSpectral.h"
-#import "ArfOpenEXRRGB.h"
+#ifdef ART_WITH_OPENEXR
 
+#import "ArfRAWRasterImage.h"
+
+#define ARFOPENEXRRGB_EXTENSION     "exr"
+
+
+@interface ArfOpenEXRRGB
+           : ArfRasterImage
+{
+    BOOL                  _writtingMode;
+    ArnImageInfo        * _imageInfo;
+    IVec2D                _size;
+    ArDataType            _fileDataType;
+    
+    float               * _bufferRGB;
+    float               * _bufferGrey;
+    float               * _bufferAlpha;    
+}
+
+@end
+
+
+#endif // ART_WITH_OPENEXR
 // ===========================================================================
