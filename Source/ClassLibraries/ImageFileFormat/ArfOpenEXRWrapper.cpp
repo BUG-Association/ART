@@ -400,9 +400,9 @@ int readRGBOpenEXR(
         const Imf::Channel* channel_ry = channels.findChannel("RY");
         const Imf::Channel* channel_by = channels.findChannel("BY");
 
-        bool hasRGB = (channel_r != nullptr) || (channel_g != nullptr) || (channel_b != nullptr);
-        bool hasLuminance = (channel_y != nullptr);
-        bool hasRYBY = (channel_ry != nullptr && channel_by != nullptr);
+        const bool hasRGB       = (channel_r != nullptr) || (channel_g != nullptr) || (channel_b != nullptr);
+        const bool hasLuminance = (channel_y != nullptr);
+        const bool hasRYBY      = (channel_ry != nullptr && channel_by != nullptr);
 
         // -------------------------------------------------------------------
         // Allocate memory 
@@ -411,9 +411,11 @@ int readRGBOpenEXR(
         // -------------------------------------------------------------------
 
         if (hasRGB || (hasRYBY && hasLuminance)) {
+            // This is a colour image, either RGB or YRYBY
             local_data_rgb.resize(3 * data_width * data_height);
             *rgb_buffer = (float*)calloc(3 * (*width) * (*height), sizeof(float));
         } else if (hasLuminance) {
+            // This is a gray image
             local_data_gray.resize(data_width * data_height);
             *gray_buffer = (float*)calloc((*width) * (*height), sizeof(float));
         } else {
@@ -459,19 +461,17 @@ int readRGBOpenEXR(
             file.readPixels(dataWindow.min.y, dataWindow.max.y);
 
             // Handle custom chromaticities
-            for (int y = 0; y < data_height; y++) {
-                for (int x = 0; x < data_width; x++) {
-                    Imath::V3f rgb(
-                        local_data_rgb[3 * (y * data_width + x) + 0],
-                        local_data_rgb[3 * (y * data_width + x) + 1],
-                        local_data_rgb[3 * (y * data_width + x) + 2]);
+            for (int i = 0; i < data_width * data_height; i++) {
+                Imath::V3f rgb(
+                    local_data_rgb[3 * i + 0],
+                    local_data_rgb[3 * i + 1],
+                    local_data_rgb[3 * i + 2]);
 
-                    rgb = rgb * conversionMatrix;
+                rgb = rgb * conversionMatrix;
 
-                    local_data_rgb[3 * (y * data_width + x) + 0] = std::max(0.f, rgb.x);
-                    local_data_rgb[3 * (y * data_width + x) + 1] = std::max(0.f, rgb.y);
-                    local_data_rgb[3 * (y * data_width + x) + 2] = std::max(0.f, rgb.z);
-                }
+                local_data_rgb[3 * i + 0] = std::max(0.f, rgb.x);
+                local_data_rgb[3 * i + 1] = std::max(0.f, rgb.y);
+                local_data_rgb[3 * i + 2] = std::max(0.f, rgb.z);
             }
         } else if (hasLuminance && !hasRYBY) {
             Imf::FrameBuffer framebuffer;
@@ -481,7 +481,8 @@ int readRGBOpenEXR(
                 &local_data_gray[0],
                 dataWindow,
                 sizeof(float),
-                data_width * sizeof(float));
+                data_width * sizeof(float)
+                );
 
             framebuffer.insert("Y", ySlice);
 
@@ -505,7 +506,8 @@ int readRGBOpenEXR(
                 &yBuffer[0],
                 dataWindow,
                 sizeof(float),
-                data_width * sizeof(float));
+                data_width * sizeof(float)
+                );
 
             Imf::Slice rySlice = Imf::Slice::Make(
                 Imf::PixelType::FLOAT,
@@ -513,8 +515,8 @@ int readRGBOpenEXR(
                 dataWindow,
                 sizeof(float),
                 data_width / 2 * sizeof(float),
-                2,
-                2);
+                2, 2    // x, y sampling
+                );
 
             Imf::Slice bySlice = Imf::Slice::Make(
                 Imf::PixelType::FLOAT,
@@ -522,8 +524,8 @@ int readRGBOpenEXR(
                 dataWindow,
                 sizeof(float),
                 data_width / 2 * sizeof(float),
-                2,
-                2);
+                2, 2    // x, y sampling
+                );
 
             framebuffer.insert("Y", ySlice);
             framebuffer.insert("RY", rySlice);
@@ -591,24 +593,22 @@ int readRGBOpenEXR(
             }
 
             // Handle custom chromaticities and clamp negative values
-            for (int y = 0; y < data_height; y++) {
-                for (int x = 0; x < data_width; x++) {
-                    Imath::V3f rgb(
-                        buff2[y * data_width + x].r,
-                        buff2[y * data_width + x].g,
-                        buff2[y * data_width + x].b);
+            for (int i = 0; i < data_width * data_height; i++) {
+                Imath::V3f rgb(
+                    buff2[i].r,
+                    buff2[i].g,
+                    buff2[i].b);
 
-                    rgb = rgb * conversionMatrix;
+                rgb = rgb * conversionMatrix;
 
-                    local_data_rgb[3 * (y * data_width + x) + 0] = std::max(0.f, rgb.x);
-                    local_data_rgb[3 * (y * data_width + x) + 1] = std::max(0.f, rgb.y);
-                    local_data_rgb[3 * (y * data_width + x) + 2] = std::max(0.f, rgb.z);
-                }
+                local_data_rgb[3 * i + 0] = std::max(0.f, rgb.x);
+                local_data_rgb[3 * i + 1] = std::max(0.f, rgb.y);
+                local_data_rgb[3 * i + 2] = std::max(0.f, rgb.z);
             }
         }
 
-        // Alpha channel: default to 1.f if no value are provided
-        // i.e. full opacity
+        // Alpha channel:
+        // fill with 1.f if no value are provided i.e. full opacity
         Imf::FrameBuffer framebuffer;
 
         Imf::Slice aSlice = Imf::Slice::Make(
@@ -617,7 +617,9 @@ int readRGBOpenEXR(
             dataWindow,
             sizeof(float),
             data_width * sizeof(float),
-            1, 1, 1.f);
+            1, 1, 
+            1.f     // Fill value
+            );
 
         framebuffer.insert("A", aSlice);
 
@@ -632,13 +634,16 @@ int readRGBOpenEXR(
         const int start_x = dataWindow.min.x - displayWindow.min.x;
         const int start_y = dataWindow.min.y - displayWindow.min.y;
 
-        // Initialize memory: 0 for colours, 0 for alpha (full transparency)
+        // Initialize memory: 0 for colours
         if (hasRGB || (hasRYBY && hasLuminance)) {
+            // This is a colour image, either RGB or YRYBY
             memset(&((*rgb_buffer)[0]), 0, 3 * (*width) * (*height) * sizeof(float));
         } else if (hasLuminance) {
+            // This is a gray image
             memset(&((*gray_buffer)[0]), 0, (*width) * (*height) * sizeof(float));
         }
 
+        // Initialize memory: 0 for alpha (full transparency)
         memset(&((*alpha_buffer)[0]), 0, (*width) * (*height) * sizeof(float));
 
         // Copy the datawindow at the appropriate position in the display window
@@ -661,12 +666,14 @@ int readRGBOpenEXR(
             assert((n_pixels == 0) || (start_data_x    + n_pixels <= data_width));
 
             if (hasRGB || (hasRYBY && hasLuminance)) {
+                // This is a colour image, either RGB or YRYBY
                 memcpy(
                     &((*rgb_buffer)[3 * (display_y * (*width)   + start_display_x)]), 
                     &local_data_rgb[3 * (data_y    * data_width + start_data_x)],
                     3 * sizeof(float) * n_pixels
                     );
             } else if (hasLuminance) {
+                // This is a gray image
                 memcpy(
                     &((*gray_buffer)[display_y * (*width)   + start_display_x]), 
                     &local_data_gray[data_y    * data_width + start_data_x],
@@ -674,6 +681,7 @@ int readRGBOpenEXR(
                     );
             }
 
+            // Copy the alpha channel
             memcpy(
                 &((*alpha_buffer)[display_y * (*width)   + start_display_x]), 
                 &local_data_alpha[data_y    * data_width + start_data_x],
@@ -691,7 +699,7 @@ int readRGBOpenEXR(
         ART_ERRORHANDLING_WARNING(
             "Error while loading OpenEXR file %s: %s",
             filename, e.what()
-        );
+            );
 
         return -1;
     }
