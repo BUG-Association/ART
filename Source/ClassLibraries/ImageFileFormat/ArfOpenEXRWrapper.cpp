@@ -1036,6 +1036,10 @@ int readSpectralOpenEXR(
         exrIn.setFrameBuffer(exrFrameBuffer);
         exrIn.readPixels(dataWindow.min.y, dataWindow.max.y);
 
+       for (int i = 0; i < data_width * data_height; i++) { 
+            local_alpha_buffer[i] = std::max(0.f, std::min(1.f, local_alpha_buffer[i]));
+        }
+
         // -------------------------------------------------------------------
         // Set the displayWindow data
         // -------------------------------------------------------------------
