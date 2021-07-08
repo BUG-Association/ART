@@ -626,6 +626,16 @@ int readRGBOpenEXR(
         file.setFrameBuffer(framebuffer);
         file.readPixels(dataWindow.min.y, dataWindow.max.y);
 
+        // Noticed in 2 images of the OpenEXR image sample set the transparency 
+        // values can be very sighly above 1. This will confuse ART assuming 
+        // alpha is in [0, 1]. We just clamp to avoid potential overflow.
+        // Images are:
+        // - `Scanlines/Blobbies.exr`
+        // - `Tiles/Spirals.exr`
+        for (int i = 0; i < data_width * data_height; i++) { 
+            local_data_alpha[i] = std::max(0.f, std::min(1.f, local_data_alpha[i]));
+        }
+
         // -------------------------------------------------------------------
         // Set the displayWindow data
         // -------------------------------------------------------------------
