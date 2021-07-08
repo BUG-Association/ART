@@ -633,7 +633,7 @@ int readRGBOpenEXR(
         const int start_y = dataWindow.min.y - displayWindow.min.y;
 
         // Initialize memory: 0 for colours, 0 for alpha (full transparency)
-        if (hasRGB) {
+        if (hasRGB || (hasRYBY && hasLuminance)) {
             memset(&((*rgb_buffer)[0]), 0, 3 * (*width) * (*height) * sizeof(float));
         } else if (hasLuminance) {
             memset(&((*gray_buffer)[0]), 0, (*width) * (*height) * sizeof(float));
@@ -660,7 +660,7 @@ int readRGBOpenEXR(
             assert((n_pixels == 0) || (start_display_x + n_pixels <= (*width)));
             assert((n_pixels == 0) || (start_data_x    + n_pixels <= data_width));
 
-            if (hasRGB) {
+            if (hasRGB || (hasRYBY && hasLuminance)) {
                 memcpy(
                     &((*rgb_buffer)[3 * (display_y * (*width)   + start_display_x)]), 
                     &local_data_rgb[3 * (data_y    * data_width + start_data_x)],
