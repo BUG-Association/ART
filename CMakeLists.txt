@@ -7,8 +7,8 @@ cmake_minimum_required (VERSION 3.0)
 project (ART)
 
 set ( ART_VERSION_MAJOR 2 )
-set ( ART_VERSION_MINOR 0 )
-set ( ART_VERSION_PATCH 4 )
+set ( ART_VERSION_MINOR 1 )
+set ( ART_VERSION_PATCH 0 )
 set ( ART_VERSION_DEVTAG -dev)
 
 if ( APPLE )
