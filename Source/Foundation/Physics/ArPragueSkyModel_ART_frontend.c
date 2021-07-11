@@ -28,20 +28,10 @@
 
 #include "ColourAndLightSubsystem.h"
 #include "ArPragueSkyModel_ART_frontend.h"
+#include "ArPragueSkyModel.h"
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
-
-double arpragueskymodel_polarisation(
-        const ArPragueSkyModelState  * state,
-        const double                   theta,
-        const double                   gamma,
-        const double                   elevation,
-        const double                   altitude,
-        const double                   turbidity,
-        const double                   albedo,
-        const double                   wavelength
-        );
 
 void arpragueskymodel_polarised_light_sample(
               ART_GV                 * art_gv,

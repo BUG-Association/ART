@@ -27,6 +27,7 @@
 #define ART_MODULE_NAME     ArnPragueSkyModel_VolumeMaterial
 
 #import "ArnPragueSkyModel_VolumeMaterial.h"
+#include "ArPragueSkyModel_ART_frontend.h"
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
