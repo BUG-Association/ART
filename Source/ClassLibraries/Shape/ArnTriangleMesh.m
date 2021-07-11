@@ -672,7 +672,13 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
     // If embree is enabled, there is no need to create an internal
     // mesh tree since embree does that by itself
 
-    // if ( [ArnEmbree embreeEnabled]) return;
+
+    if ( [ArnEmbree embreeEnabled] ) {
+        ArnEmbree * embree = [ArnEmbree embreeManager];
+
+        if(!embree->temporaryVariableTriangleMeshContained)
+            return;
+    }
 #endif
 
     //   The number of faces is the size of the faces array divided by 3 since

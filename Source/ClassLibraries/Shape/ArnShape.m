@@ -247,6 +247,10 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
         {
             if([self isKindOfClass: [ArnTriangleMesh class]]) {
                 embree->temporaryVariableTriangleMeshContained = YES;
+
+                ArnTriangleMesh * thisMesh = (ArnTriangleMesh *) self;
+                [thisMesh setupNodeData: &traversal->state];
+
             }
 
             return result;

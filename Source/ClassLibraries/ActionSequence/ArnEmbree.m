@@ -214,12 +214,14 @@ void embree_intersect_geometry(const int * valid,
 
     // update embree components
     rtc_ray->tfar = (float) intersectionList.head->t;
+
     rtc_hit->geomID = geomID;
     rtc_hit->primID = 0;
 
     // set intersection list
     intersectionList.head->embreeShapeUserGeometry = YES;
     [rayCaster addIntersectionToIntersectionLinkedList :geometryData->_combinedAttributes_or_csg_node : intersectionList];
+
 }
 
 void embree_intersect (const struct RTCIntersectFunctionNArguments* args) {
@@ -369,7 +371,9 @@ static ArnEmbree * embreeManager = NULL;
         if([combinedAttributes_or_csg_node isKindOfClass: [ArnBinary class]])
         {
             ArnBinary * topCSGNode = (ArnBinary *) combinedAttributes_or_csg_node;
-            if(!topCSGNode->internalBSPTree)
+
+            // build internal kd tree only for csg geometry with triangle mesh as primitive
+            if(!topCSGNode->internalBSPTree && topCSGNode->containsTriangleMesh)
             {
                 [embree createInternalBSPTreeForSingleCSGGeometry : topCSGNode];
             }
@@ -483,7 +487,7 @@ static ArnEmbree * embreeManager = NULL;
             RTCScene newScene = rtcNewScene(device);
             if(!newScene)
                 printf("error %d: cannot create embree scene on device\n", rtcGetDeviceError(NULL));
-            rtcSetSceneFlags(newScene,RTC_SCENE_FLAG_NONE); // for now a bit pointless but change later
+            rtcSetSceneFlags(newScene,RTC_SCENE_FLAG_COMPACT);
             rtcSetSceneBuildQuality(newScene,RTC_BUILD_QUALITY_MEDIUM); // for now using lowest build quality
             [embreeManager setScene: newScene];
         }
