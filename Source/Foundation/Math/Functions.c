@@ -989,7 +989,7 @@ int m_ii_atomic_add(
     : "memory"
     );
     
-    return value;
+    return i0;
 #endif
 }
 
