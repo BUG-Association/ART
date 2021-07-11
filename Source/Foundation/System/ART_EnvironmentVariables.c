@@ -223,7 +223,7 @@ static const char * art_system_library_directories =
 
 static const char * art_system_include_directories =
     "~/Library/Frameworks/AdvancedRenderingToolkit.framework/Headers:"
-    "/usr/local/include:/opt/local/include";
+    "/usr/local/include:/opt/local/include:/opt/homebrew/include";
 
 //   Additional unusual execute paths needed to find gcc. This only applies
 //   to XCode 4.2 and older, from 4.3 onwards gcc is installed in a normal

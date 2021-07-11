@@ -372,20 +372,10 @@ void m_i_xadd_i(
         int  * memory_location_to_increment
         );
 
-static inline int m_ii_atomic_add(
-        int    value,
-        int  * variable
-        )
-{
-    __asm__ volatile("lock; xaddl %0, %1"
-    : "+r" (value), "+m" (*variable) // input+output
-    : // No input-only
-    : "memory"
-    );
-    
-    return value;
-}
-
+int m_ii_atomic_add(
+                 int    i0,
+        volatile int  * ir
+        );
 
 float m_ff_atomic_add(
                  float    f0,
