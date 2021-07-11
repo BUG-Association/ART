@@ -781,15 +781,70 @@ int m_d_isInf(
     return ! isfinite( number );
 }
 
+#ifdef __APPLE__
+#include <stdatomic.h>
+#endif
+
+int m_iii_atomic_compare_and_swap(
+                 int    old_value,
+                 int    new_value,
+        volatile int  * location_to_swap_with
+        )
+{
+#ifdef __APPLE__
+    //   Note: the cast we are doing here is potentially dodgy. It _should_ be harmless, but YMMV.
+
+    atomic_compare_exchange_strong((volatile atomic_int *) location_to_swap_with, old_value, new_value );
+#else
+    int  result;
+
+    asm volatile (
+        "lock; cmpxchgl %2,%1"
+        : "=a" (result),
+          "=m" (*location_to_swap_with)
+        : "q"  (new_value),
+          "0"  (old_value)
+        : "memory"
+        );
+
+    return result;
+#endif
+}
+
+void m_i_xadd_i(
+    int  * increment_value_and_prev_value,
+    int  * memory_location_to_increment
+    )
+{
+#ifdef __aarch64__
+    atomic_fetch_add((atomic_int*)memory_location_to_increment, increment_value_and_prev_value);
+#else
+    asm volatile (
+        "lock; xaddl %0,%1"
+        : "=r" (*increment_value_and_prev_value),
+          "=m" (*memory_location_to_increment)
+        : "0"  (*increment_value_and_prev_value),
+          "m"  (*memory_location_to_increment)
+        : "memory", "cc"
+        );
+#endif
+}
+
 Int32 m_iii32_atomic_compare_and_swap(
                  Int32    old_value,
                  Int32    new_value,
         volatile Int32  * location_to_swap_with
         )
 {
+#ifdef __APPLE__
+    //   Note: the cast we are doing here is potentially dodgy. It _should_ be harmless, but YMMV.
+
+    atomic_compare_exchange_strong((volatile atomic_int *) location_to_swap_with, old_value, new_value );
+#else
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0;
+#endif
 
 /*
     Int32  result;
@@ -813,15 +868,21 @@ Int64 m_iii64_atomic_compare_and_swap(
         volatile Int64  * location_to_swap_with
         )
 {
+#ifdef __APPLE__
+    //   Note: the cast we are doing here is potentially dodgy. It _should_ be harmless, but YMMV.
+
+    atomic_compare_exchange_strong((volatile atomic_long *) location_to_swap_with, old_value, new_value );
+#else
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0;
+#endif
 
 /*
-    Int64  result;
+    Int32  result;
 
-   asm volatile (
-        "lock; cmpxchgq %2,%1"
+    asm volatile (
+        "lock; cmpxchg %2,%1"
         : "=a" (result),
           "=m" (*location_to_swap_with)
         : "q"  (new_value),
@@ -831,47 +892,6 @@ Int64 m_iii64_atomic_compare_and_swap(
 
     return result;
 */
-}
-
-int m_iii_atomic_compare_and_swap(
-                 int    old_value,
-                 int    new_value,
-        volatile int  * location_to_swap_with
-        )
-{
-#ifdef __aarch64__
-#else
-    int  result;
-
-    asm volatile (
-        "lock; cmpxchgl %2,%1"
-        : "=a" (result),
-          "=m" (*location_to_swap_with)
-        : "q"  (new_value),
-          "0"  (old_value)
-        : "memory"
-        );
-
-    return result;
-#endif
-}
-
-void m_i_xadd_i(
-    int  * increment_value_and_prev_value,
-    int  * memory_location_to_increment
-    )
-{
-#ifdef __aarch64__
-#else
-    asm volatile (
-        "lock; xaddl %0,%1"
-        : "=r" (*increment_value_and_prev_value),
-          "=m" (*memory_location_to_increment)
-        : "0"  (*increment_value_and_prev_value),
-          "m"  (*memory_location_to_increment)
-        : "memory", "cc"
-        );
-#endif
 }
 
 float m_ff_atomic_add(
@@ -884,6 +904,8 @@ float m_ff_atomic_add(
 
     do {
 #ifdef __aarch64__
+        //   This _should_ do the right thing
+        __compiler_barrier();
 #else
         asm volatile (
             "pause"
@@ -916,11 +938,14 @@ double m_dd_atomic_add(
 
     do {
 #ifdef __aarch64__
+        //   This _should_ do the right thing
+        __compiler_barrier();
 #else
         asm volatile (
             "pause"
             );
 #endif
+
         oldVal.d = *dr;
         newVal.d = oldVal.d + d0;
     }
@@ -947,5 +972,25 @@ double m_dd_atomic_add(
 }
 
 #endif
+
+int m_ii_atomic_add(
+                 int    i0,
+        volatile int  * ir
+        )
+{
+#ifdef __APPLE__
+    //  This cast to "atomic" is potentially dodgy, although it *seems* to work
+    atomic_fetch_add((atomic_int*)ir, i0);
+    return i0;
+#else
+    __asm__ volatile("lock; xaddl %0, %1"
+    : "+r" (i0), "+m" (*ir) // input+output
+    : // No input-only
+    : "memory"
+    );
+    
+    return value;
+#endif
+}
 
 /* ======================================================================== */
