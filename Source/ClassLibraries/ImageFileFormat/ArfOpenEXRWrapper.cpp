@@ -661,7 +661,7 @@ int readRGBOpenEXR(
             const int data_y = display_y - start_y;
 
             assert(display_y >= 0);
-            assert(display_y < display_height);
+            assert(display_y < (*height));
 
             assert(data_y >= 0);
             assert(data_y < data_height);
@@ -1060,7 +1060,7 @@ int readSpectralOpenEXR(
             const int data_y = display_y - start_y;
 
             assert(display_y >= 0);
-            assert(display_y < display_height);
+            assert(display_y < (*height));
 
             assert(data_y >= 0);
             assert(data_y < data_height);
