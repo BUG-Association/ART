@@ -38,6 +38,8 @@
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
+//#define EMBREE_DEBUG_PRINT
+
 // print embree-related errors
 void errorFunction(void* userPtr, enum RTCError error, const char* str) {
     printf("\nembree error %d: %s\n", error, str);
@@ -166,6 +168,7 @@ void embree_intersect_geometry(const int * valid,
     // If the geometry about to be ray cast is a csg geometry ...
     if(geometryData->_isCSGGeometry)
     {
+
         ArnBinary * csgNode =
                 (ArnBinary *) geometryData->_combinedAttributes_or_csg_node;
 
@@ -183,9 +186,9 @@ void embree_intersect_geometry(const int * valid,
         }
         // .. and if not, we use the internal kd-trees associated with the csg geometry
         // (faster)
-        else
-        {
-            ArnBSPTree * internalBSPTree = (ArnBSPTree *) csgNode->internalBSPTree;
+        else {
+
+            ArnBSPTree *internalBSPTree = (ArnBSPTree *) csgNode->internalBSPTree;
             [internalBSPTree
                     getIntersectionList
                     :rayCaster
@@ -196,6 +199,7 @@ void embree_intersect_geometry(const int * valid,
     }
     // for non-csg geometry, we determine the intersection list by traversing the original
     // scene graph
+
     else
     {
         [geometryData->_combinedAttributes_or_csg_node
@@ -205,7 +209,6 @@ void embree_intersect_geometry(const int * valid,
                 :&intersectionList
         ];
     }
-    //*/
 
     // if no intersection is found, return
     if(!intersectionList.head) {
@@ -248,8 +251,6 @@ void embree_occluded(const struct RTCOccludedFunctionNArguments* args) {
 static BOOL EMBREE_ENABLED = NO;
 static ArnEmbree * embreeManager = NULL;
 
-
-// #define EMBREE_DEBUG_PRINT
 
 + (void) enableEmbree: (BOOL) enabled {
     EMBREE_ENABLED = enabled;
@@ -332,9 +333,6 @@ static ArnEmbree * embreeManager = NULL;
     ArnOperationTree  * operationTree =
             [ ALLOC_INIT_OBJECT(ArnOperationTree) ];
 
-    // debug
-    // printf("created operation tree %p\n", operationTree);
-
     [ csgNodeBinary collectLeafBBoxes
             :   traversal
             :   leafNodeBBoxCollection
@@ -348,6 +346,9 @@ static ArnEmbree * embreeManager = NULL;
                     :   leafNodeBBoxCollection
                     :   operationTree
             ];
+
+    // debug
+    // printf("created bsp tree %p\n", csgNodeBinary->internalBSPTree);
 
     csgNodeBinary->internalOpTree = operationTree;
 
@@ -373,7 +374,7 @@ static ArnEmbree * embreeManager = NULL;
             ArnBinary * topCSGNode = (ArnBinary *) combinedAttributes_or_csg_node;
 
             // build internal kd tree only for csg geometry with triangle mesh as primitive
-            if(!topCSGNode->internalBSPTree && topCSGNode->containsTriangleMesh)
+            if(!topCSGNode->internalBSPTree  /* && topCSGNode->containsTriangleMesh */)
             {
                 [embree createInternalBSPTreeForSingleCSGGeometry : topCSGNode];
             }
@@ -451,11 +452,12 @@ static ArnEmbree * embreeManager = NULL;
     GeometryData * found = NULL;
 
     GeometryDataList * traversalNode = userGeometryListHead;
-    while(traversalNode->next) {
+    while(traversalNode) {
         if(traversalNode->data->_embreeGeomID == geomID) {
             found = traversalNode->data;
             break;
         }
+        traversalNode = traversalNode->next;
     }
 
     return found;

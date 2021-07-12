@@ -70,6 +70,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnBinary ( AttributeConcatenation )
 
+
 - (ArNode *) pushAttributesToLeafNodes
         : (ArnGraphTraversal *) traversal
 {
@@ -89,6 +90,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             if(![ ARNBINARY_SUBNODE_0 isKindOfClass: [ArnInfSphere class]]
                    &&  ![ ARNBINARY_SUBNODE_1 isKindOfClass: [ArnInfSphere class]])
             {
+
+
                 // feed CSG geometry to Embree
                 self->embreeGeomID = [embree initEmbreeCSGGeometry: self : &traversal->state];
 
@@ -235,38 +238,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     unsigned int numberOfSubnodes =
         arnoderefdynarray_size( & subnodeRefArray );
 
-    /*
-#if defined(ENABLE_EMBREE_SUPPORT)
-    if([ArnEmbree embreeEnabled])
-    {
-        ArnEmbree * embree = [ArnEmbree embreeManager];
-
-        for (unsigned int i = 0; i < numberOfSubnodes; i++) {
-
-            if(!embree->topmostCSGNode) {
-                [embree traversingCSGSubtree: YES];
-                [embree addedCSGNodeToEmbree: NO];
-                embree->topmostCSGNode = self;
-            }
-
-            ASSIGN_AS_HARD_NODE_REFERENCE_TO_NARY_SUBNODE(
-                    i,
-                    [ARNARY_SUBNODE_I(i) pushAttributesToLeafNodes
-                    :traversal
-                    ]
-            );
-
-            if(embree->topmostCSGNode && embree->topmostCSGNode == self) {
-                [embree traversingCSGSubtree: NO];
-                [embree addedCSGNodeToEmbree: NO];
-                embree->topmostCSGNode = NULL;
-            }
-        }
-    }
-    else
-    {
-#endif
-    */
         for (unsigned int i = 0; i < numberOfSubnodes; i++)
             ASSIGN_AS_HARD_NODE_REFERENCE_TO_NARY_SUBNODE(
                     i,
@@ -274,11 +245,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
                     :traversal
                     ]
             );
-/*
-#if defined(ENABLE_EMBREE_SUPPORT)
-    }
-#endif
-*/
+
     ASSERT_VALID_ARNGRAPHTRAVERSAL(traversal)
 
     return self;
