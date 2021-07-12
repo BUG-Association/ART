@@ -298,7 +298,7 @@ int isRGBEXR(const char* filename)
 
 
 /* ======================================================================== */
-/* OpenEXR RGB Read / Write wrapper functions
+/* OpenEXR RGB Read / Write wrapper functions                               */
 /* ======================================================================== */
 
 
@@ -806,7 +806,7 @@ void writeRGBOpenEXR(
 
 
 /* ======================================================================== */
-/* OpenEXR spectral Read / Write wrapper functions
+/* OpenEXR spectral Read / Write wrapper functions                          */
 /* ======================================================================== */
 
 int readSpectralOpenEXR(

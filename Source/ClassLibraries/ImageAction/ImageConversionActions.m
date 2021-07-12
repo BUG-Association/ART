@@ -1257,6 +1257,9 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
 
                         XYZA_DESTINATION_BUFFER_ALPHA(x) = GREYALPHA_SOURCE_BUFFER_A(x);
                         break;
+                        
+                    default:
+                        ART_ERRORHANDLING_FATAL_ERROR("Unsupported data type");
                 }
 
                 // // Handle custom whitepoint
