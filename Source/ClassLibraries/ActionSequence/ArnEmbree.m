@@ -125,6 +125,7 @@ void embree_intersect_geometry(const int * valid,
     ArnRayCaster * rayCaster = [embree getRayCasterFromRayCasterArray];
     GeometryData * geometryData = (GeometryData *) geometryUserPtr;
 
+
     // handling prior non-user-geometry intersections
     if(rtc_hit->geomID != RTC_INVALID_GEOMETRY_ID) {
 
@@ -132,7 +133,7 @@ void embree_intersect_geometry(const int * valid,
         {
             // retreive the geometry data associated with the previous hit
             GeometryData * previouslyHitGeometryData =
-                                [embree getFromUserGeometryList: rtc_hit->geomID];
+                                [rayCaster getFromEmbreeGeometryList: rtc_hit->geomID];
 
             if(!previouslyHitGeometryData) {
                 ART_ERRORHANDLING_FATAL_ERROR("embree error: previous intersection found on geometry that is not present in the geometry list");
@@ -160,6 +161,7 @@ void embree_intersect_geometry(const int * valid,
             rayCaster->surfacepoint_test_shape = NULL;
             rayCaster->state = geometryData->_traversalState;
         }
+
     }
 
     // perform the intersection
@@ -363,7 +365,7 @@ static ArnEmbree * embreeManager = NULL;
 + (void) createInternalBSPTreeForAllCSGGeometries {
     ArnEmbree * embree = [ArnEmbree embreeManager];
 
-    GeometryDataList * iteratorNode = embree->userGeometryListHead;
+    GeometryDataList * iteratorNode = embree->geometryDataListHead;
 
     while(iteratorNode) {
         ArNode * combinedAttributes_or_csg_node =
@@ -386,12 +388,12 @@ static ArnEmbree * embreeManager = NULL;
 }
 
 - (void) initializeEmptyGeometryList {
-    userGeometryListHead = NULL;
+    geometryDataListHead = NULL;
 }
 
-- (void) freeGeometryDataList {
+- (void) freeGeometryDataList : (GeometryDataList *) listHead {
 
-    GeometryDataList * iteratorNode = userGeometryListHead;
+    GeometryDataList * iteratorNode = listHead;
     GeometryDataList * next;
 
     while( iteratorNode ) {
@@ -432,12 +434,12 @@ static ArnEmbree * embreeManager = NULL;
     newNode->next = NULL;
     newNode->data = data;
 
-    if( !userGeometryListHead ) {
-        userGeometryListHead = newNode;
+    if( !geometryDataListHead ) {
+        geometryDataListHead = newNode;
         return;
     }
 
-    GeometryDataList * iteratorNode = userGeometryListHead;
+    GeometryDataList * iteratorNode = geometryDataListHead;
     while( true ) {
         if (!iteratorNode->next) {
             iteratorNode->next = newNode;
@@ -445,22 +447,6 @@ static ArnEmbree * embreeManager = NULL;
         }
         iteratorNode = iteratorNode->next;
     }
-}
-
-- (GeometryData *) getFromUserGeometryList : (int) geomID {
-
-    GeometryData * found = NULL;
-
-    GeometryDataList * traversalNode = userGeometryListHead;
-    while(traversalNode) {
-        if(traversalNode->data->_embreeGeomID == geomID) {
-            found = traversalNode->data;
-            break;
-        }
-        traversalNode = traversalNode->next;
-    }
-
-    return found;
 }
 
 // initialize singleton ArnEmbree object
@@ -603,7 +589,7 @@ static ArnEmbree * embreeManager = NULL;
     struct GeometryData * data = malloc(sizeof(struct GeometryData));
 
     if( !data ) {
-        fprintf(stderr, "Unable to allocate memory for new user geometry data struct\n");
+        fprintf(stderr, "Embree: Unable to allocate memory for new geometry data struct\n");
         exit(-1);
     }
 
@@ -851,6 +837,38 @@ static ArnEmbree * embreeManager = NULL;
     return geomID;
 }
 
+// code of this function is taken from the answer of "templatetypedef"
+// on https://stackoverflow.com/questions/4984071/how-do-you-copy-a-linked-list-into-another-list
+- (GeometryDataList *) cloneGeometryDataListForRayCaster
+        : (ArnRayCaster *) rayCaster
+        : (GeometryDataList *) orgListHead
+{
+
+    if(!orgListHead)
+        return NULL;
+
+    GeometryDataList * newNode =
+            (GeometryDataList *) malloc(sizeof(GeometryDataList));
+
+    if( !newNode ) {
+        fprintf(stderr, "Embree: Unable to allocate memory for new geometry list copy node\n");
+        exit(-1);
+    }
+
+    GeometryData * newNodeData =
+            (GeometryData *) malloc(sizeof(GeometryData));
+
+    if( !newNodeData ) {
+        fprintf(stderr, "Embree: Unable to allocate memory for new geometry list copy node\n");
+        exit(-1);
+    }
+
+    memcpy(newNodeData, orgListHead->data, sizeof(GeometryData));
+    newNode->data = newNodeData;
+    newNode->next = [self cloneGeometryDataListForRayCaster: rayCaster :orgListHead->next];
+
+    return newNode;
+}
 
 
 // does a linear search in the static raycaster array
@@ -871,7 +889,7 @@ static ArnEmbree * embreeManager = NULL;
     if(!embree)
         return;
 
-    [embree freeGeometryDataList];
+    [embree freeGeometryDataList : embree->geometryDataListHead];
 
     rtcReleaseScene([embree getScene]);
     rtcReleaseDevice([embree getDevice]);

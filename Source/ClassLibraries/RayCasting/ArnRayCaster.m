@@ -588,9 +588,36 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         self->addedToEmbreeArray = NO;
         self->intersectionListHead = NULL;
         [embree increaseRayCasterCount];
+
+        // clone geometry list to raycaster
+        if(!self->geometryDataListCopyHead)
+            self->geometryDataListCopyHead =
+                    [embree cloneGeometryDataListForRayCaster
+                            : self
+                            :embree->geometryDataListHead
+                    ];
     }
 #endif
 }
+
+#if defined(ENABLE_EMBREE_SUPPORT)
+// function for retrieving a
+- (GeometryData *) getFromEmbreeGeometryList : (int) geomID {
+
+    GeometryData * found = NULL;
+
+    GeometryDataList * traversalNode = self->geometryDataListCopyHead;
+    while(traversalNode) {
+        if(traversalNode->data->_embreeGeomID == geomID) {
+            found = traversalNode->data;
+            break;
+        }
+        traversalNode = traversalNode->next;
+    }
+
+    return found;
+}
+#endif
 
 - (void) cleanupAfterRayCasting
         : (ArNode <ArpWorld> *) geometryToRayCast
