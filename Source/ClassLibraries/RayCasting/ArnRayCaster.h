@@ -102,6 +102,9 @@ IntersectionLinkedListNode;
 
     BOOL                   * activeNodes;
 
+    // debug
+    long                     activeNodesSize;
+
 #if defined(ENABLE_EMBREE_SUPPORT)
 //----------------------------------------------------------------//
 //              embree related stuff                              //
@@ -111,8 +114,6 @@ IntersectionLinkedListNode;
     BOOL addedToEmbreeArray;
 
     IntersectionLinkedListNode * intersectionListHead;
-
-    GeometryDataList * geometryDataListCopyHead;
 #endif
 }
 
@@ -154,8 +155,6 @@ IntersectionLinkedListNode;
         : (ArNode *) combinedAttributesOrCSGNode
         : (struct ArIntersectionList) list
                 ;
-
-- (GeometryData *) getFromEmbreeGeometryList : (int) geomID;
 
 #endif
 

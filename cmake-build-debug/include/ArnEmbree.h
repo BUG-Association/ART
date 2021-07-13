@@ -65,6 +65,10 @@ GeometryDataList;
     RTCDevice device; // Embree device
     RTCScene scene; // Embree scene
 
+    // head of linked list in which the ArIntersectionlists
+    // are stored after intersecting the scene with embree
+    GeometryDataList * geometryDataListHead;
+
     // predefined array of ArnRayCaster in which the multiple
     // ArnRayCaster objects are stored during rendering
     ArnRayCaster * rayCasterArray[THREAD_MAX];
@@ -73,10 +77,6 @@ GeometryDataList;
     BOOL currentCSGGeometryAdded;
 
 @public
-
-    // head of linked list in which the ArIntersectionlists
-    // are stored after intersecting the scene with embree
-    GeometryDataList * geometryDataListHead;
 
     // we exclude the raycasting of an infinite sphere from Embree
     // (for reasons of efficiency) and intersect it only if the ray
@@ -99,7 +99,8 @@ GeometryDataList;
 + (BOOL) embreeEnabled;
 + (void) enableEmbree: (BOOL) enabled;
 
-- (void) addToUserGeometryList : (GeometryData *) data;
+- (void) addToGeometryDataList : (GeometryData *) data;
+- (GeometryData *) getFromUserGeometryList : (int) geomID;
 
 // setup embree singleton
 + (void) initialize : (ART_GV *) newART_GV;
@@ -121,7 +122,7 @@ GeometryDataList;
 + (void) createInternalBSPTreeForAllCSGGeometries;
 
 - (void) initializeEmptyGeometryList;
-- (void) freeGeometryDataList : (GeometryDataList *) listHead;
+- (void) freeGeometryDataList;
 
 - (void) clearRayCasterIntersectionList: (ArnRayCaster *) rayCaster;
 
@@ -169,12 +170,6 @@ GeometryDataList;
         : (ArNode *) trafo
         ;
 
-// clones a linked list of the embree geometry data to
-// a copy of the ray caster
-- (GeometryDataList *) cloneGeometryDataListForRayCaster
-        : (ArnRayCaster *) rayCaster
-        : (GeometryDataList *) orgListHead
-        ;
 
 // retrieves and add a ArnRaycaster object to the raycaster array by
 // simple hashing

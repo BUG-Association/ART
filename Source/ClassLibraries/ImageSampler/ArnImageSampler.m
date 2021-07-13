@@ -789,16 +789,6 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
     for ( unsigned int i = 0; i < numberOfRenderThreads; i++ )
     {
         [ pathspaceIntegrator[i] cleanupAfterEstimation: ART_GLOBAL_REPORTER ];
-
-#if defined(ENABLE_EMBREE_SUPPORT)
-        if ([pathspaceIntegrator[i] isKindOfClass: [ArnPathTracer class]]) {
-            ArnEmbree * embree = [ArnEmbree embreeManager];
-            ArnPathTracer * thisPathTracer = (ArnPathTracer *) pathspaceIntegrator[i];
-            ArnRayCaster * thisRayCaster = [thisPathTracer getRayCaster];
-            [embree freeGeometryDataList: thisRayCaster->geometryDataListCopyHead];
-        }
-#endif
-
         RELEASE_OBJECT( pathspaceIntegrator[i] );
     }
     

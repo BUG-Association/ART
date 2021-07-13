@@ -86,10 +86,6 @@ ArPathTracerMode;
         : (ArDistanceTrackingMode) newDistanceTrackingMode
         ;
 
-#if defined(ENABLE_EMBREE_SUPPORT)
-// returning the associated ray caster object
-- (ArnRayCaster *) getRayCaster;
-#endif
 
 @end
 

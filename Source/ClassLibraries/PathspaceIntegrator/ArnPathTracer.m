@@ -1293,12 +1293,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     return ( mode & arpathtracermode_light_sampling ? YES : NO );
 }
 
-#if defined(ENABLE_EMBREE_SUPPORT)
-// returning the associated ray caster object
-- (ArnRayCaster *) getRayCaster {
-    return (ArnRayCaster *) RAYCASTER;
-}
-#endif
 
 @end
 
