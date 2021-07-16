@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2020 The ART Development Team
+    Copyright (c) 1996-2021 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -137,9 +137,7 @@
 
 - (oneway void) release
 {
-    int  i = art_retain_counter;
-
-    printf("REL %p ",self);
+    printf("method REL %p ",self);
 
     printf("%s %lu/%u->"
         ,   [ self cStringClassName ]
@@ -149,16 +147,11 @@
 
     if ( art_retain_counter <= 1 )
         [ super release ];
-    else
-        art_retain_counter--;
 
-    if ( i == 1 || i == 0 )
-        printf("0/0\n");
-    else
-        printf("%lu/%u\n"
-            ,   (unsigned long)[ self retainCount ]
-            ,   art_retain_counter
-            );
+    printf("%lu/%u\n"
+        ,   (unsigned long)[ self retainCount ]
+        ,   art_retain_counter
+        );
 
     fflush(stdout);
 }
@@ -169,7 +162,7 @@
 {
     int  i = [ self retainCount ];
 
-    printf("REL %u ",self);
+    printf("method REL %u ",self);
 
     printf("%s 0x%x->"
         ,   [ self cStringClassName ]

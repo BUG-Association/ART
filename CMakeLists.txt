@@ -1,7 +1,3 @@
-# The XCode generator only works properly on cmake > 2.8.11
-# On other platforms, earlier 2.8 versions are fine
-# Now deprecated...
-
 cmake_minimum_required (VERSION 3.0)
 
 project (ART)
@@ -53,8 +49,9 @@ if (OpenEXR_FOUND)
 
 	set(OPENEXR_LIBRARIES 
 		OpenEXR::OpenEXR
+		OpenEXR::IlmThread
+		OpenEXR::Iex
 		Imath::Imath
-        # Imath::Half
 		)
 
 	SET(OPENEXR_FOUND 1)
@@ -100,7 +97,7 @@ message("GSL include dir:       ${GSL_INCLUDE_DIR}")
 message("GSL library:           ${GSL_LIBRARY}")
 message("OPENEXR_FOUND:         ${OPENEXR_FOUND}")
 message("OPENEXR include dir:   ${OPENEXR_INCLUDE_DIR}")
-message("OPENEXR library:       ${OPENEXR_LIBRARY}")
+message("OPENEXR library:       ${OPENEXR_LIBRARIES}")
 message("")
 
 
@@ -148,12 +145,19 @@ message("Executables will be installed in '${art_executable_directory}'")
 # (depending on platform)
 
 if ( APPLE )
-	set(CMAKE_XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "-o linker-signed")
+	if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin" 
+    		AND CMAKE_HOST_SYSTEM_VERSION VERSION_GREATER_EQUAL 20
+# leaving this here in case we ever need to be specific for MacOS 11, saves me having to google this again
+#    		AND CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 21
+		)
+    		message("Building for MacOS 11 or later, activating code signing")
+		set(CMAKE_XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "-o linker-signed")
+	endif ()
 	set( art_resource_directory_location "Library" )
 #	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE -DART_4_OPENSTEP -D_ART_WITHOUT_JPEGLIB" )
 #	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -DART_4_OPENSTEP -D_ART_WITHOUT_JPEGLIB" )
 	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE -DART_4_OPENSTEP -D_ART_WITHOUT_JPEGLIB_ -O3" )
-	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -DART_4_OPENSTEP -D_ART_WITHOUT_JPEGLIB_ -O3 -std=c++11" )
+	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -DART_4_OPENSTEP -D_ART_WITHOUT_JPEGLIB_ -O3" )
 else ( APPLE )
 	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE -DNDEBUG -DART_4_GNUSTEP -O3" )
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -DNDEBUG -DART_4_GNUSTEP -D_NATIVE_OBJC_EXCEPTIONS=1 -O3" )

@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2020 The ART Development Team
+    Copyright (c) 1996-2021 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -149,7 +149,8 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
     FREE_ARRAY(_bufferGrey);  
     FREE_ARRAY(_bufferAlpha);
 
-    [_imageInfo release];
+    RELEASE_OBJECT(_imageInfo);
+    
     [ super dealloc ];
 }
 

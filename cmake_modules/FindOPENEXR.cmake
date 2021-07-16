@@ -28,6 +28,8 @@ FIND_PATH(OPENEXR_INCLUDE_DIR OpenEXR/ImfIO.h
     /opt/local/include/OpenEXR # DarwinPorts
     /opt/csw/include/OpenEXR # Blastwave
     /opt/include/OpenEXR
+    /opt/homebrew/include
+    /opt/homebrew/include/OpenEXR
     /usr/freeware/include/OpenEXR
 )
 
@@ -47,6 +49,7 @@ MACRO(OPENEXR_FIND_VAR varname libname)
         /opt/local/lib
         /opt/csw/lib
         /opt/lib
+        /opt/homebrew/lib
         /usr/freeware/lib64
     )
 ENDMACRO(OPENEXR_FIND_VAR)

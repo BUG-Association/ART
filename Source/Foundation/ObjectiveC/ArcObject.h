@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2020 The ART Development Team
+    Copyright (c) 1996-2021 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -166,26 +166,23 @@ ART_MODULE_INTERFACE(ArcObject)
         : \
         ( \
             printf( \
-                "ReL %s %p %lu/%u->" \
+                "macro REL %s %p %lu/%u->" \
                 ,   [ ((id)(_object)) cStringClassName ] \
                 ,   (_object) \
                 ,   (unsigned long)[ ((id)(_object)) retainCount ] \
                 ,   ((ArcObject*)(_object))->art_retain_counter \
                 ), \
-            ((ArcObject*)(_object))->art_retain_counter--, \
+            ((ArcObject*)(_object))->art_retain_counter, \
             ( \
+                printf( \
+                    "%lu/%u\n" \
+                    ,   (unsigned long)[ ((id)(_object)) retainCount ] \
+                    ,   ((ArcObject*)(_object))->art_retain_counter \
+                    ), \
                 ((ArcObject*)(_object))->art_retain_counter == 0 \
                 ? \
-                    printf( \
-                        "0/0\n" \
-                        ), \
                     [ ((id)(_object)) release ] \
                 : \
-                    printf( \
-                        "%lu/%u\n" \
-                        ,   (unsigned long)[ ((id)(_object)) retainCount ] \
-                        ,   ((ArcObject*)(_object))->art_retain_counter \
-                        ), \
                     0 \
             ) \
         ) \

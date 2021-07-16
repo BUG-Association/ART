@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2020 The ART Development Team
+    Copyright (c) 1996-2021 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -884,7 +884,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
             for ( int x = 0; x < XC(destinationImageSize); x++ )
             {
-                LIGHTALPHA_DESTINATION_BUFFER_LIGHT(x) = LIGHTALPHA_SOURCE_BUFFER_LIGHT(x);
+                arlight_l_init_l(art_gv,LIGHTALPHA_SOURCE_BUFFER_LIGHT(x),LIGHTALPHA_DESTINATION_BUFFER_LIGHT(x));
                 LIGHTALPHA_DESTINATION_BUFFER_ALPHA(x) = LIGHTALPHA_SOURCE_BUFFER_ALPHA(x);
             }
 
