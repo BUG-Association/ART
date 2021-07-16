@@ -100,6 +100,7 @@ void embree_bbox(const struct RTCBoundsFunctionArguments* args) {
     printf("object box - max y: %f\n", bounds_o->upper_y);
     printf("object box - max z: %f\n", bounds_o->upper_z);
 #endif
+
 }
 
 
@@ -418,7 +419,7 @@ static ArnEmbree * embreeManager = NULL;
     }
 }
 
-- (void) addToUserGeometryList : (GeometryData *) data {
+- (void) addToGeometryDataList : (GeometryData *) data {
     // arlist_add_GeometryDataptr_at_tail( &userGeometryList, data );
 
 
@@ -639,7 +640,7 @@ static ArnEmbree * embreeManager = NULL;
     if(traversalState) data->_traversalState = *traversalState;
     data->_combinedAttributes_or_csg_node = combinedAttributesOrCSGNode;
 
-    [self addToUserGeometryList: data];
+    [self addToGeometryDataList: data];
 
     rtcSetGeometryUserData(thisGeometry, (void *) data);
 }
