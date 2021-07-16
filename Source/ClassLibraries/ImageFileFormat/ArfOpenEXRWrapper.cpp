@@ -298,7 +298,7 @@ int isRGBEXR(const char* filename)
 
 
 /* ======================================================================== */
-/* OpenEXR RGB Read / Write wrapper functions
+/* OpenEXR RGB Read / Write wrapper functions                               */
 /* ======================================================================== */
 
 
@@ -661,8 +661,7 @@ int readRGBOpenEXR(
             const int data_y = display_y - start_y;
 
             assert(display_y >= 0);
-            #warning had to comment this out to get it to compile
-            //assert(display_y < display_height);
+            assert(display_y < (*height));
 
             assert(data_y >= 0);
             assert(data_y < data_height);
@@ -807,7 +806,7 @@ void writeRGBOpenEXR(
 
 
 /* ======================================================================== */
-/* OpenEXR spectral Read / Write wrapper functions
+/* OpenEXR spectral Read / Write wrapper functions                          */
 /* ======================================================================== */
 
 int readSpectralOpenEXR(
@@ -1061,8 +1060,7 @@ int readSpectralOpenEXR(
             const int data_y = display_y - start_y;
 
             assert(display_y >= 0);
-            #warning had to comment this out to get it to compile
-//            assert(display_y < display_height);
+            assert(display_y < (*height));
 
             assert(data_y >= 0);
             assert(data_y < data_height);
