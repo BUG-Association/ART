@@ -472,6 +472,8 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
                 self);
 
         intersectionList->head->embreeShapeUserGeometry = NO;
+
+        [embree freeRayCasterIntersectionList: self];
     }
     else {
         *intersectionList = [embree extractClosestIntersectionList: self];

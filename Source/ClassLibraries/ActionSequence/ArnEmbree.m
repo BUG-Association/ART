@@ -142,12 +142,13 @@ void embree_intersect_geometry(const int * valid,
             // set up ray caster with info from prev hit
             ArIntersectionList prevIntersectionList = ARINTERSECTIONLIST_EMPTY;
 
-            // without a copy of a ray caster, some scene cause bugs
-            // when using multiple threads
-            ArnRayCaster * tempRayCaster = [rayCaster copy];
+            // temparily save ray caster variables
+            ArTraversalState primaryState = rayCaster->state;
+            ArNode<ArpShape> * primarySurfacepointTestShape = rayCaster->surfacepoint_test_shape;
 
-            tempRayCaster->state = previouslyHitGeometryData->_traversalState;
-            tempRayCaster->surfacepoint_test_shape = (ArNode<ArpShape> *)previouslyHitGeometryData->_shape;
+            // overwrtie them for intersectionlist initilaization
+            rayCaster->state = previouslyHitGeometryData->_traversalState;
+            rayCaster->surfacepoint_test_shape = (ArNode<ArpShape> *)previouslyHitGeometryData->_shape;
 
             // init intersection list
             arintersectionlist_init_1(
@@ -156,13 +157,16 @@ void embree_intersect_geometry(const int * valid,
                     0,
                     arface_on_shape_is_planar,
                     NULL,
-                    tempRayCaster); // no idea why, but it's working
-            prevIntersectionList.head->embreeShapeUserGeometry = NO;
+                    rayCaster);
 
-            RELEASE_OBJECT(tempRayCaster);
+            prevIntersectionList.head->embreeShapeUserGeometry = NO;
 
             // add intersection list to linked list
             [rayCaster addIntersectionToIntersectionLinkedList :NULL : prevIntersectionList];
+
+            // restore original ray caster variables
+            rayCaster->state = primaryState;
+            rayCaster->surfacepoint_test_shape = primarySurfacepointTestShape;
         }
     }
 
@@ -512,7 +516,7 @@ static ArnEmbree * embreeManager = NULL;
     }
 }
 
-- (void) clearRayCasterIntersectionList: (ArnRayCaster *) rayCaster {
+- (void) freeRayCasterIntersectionList: (ArnRayCaster *) rayCaster {
 
     if(!rayCaster->intersectionListHead)
         return;
@@ -581,7 +585,7 @@ static ArnEmbree * embreeManager = NULL;
     free(minIntersectionNode);
 
 
-    [self clearRayCasterIntersectionList: rayCaster];
+    [self freeRayCasterIntersectionList: rayCaster];
 
     return minimumList;
 }

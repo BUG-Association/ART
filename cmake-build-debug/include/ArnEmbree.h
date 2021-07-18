@@ -124,7 +124,7 @@ GeometryDataList;
 - (void) initializeEmptyGeometryList;
 - (void) freeGeometryDataList;
 
-- (void) clearRayCasterIntersectionList: (ArnRayCaster *) rayCaster;
+- (void) freeRayCasterIntersectionList: (ArnRayCaster *) rayCaster;
 
 - (struct ArIntersectionList) extractClosestIntersectionList
         : (ArnRayCaster *) rayCaster
