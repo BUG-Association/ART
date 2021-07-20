@@ -229,7 +229,7 @@ int polvis(
 
     asprintf(
 	& description_string,
-          "Visualises the polarisation state of light stored in an ARTRAW image.\n"
+          "Visualises the polarisation state of light stored in a RAW image.\n"
           "Refuses to work on non-polarised images. The four canonical plots from \n"
           "the 2010 SCCG paper are offered, as well as the option to show all four\n"
           "Stokes components in separate heatmap visualisations. The wavelength for\n"
@@ -239,7 +239,7 @@ int polvis(
 
     ART_SINGLE_INPUT_FILE_APPLICATION_STARTUP_WITH_SYNOPSIS(
         "polvis",
-        "ARTRAW image polarisation visualisation utility",
+        "RAW image polarisation visualisation utility",
         description_string,
         "polvis <inputfile> [options]"
         );
@@ -413,7 +413,7 @@ int polvis(
             ];
 
     [ ART_GLOBAL_REPORTER beginTimedAction
-        :   "reading ARTRAW input image of size %d x %d"
+        :   "reading RAW input image of size %d x %d"
         ,   XC( [ inputFileImage size ] )
         ,   YC( [ inputFileImage size ] )
         ];
@@ -435,7 +435,7 @@ int polvis(
     ArNode <ArpAction>  * viewingAction = NOP_ACTION;
 
     isrChangeAction =
-        CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_CHECK_WL_REQUIRE_POL_ACTION(
+        CHANGE_ISR_TO_MATCH_RAW_CONTENTS_CHECK_WL_REQUIRE_POL_ACTION(
             wavelength
             );
 
@@ -450,7 +450,7 @@ int polvis(
 
 #ifndef CYGWIN
         polvisFilterAction =
-            [ FILTER_TINY_ARTRAW_VALUES
+            [ FILTER_TINY_RAW_VALUES
                 thresholdValue:
                     pow(10.0,(float)[filterTinyOpt integerValue])
                 ];
@@ -461,7 +461,7 @@ int polvis(
     {
 #ifndef CYGWIN
         polvisDOPAction =
-            [ FILTER_HIGH_DOP_ARTRAW_VALUES
+            [ FILTER_HIGH_DOP_RAW_VALUES
                 thresholdValue: [filterHighDOPOpt doubleValue]
                 removeSource: rawRemoveSource
                 ];
@@ -472,7 +472,7 @@ int polvis(
     if ( [ stcOpt hasBeenSpecified ] )
     {
         polvisAction =
-            [ IMAGECONVERSION_ARTRAW_TO_SINGLECHANNEL_ARTGSC
+            [ IMAGECONVERSION_RAW_TO_SINGLECHANNEL_ARTGSC
                 removeSource: rawRemoveSource
                 normalise:    normalise
                 wavelength:   wavelength
@@ -503,7 +503,7 @@ int polvis(
                 aperture = IAC_TONEMAPPER_DEFAULT_APERTURE;
             
             polvisPreAction =
-                [ IMAGECONVERSION_ARTRAW_TO_MONO_ARTCSP
+                [ IMAGECONVERSION_RAW_TO_MONO_ARTCSP
                     wavelength: wavelength
                     ];
 
@@ -526,7 +526,7 @@ int polvis(
         }
         
         polvisAction =
-            [ ARTRAW_POLARISATION_VISUALISATION
+            [ RAW_POLARISATION_VISUALISATION
                 sv1:  sc1Colour
                 sv2:  sc2Colour
                 sv3:  sc3Colour

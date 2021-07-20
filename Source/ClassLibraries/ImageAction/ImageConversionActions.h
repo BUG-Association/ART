@@ -35,10 +35,10 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 #import "ArnSingleImageManipulationAction.h"
 
 /* ===========================================================================
-    'ArnImageConverter_ARTRAW_To_ARTCSP'
+    'ArnImageConverter_RAW_To_ARTCSP'
 =========================================================================== */
 
-@interface ArnImageConverter_ARTRAW_To_ARTCSP
+@interface ArnImageConverter_RAW_To_ARTCSP
         : ArnSingleImageManipulationAction
         < ArpConcreteClass, ArpAction >
 {
@@ -46,13 +46,13 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 
 @end
 
-#define ARTRAW_CONVERSION_WAVELENGTH_SAMPLE_TAG     "monochrome"
+#define RAW_CONVERSION_WAVELENGTH_SAMPLE_TAG     "monochrome"
 
 /* ===========================================================================
-    'ArnImageConverter_ARTRAW_To_Monochrome_ARTCSP'
+    'ArnImageConverter_RAW_To_Monochrome_ARTCSP'
 =========================================================================== */
 
-@interface ArnImageConverter_ARTRAW_To_Monochrome_ARTCSP
+@interface ArnImageConverter_RAW_To_Monochrome_ARTCSP
         : ArnSingleImageManipulationAction
         < ArpConcreteClass, ArpAction, ArpCoding >
 {
@@ -118,94 +118,11 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 
 @end
 
-#ifdef ART_WITH_OPENEXR
-
 /* ===========================================================================
-    'ArnImageConverter_ARTRAW_To_SPECTRAL_EXR'
+    'ArnImageConverter_RAW_To_Singlechannel_ARTGSC'
 =========================================================================== */
 
-@interface ArnImageConverter_ARTRAW_To_Spectral_EXR
-        : ArnSingleImageManipulationAction
-        < ArpConcreteClass, ArpAction >
-{
-}
-
-@end
-
-/* ===========================================================================
-    'ArnImageConverter_ARTCSP_To_EXR'
-=========================================================================== */
-
-@interface ArnImageConverter_ARTCSP_To_EXR
-        : ArnSingleImageManipulationAction
-        < ArpCoding, ArpConcreteClass, ArpAction >
-{
-}
-
-- removeSource
-                        : (BOOL) newRemoveOption
-        ;
-
-- removeSource
-                        : (BOOL) newRemoveOption
-        colourSpace     : (ArNode <ArpColourSpace> *) newColourSpace
-        ;
-
-- init
-        : (BOOL) newRemoveOption
-        : (ArNode <ArpColourSpace> *) newColourSpace
-        : (ArnColourTransform *) newColourTransform
-        ;
-
-@end
-
-/* ===========================================================================
-    'ArnImageConverter_EXR_To_ARTCSP'
-=========================================================================== */
-
-@interface ArnImageConverter_EXR_To_ARTCSP
-        : ArnSingleImageManipulationAction
-        < ArpCoding, ArpConcreteClass, ArpAction >
-{
-}
-
-- removeSource
-                        : (BOOL) newRemoveOption
-        ;
-
-- init
-        : (BOOL) newRemoveOption
-        ;
-
-@end
-
-/* ===========================================================================
-    'ArnImageConverter_ARTGSC_To_EXR'
-=========================================================================== */
-
-@interface ArnImageConverter_ARTGSC_To_EXR
-        : ArnSingleImageManipulationAction
-        < ArpCoding, ArpConcreteClass, ArpAction >
-{
-}
-
-- removeSource
-                        : (BOOL) newRemoveOption
-        ;
-
-- init
-        : (BOOL) newRemoveOption
-        ;
-
-@end
-
-#endif // ART_WITH_OPENEXR
-
-/* ===========================================================================
-    'ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSC'
-=========================================================================== */
-
-@interface ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSC
+@interface ArnImageConverter_RAW_To_Singlechannel_ARTGSC
         : ArnSingleImageManipulationAction
         < ArpCoding, ArpConcreteClass, ArpAction >
 {
@@ -228,10 +145,10 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 @end
 
 /* ===========================================================================
-    'ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSCs'
+    'ArnImageConverter_RAW_To_Singlechannel_ARTGSCs'
 =========================================================================== */
 
-@interface ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSCs
+@interface ArnImageConverter_RAW_To_Singlechannel_ARTGSCs
         : ArnSingleImageManipulationAction
         < ArpCoding, ArpConcreteClass, ArpAction >
 {
@@ -316,3 +233,88 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 
 
 // ===========================================================================
+
+
+#ifdef ART_WITH_OPENEXR
+
+/* ===========================================================================
+    'ArnImageConverter_RAW_To_SPECTRAL_EXR'
+=========================================================================== */
+
+@interface ArnImageConverter_RAW_To_Spectral_EXR
+        : ArnSingleImageManipulationAction
+        < ArpConcreteClass, ArpAction >
+{
+}
+
+@end
+
+/* ===========================================================================
+    'ArnImageConverter_ARTCSP_To_EXR'
+=========================================================================== */
+
+@interface ArnImageConverter_ARTCSP_To_EXR
+        : ArnSingleImageManipulationAction
+        < ArpCoding, ArpConcreteClass, ArpAction >
+{
+}
+
+- removeSource
+                        : (BOOL) newRemoveOption
+        ;
+
+- removeSource
+                        : (BOOL) newRemoveOption
+        colourSpace     : (ArNode <ArpColourSpace> *) newColourSpace
+        ;
+
+- init
+        : (BOOL) newRemoveOption
+        : (ArNode <ArpColourSpace> *) newColourSpace
+        : (ArnColourTransform *) newColourTransform
+        ;
+
+@end
+
+/* ===========================================================================
+    'ArnImageConverter_EXR_To_ARTCSP'
+=========================================================================== */
+
+@interface ArnImageConverter_EXR_To_ARTCSP
+        : ArnSingleImageManipulationAction
+        < ArpCoding, ArpConcreteClass, ArpAction >
+{
+}
+
+- removeSource
+                        : (BOOL) newRemoveOption
+        ;
+
+- init
+        : (BOOL) newRemoveOption
+        ;
+
+@end
+
+/* ===========================================================================
+    'ArnImageConverter_ARTGSC_To_EXR'
+=========================================================================== */
+
+@interface ArnImageConverter_ARTGSC_To_EXR
+        : ArnSingleImageManipulationAction
+        < ArpCoding, ArpConcreteClass, ArpAction >
+{
+}
+
+- removeSource
+                        : (BOOL) newRemoveOption
+        ;
+
+- init
+        : (BOOL) newRemoveOption
+        ;
+
+@end
+
+#endif // ART_WITH_OPENEXR
+
