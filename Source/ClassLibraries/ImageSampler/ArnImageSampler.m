@@ -598,7 +598,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
     
     ArNode <ArpAction>  * actionSequence =
         ACTION_SEQUENCE(
-            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+            [ IMAGECONVERSION_RAW_TO_ARTCSP
                 removeSource : NO 
             ], 
 

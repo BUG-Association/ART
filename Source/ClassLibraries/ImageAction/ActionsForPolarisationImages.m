@@ -36,8 +36,8 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
-    [ ArnARTRAWLinearPolarisingFilter    registerWithRuntime ];
-    [ ArnARTRAWPolarisationVisualisation registerWithRuntime ];
+    [ ArnRAWLinearPolarisingFilter    registerWithRuntime ];
+    [ ArnRAWPolarisationVisualisation registerWithRuntime ];
 )
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
@@ -46,13 +46,13 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 #define REPORTER    ART_GLOBAL_REPORTER
 
 /* ===========================================================================
-    'ArnARTRAWLinearPolarisingFilter'
+    'ArnRAWLinearPolarisingFilter'
 =========================================================================== */
 
-@implementation ArnARTRAWLinearPolarisingFilter
+@implementation ArnRAWLinearPolarisingFilter
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnARTRAWLinearPolarisingFilter)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTRAWLinearPolarisingFilter)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRAWLinearPolarisingFilter)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWLinearPolarisingFilter)
 
 - (void) _setupAttenuation
 {
@@ -437,10 +437,10 @@ void polvis_colour_to_rgb(
     }
 }
 
-@implementation ArnARTRAWPolarisationVisualisation
+@implementation ArnRAWPolarisationVisualisation
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnARTRAWPolarisationVisualisation)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTRAWPolarisationVisualisation)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRAWPolarisationVisualisation)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWPolarisationVisualisation)
 
 - sv1
            : (ArPolVisColour) newSC1Colour

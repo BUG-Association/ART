@@ -21,6 +21,12 @@ configure_file (
   "${PROJECT_BINARY_DIR}/ART_Version_Numbers.h"
   )
 
+# enable deprecated actions: those actions are still there for backward
+# compatibility. At the time of writing this comment, they handle 
+# ARTRAWs and Spectral OpenEXRs but were named *ARTRAW* and changed
+# to *RAW* after adding the support for Spectral OpenEXRs.
+add_definitions(-DENABLE_DEPRECATED_ACTIONS)
+
 include_directories("${PROJECT_BINARY_DIR}")
 
 message("")

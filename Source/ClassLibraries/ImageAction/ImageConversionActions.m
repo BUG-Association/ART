@@ -31,12 +31,22 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
-    [ ArnImageConverter_ARTRAW_To_ARTCSP  registerWithRuntime ];
-    [ ArnImageConverter_ARTCSP_To_TIFF    registerWithRuntime ];
-    [ ArnImageConverter_ARTGSC_To_TIFF    registerWithRuntime ];
+    [ ArnImageConverter_RAW_To_ARTCSP                registerWithRuntime ];
+    [ ArnImageConverter_RAW_To_Monochrome_ARTCSP     registerWithRuntime ];
+    [ ArnImageConverter_TIFF_To_ARTCSP               registerWithRuntime ];
+    [ ArnImageConverter_ARTCSP_To_TIFF               registerWithRuntime ];
+    [ ArnImageConverter_RAW_To_Singlechannel_ARTGSC  registerWithRuntime ];
+    [ ArnImageConverter_RAW_To_Singlechannel_ARTGSCs registerWithRuntime ];
+    [ ArnImageConverter_ARTGSC_To_TIFF               registerWithRuntime ];
+    [ ArnImageConverter_ARTGSC_To_GreyCSV            registerWithRuntime ];
+
 #ifdef ART_WITH_OPENEXR
-    [ ArnImageConverter_ARTCSP_To_EXR     registerWithRuntime ];
+    [ ArnImageConverter_RAW_To_Spectral_EXR          registerWithRuntime ];
+    [ ArnImageConverter_ARTCSP_To_EXR                registerWithRuntime ];
+    [ ArnImageConverter_EXR_To_ARTCSP                registerWithRuntime ];
+    [ ArnImageConverter_ARTGSC_To_EXR                registerWithRuntime ];
 #endif // ART_WITH_OPENEXR
+
 )
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
@@ -47,13 +57,13 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 #define REPORTER    ART_GLOBAL_REPORTER
 
 /* ===========================================================================
-    'ArnImageConverter_ARTRAW_To_ARTCSP'
+    'ArnImageConverter_RAW_To_ARTCSP'
 =========================================================================== */
 
-@implementation ArnImageConverter_ARTRAW_To_ARTCSP
+@implementation ArnImageConverter_RAW_To_ARTCSP
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_ARTCSP)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_ARTCSP)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_RAW_To_ARTCSP)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_ARTCSP)
 
 - (void) performOn
         : (ArNode <ArpNodeStack> *) nodeStack
@@ -78,7 +88,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
-         we wish to create (in our case, ArfARTRAW and ArfARTCSP).
+         we wish to create (in our case, ArfRAWRasterImage and ArfARTCSP).
     ---------------------------------------------------------------aw- */
 
     [ self prepareForImageManipulation
@@ -168,13 +178,13 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 #define MONOCHROME_SAMPLE_WIDTH     5 NM
 
 /* ===========================================================================
-    'ArnImageConverter_ARTRAW_To_Monochrome_ARTCSP'
+    'ArnImageConverter_RAW_To_Monochrome_ARTCSP'
 =========================================================================== */
 
-@implementation ArnImageConverter_ARTRAW_To_Monochrome_ARTCSP
+@implementation ArnImageConverter_RAW_To_Monochrome_ARTCSP
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_Monochrome_ARTCSP)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_Monochrome_ARTCSP)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_RAW_To_Monochrome_ARTCSP)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Monochrome_ARTCSP)
 
 - wavelength
         : (double) newWavelength
@@ -211,7 +221,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
     sprintf(
         destinationFilenameTag[0],
         "%s",
-        ARTRAW_CONVERSION_WAVELENGTH_SAMPLE_TAG
+        RAW_CONVERSION_WAVELENGTH_SAMPLE_TAG
         );
 
     /* ------------------------------------------------------------------
@@ -221,7 +231,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
-         we wish to create (in our case, ArfARTRAW and ArfARTCSP).
+         we wish to create (in our case, ArfRAWRasterImage and ArfARTCSP).
     ---------------------------------------------------------------aw- */
 
     [ self prepareForImageManipulation
@@ -824,91 +834,8 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
 
 @end
 
-#ifdef ART_WITH_OPENEXR
-
 /* ===========================================================================
-    'ArnImageConverter_ARTRAW_To_Spectral_EXR'
-=========================================================================== */
-
-@implementation ArnImageConverter_ARTRAW_To_Spectral_EXR
-
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_Spectral_EXR)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_Spectral_EXR)
-
-- (void) performOn
-        : (ArNode <ArpNodeStack> *) nodeStack
-{
-    /* ------------------------------------------------------------------
-         Before calling the function that sets up the framework for
-         image manipulation we have to specify what colour type the
-         result image will have.
-
-         imageDataType = what we are going to feed it
-         fileDataType  = what we want it to write to disk for us
-    ---------------------------------------------------------------aw- */
-
-    destinationImageDataType = art_foundation_isr(art_gv);
-    destinationFileDataType  = art_foundation_isr(art_gv);
-
-
-    /* ------------------------------------------------------------------
-         Activation of the framework common to all image manipulation
-         actions. This takes the source image from the stack, and creates
-         the destination image aint with all needed scanline buffers.
-
-         In order to do this properly it has to be informed of what
-         kind of source image to expect, and what kind of result image
-         we wish to create.
-    ---------------------------------------------------------------aw- */
-
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfRAWRasterImage class ]
-        :   [ ArfOpenEXRSpectral class ]
-        ];
-
-    if ( numberOfSourceImages > 1 )
-        [ REPORTER beginTimedAction
-            :   "converting raw images to spectral EXRs"
-            ];
-    else
-        [ REPORTER beginTimedAction
-            :   "converting raw image to spectral EXR"
-            ];
-        
-    for ( int i = 0; i < numberOfSourceImages; i++ )
-    {
-        for ( int y = 0; y < YC(destinationImageSize); y++ )
-        {
-            [ self loadSourceScanlineBuffer: i : y ];
-
-            for ( int x = 0; x < XC(destinationImageSize); x++ )
-            {
-                arlight_l_init_l(art_gv,LIGHTALPHA_SOURCE_BUFFER_LIGHT(x),LIGHTALPHA_DESTINATION_BUFFER_LIGHT(x));
-                LIGHTALPHA_DESTINATION_BUFFER_ALPHA(x) = LIGHTALPHA_SOURCE_BUFFER_ALPHA(x);
-            }
-
-            [ self writeDestinationScanlineBuffer: i : y ];
-        }
-    }
-
-    /* ------------------------------------------------------------------
-         Free the image manipulation infrastructure and end the action;
-         this also places the destination image on the stack.
-    ---------------------------------------------------------------aw- */
-
-    [ self finishImageManipulation
-        :   nodeStack
-        ];
-
-    [ REPORTER endAction ];
-}
-
-@end
-
-
-/* ===========================================================================
-    'ArnImageConverter_ARTCSP_To_EXR'
+    'ArnImageConverter_RAW_To_Singlechannel_ARTGSCs'
 =========================================================================== */
 
 #define DESTINATION_COLOURSPACE \
@@ -919,550 +846,10 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 #define DESTINATION_COLOURSPACE_REF     [ DESTINATION_COLOURSPACE colourSpaceRef ]
 #define COLOUR_TRANSFORM_REF            [ COLOUR_TRANSFORM transformRef ]
 
-@implementation ArnImageConverter_ARTCSP_To_EXR
+@implementation ArnImageConverter_RAW_To_Singlechannel_ARTGSCs
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTCSP_To_EXR)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To_EXR)
-
-- (void)  _setupColourTransform
-{
-    [ COLOUR_TRANSFORM setSourceAndDestinationColourspace
-        :   ARCSR_CIELab
-        :   DESTINATION_COLOURSPACE_REF
-        ];
-}
-
-- removeSource : (BOOL) newRemoveOption
-{
-    return
-        [ self init
-            :   newRemoveOption
-            :   DEFAULT_RGB_COLOURSPACE
-            :   [ ALLOC_INIT_OBJECT(ArnColourTransform) : arintent_perceptual ]
-            ];
-}
-
-- removeSource
-                        : (BOOL) newRemoveOption
-        colourSpace     : (ArNode <ArpColourSpace> *) newColourSpace
-{
-    return
-        [ self init
-            :   newRemoveOption
-            :   newColourSpace
-            :   [ ALLOC_INIT_OBJECT(ArnColourTransform) : arintent_perceptual ]
-            ];
-}
-
-- init
-        : (BOOL) newDeleteSourceImageAfterUse
-        : (ArNode <ArpColourSpace> *) newColourSpace
-        : (ArnColourTransform *) newColourTransform
-{
-    self =
-        [ super init
-            :   newDeleteSourceImageAfterUse
-            :   newColourSpace
-            :   newColourTransform ];
-
-    if ( self )
-    {
-        [ self _setupColourTransform ];
-    }
-    
-    return self;
-}
-
-- (void) performOn
-        : (ArNode <ArpNodeStack> *) nodeStack
-{
-    /* ------------------------------------------------------------------
-         Before calling the function that sets up the framework for
-         image manipulation we have to specify what colour type the
-         result image will have.
-
-         imageDataType = what we are going to feed it
-         fileDataType  = what we want it to write to disk for us
-
-         In this case the two are not the same because we let the
-         ArfTIFF class do the reduction from floating-point RGBA (which
-         is what we provide) to 32/64 bit RGBA (which is the standard
-         content of TIFF files) for us.
-    ---------------------------------------------------------------aw- */
-
-    destinationImageDataType = ardt_rgba;
-
-    destinationFileDataType  = ardt_rgba;
-
-
-    /* ------------------------------------------------------------------
-         Activation of the framework common to all image manipulation
-         actions. This takes the source image from the stack, and creates
-         the destination image aint with all needed scanline buffers.
-
-         In order to do this properly it has to be informed of what
-         kind of source image to expect, and what kind of result image
-         we wish to create (in our case, ArfARTCSP and ArfTIFF).
-    ---------------------------------------------------------------aw- */
-
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfARTCSP class ]
-        :   [ ArfOpenEXRRGB class ] ];
-
-    if ( numberOfSourceImages > 1 )
-        [ REPORTER beginTimedAction
-            :   "converting to %s OpenEXRs"
-            ,   ARCSR_NAME( DESTINATION_COLOURSPACE_REF )
-            ];
-    else
-        [ REPORTER beginTimedAction
-            :   "converting to %s OpenEXR"
-            ,   ARCSR_NAME( DESTINATION_COLOURSPACE_REF )
-            ];
-
-    Mat3  xyz_whitebalance_xyz;
-
-    xyz_whitebalance_xyz =
-        art_chromatic_adaptation_matrix(
-          art_gv,
-          arcas_xyz_scaling,
-        & ARCIEXY_SYSTEM_WHITE_POINT,
-        & ARCSR_W(DEFAULT_RGB_SPACE_REF)
-        );
-
-    /* ------------------------------------------------------------------
-         Process all pixels in the image.
-    ---------------------------------------------------------------aw- */
-
-    for ( int i = 0; i < numberOfSourceImages; i++ )
-    {
-        for ( int y = 0; y < YC(destinationImageSize); y++ )
-        {
-            //   Load the source scanline into the buffer
-
-            [ self loadSourceScanlineBuffer: i : y ];
-
-            for ( int x = 0; x < XC(destinationImageSize); x++ )
-            {
-    #ifdef IMAGECONVERSION_DEBUGPRINTF
-                xyz_s_debugprintf( art_gv,& XYZA_SOURCE_BUFFER_XYZ(x) );
-    #endif
-                ArCIEXYZ  xyz_wb;
-                
-                xyz_mat_to_xyz(
-                      art_gv,
-                    & XYZA_SOURCE_BUFFER_XYZ(x),
-                    & xyz_whitebalance_xyz,
-                    & xyz_wb
-                    );
-
-                xyz_conversion_to_linear_rgb(
-                      art_gv,
-                    & xyz_wb,
-                    & RGBA_DESTINATION_BUFFER_RGB(x)
-                    );
-
-    #ifdef IMAGECONVERSION_DEBUGPRINTF
-                rgb_s_debugprintf( art_gv,& RGBA_DESTINATION_BUFFER_RGB(x) );
-    #endif
-
-                //   Copy the alpha channel from the source image
-
-                RGBA_DESTINATION_BUFFER_ALPHA(x) = XYZA_SOURCE_BUFFER_ALPHA(x);
-            }
-
-            //   Write the destination scanline buffer to disk for this line
-
-            [ self writeDestinationScanlineBuffer: i : y ];
-        }
-    }
-
-
-    /* ------------------------------------------------------------------
-         Free the image manipulation infrastructure and end the action;
-         this also places the destination image on the stack.
-    ---------------------------------------------------------------aw- */
-
-    [ self finishImageManipulation
-        :   nodeStack ];
-
-    [ REPORTER endAction ];
-}
-
-- (void) code
-        : (ArcObject <ArpCoder> *) coder
-{
-    //  The destination colour space and the colour transform are
-    //  automatically coded since they are subnodes.
-
-    [ super code: coder ];
-
-    if ( [ coder isReading ] )
-        [ self _setupColourTransform ];
-}
-
-@end
-
-/* ===========================================================================
-    'ArnImageConverter_EXR_To_ARTCSP'
-=========================================================================== */
-
-// #define DESTINATION_COLOURSPACE \
-// ((ArnColourSpace *) ARNODEREF_POINTER(subnodeRefArray[0]))
-// #define COLOUR_TRANSFORM \
-// ((ArnColourTransform *) ARNODEREF_POINTER(subnodeRefArray[1]))
-
-// #define DESTINATION_COLOURSPACE_REF     [ DESTINATION_COLOURSPACE colourSpaceRef ]
-// #define COLOUR_TRANSFORM_REF            [ COLOUR_TRANSFORM transformRef ]
-
-@implementation ArnImageConverter_EXR_To_ARTCSP
-
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_EXR_To_ARTCSP)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_ARTCSP)
-
-- removeSource
-        : (BOOL) newRemoveOption
-{
-    return
-        [ self init
-            :   newRemoveOption
-            ];
-}
-
-
-- init
-        : (BOOL) newDeleteSourceImageAfterUse
-{
-    self =
-        [ super init
-            :   newDeleteSourceImageAfterUse
-            ];
-
-    return self;
-}
-
-
-- (void) performOn
-        : (ArNode <ArpNodeStack> *) nodeStack
-{
-    /* ------------------------------------------------------------------
-         imageDataType = what we are going to feed it
-         fileDataType  = what we want it to write to disk for us
-       --------------------------------------------------------------- */
-
-    destinationImageDataType = ardt_xyza;
-    destinationFileDataType  = ardt_xyza;
-
-    /* ------------------------------------------------------------------
-         Activation of the framework common to all image manipulation
-         actions. This takes the source image from the stack, and creates
-         the destination image aint with all needed scanline buffers.
-       --------------------------------------------------------------- */
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfOpenEXRRGB class ]
-        :   [ ArfARTCSP class ]
-        ];
-
-    if ( numberOfSourceImages > 1 ) {
-        [ REPORTER beginTimedAction
-            :   "converting OpenEXR images to ARTCSP format"
-            ];
-    } else {
-        [ REPORTER beginTimedAction
-            :   "converting OpenEXR to ARTCSP format"
-            ];
-    }
-
-    // // Load current whitepoint to later transform XYZ values
-    // Mat3 xyz_whitebalance_xyz =
-    //     art_chromatic_adaptation_matrix(
-    //           art_gv,
-    //           arcas_xyz_scaling,
-    //         & ARCSR_W(DEFAULT_RGB_SPACE_REF),
-    //         & ARCIEXY_SYSTEM_WHITE_POINT
-    //         );
-
-    /* ------------------------------------------------------------------
-         Process all pixels in the image.
-    ---------------------------------------------------------------aw- */
-
-    for ( int i = 0; i < numberOfSourceImages; i++ )
-    {
-        ArDataType  sourceDataType =
-            [ sourceImage[i]->imageInfo fileDataType ];
-
-        for ( int y = 0; y < YC(destinationImageSize); y++ )
-        {
-            // Load the source scanline into the buffer
-            [ self loadSourceScanlineBuffer: i : y ];
-
-            for ( int x = 0; x < XC(destinationImageSize); x++ )
-            {
-                // ArCIEXYZ  xyz_raw;
-
-                switch (sourceDataType) {
-                    case ardt_rgb:
-                        // rgba_to_xyz(
-                        //     art_gv,
-                        //     & RGB_SOURCE_BUFFER(x),
-                        //     & xyz_raw
-                        //     );
-
-                        rgb_to_xyz(
-                            art_gv,
-                            & RGB_SOURCE_BUFFER(x),
-                            & XYZA_DESTINATION_BUFFER_XYZ(x)
-                            );
-
-                        // Set alpha channel to full opacity: no alpha on source
-                        XYZA_DESTINATION_BUFFER_ALPHA(x) = 1.f;
-                        break;
-                    
-                    case ardt_rgba:
-                        // rgba_to_xyz(
-                        //     art_gv,
-                        //     & RGBA_SOURCE_BUFFER(x),
-                        //     & xyz_raw
-                        //     );
-
-                        rgba_to_xyz(
-                            art_gv,
-                            & RGBA_SOURCE_BUFFER(x),
-                            & XYZA_DESTINATION_BUFFER_XYZ(x)
-                            );
-
-                        // Copy the alpha channel from the source image
-                        XYZA_DESTINATION_BUFFER_ALPHA(x) = RGBA_SOURCE_BUFFER_ALPHA(x);
-                        break;
-
-
-                    case ardt_grey:
-                        g_to_xyz(
-                            art_gv,
-                            & GREY_SOURCE_BUFFER(x),
-                            & XYZA_DESTINATION_BUFFER_XYZ(x)
-                        );
-
-                        XYZA_DESTINATION_BUFFER_ALPHA(x) = 1.f;
-                        break;
-
-                    case ardt_grey_alpha:
-                        ga_to_xyz(
-                            art_gv,
-                            & GREYALPHA_SOURCE_BUFFER(x),
-                            & XYZA_DESTINATION_BUFFER_XYZ(x)
-                        );
-
-                        XYZA_DESTINATION_BUFFER_ALPHA(x) = GREYALPHA_SOURCE_BUFFER_A(x);
-                        break;
-                        
-                    default:
-                        ART_ERRORHANDLING_FATAL_ERROR("Unsupported data type");
-                }
-
-                // // Handle custom whitepoint
-                // xyz_mat_to_xyz(
-                //     art_gv,
-                //     & xyz_raw,
-                //     & xyz_whitebalance_xyz,
-                //     & XYZA_DESTINATION_BUFFER_XYZ(x)
-                //     );
-            }
-
-            // Write the destination scanline buffer to disk for this line
-            [ self writeDestinationScanlineBuffer: i : y ];
-        }
-    }
-    
-    /* ------------------------------------------------------------------
-         Free the image manipulation infrastructure and end the action;
-         this also places the destination image on the stack.
-    ---------------------------------------------------------------aw- */
-
-    [ self finishImageManipulation
-        :   nodeStack ];
-
-    [ REPORTER endAction ];
-}
-
-- (void) code
-        : (ArcObject <ArpCoder> *) coder
-{
-    [ super code: coder ];
-}
-
-@end
-
-/* ===========================================================================
-    'ArnImageConverter_ARTGSC_To_EXR'
-=========================================================================== */
-
-// #define DESTINATION_COLOURSPACE \
-// ((ArnColourSpace *) ARNODEREF_POINTER(subnodeRefArray[0]))
-// #define COLOUR_TRANSFORM \
-// ((ArnColourTransform *) ARNODEREF_POINTER(subnodeRefArray[1]))
-
-// #define DESTINATION_COLOURSPACE_REF     [ DESTINATION_COLOURSPACE colourSpaceRef ]
-// #define COLOUR_TRANSFORM_REF            [ COLOUR_TRANSFORM transformRef ]
-
-@implementation ArnImageConverter_ARTGSC_To_EXR
-
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTGSC_To_EXR)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To_EXR)
-
-- removeSource : (BOOL) newRemoveOption
-{
-    return
-        [ self init
-            :   newRemoveOption
-            ];
-}
-
-- init
-        : (BOOL) newDeleteSourceImageAfterUse
-{
-    self =
-        [ super init
-            :   newDeleteSourceImageAfterUse
-            :   DEFAULT_RGB_COLOURSPACE
-            :   [ ALLOC_INIT_OBJECT(ArnColourTransform) : arintent_perceptual ]
-            ];
-
-    return self;
-}
-
-- (void) performOn
-        : (ArNode <ArpNodeStack> *) nodeStack
-{
-    /* ------------------------------------------------------------------
-         Before calling the function that sets up the framework for
-         image manipulation we have to specify what colour type the
-         result image will have.
-
-         imageDataType = what we are going to feed it
-         fileDataType  = what we want it to write to disk for us
-
-         In this case the two are not the same because we let the
-         ArfTIFF class do the reduction from floating-point RGBA (which
-         is what we provide) to 32/64 bit RGBA (which is the standard
-         content of TIFF files) for us.
-    ---------------------------------------------------------------aw- */
-
-    destinationImageDataType = ardt_grey_alpha;
-    destinationFileDataType  = ardt_grey_alpha;
-
-    /* ------------------------------------------------------------------
-         Activation of the framework common to all image manipulation
-         actions. This takes the source image from the stack, and creates
-         the destination image aint with all needed scanline buffers.
-
-         In order to do this properly it has to be informed of what
-         kind of source image to expect, and what kind of result image
-         we wish to create (in our case, ArfARTCSP and ArfTIFF).
-    ---------------------------------------------------------------aw- */
-
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfARTGSC class ]
-        :   [ ArfOpenEXRRGB class ]
-        ];
-
-    if ( numberOfSourceImages > 1 )
-        [ REPORTER beginTimedAction
-            :   "converting greyscale images to OpenEXRs"
-            ];
-    else
-        [ REPORTER beginTimedAction
-            :   "converting greyscale image to OpenEXR"
-            ];
-
-    /* ------------------------------------------------------------------
-         Process all pixels in the image.
-    ---------------------------------------------------------------aw- */
-
-    BOOL  * imageHasOnlyPositiveValues =
-        ALLOC_ARRAY( BOOL, numberOfSourceImages );
-
-    for ( int i = 0; i < numberOfSourceImages; i++ )
-    {
-        //   This cast looks hack-y. But in this context, it is safe.
-        //   We know the source images are ArfARTGSCs.
-        
-        if ( [ (ArfARTGSC *)(sourceImage[i]->imageFile) minDataValue ] < 0. )
-        {
-            imageHasOnlyPositiveValues[i] = NO;
-        }
-        else
-        {
-            imageHasOnlyPositiveValues[i] = YES;
-        }
-    }
-
-    for ( int i = 0; i < numberOfSourceImages; i++ )
-    {
-        
-        for ( int y = 0; y < YC(destinationImageSize); y++ )
-        {
-            //   Load the source scanline into the buffer
-
-            [ self loadSourceScanlineBuffer: i : y ];
-
-            for ( int x = 0; x < XC(destinationImageSize); x++ )
-            {
-                GREYALPHA_DESTINATION_BUFFER_G(x) = GREYALPHA_SOURCE_BUFFER_G(x);
-                GREYALPHA_DESTINATION_BUFFER_A(x) = GREYALPHA_SOURCE_BUFFER_A(x);
-            }
-
-            //   Write the destination scanline buffer to disk for this line
-
-            [ self writeDestinationScanlineBuffer: i : y ];
-        }
-    }
-
-    FREE_ARRAY( imageHasOnlyPositiveValues );
-
-    /* ------------------------------------------------------------------
-         Free the image manipulation infrastructure and end the action;
-         this also places the destination image on the stack.
-    ---------------------------------------------------------------aw- */
-
-    [ self finishImageManipulation
-        :   nodeStack ];
-
-    [ REPORTER endAction ];
-}
-
-- (void) code
-        : (ArcObject <ArpCoder> *) coder
-{
-    //  The destination colour space and the colour transform are
-    //  automatically coded since they are subnodes.
-
-    [ super code: coder ];
-}
-
-@end
-
-#endif // ART_WITH_OPENEXR
-
-/* ===========================================================================
-    'ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSCs'
-=========================================================================== */
-
-#define DESTINATION_COLOURSPACE \
-((ArnColourSpace *) ARNODEREF_POINTER(subnodeRefArray[0]))
-#define COLOUR_TRANSFORM \
-((ArnColourTransform *) ARNODEREF_POINTER(subnodeRefArray[1]))
-
-#define DESTINATION_COLOURSPACE_REF     [ DESTINATION_COLOURSPACE colourSpaceRef ]
-#define COLOUR_TRANSFORM_REF            [ COLOUR_TRANSFORM transformRef ]
-
-@implementation ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSCs
-
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSCs)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSCs)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_RAW_To_Singlechannel_ARTGSCs)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Singlechannel_ARTGSCs)
 
 //  helper function from Stackoverflow
 
@@ -1645,11 +1032,11 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 
     if ( numberOfSourceImages > 1 )
         [ REPORTER beginTimedAction
-            :   "converting ARTRAW images to singlechannel GSCs"
+            :   "converting RAW images to singlechannel GSCs"
             ];
     else
         [ REPORTER beginTimedAction
-            :   "converting ARTRAW image to singlechannel GSCs"
+            :   "converting RAW image to singlechannel GSCs"
             ];
     
     if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
@@ -1838,7 +1225,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 @end
 
 /* ===========================================================================
-    'ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSC'
+    'ArnImageConverter_RAW_To_Singlechannel_ARTGSC'
 =========================================================================== */
 
 #define DESTINATION_COLOURSPACE \
@@ -1849,10 +1236,10 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
 #define DESTINATION_COLOURSPACE_REF     [ DESTINATION_COLOURSPACE colourSpaceRef ]
 #define COLOUR_TRANSFORM_REF            [ COLOUR_TRANSFORM transformRef ]
 
-@implementation ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSC
+@implementation ArnImageConverter_RAW_To_Singlechannel_ARTGSC
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSC)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSC)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_RAW_To_Singlechannel_ARTGSC)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Singlechannel_ARTGSC)
 
 - removeSource
                   : (BOOL) newRemoveOption
@@ -1977,14 +1364,14 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
         {
             [ REPORTER beginTimedAction
                 :   "extracting data @ %4.1f nm from multiple polarised "
-                    "ARTRAWs to 4 ARTGSCs each"
+                    "RAWs to 4 ARTGSCs each"
                 ,   NANO_FROM_UNIT(wavelength)
                 ];
         }
         else
         {
             [ REPORTER beginTimedAction
-                :   "extracting data @ %4.1f nm from multiple ARTRAWs "
+                :   "extracting data @ %4.1f nm from multiple RAWs "
                     "to one ARTGSC each"
                 ,   NANO_FROM_UNIT(wavelength)
                 ];
@@ -1995,7 +1382,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
         if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
         {
             [ REPORTER beginTimedAction
-                :   "extracting data @ %4.1f nm from polarised ARTRAW to 4 "
+                :   "extracting data @ %4.1f nm from polarised RAW to 4 "
                     "ARTGSCs"
                 ,   NANO_FROM_UNIT(wavelength)
                 ];
@@ -2003,7 +1390,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTRAW_To
         else
         {
             [ REPORTER beginTimedAction
-                :   "extracting data @ %4.1f nm from ARTRAW to ARTGSC"
+                :   "extracting data @ %4.1f nm from RAW to ARTGSC"
                 ,   NANO_FROM_UNIT(wavelength)
                 ];
         }
@@ -2939,7 +2326,630 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
 
 @end
 
+
+#ifdef ART_WITH_OPENEXR
+
+/* ===========================================================================
+    'ArnImageConverter_RAW_To_Spectral_EXR'
+=========================================================================== */
+
+@implementation ArnImageConverter_RAW_To_Spectral_EXR
+
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_RAW_To_Spectral_EXR)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Spectral_EXR)
+
+- (void) performOn
+        : (ArNode <ArpNodeStack> *) nodeStack
+{
+    /* ------------------------------------------------------------------
+         Before calling the function that sets up the framework for
+         image manipulation we have to specify what colour type the
+         result image will have.
+
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
+    ---------------------------------------------------------------aw- */
+
+    destinationImageDataType = art_foundation_isr(art_gv);
+    destinationFileDataType  = art_foundation_isr(art_gv);
+
+
+    /* ------------------------------------------------------------------
+         Activation of the framework common to all image manipulation
+         actions. This takes the source image from the stack, and creates
+         the destination image aint with all needed scanline buffers.
+
+         In order to do this properly it has to be informed of what
+         kind of source image to expect, and what kind of result image
+         we wish to create.
+    ---------------------------------------------------------------aw- */
+
+    [ self prepareForImageManipulation
+        :   nodeStack
+        :   [ ArfRAWRasterImage class ]
+        :   [ ArfOpenEXRSpectral class ]
+        ];
+
+    if ( numberOfSourceImages > 1 )
+        [ REPORTER beginTimedAction
+            :   "converting raw images to spectral EXRs"
+            ];
+    else
+        [ REPORTER beginTimedAction
+            :   "converting raw image to spectral EXR"
+            ];
+        
+    for ( int i = 0; i < numberOfSourceImages; i++ )
+    {
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
+        {
+            [ self loadSourceScanlineBuffer: i : y ];
+
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
+            {
+                arlight_l_init_l(art_gv,LIGHTALPHA_SOURCE_BUFFER_LIGHT(x),LIGHTALPHA_DESTINATION_BUFFER_LIGHT(x));
+                LIGHTALPHA_DESTINATION_BUFFER_ALPHA(x) = LIGHTALPHA_SOURCE_BUFFER_ALPHA(x);
+            }
+
+            [ self writeDestinationScanlineBuffer: i : y ];
+        }
+    }
+
+    /* ------------------------------------------------------------------
+         Free the image manipulation infrastructure and end the action;
+         this also places the destination image on the stack.
+    ---------------------------------------------------------------aw- */
+
+    [ self finishImageManipulation
+        :   nodeStack
+        ];
+
+    [ REPORTER endAction ];
+}
+
+@end
+
+
+/* ===========================================================================
+    'ArnImageConverter_ARTCSP_To_EXR'
+=========================================================================== */
+
+#define DESTINATION_COLOURSPACE \
+((ArnColourSpace *) ARNODEREF_POINTER(subnodeRefArray[0]))
+#define COLOUR_TRANSFORM \
+((ArnColourTransform *) ARNODEREF_POINTER(subnodeRefArray[1]))
+
+#define DESTINATION_COLOURSPACE_REF     [ DESTINATION_COLOURSPACE colourSpaceRef ]
+#define COLOUR_TRANSFORM_REF            [ COLOUR_TRANSFORM transformRef ]
+
+@implementation ArnImageConverter_ARTCSP_To_EXR
+
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTCSP_To_EXR)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To_EXR)
+
+- (void)  _setupColourTransform
+{
+    [ COLOUR_TRANSFORM setSourceAndDestinationColourspace
+        :   ARCSR_CIELab
+        :   DESTINATION_COLOURSPACE_REF
+        ];
+}
+
+- removeSource : (BOOL) newRemoveOption
+{
+    return
+        [ self init
+            :   newRemoveOption
+            :   DEFAULT_RGB_COLOURSPACE
+            :   [ ALLOC_INIT_OBJECT(ArnColourTransform) : arintent_perceptual ]
+            ];
+}
+
+- removeSource
+                        : (BOOL) newRemoveOption
+        colourSpace     : (ArNode <ArpColourSpace> *) newColourSpace
+{
+    return
+        [ self init
+            :   newRemoveOption
+            :   newColourSpace
+            :   [ ALLOC_INIT_OBJECT(ArnColourTransform) : arintent_perceptual ]
+            ];
+}
+
+- init
+        : (BOOL) newDeleteSourceImageAfterUse
+        : (ArNode <ArpColourSpace> *) newColourSpace
+        : (ArnColourTransform *) newColourTransform
+{
+    self =
+        [ super init
+            :   newDeleteSourceImageAfterUse
+            :   newColourSpace
+            :   newColourTransform ];
+
+    if ( self )
+    {
+        [ self _setupColourTransform ];
+    }
+    
+    return self;
+}
+
+- (void) performOn
+        : (ArNode <ArpNodeStack> *) nodeStack
+{
+    /* ------------------------------------------------------------------
+         Before calling the function that sets up the framework for
+         image manipulation we have to specify what colour type the
+         result image will have.
+
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
+
+         In this case the two are not the same because we let the
+         ArfTIFF class do the reduction from floating-point RGBA (which
+         is what we provide) to 32/64 bit RGBA (which is the standard
+         content of TIFF files) for us.
+    ---------------------------------------------------------------aw- */
+
+    destinationImageDataType = ardt_rgba;
+
+    destinationFileDataType  = ardt_rgba;
+
+
+    /* ------------------------------------------------------------------
+         Activation of the framework common to all image manipulation
+         actions. This takes the source image from the stack, and creates
+         the destination image aint with all needed scanline buffers.
+
+         In order to do this properly it has to be informed of what
+         kind of source image to expect, and what kind of result image
+         we wish to create (in our case, ArfARTCSP and ArfTIFF).
+    ---------------------------------------------------------------aw- */
+
+    [ self prepareForImageManipulation
+        :   nodeStack
+        :   [ ArfARTCSP class ]
+        :   [ ArfOpenEXRRGB class ] ];
+
+    if ( numberOfSourceImages > 1 )
+        [ REPORTER beginTimedAction
+            :   "converting to %s OpenEXRs"
+            ,   ARCSR_NAME( DESTINATION_COLOURSPACE_REF )
+            ];
+    else
+        [ REPORTER beginTimedAction
+            :   "converting to %s OpenEXR"
+            ,   ARCSR_NAME( DESTINATION_COLOURSPACE_REF )
+            ];
+
+    Mat3  xyz_whitebalance_xyz;
+
+    xyz_whitebalance_xyz =
+        art_chromatic_adaptation_matrix(
+          art_gv,
+          arcas_xyz_scaling,
+        & ARCIEXY_SYSTEM_WHITE_POINT,
+        & ARCSR_W(DEFAULT_RGB_SPACE_REF)
+        );
+
+    /* ------------------------------------------------------------------
+         Process all pixels in the image.
+    ---------------------------------------------------------------aw- */
+
+    for ( int i = 0; i < numberOfSourceImages; i++ )
+    {
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
+        {
+            //   Load the source scanline into the buffer
+
+            [ self loadSourceScanlineBuffer: i : y ];
+
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
+            {
+    #ifdef IMAGECONVERSION_DEBUGPRINTF
+                xyz_s_debugprintf( art_gv,& XYZA_SOURCE_BUFFER_XYZ(x) );
+    #endif
+                ArCIEXYZ  xyz_wb;
+                
+                xyz_mat_to_xyz(
+                      art_gv,
+                    & XYZA_SOURCE_BUFFER_XYZ(x),
+                    & xyz_whitebalance_xyz,
+                    & xyz_wb
+                    );
+
+                xyz_conversion_to_linear_rgb(
+                      art_gv,
+                    & xyz_wb,
+                    & RGBA_DESTINATION_BUFFER_RGB(x)
+                    );
+
+    #ifdef IMAGECONVERSION_DEBUGPRINTF
+                rgb_s_debugprintf( art_gv,& RGBA_DESTINATION_BUFFER_RGB(x) );
+    #endif
+
+                //   Copy the alpha channel from the source image
+
+                RGBA_DESTINATION_BUFFER_ALPHA(x) = XYZA_SOURCE_BUFFER_ALPHA(x);
+            }
+
+            //   Write the destination scanline buffer to disk for this line
+
+            [ self writeDestinationScanlineBuffer: i : y ];
+        }
+    }
+
+
+    /* ------------------------------------------------------------------
+         Free the image manipulation infrastructure and end the action;
+         this also places the destination image on the stack.
+    ---------------------------------------------------------------aw- */
+
+    [ self finishImageManipulation
+        :   nodeStack ];
+
+    [ REPORTER endAction ];
+}
+
+- (void) code
+        : (ArcObject <ArpCoder> *) coder
+{
+    //  The destination colour space and the colour transform are
+    //  automatically coded since they are subnodes.
+
+    [ super code: coder ];
+
+    if ( [ coder isReading ] )
+        [ self _setupColourTransform ];
+}
+
+@end
+
+/* ===========================================================================
+    'ArnImageConverter_EXR_To_ARTCSP'
+=========================================================================== */
+
+// #define DESTINATION_COLOURSPACE \
+// ((ArnColourSpace *) ARNODEREF_POINTER(subnodeRefArray[0]))
+// #define COLOUR_TRANSFORM \
+// ((ArnColourTransform *) ARNODEREF_POINTER(subnodeRefArray[1]))
+
+// #define DESTINATION_COLOURSPACE_REF     [ DESTINATION_COLOURSPACE colourSpaceRef ]
+// #define COLOUR_TRANSFORM_REF            [ COLOUR_TRANSFORM transformRef ]
+
+@implementation ArnImageConverter_EXR_To_ARTCSP
+
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_EXR_To_ARTCSP)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_ARTCSP)
+
+- removeSource
+        : (BOOL) newRemoveOption
+{
+    return
+        [ self init
+            :   newRemoveOption
+            ];
+}
+
+
+- init
+        : (BOOL) newDeleteSourceImageAfterUse
+{
+    self =
+        [ super init
+            :   newDeleteSourceImageAfterUse
+            ];
+
+    return self;
+}
+
+
+- (void) performOn
+        : (ArNode <ArpNodeStack> *) nodeStack
+{
+    /* ------------------------------------------------------------------
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
+       --------------------------------------------------------------- */
+
+    destinationImageDataType = ardt_xyza;
+    destinationFileDataType  = ardt_xyza;
+
+    /* ------------------------------------------------------------------
+         Activation of the framework common to all image manipulation
+         actions. This takes the source image from the stack, and creates
+         the destination image aint with all needed scanline buffers.
+       --------------------------------------------------------------- */
+    [ self prepareForImageManipulation
+        :   nodeStack
+        :   [ ArfOpenEXRRGB class ]
+        :   [ ArfARTCSP class ]
+        ];
+
+    if ( numberOfSourceImages > 1 ) {
+        [ REPORTER beginTimedAction
+            :   "converting OpenEXR images to ARTCSP format"
+            ];
+    } else {
+        [ REPORTER beginTimedAction
+            :   "converting OpenEXR to ARTCSP format"
+            ];
+    }
+
+    // // Load current whitepoint to later transform XYZ values
+    // Mat3 xyz_whitebalance_xyz =
+    //     art_chromatic_adaptation_matrix(
+    //           art_gv,
+    //           arcas_xyz_scaling,
+    //         & ARCSR_W(DEFAULT_RGB_SPACE_REF),
+    //         & ARCIEXY_SYSTEM_WHITE_POINT
+    //         );
+
+    /* ------------------------------------------------------------------
+         Process all pixels in the image.
+    ---------------------------------------------------------------aw- */
+
+    for ( int i = 0; i < numberOfSourceImages; i++ )
+    {
+        ArDataType  sourceDataType =
+            [ sourceImage[i]->imageInfo fileDataType ];
+
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
+        {
+            // Load the source scanline into the buffer
+            [ self loadSourceScanlineBuffer: i : y ];
+
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
+            {
+                // ArCIEXYZ  xyz_raw;
+
+                switch (sourceDataType) {
+                    case ardt_rgb:
+                        // rgba_to_xyz(
+                        //     art_gv,
+                        //     & RGB_SOURCE_BUFFER(x),
+                        //     & xyz_raw
+                        //     );
+
+                        rgb_to_xyz(
+                            art_gv,
+                            & RGB_SOURCE_BUFFER(x),
+                            & XYZA_DESTINATION_BUFFER_XYZ(x)
+                            );
+
+                        // Set alpha channel to full opacity: no alpha on source
+                        XYZA_DESTINATION_BUFFER_ALPHA(x) = 1.f;
+                        break;
+                    
+                    case ardt_rgba:
+                        // rgba_to_xyz(
+                        //     art_gv,
+                        //     & RGBA_SOURCE_BUFFER(x),
+                        //     & xyz_raw
+                        //     );
+
+                        rgba_to_xyz(
+                            art_gv,
+                            & RGBA_SOURCE_BUFFER(x),
+                            & XYZA_DESTINATION_BUFFER_XYZ(x)
+                            );
+
+                        // Copy the alpha channel from the source image
+                        XYZA_DESTINATION_BUFFER_ALPHA(x) = RGBA_SOURCE_BUFFER_ALPHA(x);
+                        break;
+
+
+                    case ardt_grey:
+                        g_to_xyz(
+                            art_gv,
+                            & GREY_SOURCE_BUFFER(x),
+                            & XYZA_DESTINATION_BUFFER_XYZ(x)
+                        );
+
+                        XYZA_DESTINATION_BUFFER_ALPHA(x) = 1.f;
+                        break;
+
+                    case ardt_grey_alpha:
+                        ga_to_xyz(
+                            art_gv,
+                            & GREYALPHA_SOURCE_BUFFER(x),
+                            & XYZA_DESTINATION_BUFFER_XYZ(x)
+                        );
+
+                        XYZA_DESTINATION_BUFFER_ALPHA(x) = GREYALPHA_SOURCE_BUFFER_A(x);
+                        break;
+                        
+                    default:
+                        ART_ERRORHANDLING_FATAL_ERROR("Unsupported data type");
+                }
+
+                // // Handle custom whitepoint
+                // xyz_mat_to_xyz(
+                //     art_gv,
+                //     & xyz_raw,
+                //     & xyz_whitebalance_xyz,
+                //     & XYZA_DESTINATION_BUFFER_XYZ(x)
+                //     );
+            }
+
+            // Write the destination scanline buffer to disk for this line
+            [ self writeDestinationScanlineBuffer: i : y ];
+        }
+    }
+    
+    /* ------------------------------------------------------------------
+         Free the image manipulation infrastructure and end the action;
+         this also places the destination image on the stack.
+    ---------------------------------------------------------------aw- */
+
+    [ self finishImageManipulation
+        :   nodeStack ];
+
+    [ REPORTER endAction ];
+}
+
+- (void) code
+        : (ArcObject <ArpCoder> *) coder
+{
+    [ super code: coder ];
+}
+
+@end
+
+/* ===========================================================================
+    'ArnImageConverter_ARTGSC_To_EXR'
+=========================================================================== */
+
+// #define DESTINATION_COLOURSPACE \
+// ((ArnColourSpace *) ARNODEREF_POINTER(subnodeRefArray[0]))
+// #define COLOUR_TRANSFORM \
+// ((ArnColourTransform *) ARNODEREF_POINTER(subnodeRefArray[1]))
+
+// #define DESTINATION_COLOURSPACE_REF     [ DESTINATION_COLOURSPACE colourSpaceRef ]
+// #define COLOUR_TRANSFORM_REF            [ COLOUR_TRANSFORM transformRef ]
+
+@implementation ArnImageConverter_ARTGSC_To_EXR
+
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTGSC_To_EXR)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To_EXR)
+
+- removeSource : (BOOL) newRemoveOption
+{
+    return
+        [ self init
+            :   newRemoveOption
+            ];
+}
+
+- init
+        : (BOOL) newDeleteSourceImageAfterUse
+{
+    self =
+        [ super init
+            :   newDeleteSourceImageAfterUse
+            :   DEFAULT_RGB_COLOURSPACE
+            :   [ ALLOC_INIT_OBJECT(ArnColourTransform) : arintent_perceptual ]
+            ];
+
+    return self;
+}
+
+- (void) performOn
+        : (ArNode <ArpNodeStack> *) nodeStack
+{
+    /* ------------------------------------------------------------------
+         Before calling the function that sets up the framework for
+         image manipulation we have to specify what colour type the
+         result image will have.
+
+         imageDataType = what we are going to feed it
+         fileDataType  = what we want it to write to disk for us
+
+         In this case the two are not the same because we let the
+         ArfTIFF class do the reduction from floating-point RGBA (which
+         is what we provide) to 32/64 bit RGBA (which is the standard
+         content of TIFF files) for us.
+    ---------------------------------------------------------------aw- */
+
+    destinationImageDataType = ardt_grey_alpha;
+    destinationFileDataType  = ardt_grey_alpha;
+
+    /* ------------------------------------------------------------------
+         Activation of the framework common to all image manipulation
+         actions. This takes the source image from the stack, and creates
+         the destination image aint with all needed scanline buffers.
+
+         In order to do this properly it has to be informed of what
+         kind of source image to expect, and what kind of result image
+         we wish to create (in our case, ArfARTCSP and ArfTIFF).
+    ---------------------------------------------------------------aw- */
+
+    [ self prepareForImageManipulation
+        :   nodeStack
+        :   [ ArfARTGSC class ]
+        :   [ ArfOpenEXRRGB class ]
+        ];
+
+    if ( numberOfSourceImages > 1 )
+        [ REPORTER beginTimedAction
+            :   "converting greyscale images to OpenEXRs"
+            ];
+    else
+        [ REPORTER beginTimedAction
+            :   "converting greyscale image to OpenEXR"
+            ];
+
+    /* ------------------------------------------------------------------
+         Process all pixels in the image.
+    ---------------------------------------------------------------aw- */
+
+    BOOL  * imageHasOnlyPositiveValues =
+        ALLOC_ARRAY( BOOL, numberOfSourceImages );
+
+    for ( int i = 0; i < numberOfSourceImages; i++ )
+    {
+        //   This cast looks hack-y. But in this context, it is safe.
+        //   We know the source images are ArfARTGSCs.
+        
+        if ( [ (ArfARTGSC *)(sourceImage[i]->imageFile) minDataValue ] < 0. )
+        {
+            imageHasOnlyPositiveValues[i] = NO;
+        }
+        else
+        {
+            imageHasOnlyPositiveValues[i] = YES;
+        }
+    }
+
+    for ( int i = 0; i < numberOfSourceImages; i++ )
+    {
+        
+        for ( int y = 0; y < YC(destinationImageSize); y++ )
+        {
+            //   Load the source scanline into the buffer
+
+            [ self loadSourceScanlineBuffer: i : y ];
+
+            for ( int x = 0; x < XC(destinationImageSize); x++ )
+            {
+                GREYALPHA_DESTINATION_BUFFER_G(x) = GREYALPHA_SOURCE_BUFFER_G(x);
+                GREYALPHA_DESTINATION_BUFFER_A(x) = GREYALPHA_SOURCE_BUFFER_A(x);
+            }
+
+            //   Write the destination scanline buffer to disk for this line
+
+            [ self writeDestinationScanlineBuffer: i : y ];
+        }
+    }
+
+    FREE_ARRAY( imageHasOnlyPositiveValues );
+
+    /* ------------------------------------------------------------------
+         Free the image manipulation infrastructure and end the action;
+         this also places the destination image on the stack.
+    ---------------------------------------------------------------aw- */
+
+    [ self finishImageManipulation
+        :   nodeStack ];
+
+    [ REPORTER endAction ];
+}
+
+- (void) code
+        : (ArcObject <ArpCoder> *) coder
+{
+    //  The destination colour space and the colour transform are
+    //  automatically coded since they are subnodes.
+
+    [ super code: coder ];
+}
+
+@end
+
+#endif // ART_WITH_OPENEXR
+
+
 // ===========================================================================
-
-
 
