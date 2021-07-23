@@ -497,7 +497,7 @@ ARM_MAIN_FUNCTION(CGA_Sunset_Scene_Alienworld)
                 randomValueGeneration: PSEUDORANDOM_SEQUENCE
             ],
 
-            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+            [ IMAGECONVERSION_RAW_TO_ARTCSP
                 removeSource: NO
             ],
 
