@@ -72,6 +72,7 @@
     		RANDOM_SEQUENCE,
     		ACTION_SEQUENCE_END,
     		IMAGECONVERSION_ARTRAW_TO_ARTCSP,
+    		IMAGECONVERSION_RAW_TO_ARTCSP,
     		STANDARD_TONEMAPPING_OPERATOR,
 		STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
 		STANDARD_LUMINANCE_CLIPPING,
@@ -259,7 +260,7 @@ However, if we render this scene using:
 artist SimpleScene.arm
 \end{verbatim}
 
-The renderer will not produce any common image file format. As matter of fact, the renderer will produce an ARTRAW which is the raw output of the renderer. To view it, it needs to be converted to RGB colourspace and tone-mapped. You can do that using \verb?tonemap? utility:
+The renderer will not produce any common image file format. As matter of fact, the renderer will produce an ARTRAW or a spectral OpenEXR file which is the raw output of the renderer. To view it, it needs to be converted to RGB colourspace and tone-mapped. You can do that using \verb?tonemap? utility:
 
 \begin{verbatim}
 tonemap SimpleScene.artraw -iac
@@ -267,10 +268,10 @@ tonemap SimpleScene.artraw -iac
 
 However, for more convenience, you may want to have the tone-mapped version generated on the fly. This can be done by adding some instructions in the action sequence.
 
-To convert the spectral ARTRAW file to a RGB version, ART is using an intermediate format, ARTCSP. To perform this action, use the object given by \verb?IMAGECONVERSION_ARTRAW_TO_ARTCSP? and tell if you want to retain the ARTRAW file after the conversion. In our case, we want to keep the original file:
+To convert a spectral ARTRAW or a spectral OpenEXR file to a RGB version, ART is using an intermediate format, ARTCSP. To perform this action, use the object given by \verb?IMAGECONVERSION_RAW_TO_ARTCSP? and tell if you want to retain the original file after the conversion. In our case, we want to keep the original file:
 
 \begin{lstlisting}
-[ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+[ IMAGECONVERSION_RAW_TO_ARTCSP
     removeSource: NO
     ]
 \end{lstlisting}
@@ -366,7 +367,7 @@ id actionsquence =
             randomValueGeneration: RANDOM_SEQUENCE
             ],
 
-        [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+        [ IMAGECONVERSION_RAW_TO_ARTCSP
             removeSource: NO
             ],
 
