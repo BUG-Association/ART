@@ -130,7 +130,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDualImageManipulationAction)
         (ArnFileImage <ArpImage>*)ARNODEREF_POINTER(sourceImageA_Ref);
 
 
-    if ( ! ( [ sourceImageA dataImageClass ] == sourceImageClass ) )
+    if ( ! [ sourceImageA imageFileIsKindOf: sourceImageClass ] )
         ART_ERRORHANDLING_FATAL_ERROR(
             "wrong type of object found on stack - "
             "%s instead of %s"
@@ -153,7 +153,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDualImageManipulationAction)
     sourceImageB =
         (ArnFileImage <ArpImage>*)ARNODEREF_POINTER(sourceImageB_Ref);
 
-    if ( ! ( [ sourceImageB dataImageClass ] == sourceImageClass ) )
+    if ( ! [ sourceImageB imageFileIsKindOf: sourceImageClass ] )
         ART_ERRORHANDLING_FATAL_ERROR(
             "wrong type of object found on stack - "
             "%s instead of %s"

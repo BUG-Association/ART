@@ -52,7 +52,7 @@ void imageProbe(
                 , YC(queryPoint)
                 );
         
-        if ( ! (   ( [ inputFileImage dataImageClass ] == [ ArfRAWRasterImage class ] )
+        if ( ! (   [ inputFileImage imageFileIsKindOf: [ ArfRAWRasterImage class ] ]
                 || ( [ inputFileImage dataImageClass ] == [ ArfARTCSP class ] )) )
             ART_ERRORHANDLING_FATAL_ERROR(
                 "file is not an internal ART image file - "
@@ -60,7 +60,7 @@ void imageProbe(
                 ,   [ [ inputFileImage dataImageClass ] cStringClassName ]
                 );
 
-        if ( [ inputFileImage dataImageClass ] == [ ArfRAWRasterImage class ] )
+        if ( [ inputFileImage imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
         {
             ArfRAWRasterImage  * rawImage =
                 (ArfRAWRasterImage *) inputFileImage->imageFile;

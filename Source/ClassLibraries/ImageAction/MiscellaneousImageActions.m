@@ -813,11 +813,19 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAW_Double_Mul_RAW)
          we wish to create (in our case, ArfRAWRasterImage).
     ---------------------------------------------------------------aw- */
 
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfRAWRasterImage class ]
-        :   [ ArfRAWRasterImage class ]
-        ];
+    if (ART_RAW_WORKFLOW_FORMAT_IS_NATIVE) {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfARTRAW class ]
+            ];
+    } else {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfOpenEXRSpectral class ]
+            ];
+    }
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.
@@ -969,11 +977,19 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyRAWValues)
          we wish to create (in our case, ArfRAWRasterImage).
     ---------------------------------------------------------------aw- */
 
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfRAWRasterImage class ]
-        :   [ ArfRAWRasterImage class ]
-        ];
+    if (ART_RAW_WORKFLOW_FORMAT_IS_NATIVE) {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfARTRAW class ]
+            ];
+    } else {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfOpenEXRSpectral class ]
+            ];
+    }
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.
@@ -1104,12 +1120,22 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleRAW)
          we wish to create (in our case, ArfRAW and ArfARTCSP).
     ---------------------------------------------------------------aw- */
 
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfRAWRasterImage class ]
-        :   [ ArfRAWRasterImage class ]
-        :   downscaleFactor
-        ];
+
+    if (ART_RAW_WORKFLOW_FORMAT_IS_NATIVE) {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfARTRAW class ]
+            :   downscaleFactor
+            ];
+    } else {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfOpenEXRSpectral class ]
+            :   downscaleFactor
+            ];
+    }
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.
@@ -1311,11 +1337,19 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopRAWValues)
          we wish to create (in our case, ArfRAWRasterImage).
     ---------------------------------------------------------------aw- */
 
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfRAWRasterImage class ]
-        :   [ ArfRAWRasterImage class ]
-        ];
+    if (ART_RAW_WORKFLOW_FORMAT_IS_NATIVE) {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfARTRAW class ]
+            ];
+    } else {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfOpenEXRSpectral class ]
+            ];
+    }
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.

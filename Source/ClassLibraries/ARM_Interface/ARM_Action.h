@@ -23,6 +23,10 @@
     along with ART.  If not, see <http://www.gnu.org/licenses/>.
 
 =========================================================================== */
+
+// Enable the legacy actions (*ARTRAW*) replaced by general (*RAW*) equivalents
+#define ENABLE_DEPRECATED_ACTIONS
+
 /**
  * @file ARM_Action.h
  * @brief Actions
@@ -205,7 +209,6 @@ ART_MODULE_INTERFACE(ARM_Action)
                     :   0 \
                     ]
 
-#warning check if these actions work with Spectral OpenEXRs
         /**
          * @def MUL_RAW_IMAGE
          */

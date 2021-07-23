@@ -570,7 +570,6 @@ int tonemap(
         {
             if (   [ inputImage imageFileIsKindOf: [ ArfARTCSP class ] ]
                 || [ inputImage imageFileIsKindOf: [ ArfTIFF class ] ]
-                #warning Handle properly different EXR formats
             #ifdef ART_WITH_OPENEXR
                 || [ inputImage imageFileIsKindOf: [ ArfOpenEXRRGB class ] ] 
             #endif    
