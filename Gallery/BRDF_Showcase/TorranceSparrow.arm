@@ -479,7 +479,7 @@ ARM_MAIN_FUNCTION(SphereStage_TorranceSparrow)
                 randomValueGeneration: PSEUDORANDOM_SEQUENCE
             ],
 
-            [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+            [ IMAGECONVERSION_RAW_TO_ARTCSP
                 removeSource: NO
             ],
 
