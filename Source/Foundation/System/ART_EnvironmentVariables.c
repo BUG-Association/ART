@@ -79,8 +79,11 @@ typedef struct ART_EnvironmentVariables_GV
     ArString        art_osx_isysroot;
 #endif
     ArString        art_viewer;
+    int             art_raw_workflow_format;
+    int             art_end_result_image_format;
+    int             art_end_result_tone_mapping;
     ArString        art_default_isr_string;
-    ArDataType  art_default_isr;
+    ArDataType      art_default_isr;
     ArString        arm2art_sed_path;
     ArString        arm2art_compiler_path;
     ArString        arm2art_stub_path;
@@ -98,6 +101,9 @@ ART_EnvironmentVariables_GV;
 #define ART_EV_OSX_ISYSROOT             ART_EV_GV->art_osx_isysroot
 #endif
 #define ART_EV_VIEWER                   ART_EV_GV->art_viewer
+#define ART_EV_RAW_WORKFLOW_FORMAT      ART_EV_GV->art_raw_workflow_format
+#define ART_EV_END_RESULT_IMAGE_FORMAT  ART_EV_GV->art_end_result_image_format
+#define ART_EV_END_RESULT_TONE_MAPPING  ART_EV_GV->art_end_result_tone_mapping
 #define ART_EV_DEFAULT_ISR_STRING       ART_EV_GV->art_default_isr_string
 #define ART_EV_DEFAULT_ISR              ART_EV_GV->art_default_isr
 #define ART_EV_ARM2ART_SED_PATH         ART_EV_GV->arm2art_sed_path
@@ -244,21 +250,24 @@ ART_MODULE_INITIALISATION_FUNCTION
 
     //   All set to zero, lazy evaluation only if needed
 
-    ART_EV_RESOURCE_PATHS         = 0;
-    ART_EV_RESOURCE_PATHLIST      = 0;
-    ART_EV_LIBRARY_PATHS          = 0;
-    ART_EV_INCLUDE_PATHS          = 0;
-    ART_EV_EXECUTE_PATHS          = 0;
-    ART_EV_SUBPROCESS_ENVP        = 0;
+    ART_EV_RESOURCE_PATHS          = 0;
+    ART_EV_RESOURCE_PATHLIST       = 0;
+    ART_EV_LIBRARY_PATHS           = 0;
+    ART_EV_INCLUDE_PATHS           = 0;
+    ART_EV_EXECUTE_PATHS           = 0;
+    ART_EV_SUBPROCESS_ENVP         = 0;
 #ifdef __APPLE__
-    ART_EV_OSX_ISYSROOT           = 0;
+    ART_EV_OSX_ISYSROOT            = 0;
 #endif
-    ART_EV_ARM2ART_SED_PATH       = 0;
-    ART_EV_ARM2ART_COMPILER_PATH  = 0;
-    ART_EV_ARM2ART_STUB_PATH      = 0;
-    ART_EV_VIEWER                 = 0;
-    ART_EV_DEFAULT_ISR_STRING     = 0;
-    ART_EV_DEFAULT_ISR            = 0;
+    ART_EV_ARM2ART_SED_PATH        = 0;
+    ART_EV_ARM2ART_COMPILER_PATH   = 0;
+    ART_EV_ARM2ART_STUB_PATH       = 0;
+    ART_EV_VIEWER                  = 0;
+    ART_EV_RAW_WORKFLOW_FORMAT     = -1;
+    ART_EV_END_RESULT_IMAGE_FORMAT = -1;
+    ART_EV_END_RESULT_TONE_MAPPING = -1;
+    ART_EV_DEFAULT_ISR_STRING      = 0;
+    ART_EV_DEFAULT_ISR             = 0;
 )
 
 ART_MODULE_SHUTDOWN_FUNCTION
@@ -636,11 +645,143 @@ ArConstString  art_ev_viewer(
 
     return (ArConstString) ART_EV_VIEWER;
 }
-/*
-#define ART_EV_DEFAULT_ISR_STRING          ART_EV_GV->art_default_isr_string
-#define ART_EV_DEFAULT_ISR              ART_EV_GV->art_default_isr
 
-*/
+int  art_ev_raw_workflow_format(
+        const ART_GV  * art_gv
+        )
+{
+    if ( ART_EV_RAW_WORKFLOW_FORMAT == -1 )
+    {
+        //   text specification made by the user
+
+        ArString  user_choice = getenv( "ART_RAW_WORKFLOW" );
+        
+        if ( user_choice )
+        {
+            if ( strcmp( user_choice, "ARTRAW" ) == 0 )
+                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_NATIVE;
+            if ( strcmp( user_choice, "artraw" ) == 0 )
+                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_NATIVE;
+                
+            if ( strcmp( user_choice, "EXR" ) == 0 )
+                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_OPENEXR;
+            if ( strcmp( user_choice, "exr" ) == 0 )
+                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_OPENEXR;
+            if ( strcmp( user_choice, "OPENEXR" ) == 0 )
+                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_OPENEXR;
+            if ( strcmp( user_choice, "OpenEXR" ) == 0 )
+                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_OPENEXR;
+            if ( strcmp( user_choice, "openexr" ) == 0 )
+                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_OPENEXR;
+        }
+
+        //   we only default to ARTRAW if the user string didn't make sense, or none was specified
+
+        if ( ART_EV_RAW_WORKFLOW_FORMAT == -1 )
+        {
+            ART_EV_RAW_WORKFLOW_FORMAT = ART_RAW_WORKFLOW_FORMAT_NATIVE;
+        }
+    }
+
+    return ART_EV_RAW_WORKFLOW_FORMAT;
+}
+
+int  art_ev_end_result_image_format(
+        const ART_GV  * art_gv
+        )
+{
+    if ( ART_EV_END_RESULT_IMAGE_FORMAT == -1 )
+    {
+        //   text specification made by the user
+
+        ArString  user_choice = getenv( "ART_END_RESULT_IMAGE_FORMAT" );
+        
+        if ( user_choice )
+        {
+            if ( strcmp( user_choice, "TIFF" ) == 0 )
+                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_TIFF;
+            if ( strcmp( user_choice, "Tiff" ) == 0 )
+                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_TIFF;
+            if ( strcmp( user_choice, "tiff" ) == 0 )
+                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_TIFF;
+                
+            if ( strcmp( user_choice, "OPENEXR" ) == 0 )
+                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_OPENEXR;
+            if ( strcmp( user_choice, "OpenEXR" ) == 0 )
+                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_OPENEXR;
+            if ( strcmp( user_choice, "openexr" ) == 0 )
+                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_OPENEXR;
+                
+            if ( strcmp( user_choice, "SPECTRALOPENEXR" ) == 0 )
+                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_SPECTRAL_OPENEXR;
+            if ( strcmp( user_choice, "SpectralOpenEXR" ) == 0 )
+                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_SPECTRAL_OPENEXR;
+            if ( strcmp( user_choice, "spectralopenexr" ) == 0 )
+                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_SPECTRAL_OPENEXR;
+        }
+
+        //   we only default to EXR if the user string didn't make sense, or none was specified
+
+        if ( ART_EV_END_RESULT_IMAGE_FORMAT == -1 )
+        {
+            ART_EV_END_RESULT_IMAGE_FORMAT = ART_END_RESULT_IMAGE_FORMAT_OPENEXR;
+        }
+    }
+
+    return ART_EV_END_RESULT_IMAGE_FORMAT;
+}
+
+int  art_ev_end_result_tone_mapping(
+        const ART_GV  * art_gv
+        )
+{
+    if ( ART_EV_END_RESULT_TONE_MAPPING == -1 )
+    {
+        //   text specification made by the user
+
+        ArString  user_choice = getenv( "ART_END_RESULT_TONE_MAPPING" );
+        
+        if ( user_choice )
+        {
+            if ( strcmp( user_choice, "YES" ) == 0 )
+                ART_EV_END_RESULT_TONE_MAPPING == 1;
+            if ( strcmp( user_choice, "Yes" ) == 0 )
+                ART_EV_END_RESULT_TONE_MAPPING == 1;
+            if ( strcmp( user_choice, "yes" ) == 0 )
+                ART_EV_END_RESULT_TONE_MAPPING == 1;
+                
+            if ( strcmp( user_choice, "NO" ) == 0 )
+                ART_EV_END_RESULT_TONE_MAPPING == 0;
+            if ( strcmp( user_choice, "No" ) == 0 )
+                ART_EV_END_RESULT_TONE_MAPPING == 0;
+            if ( strcmp( user_choice, "no" ) == 0 )
+                ART_EV_END_RESULT_TONE_MAPPING == 0;
+                
+            if (   ART_END_RESULT_IMAGE_FORMAT_IS_SPECTRAL_OPENEXR
+                && ART_EV_END_RESULT_TONE_MAPPING == 1 )
+            {
+                ART_ERRORHANDLING_WARNING(
+                    "overriding environment variable ART_END_RESULT_TONE_MAPPING - "
+                    "valuer reverted to NO, as default target image is set to "
+                    "spectral OpenEXR"
+                    );
+                    
+                ART_EV_END_RESULT_TONE_MAPPING == 0;
+            }
+        }
+
+        //   we only default to "no" if the user string didn't make sense,
+        //   or none was specified
+
+        if ( ART_EV_END_RESULT_TONE_MAPPING == -1 )
+        {
+            ART_EV_END_RESULT_TONE_MAPPING = 0;
+        }
+    }
+
+    return ART_EV_END_RESULT_TONE_MAPPING;
+}
+
 unsigned int  art_default_isr(
         const ART_GV  * art_gv
         )

@@ -197,6 +197,136 @@ ArConstString  art_ev_viewer(
 
 /* ---------------------------------------------------------------------------
 
+    ART_RAW_WORKFLOW_FORMAT
+
+    Controls the raw format used within a rendering process.
+    
+    By default, rendering yields ARTRAW images, which are then processed
+    further to some displayable format like EXR or TIFF. However, starting
+    with version 2.1, ART also offers the option to use spectral OpenEXR
+    images throughout.
+    
+    Valid string values for the envvar are "ARTRAW" and "OpenEXR".
+    
+    --->  Default is "ARTRAW"  <---
+    
+    Note that this envvar only affects action sequences that use
+    generic actions to specify workflow formats. If a specific type of
+    raw image is referenced in an action sequence, setting this envvar will
+    not alter the system behaviour.
+
+------------------------------------------------------------------------aw- */
+
+int  art_ev_raw_workflow_format(
+        const ART_GV  * art_gv
+        );
+
+#define ART_RAW_WORKFLOW_FORMAT  art_ev_raw_workflow_format( art_gv )
+
+#define ART_RAW_WORKFLOW_FORMAT_NATIVE         0
+#define ART_RAW_WORKFLOW_FORMAT_OPENEXR        1
+
+#define ART_RAW_WORKFLOW_FORMAT_IS_NATIVE      \
+( ART_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_NATIVE )
+#define ART_RAW_WORKFLOW_FORMAT_IS_OPENEXR     \
+( ART_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_OPENEXR )
+
+
+/* ---------------------------------------------------------------------------
+
+    ART_END_RESULT_IMAGE_FORMAT
+
+    Determines the default format of the final result of a rendering process.
+    
+    Valid string values for the envvar are:
+    
+    "TIFF": RGB LDR images
+
+    "OpenEXR": RGB HDR images
+    
+    "SpectralOpenEXR": RGB + Spectral HDR images
+    
+    --->  Default is "OpenEXR"  <---
+    
+    The ART_END_RESULT_TONE_MAPPING envvar can be used to control
+    whether the unmodified raw output of the rendering pass should be put in
+    the result image, or whether a tone mapping step should be performed.
+    
+    Note that it rarely makes sense to write to TIFF without a tone
+    mapping step.
+
+    Also note that this envvar only affects action sequences that use
+    generic format conversion and tone reproduction actions. Action
+    sequences which explicitly reference specific image formats are not
+    affected by this envvar!
+
+------------------------------------------------------------------------aw- */
+
+int  art_ev_end_result_image_format(
+        const ART_GV  * art_gv
+        );
+
+#define ART_END_RESULT_IMAGE_FORMAT  \
+    art_ev_end_result_image_format( art_gv )
+
+#define ART_END_RESULT_IMAGE_FORMAT_TIFF                0
+#define ART_END_RESULT_IMAGE_FORMAT_OPENEXR             1
+#define ART_END_RESULT_IMAGE_FORMAT_SPECTRAL_OPENEXR    2
+
+#define ART_END_RESULT_IMAGE_FORMAT_IS_TIFF     \
+( ART_END_RESULT_IMAGE_FORMAT == \
+  ART_END_RESULT_IMAGE_FORMAT_TIFF )
+  
+#define ART_END_RESULT_IMAGE_FORMAT_IS_OPENEXR  \
+( ART_END_RESULT_IMAGE_FORMAT == \
+  ART_END_RESULT_IMAGE_FORMAT_OPENEXR )
+
+#define ART_END_RESULT_IMAGE_FORMAT_IS_SPECTRAL_OPENEXR  \
+( ART_END_RESULT_IMAGE_FORMAT == \
+  ART_END_RESULT_IMAGE_FORMAT_SPECTRAL_OPENEXR )
+
+
+/* ---------------------------------------------------------------------------
+
+    ART_END_RESULT_TONE_MAPPING
+
+    Determines whether a tone mapping step is by default applied to the
+    raw result of a rendering job which uses a default action sequence.
+    
+    Valid string values for the envvar are:
+    
+    "yes": a generic default tone mapping algorithm is applied
+
+    "no" : no tone mapping, the raw contents are written straight out
+
+    --->  Default is "no"  <---
+    
+    Please note the following:
+    
+    - it rarely makes sense to work with non tone mapped TIFF images.
+    
+    - if ART_END_RESULT_IMAGE_FORMAT is set to "SpectralOpenEXR",
+      this envvar is always "no": if the user explicitly sets it to
+      "yes" in this case, a warning is issued, and the variable is
+      still set to "no". Reason being that tone mapping of spectral images
+      is a conceptually dodgy idea in the first place.
+      
+    - this envvar only affects action sequences that use generic format
+      conversion and tone reproduction actions. Action sequences which
+      explicitly reference specific image formats are not affected by it.
+
+------------------------------------------------------------------------aw- */
+
+int  art_ev_end_result_tone_mapping(
+        const ART_GV  * art_gv
+        );
+
+#define ART_END_RESULT_TONE_MAPPING  \
+    art_ev_end_result_default_tone_mapping( art_gv )
+
+
+/* ---------------------------------------------------------------------------
+
     ARM2ART_SED_PATH
 
     The path to the 'sed' executable used during .arm -> .art translations.
