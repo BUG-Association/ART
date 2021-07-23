@@ -36,7 +36,7 @@
 ART_MODULE_INITIALISATION_FUNCTION
 (
     [ Arn2xARTCSP_To_ARTGSC_DifferenceImage registerWithRuntime ];
-    [ Arn2xARTRAW_SNR registerWithRuntime ];
+    [ Arn2xRAW_SNR registerWithRuntime ];
 )
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
@@ -45,13 +45,13 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 #define REPORTER    ART_GLOBAL_REPORTER
 
 /* ===========================================================================
-    'Arn2xARTRAW_Add_ARTRAW'
+    'Arn2xRAW_Add_RAW'
 =========================================================================== */
 
-@implementation Arn2xARTRAW_Add_ARTRAW
+@implementation Arn2xRAW_Add_RAW
     
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_Add_ARTRAW)
-ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_Add_ARTRAW)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xRAW_Add_RAW)
+ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_Add_RAW)
 
 - outputName
         : (const char *) newOutputName
@@ -102,19 +102,26 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_Add_ARTRAW)
          we wish to create (in our case, ArfARTCSP and ArfTIFF).
     ---------------------------------------------------------------aw- */
 
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfRAWRasterImage class ]
-        :   [ ArfRAWRasterImage class ]
-        ];
-
+    if (ART_RAW_WORKFLOW_FORMAT_IS_NATIVE) {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfARTRAW class ]
+            ];
+    } else {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfOpenEXRSpectral class ]
+            ];
+    }
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
     [ REPORTER beginTimedAction
-        :   "adding ARTRAW images"
+        :   "adding RAW images"
         ];
 
     for ( long y = 0; y < YC(imageSize); y++ )
@@ -663,13 +670,13 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_To_ARTGSC_DifferenceImage)
 @end
 
 /* ===========================================================================
-    'Arn2xARTRAW_To_ARTGSC_DifferenceImage'
+    'Arn2xRAW_To_ARTGSC_DifferenceImage'
 =========================================================================== */
 
-@implementation Arn2xARTRAW_To_ARTGSC_DifferenceImage
+@implementation Arn2xRAW_To_ARTGSC_DifferenceImage
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_To_ARTGSC_DifferenceImage)
-ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_To_ARTGSC_DifferenceImage)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xRAW_To_ARTGSC_DifferenceImage)
+ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_To_ARTGSC_DifferenceImage)
 
 - outputName      : (const char *) newOutputName
         wavelength: (double) newWavelength
@@ -903,13 +910,13 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_To_ARTGSC_DifferenceImage)
 @end
 
 /* ===========================================================================
-    'Arn2xARTRAW_SNR'
+    'Arn2xRAW_SNR'
 ========================================================================cu= */
 
-@implementation Arn2xARTRAW_SNR
+@implementation Arn2xRAW_SNR
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_SNR)
-ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_SNR)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xRAW_SNR)
+ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_SNR)
 
 - outputName: (const char *) newFilename
 {
@@ -950,7 +957,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTRAW_SNR)
     ---------------------------------------------------------------aw- */
 
     [ REPORTER beginTimedAction
-        :   "computing ARTRAW SNR"
+        :   "computing RAW SNR"
         ];
 
     ArSpectrum  * spectrumReference    = spc_alloc(art_gv);

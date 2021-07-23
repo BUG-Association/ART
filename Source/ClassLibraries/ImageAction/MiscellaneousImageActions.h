@@ -144,21 +144,21 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
 @end
 
 /* ===========================================================================
-    'ArnChangeISR_to_Match_ARTRAW_Contents'
+    'ArnChangeISR_to_Match_RAW_Contents'
 =========================================================================== */
 
 #define ISR_CHANGE_PERFORM_NO_WAVELENGTH_CHECK      -1.0
 
-@interface ArnChangeISR_to_Match_ARTRAW_Contents
+@interface ArnChangeISR_to_Match_RAW_Contents
         : ArNode < ArpConcreteClass, ArpAction >
 {
     double  wavelengthToCheckAgainstISRBounds;
-    BOOL    requirePolarisedARTRAW;
+    BOOL    requirePolarisedRAW;
 }
 
 - init
         : (double) newWavelengthToCheckAgainstISRBounds
-        : (BOOL) newRequirePolarisedARTRAW
+        : (BOOL) newRequirePolarisedRAW
         ;
 
 @end
@@ -175,10 +175,10 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
 @end
 
 /* ===========================================================================
-    'ArnARTRAW_Double_Mul_ARTRAW'
+    'ArnRAW_Double_Mul_RAW'
 =========================================================================== */
 
-@interface ArnARTRAW_Double_Mul_ARTRAW
+@interface ArnRAW_Double_Mul_RAW
         : ArnSingleImageManipulationAction
         < ArpCoding, ArpConcreteClass, ArpAction >
 {
@@ -198,10 +198,10 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
 @end
 
 /* ===========================================================================
-    'ArnDownscaleARTRAW'
+    'ArnDownscaleRAW'
 =========================================================================== */
 
-@interface ArnDownscaleARTRAW
+@interface ArnDownscaleRAW
         : ArnSingleImageManipulationAction
         < ArpCoding, ArpConcreteClass, ArpAction >
 {
@@ -215,10 +215,10 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
 @end
 
 /* ===========================================================================
-    'ArnFilterTinyARTRAWValues'
+    'ArnFilterTinyRAWValues'
 =========================================================================== */
 
-@interface ArnFilterTinyARTRAWValues
+@interface ArnFilterTinyRAWValues
         : ArnSingleImageManipulationAction
         < ArpCoding, ArpConcreteClass, ArpAction >
 {
@@ -238,10 +238,10 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
 @end
 
 /* ===========================================================================
-    'ArnFilterHighDopARTRAWValues'
+    'ArnFilterHighDopRAWValues'
 =========================================================================== */
 
-@interface ArnFilterHighDopARTRAWValues
+@interface ArnFilterHighDopRAWValues
         : ArnSingleImageManipulationAction
         < ArpCoding, ArpConcreteClass, ArpAction >
 {

@@ -51,7 +51,7 @@ ART_MODULE_INTERFACE(ArnSingleImageManipulationAction)
     Superclass for all image manipulation actions that take a single
     image as input, and yield one or more result images. The standard
     case is a single result image, but a few operations (such as the
-    split of an ARTRAW image into its spectral components) yield more.
+    split of a RAW image into its spectral components) yield more.
     
     The purpose of this class is to take over all the housekeeping tasks
     associated with opening, creation and closing of image files,

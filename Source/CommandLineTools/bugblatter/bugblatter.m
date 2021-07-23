@@ -92,8 +92,7 @@ void readInputImageAndPlaceOnNodeStack(
         inputImage = (ArnFileImage *)imageFromStack;
     }
 #ifdef ART_WITH_OPENEXR
-#warning handle properly different OpenEXR files
-    else if ( [ originalInputImage imageFileIsKindOf: [ArfOpenEXRSpectral class ] ] )
+    else if ( [ originalInputImage imageFileIsKindOf: [ArfOpenEXRRGB class ] ] )
     {
         char  * conversionMasterFilename = 0;
 
@@ -234,7 +233,7 @@ void readInputImageAndPlaceOnNodeStack(
 //                }
 
                 [ ART_GLOBAL_REPORTER beginTimedAction
-                    :   "reading raw input image %s of size %d x %d"
+                    :   "reading RAW input image %s of size %d x %d"
                     ,   imageID
                     ,   XC(*imageSize)
                     ,   YC(*imageSize)
@@ -592,7 +591,7 @@ int bugblatter(
         actionSequence =
             ACTION_SEQUENCE(
 
-                [ GENERATE_2xARTRAW_TO_ARTGSC_DIFFERENCE_IMAGE
+                [ GENERATE_2xRAW_TO_ARTGSC_DIFFERENCE_IMAGE
                     outputName:  ART_APPLICATION_MAIN_FILENAME
                     wavelength:  wavelength
                 ],

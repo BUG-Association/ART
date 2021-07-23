@@ -52,7 +52,7 @@ void imageProbe(
                 , YC(queryPoint)
                 );
         
-        if ( ! (   ( [ inputFileImage dataImageClass ] == [ ArfRAWRasterImage class ] )
+        if ( ! (   [ inputFileImage imageFileIsKindOf: [ ArfRAWRasterImage class ] ]
                 || ( [ inputFileImage dataImageClass ] == [ ArfARTCSP class ] )) )
             ART_ERRORHANDLING_FATAL_ERROR(
                 "file is not an internal ART image file - "
@@ -60,7 +60,7 @@ void imageProbe(
                 ,   [ [ inputFileImage dataImageClass ] cStringClassName ]
                 );
 
-        if ( [ inputFileImage dataImageClass ] == [ ArfRAWRasterImage class ] )
+        if ( [ inputFileImage imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
         {
             ArfRAWRasterImage  * rawImage =
                 (ArfRAWRasterImage *) inputFileImage->imageFile;
@@ -75,7 +75,7 @@ void imageProbe(
                 //   If they do not match...
 
                 [ ART_GLOBAL_REPORTER beginAction
-                    :   "automatically switching ISR to match ARTRAW contents"
+                    :   "automatically switching ISR to match RAW contents"
                     ];
 
                 char  * newInputFileName;
@@ -91,7 +91,7 @@ void imageProbe(
                     ];
 
                 [ ART_GLOBAL_REPORTER printf
-                    :   "ARTRAW content is : %s\n"
+                    :   "RAW content is : %s\n"
                     ,   ardatatype_name( rawContentType )
                     ];
 
@@ -649,7 +649,7 @@ int art_imagetool(
     ART_SINGLE_INPUT_FILE_APPLICATION_STARTUP_WITH_SYNOPSIS(
         "art_imagetool",
         "raw image manipulation",
-"This tool reads one or two ARTRAW resp. ARTCSP input images, performs the\n"
+"This tool reads one or two RAW resp. ARTCSP input images, performs the\n"
 "specified operation, and depending on the operation, either writes the result to a\n"
 "new output image, or outputs the numerical result to screen and/or text file.\n\n"
 "Options flagged with 'S' require a single input image, those with 'D' two.\n"
@@ -762,7 +762,7 @@ int art_imagetool(
     {
         ArNode <ArpAction>  * firstActionSequence =
             ACTION_SEQUENCE(
-                CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_ACTION,
+                CHANGE_ISR_TO_MATCH_RAW_CONTENTS_ACTION,
 
                 ACTION_SEQUENCE_END
             );
@@ -804,7 +804,7 @@ int art_imagetool(
     {
         mainActionSequence =
             ACTION_SEQUENCE(
-                [ ADD_2_ARTRAW_IMAGES
+                [ ADD_2_RAW_IMAGES
                     outputName :  ART_APPLICATION_MAIN_FILENAME
                     ],
 
@@ -828,7 +828,7 @@ int art_imagetool(
         
         mainActionSequence =
             ACTION_SEQUENCE(
-                [ COMPUTE_2xARTRAW_SNR
+                [ COMPUTE_2xRAW_SNR
                     outputName :  outputName
                     ],
 
@@ -863,7 +863,7 @@ int art_imagetool(
     if ( [ dscOpt hasBeenSpecified ] )
     {
         ArNode <ArpAction>  * dscAction =
-            [ DOWNSCALE_ARTRAW_IMAGE
+            [ DOWNSCALE_RAW_IMAGE
                 downscaleFactor: [ dscOpt integerValue ]
                 ];
         
@@ -880,7 +880,7 @@ int art_imagetool(
     if ( [ mulOpt hasBeenSpecified ] )
     {
         ArNode <ArpAction>  * mulAction =
-            [ MUL_ARTRAW_IMAGE
+            [ MUL_RAW_IMAGE
                 multiplyBy: [ mulOpt doubleValue ]
                 ];
         

@@ -246,12 +246,12 @@ int tonemap(
         "tonemap",
         "tone mapping utility",
         "This application processes floating point HDR images so that they become displayable\n"
-        "on LDR output devices. If ARTRAW input images are used, the application automatically\n"
+        "on LDR output devices. If RAW input images are used, the application automatically\n"
         "switches the ISR to the contents of the raw file. For all other formats, the chosen\n"
-        "RGB space is used instead. The utility can also split ARTRAW images into their spectral\n"
+        "RGB space is used instead. The utility can also split RAW images into their spectral\n"
         "channels, or extract data for a particular wavelength.\n\n"
         "If no option is selected, the tone mapping operator '-iac' is applied by default.\n\n"
-        "For ARTRAW images which contain polarisation information, the n-channel split by default\n"
+        "For RAW images which contain polarisation information, the n-channel split by default\n"
         "yields 4 images for each channel: one for each Stokes component. Via the \"Stokes bits\" \n"
         "option, the user can restrict this to specific Stokes components via bit arithmetic:\n"
         "e.g. an input value of 5 only yields Stokes components 2 and 4 (5 = binary 0101).\n\n"
@@ -353,16 +353,16 @@ int tonemap(
         ArNode <ArpAction>  * convertToResultFormatActionB = NOP_ACTION;
         ArNode <ArpAction>  * resultViewingAction = ART_VIEWING_ACTION;
 
-        //   First check: are we dealing with an ARTRAW?
+        //   First check: are we dealing with a RAW?
 
         BOOL  rawInput = NO;
 
         if ( [ inputImage imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
             rawInput = YES;
 
-        //   We only adapt the ISR to the contents of the ARTRAW image we
+        //   We only adapt the ISR to the contents of the RAW image we
         //   are processing if a) the user did not override the ISR manually,
-        //   and b) we are, in fact, processing an ARTRAW image (and not an
+        //   and b) we are, in fact, processing an RAW image (and not an
         //   ARTCSP, TIFF or OpenEXR). Automatically adapting to a ISR
         //   makes no sense for any other input data type.
 
@@ -376,9 +376,9 @@ int tonemap(
         else
         {
             //   If we are extracting a single wavelength slice from an
-            //   ARTRAW, we want to check the wavelength the user supplied
+            //   RAW, we want to check the wavelength the user supplied
             //   against the bounds of the spectral range that is actually
-            //   contained in the ARTRAW
+            //   contained in the RAW
             
             if (    [ singleWLtoCSVOpt hasBeenSpecified ]
     #ifdef ART_WITH_OPENEXR
@@ -400,14 +400,14 @@ int tonemap(
                 }
     #endif
                 isrChangeAction =
-                    CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_CHECK_WL_ACTION(
+                    CHANGE_ISR_TO_MATCH_RAW_CONTENTS_CHECK_WL_ACTION(
                         wavelengthToExtract
                         );
             }
             else
             {
                 isrChangeAction =
-                    CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_ACTION;
+                    CHANGE_ISR_TO_MATCH_RAW_CONTENTS_ACTION;
             }
         }
         
@@ -415,7 +415,7 @@ int tonemap(
         if ( [ outputSpectralEXROpt hasBeenSpecified ] && rawInput )
         {
             convertToResultFormatActionA =
-                [ IMAGECONVERSION_ARTRAW_TO_SPECTRAL_EXR
+                [ IMAGECONVERSION_RAW_TO_SPECTRAL_EXR
                     removeSource: NO
                     ];
 
@@ -440,7 +440,7 @@ int tonemap(
                     ];
         }
 
-        //   n-channel split of ARTRAW contents
+        //   n-channel split of RAW contents
         
         if (    [ splitToSinglechannelCSVOpt hasBeenSpecified ]
 #ifdef ART_WITH_OPENEXR
@@ -452,13 +452,13 @@ int tonemap(
             {
 #ifdef ART_WITH_OPENEXR
 	      convertToResultFormatActionA =
-	          [ IMAGECONVERSION_ARTRAW_TO_SINGLECHANNEL_ARTGSCs
+	          [ IMAGECONVERSION_RAW_TO_SINGLECHANNEL_ARTGSCs
                       removeSource: NO
 		      stokesComponentsToOutput: [ splitToSinglechannelEXROpt integerValue ]
 		      ];
 #else
 	      convertToResultFormatActionA =
-	          [ IMAGECONVERSION_ARTRAW_TO_SINGLECHANNEL_ARTGSCs
+	          [ IMAGECONVERSION_RAW_TO_SINGLECHANNEL_ARTGSCs
                       removeSource: NO
 		      stokesComponentsToOutput: [ splitToSinglechannelCSVOpt integerValue ]
 		      ];
@@ -490,11 +490,11 @@ int tonemap(
             }
             else
                 ART_ERRORHANDLING_FATAL_ERROR(
-                    "n-channel splitting only possible for ARTRAW images"
+                    "n-channel splitting only possible for RAW images"
                     );
         }
 
-        //   single wavelength data extraction from ARTRAWs
+        //   single wavelength data extraction from RAWs
         
         if (    [ singleWLtoCSVOpt hasBeenSpecified ]
 #ifdef ART_WITH_OPENEXR
@@ -505,7 +505,7 @@ int tonemap(
             if ( [ inputImage imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
             {
                 convertToResultFormatActionA =
-                    [ IMAGECONVERSION_ARTRAW_TO_SINGLECHANNEL_ARTGSC
+                    [ IMAGECONVERSION_RAW_TO_SINGLECHANNEL_ARTGSC
                         removeSource: NO
                         normalise:    NO
                         wavelength:   wavelengthToExtract
@@ -537,7 +537,7 @@ int tonemap(
             }
             else
                 ART_ERRORHANDLING_FATAL_ERROR(
-                    "single wavelength extraction only possible for ARTRAW images"
+                    "single wavelength extraction only possible for RAW images"
                     );
         }
 
@@ -562,7 +562,7 @@ int tonemap(
                 rawRemoveSource = YES;
 
             rawConversionAction =
-                [ IMAGECONVERSION_ARTRAW_TO_ARTCSP
+                [ IMAGECONVERSION_RAW_TO_ARTCSP
                     removeSource: rawRemoveSource
                     ];
         }
@@ -570,7 +570,6 @@ int tonemap(
         {
             if (   [ inputImage imageFileIsKindOf: [ ArfARTCSP class ] ]
                 || [ inputImage imageFileIsKindOf: [ ArfTIFF class ] ]
-                #warning Handle properly different EXR formats
             #ifdef ART_WITH_OPENEXR
                 || [ inputImage imageFileIsKindOf: [ ArfOpenEXRRGB class ] ] 
             #endif    
@@ -604,11 +603,11 @@ int tonemap(
             else
         #ifdef ART_WITH_OPENEXR
                 ART_ERRORHANDLING_FATAL_ERROR(
-                    "Input has to be either an ARTRAW, ARTCSP, TIFF or OpenEXR image!"
+                    "Input has to be either an RAW, ARTCSP, TIFF or OpenEXR image!"
                     );
         #else
                 ART_ERRORHANDLING_FATAL_ERROR(
-                    "Input has to be either an ARTRAW, ARTCSP or TIFF image!"
+                    "Input has to be either an RAW, ARTCSP or TIFF image!"
                     );
         #endif
         }

@@ -33,7 +33,7 @@ ART_MODULE_INTERFACE(ActionsForPolarisationImages)
 #import "ArnSingleImageManipulationAction.h"
 
 
-@interface ArnARTRAWLinearPolarisingFilter
+@interface ArnRAWLinearPolarisingFilter
         : ArnSingleImageManipulationAction
         < ArpCoding, ArpConcreteClass, ArpAction >
 {
@@ -73,9 +73,9 @@ typedef enum ArPolVisColour
 }
 ArPolVisColour;
 
-#define ARTRAW_POLVIS_USE_AVERAGE_OF_IMAGE  -1.0
+#define RAW_POLVIS_USE_AVERAGE_OF_IMAGE  -1.0
 
-@interface ArnARTRAWPolarisationVisualisation
+@interface ArnRAWPolarisationVisualisation
         : ArnSingleImageManipulationAction
         < ArpCoding, ArpConcreteClass, ArpAction >
 {

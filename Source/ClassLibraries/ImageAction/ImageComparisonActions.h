@@ -35,10 +35,10 @@ ART_MODULE_INTERFACE(ImageComparisonActions)
 
 
 /* ===========================================================================
-    'Arn2xARTRAW_Add_ARTRAW'
+    'Arn2xRAW_Add_RAW'
 =========================================================================== */
     
-@interface Arn2xARTRAW_Add_ARTRAW
+@interface Arn2xRAW_Add_RAW
         : ArnDualImageManipulationAction
         < ArpCoding, ArpConcreteClass, ArpAction >
 {
@@ -140,10 +140,10 @@ ArDifferenceImageFeatures;
 @end
 
 /* ===========================================================================
-    'Arn2xARTRAW_To_ARTGSC_DifferenceImage'
+    'Arn2xRAW_To_ARTGSC_DifferenceImage'
 =========================================================================== */
 
-@interface Arn2xARTRAW_To_ARTGSC_DifferenceImage
+@interface Arn2xRAW_To_ARTGSC_DifferenceImage
         : ArnDualImageManipulationAction
         < ArpCoding, ArpConcreteClass, ArpAction >
 {
@@ -162,10 +162,10 @@ ArDifferenceImageFeatures;
 @end
 
 /* ===========================================================================
-    'Arn2xARTRAW_SNR'
+    'Arn2xRAW_SNR'
 =========================================================================== */
 
-@interface Arn2xARTRAW_SNR
+@interface Arn2xRAW_SNR
         : ArnDualImageManipulationAction
         < ArpCoding, ArpConcreteClass, ArpAction >
 {

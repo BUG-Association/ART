@@ -184,7 +184,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTCSPLuminanceClipping)
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
-         we wish to create (in our case, ArfARTRAW and ArfARTCSP).
+         we wish to create (in our case, ArfARTCSP and ArfARTCSP).
     ---------------------------------------------------------------aw- */
 
     [ self prepareForImageManipulation
@@ -516,25 +516,25 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetColourSubsystemWhitepoint)
 
 
 /* ===========================================================================
-    'ArnChangeISR_to_Match_ARTRAW_Contents'
+    'ArnChangeISR_to_Match_RAW_Contents'
 =========================================================================== */
 
 
-@implementation ArnChangeISR_to_Match_ARTRAW_Contents
+@implementation ArnChangeISR_to_Match_RAW_Contents
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnChangeISR_to_Match_ARTRAW_Contents)
-ARPACTION_DEFAULT_IMPLEMENTATION(ArnChangeISR_to_Match_ARTRAW_Contents)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnChangeISR_to_Match_RAW_Contents)
+ARPACTION_DEFAULT_IMPLEMENTATION(ArnChangeISR_to_Match_RAW_Contents)
 
 - init
         : (double) newWavelengthToCheckAgainstISRBounds
-        : (BOOL) newRequirePolarisedARTRAW
+        : (BOOL) newRequirePolarisedRAW
 {
     self = [ super init ];
 
     if ( self )
     {
         wavelengthToCheckAgainstISRBounds = newWavelengthToCheckAgainstISRBounds;
-        requirePolarisedARTRAW            = newRequirePolarisedARTRAW;
+        requirePolarisedRAW               = newRequirePolarisedRAW;
     }
     
     return self;
@@ -581,7 +581,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnChangeISR_to_Match_ARTRAW_Contents)
 
     ArDataType  rawContentType = [ rawImage fileDataType ];
 
-    if (    requirePolarisedARTRAW
+    if (    requirePolarisedRAW
          && ! ( rawContentType & ardt_polarisable ) )
         ART_ERRORHANDLING_FATAL_ERROR(
             "non-polarised source image"
@@ -607,7 +607,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnChangeISR_to_Match_ARTRAW_Contents)
         //   If they do not match...
 
         [ ART_GLOBAL_REPORTER beginAction
-            :   "automatically switching ISR to match ARTRAW contents"
+            :   "automatically switching ISR to match RAW contents"
             ];
 
         char  * inputFileName;
@@ -627,7 +627,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnChangeISR_to_Match_ARTRAW_Contents)
             ];
 
         [ ART_GLOBAL_REPORTER printf
-            :   "ARTRAW content is : %s\n"
+            :   "RAW content is : %s\n"
             ,   ardatatype_name( rawContentType )
             ];
 
@@ -667,27 +667,27 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnChangeISR_to_Match_ARTRAW_Contents)
         RELEASE_OBJECT(fileImageToAdaptTo);
     }
     
-    //   Now that we can be sure to be in a ISR that matches ARTRAW
+    //   Now that we can be sure to be in a ISR that matches RAW
     //   contents, we can check sample WL validity - if this was
     //   requested
     
     if (    wavelengthToCheckAgainstISRBounds
          != ISR_CHANGE_PERFORM_NO_WAVELENGTH_CHECK )
     {
-        double  artraw_lower_bound =
+        double  raw_lower_bound =
             spc_channel_lower_bound( art_gv, 0 );
 
-        double  artraw_upper_bound =
+        double  raw_upper_bound =
               spc_channel_lower_bound( art_gv, spc_channels(art_gv) - 1 )
             + spc_channel_width(art_gv, spc_channels(art_gv) - 1 );
         
-        if (   ( wavelengthToCheckAgainstISRBounds < artraw_lower_bound )
-            || ( wavelengthToCheckAgainstISRBounds > artraw_upper_bound ) )
+        if (   ( wavelengthToCheckAgainstISRBounds < raw_lower_bound )
+            || ( wavelengthToCheckAgainstISRBounds > raw_upper_bound ) )
             ART_ERRORHANDLING_FATAL_ERROR(
-                "ARTRAW contains no data for selected wavelength: "
+                "RAW contains no data for selected wavelength: "
                 "spectral range is [%3.0f-%3.0f] nm, selected WL is %3.0f nm"
-                ,   NANO_FROM_UNIT(artraw_lower_bound)
-                ,   NANO_FROM_UNIT(artraw_upper_bound)
+                ,   NANO_FROM_UNIT(raw_lower_bound)
+                ,   NANO_FROM_UNIT(raw_upper_bound)
                 ,   NANO_FROM_UNIT(wavelengthToCheckAgainstISRBounds)
                 );
     }
@@ -720,13 +720,13 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnOutputCurrentISR)
 @end
 
 /* ===========================================================================
-    'ArnARTRAW_Double_Mul_ARTRAW'
+    'ArnRAW_Double_Mul_RAW'
 =========================================================================== */
 
-@implementation ArnARTRAW_Double_Mul_ARTRAW
+@implementation ArnRAW_Double_Mul_RAW
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnARTRAW_Double_Mul_ARTRAW)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTRAW_Double_Mul_ARTRAW)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRAW_Double_Mul_RAW)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAW_Double_Mul_RAW)
 
 - _init
         : (double) newFactor
@@ -782,7 +782,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTRAW_Double_Mul_ARTRAW
         : (ArNode <ArpNodeStack> *) nodeStack
 {
     [ ART_GLOBAL_REPORTER beginTimedAction
-        :   "multiplying ARTRAW pixels by %f"
+        :   "multiplying RAW pixels by %f"
         ,   factor
         ];
 
@@ -810,14 +810,22 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTRAW_Double_Mul_ARTRAW
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
-         we wish to create (in our case, ArfARTRAW and ArfARTCSP).
+         we wish to create (in our case, ArfRAWRasterImage).
     ---------------------------------------------------------------aw- */
 
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfRAWRasterImage class ]
-        :   [ ArfRAWRasterImage class ]
-        ];
+    if (ART_RAW_WORKFLOW_FORMAT_IS_NATIVE) {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfARTRAW class ]
+            ];
+    } else {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfOpenEXRSpectral class ]
+            ];
+    }
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.
@@ -875,13 +883,13 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTRAW_Double_Mul_ARTRAW
 @end
 
 /* ===========================================================================
-    'ArnFilterTinyARTRAWValues'
+    'ArnFilterTinyRAWValues'
 =========================================================================== */
 
-@implementation ArnFilterTinyARTRAWValues
+@implementation ArnFilterTinyRAWValues
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFilterTinyARTRAWValues)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyARTRAWValues)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFilterTinyRAWValues)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyRAWValues)
 
 - _init
         : (double) newThresholdValue
@@ -937,7 +945,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyARTRAWValues)
         : (ArNode <ArpNodeStack> *) nodeStack
 {
     [ ART_GLOBAL_REPORTER beginTimedAction
-        :   "filtering ARTRAW pixels with S0 < %f"
+        :   "filtering RAW pixels with S0 < %f"
         ,   thresholdValue
         ];
 
@@ -966,14 +974,22 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyARTRAWValues)
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
-         we wish to create (in our case, ArfARTRAW and ArfARTCSP).
+         we wish to create (in our case, ArfRAWRasterImage).
     ---------------------------------------------------------------aw- */
 
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfRAWRasterImage class ]
-        :   [ ArfRAWRasterImage class ]
-        ];
+    if (ART_RAW_WORKFLOW_FORMAT_IS_NATIVE) {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfARTRAW class ]
+            ];
+    } else {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfOpenEXRSpectral class ]
+            ];
+    }
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.
@@ -1050,13 +1066,13 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyARTRAWValues)
 @end
 
 /* ===========================================================================
-    'ArnDownscaleARTRAW'
+    'ArnDownscaleRAW'
 =========================================================================== */
 
-@implementation ArnDownscaleARTRAW
+@implementation ArnDownscaleRAW
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDownscaleARTRAW)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleARTRAW)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDownscaleRAW)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleRAW)
 
 - downscaleFactor
                    : (unsigned int) newDownscaleFactor
@@ -1074,7 +1090,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleARTRAW)
         : (ArNode <ArpNodeStack> *) nodeStack
 {
     [ ART_GLOBAL_REPORTER beginTimedAction
-        :   "down-scaling ARTRAW image size by a factor of %d"
+        :   "down-scaling RAW image size by a factor of %d"
         ,   downscaleFactor
         ];
 
@@ -1101,15 +1117,25 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleARTRAW)
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
-         we wish to create (in our case, ArfARTRAW and ArfARTCSP).
+         we wish to create (in our case, ArfRAW and ArfARTCSP).
     ---------------------------------------------------------------aw- */
 
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfRAWRasterImage class ]
-        :   [ ArfRAWRasterImage class ]
-        :   downscaleFactor
-        ];
+
+    if (ART_RAW_WORKFLOW_FORMAT_IS_NATIVE) {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfARTRAW class ]
+            :   downscaleFactor
+            ];
+    } else {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfOpenEXRSpectral class ]
+            :   downscaleFactor
+            ];
+    }
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.
@@ -1204,13 +1230,13 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleARTRAW)
 @end
 
 /* ===========================================================================
-    'ArnFilterHighDopARTRAWValues'
+    'ArnFilterHighDopRAWValues'
 =========================================================================== */
 
-@implementation ArnFilterHighDopARTRAWValues
+@implementation ArnFilterHighDopRAWValues
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFilterHighDopARTRAWValues)
-ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopARTRAWValues)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFilterHighDopRAWValues)
+ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopRAWValues)
 
 - _init
         : (double) newThresholdValue
@@ -1308,14 +1334,22 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopARTRAWValue
 
          In order to do this properly it has to be informed of what
          kind of source image to expect, and what kind of result image
-         we wish to create (in our case, ArfARTRAW and ArfARTCSP).
+         we wish to create (in our case, ArfRAWRasterImage).
     ---------------------------------------------------------------aw- */
 
-    [ self prepareForImageManipulation
-        :   nodeStack
-        :   [ ArfRAWRasterImage class ]
-        :   [ ArfRAWRasterImage class ]
-        ];
+    if (ART_RAW_WORKFLOW_FORMAT_IS_NATIVE) {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfARTRAW class ]
+            ];
+    } else {
+        [ self prepareForImageManipulation
+            :   nodeStack
+            :   [ ArfRAWRasterImage class ]
+            :   [ ArfOpenEXRSpectral class ]
+            ];
+    }
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.

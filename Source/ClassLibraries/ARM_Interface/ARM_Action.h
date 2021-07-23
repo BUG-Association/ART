@@ -23,6 +23,10 @@
     along with ART.  If not, see <http://www.gnu.org/licenses/>.
 
 =========================================================================== */
+
+// Enable the legacy actions (*ARTRAW*) replaced by general (*RAW*) equivalents
+#define ENABLE_DEPRECATED_ACTIONS
+
 /**
  * @file ARM_Action.h
  * @brief Actions
@@ -138,14 +142,14 @@ ART_MODULE_INTERFACE(ARM_Action)
          * @def LINEAR_POLARISATION_FILTER
          */
         #define LINEAR_POLARISATION_FILTER \
-                ALLOC_OBJECT_AUTORELEASE(ArnARTRAWLinearPolarisingFilter)
+                ALLOC_OBJECT_AUTORELEASE(ArnRAWLinearPolarisingFilter)
 
         /**
-         * @def ARTRAW_POLARISATION_VISUALISATION
+         * @def RAW_POLARISATION_VISUALISATION
          */
-        #define ARTRAW_POLARISATION_VISUALISATION \
-                ALLOC_OBJECT_AUTORELEASE(ArnARTRAWPolarisationVisualisation)
-
+        #define RAW_POLARISATION_VISUALISATION \
+                ALLOC_OBJECT_AUTORELEASE(ArnRAWPolarisationVisualisation)
+        
         /**
          * @def OUTPUT_ART_CURRENT_ISR_ACTION
          */
@@ -153,30 +157,31 @@ ART_MODULE_INTERFACE(ARM_Action)
                 ALLOC_OBJECT_AUTORELEASE(ArnOutputCurrentISR)
 
         /**
-         * @def CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_ACTION
+         * @def CHANGE_ISR_TO_MATCH_RAW_CONTENTS_ACTION
          */
-        #define CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_ACTION \
-                [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnChangeISR_to_Match_ARTRAW_Contents) \
+        #define CHANGE_ISR_TO_MATCH_RAW_CONTENTS_ACTION \
+                [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnChangeISR_to_Match_RAW_Contents) \
                     :   ISR_CHANGE_PERFORM_NO_WAVELENGTH_CHECK \
                     :   NO \
                     ] \
+
         /**
-         * @def CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_CHECK_WL_ACTION(wavelength)
+         * @def CHANGE_ISR_TO_MATCH_RAW_CONTENTS_CHECK_WL_ACTION(wavelength)
          *
          * @param wavelength    double  Wavelength (in \verb?NANOMETERS?).
          */
-        #define CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_CHECK_WL_ACTION(__wl) \
-                [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnChangeISR_to_Match_ARTRAW_Contents) \
+        #define CHANGE_ISR_TO_MATCH_RAW_CONTENTS_CHECK_WL_ACTION(__wl) \
+                [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnChangeISR_to_Match_RAW_Contents) \
                     :   (__wl) \
                     :   NO \
                     ]
         /**
-         * @def CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_CHECK_WL_REQUIRE_POL_ACTION(wavelength)
+         * @def CHANGE_ISR_TO_MATCH_RAW_CONTENTS_CHECK_WL_REQUIRE_POL_ACTION(wavelength)
          *
          * @param wavelength    double  Wavelength (in \verb?NANOMETERS?).
          */
-        #define CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_CHECK_WL_REQUIRE_POL_ACTION(__wl) \
-                [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnChangeISR_to_Match_ARTRAW_Contents) \
+        #define CHANGE_ISR_TO_MATCH_RAW_CONTENTS_CHECK_WL_REQUIRE_POL_ACTION(__wl) \
+                [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnChangeISR_to_Match_RAW_Contents) \
                     :   (__wl) \
                     :   YES \
                     ]
@@ -205,22 +210,22 @@ ART_MODULE_INTERFACE(ARM_Action)
                     ]
 
         /**
-         * @def MUL_ARTRAW_IMAGE
+         * @def MUL_RAW_IMAGE
          */
-        #define MUL_ARTRAW_IMAGE \
-                ALLOC_OBJECT_AUTORELEASE(ArnARTRAW_Double_Mul_ARTRAW)
+        #define MUL_RAW_IMAGE \
+                ALLOC_OBJECT_AUTORELEASE(ArnRAW_Double_Mul_RAW)
 
         /**
-         * @def DOWNSCALE_ARTRAW_IMAGE
+         * @def DOWNSCALE_RAW_IMAGE
          */
-        #define DOWNSCALE_ARTRAW_IMAGE \
-                ALLOC_OBJECT_AUTORELEASE(ArnDownscaleARTRAW)
+        #define DOWNSCALE_RAW_IMAGE \
+                ALLOC_OBJECT_AUTORELEASE(ArnDownscaleRAW)
 
         /**
-         * @def ADD_2_ARTRAW_IMAGES
+         * @def ADD_2_RAW_IMAGES
          */
-        #define ADD_2_ARTRAW_IMAGES \
-                ALLOC_OBJECT_AUTORELEASE(Arn2xARTRAW_Add_ARTRAW)
+        #define ADD_2_RAW_IMAGES \
+                ALLOC_OBJECT_AUTORELEASE(Arn2xRAW_Add_RAW)
 
 
         /**
@@ -231,14 +236,14 @@ ART_MODULE_INTERFACE(ARM_Action)
                 ALLOC_OBJECT_AUTORELEASE(Arn2xARTCSP_To_ARTGSC_DifferenceImage)
 
         /**
-         * @def GENERATE_2xARTRAW_TO_ARTGSC_DIFFERENCE_IMAGE
-         * Creates an ARTGSC difference image from two ARTRAW images on the stack.
+         * @def GENERATE_2xRAW_TO_ARTGSC_DIFFERENCE_IMAGE
+         * Creates an ARTGSC difference image from two RAW images on the stack.
          */
-        #define GENERATE_2xARTRAW_TO_ARTGSC_DIFFERENCE_IMAGE \
-                ALLOC_OBJECT_AUTORELEASE(Arn2xARTRAW_To_ARTGSC_DifferenceImage)
+        #define GENERATE_2xRAW_TO_ARTGSC_DIFFERENCE_IMAGE \
+                ALLOC_OBJECT_AUTORELEASE(Arn2xRAW_To_ARTGSC_DifferenceImage)
 
-        #define COMPUTE_2xARTRAW_SNR \
-                ALLOC_OBJECT_AUTORELEASE(Arn2xARTRAW_SNR)
+        #define COMPUTE_2xRAW_SNR \
+                ALLOC_OBJECT_AUTORELEASE(Arn2xRAW_SNR)
 
         #define COMPUTE_2xARTCSP_AVG_DIFF \
                 ALLOC_OBJECT_AUTORELEASE(Arn2xARTCSP_avg_diff)
@@ -267,38 +272,38 @@ ART_MODULE_INTERFACE(ARM_Action)
      \end{center}
      */
         /**
-         * @def IMAGECONVERSION_ARTRAW_TO_ARTCSP
-         * @brief ARTRAW to ARTCSP
-         * Converts an ARTRAW image from the stack to an ARTCSP image.
+         * @def IMAGECONVERSION_RAW_TO_ARTCSP
+         * @brief RAW to ARTCSP
+         * Converts a RAW image from the stack to an ARTCSP image.
          */
-        #define IMAGECONVERSION_ARTRAW_TO_ARTCSP \
-                ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_ARTRAW_To_ARTCSP)
+        #define IMAGECONVERSION_RAW_TO_ARTCSP \
+                ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_RAW_To_ARTCSP)
 
         /**
-         * @def IMAGECONVERSION_ARTRAW_TO_MONO_ARTCSP
-         * @brief ARTRAW to monochromatic ARTCSP
-         * Converts an ARTRAW image from the stack to a monochromatic ARTCSP image.
+         * @def IMAGECONVERSION_RAW_TO_MONO_ARTCSP
+         * @brief RAW to monochromatic ARTCSP
+         * Converts a RAW image from the stack to a monochromatic ARTCSP image.
          */
-        #define IMAGECONVERSION_ARTRAW_TO_MONO_ARTCSP \
-                ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_ARTRAW_To_Monochrome_ARTCSP)
+        #define IMAGECONVERSION_RAW_TO_MONO_ARTCSP \
+                ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_RAW_To_Monochrome_ARTCSP)
 
         /**
-         * @def IMAGECONVERSION_ARTRAW_TO_SINGLECHANNEL_ARTGSC
-         * @brief ARTRAW to single channel ARTGSC
-         * Converts an ARTRAW image from the stack to a monochromatic ARTGSC
+         * @def IMAGECONVERSION_RAW_TO_SINGLECHANNEL_ARTGSC
+         * @brief RAW to single channel ARTGSC
+         * Converts a RAW image from the stack to a monochromatic ARTGSC
          * image with the selected wavelength.
          */
-        #define IMAGECONVERSION_ARTRAW_TO_SINGLECHANNEL_ARTGSC \
-                ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSC)
+        #define IMAGECONVERSION_RAW_TO_SINGLECHANNEL_ARTGSC \
+                ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_RAW_To_Singlechannel_ARTGSC)
 
         /**
-         * @def IMAGECONVERSION_ARTRAW_TO_SINGLECHANNEL_ARTGSCs
-         * @brief ARTRAW to single channel ARTGSPs
-         * Converts each wavelength channel of an ARTRAW image from the stack
+         * @def IMAGECONVERSION_RAW_TO_SINGLECHANNEL_ARTGSCs
+         * @brief RAW to single channel ARTGSPs
+         * Converts each wavelength channel of a RAW image from the stack
          * to a set of monochromatic ARTGSP images.
          */
-        #define IMAGECONVERSION_ARTRAW_TO_SINGLECHANNEL_ARTGSCs \
-                ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_ARTRAW_To_Singlechannel_ARTGSCs)
+        #define IMAGECONVERSION_RAW_TO_SINGLECHANNEL_ARTGSCs \
+                ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_RAW_To_Singlechannel_ARTGSCs)
 
         /**
          * @def IMAGECONVERSION_ARTCSP_TO_TIFF
@@ -334,12 +339,12 @@ ART_MODULE_INTERFACE(ARM_Action)
 
         #ifdef ART_WITH_OPENEXR
             /**
-             * @def IMAGECONVERSION_ARTRAW_TO_SPECTRAL_EXR
+             * @def IMAGECONVERSION_RAW_TO_SPECTRAL_EXR
              * @brief ARTCSP to EXR
              * Converts an ARTCSP image from the stack to an EXR file.
              */
-            #define IMAGECONVERSION_ARTRAW_TO_SPECTRAL_EXR \
-                    ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_ARTRAW_To_Spectral_EXR)
+            #define IMAGECONVERSION_RAW_TO_SPECTRAL_EXR \
+                    ALLOC_OBJECT_AUTORELEASE(ArnImageConverter_RAW_To_Spectral_EXR)
 
             /**
              * @def IMAGECONVERSION_ARTCSP_TO_EXR
@@ -454,16 +459,16 @@ ART_MODULE_INTERFACE(ARM_Action)
                     ]
 
         /**
-         * @def FILTER_TINY_ARTRAW_VALUES
+         * @def FILTER_TINY_RAW_VALUES
          */
-        #define FILTER_TINY_ARTRAW_VALUES \
-                ALLOC_OBJECT_AUTORELEASE(ArnFilterTinyARTRAWValues)
+        #define FILTER_TINY_RAW_VALUES \
+                ALLOC_OBJECT_AUTORELEASE(ArnFilterTinyRAWValues)
 
         /**
-         * @def FILTER_HIGH_DOP_ARTRAW_VALUES
+         * @def FILTER_HIGH_DOP_RAW_VALUES
          */
-        #define FILTER_HIGH_DOP_ARTRAW_VALUES \
-                ALLOC_OBJECT_AUTORELEASE(ArnFilterHighDopARTRAWValues)
+        #define FILTER_HIGH_DOP_RAW_VALUES \
+                ALLOC_OBJECT_AUTORELEASE(ArnFilterHighDopRAWValues)
     /**
      * @popsection # Tonemapping actions
      */
@@ -540,3 +545,59 @@ ArNode <ArpAction> * scenegraph_raycasting_optimisations(
 
 #define CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE_CREATOR \
         scenegraph_raycasting_optimisations_create
+
+
+// Deprecated actions:
+// These actions historically dealt with ARTRAW files. Now, there is no 
+// distinction between an ARTRAW and a Spectral OpenEXR. Other formats can also
+// be supported as long as they inherit from ArfRAWRasterImage
+#ifdef ENABLE_DEPRECATED_ACTIONS
+#define ARTRAW_POLARISATION_VISUALISATION \
+        RAW_POLARISATION_VISUALISATION
+
+#define CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_ACTION \
+        CHANGE_ISR_TO_MATCH_RAW_CONTENTS_ACTION
+
+#define CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_CHECK_WL_ACTION \
+        CHANGE_ISR_TO_MATCH_RAW_CONTENTS_CHECK_WL_ACTION
+
+#define CHANGE_ISR_TO_MATCH_ARTRAW_CONTENTS_CHECK_WL_REQUIRE_POL_ACTION \
+        CHANGE_ISR_TO_MATCH_RAW_CONTENTS_CHECK_WL_REQUIRE_POL_ACTION
+
+#define MUL_ARTRAW_IMAGE \
+        MUL_RAW_IMAGE
+
+#define DOWNSCALE_ARTRAW_IMAGE \
+        DOWNSCALE_RAW_IMAGE
+
+#define ADD_2_ARTRAW_IMAGES \
+        ADD_2_RAW_IMAGES
+
+#define GENERATE_2xARTRAW_TO_ARTGSC_DIFFERENCE_IMAGE\
+        GENERATE_2xRAW_TO_ARTGSC_DIFFERENCE_IMAGE
+
+#define COMPUTE_2xARTRAW_SNR \
+        COMPUTE_2xRAW_SNR
+
+#define IMAGECONVERSION_ARTRAW_TO_ARTCSP \
+        IMAGECONVERSION_RAW_TO_ARTCSP
+
+#define IMAGECONVERSION_ARTRAW_TO_MONO_ARTCSP \
+        IMAGECONVERSION_RAW_TO_MONO_ARTCSP
+
+#define IMAGECONVERSION_ARTRAW_TO_SINGLECHANNEL_ARTGSC \
+        IMAGECONVERSION_RAW_TO_SINGLECHANNEL_ARTGSC
+
+#define IMAGECONVERSION_ARTRAW_TO_SINGLECHANNEL_ARTGSCs \
+        IMAGECONVERSION_RAW_TO_SINGLECHANNEL_ARTGSCs
+
+#define IMAGECONVERSION_ARTRAW_TO_SPECTRAL_EXR \
+        IMAGECONVERSION_RAW_TO_SPECTRAL_EXR
+
+#define FILTER_TINY_ARTRAW_VALUES \
+        FILTER_TINY_RAW_VALUES
+
+#define FILTER_HIGH_DOP_ARTRAW_VALUES \
+        FILTER_HIGH_DOP_RAW_VALUES
+
+#endif
