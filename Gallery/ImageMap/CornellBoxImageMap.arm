@@ -55,6 +55,7 @@ ArObj redReflectance(ART_GV * art_gv) {
             );
 }
 
+
 ArObj lightSpectrum(ART_GV * art_gv)
 {
     return
@@ -75,35 +76,6 @@ ArObj lightSpectrum(ART_GV * art_gv)
 #endif
 }
 
-ArObj ceilingHoleGeometry(ART_GV * art_gv) {
-    Pnt3D * ceilingHolePoints = ALLOC_ARRAY(Pnt3D, 5);
-
-
-    ceilingHolePoints[0] = PNT3D( 343.0, 548.8 , 227.0);
-    ceilingHolePoints[1] = PNT3D( 343.0, 548.8 , 332.0);
-    ceilingHolePoints[2] = PNT3D( 213.0, 548.8 , 332.0);
-    ceilingHolePoints[3] = PNT3D( 213.0, 548.8 , 227.0);
-
-    ceilingHolePoints[4] = PNT3D_HUGE;
-    
-    ArObj vertices =
-        arnvertexset(
-            art_gv,
-            ceilingHolePoints,
-            NULL,
-            NULL,
-            NULL,
-            NULL
-            );
-
-    return [ QUADRANGLE( 0, 1, 2, 3 ) apply: vertices ];
-}
-
-ArObj createLight(ART_GV * art_gv) {
-    ArObj emitterMaterial = LAMBERT_EMITTER( lightSpectrum(art_gv), 1.0 );
-
-    return [ ceilingHoleGeometry(art_gv) apply: emitterMaterial ];
-}
 
 ArObj createShortBlock(ART_GV * art_gv) {
     Pnt3D * blockPoints = ALLOC_ARRAY( Pnt3D, 9);
@@ -141,7 +113,7 @@ ArObj createShortBlock(ART_GV * art_gv) {
             UNION_END
             );
 
-    id blockMaterial = LAMBERT_REFLECTOR(whiteReflectance(art_gv));
+    ArObj blockMaterial = LAMBERT_REFLECTOR(whiteReflectance(art_gv));
 
     return
         [ block apply
@@ -149,6 +121,7 @@ ArObj createShortBlock(ART_GV * art_gv) {
             : blockMaterial
             ];
 }
+
 
 ArObj createTallBlock(ART_GV * art_gv) {
     Pnt3D * blockPoints = ALLOC_ARRAY( Pnt3D, 9);
@@ -190,7 +163,7 @@ ArObj createTallBlock(ART_GV * art_gv) {
             UNION_END
             );
 
-    id blockMaterial = LAMBERT_REFLECTOR(whiteReflectance(art_gv));
+    ArObj blockMaterial = LAMBERT_REFLECTOR(whiteReflectance(art_gv));
 
     return
         [ block apply
@@ -198,6 +171,7 @@ ArObj createTallBlock(ART_GV * art_gv) {
             : blockMaterial
             ];
 }
+
 
 ArObj createPictureOnWall(ART_GV * art_gv) {
     Pnt3D * picturePoints = ALLOC_ARRAY( Pnt3D, 5);
@@ -236,7 +210,7 @@ ArObj createPictureOnWall(ART_GV * art_gv) {
             NULL
             );
 
-    id textureLambert = LAMBERT_REFLECTOR( IMAGE_MAP("MountCook.exr") );
+    ArObj textureLambert = LAMBERT_REFLECTOR( IMAGE_MAP("MountCook.exr") );
 
     ArObj pictureGeometry =
         [ QUADRANGLE(2, 3, 0, 1) apply
@@ -247,8 +221,9 @@ ArObj createPictureOnWall(ART_GV * art_gv) {
         [ pictureGeometry apply : vertices ];
 }
 
+
 ArObj createBox(ART_GV * art_gv) {
-    Pnt3D * boxPoints = ALLOC_ARRAY( Pnt3D, 9 );
+    Pnt3D * boxPoints = ALLOC_ARRAY( Pnt3D, 13 );
 
     boxPoints[0] = PNT3D( 553.0, 548.8, 559.2 ); // left   top    rear
     boxPoints[1] = PNT3D( 553.0, 548.8,   0.0 ); // left   top    front
@@ -259,9 +234,15 @@ ArObj createBox(ART_GV * art_gv) {
     boxPoints[6] = PNT3D(   0.0,   0.0, 559.2 ); // right  bottom rear
     boxPoints[7] = PNT3D(   0.0,   0.0,   0.0 ); // right  bottom front
 
-    boxPoints[8] = PNT3D_HUGE;
+    // Hole in the ceiling
+    boxPoints[8]  = PNT3D( 343.0, 548.8 , 227.0);
+    boxPoints[9]  = PNT3D( 343.0, 548.8 , 332.0);
+    boxPoints[10] = PNT3D( 213.0, 548.8 , 332.0);
+    boxPoints[11] = PNT3D( 213.0, 548.8 , 227.0);
     
-    ArObj vertices =
+    boxPoints[12] = PNT3D_HUGE;
+    
+    ArObj vertices = 
         arnvertexset(
             art_gv,
             boxPoints,
@@ -271,35 +252,47 @@ ArObj createBox(ART_GV * art_gv) {
             NULL
             );
 
-    id whiteLambert = LAMBERT_REFLECTOR(whiteReflectance(art_gv));
-    id redLambert   = LAMBERT_REFLECTOR(redReflectance(art_gv));
-    id greenLambert = LAMBERT_REFLECTOR(greenReflectance(art_gv));
-    id textureLambert = LAMBERT_REFLECTOR( IMAGE_MAP("Gandalf.tiff") );
-
-    ArObj floorGeometry =
+    ArObj whiteLambert    = LAMBERT_REFLECTOR(whiteReflectance(art_gv));
+    ArObj redLambert      = LAMBERT_REFLECTOR(redReflectance(art_gv));
+    ArObj greenLambert    = LAMBERT_REFLECTOR(greenReflectance(art_gv));
+    ArObj textureLambert  = LAMBERT_REFLECTOR(IMAGE_MAP("Gandalf.tiff"));
+    ArObj emitterMaterial = LAMBERT_EMITTER  (lightSpectrum(art_gv), 1.0 );
+    
+    ArObj floorGeometry = 
         [ QUADRANGLE(2, 3, 7, 6) apply
             : whiteLambert
             ];
 
     ArObj ceilingGeometry =
-        [ QUADRANGLE(4, 5, 1, 0) apply
+      [ UNION(
+	      QUADRANGLE(0, 9, 8, 1),
+	      QUADRANGLE(1, 8, 11, 5),
+	      QUADRANGLE(5, 11, 10, 4),
+	      QUADRANGLE(4, 10, 9, 0),
+	      UNION_END
+	      ) apply
             : whiteLambert
             ];
 
     ArObj rightWallGeometry =
         [ QUADRANGLE(6, 7, 5, 4) apply
-            : redLambert
-            ];
-
-    ArObj leftWallGeometry =
-        [ QUADRANGLE(0, 1, 3, 2) apply
             : greenLambert
             ];
 
+    ArObj leftWallGeometry = 
+        [ QUADRANGLE(0, 1, 3, 2) apply
+            : redLambert
+            ];
+
     ArObj backWallGeometry =
-        [ QUADRANGLE(4, 6, 2, 0) apply
+      [ QUADRANGLE(4, 6, 2, 0) apply
             : textureLambert
             ];
+
+    ArObj lightGeometry =
+        [ QUADRANGLE( 8, 9, 10, 11) apply
+	    : emitterMaterial
+	    ];
 
     ArObj box =
         UNION(
@@ -308,21 +301,22 @@ ArObj createBox(ART_GV * art_gv) {
             ceilingGeometry,
             leftWallGeometry,
             backWallGeometry,
+	    lightGeometry,
             UNION_END
             );
 
     return [ box apply: vertices ];
 }
 
+
 ARM_MAIN_FUNCTION(CornellBoxImageMap)
 {
-    id scene_geometry =
+    ArObj scene_geometry =
         UNION(
             createBox(art_gv),
             createShortBlock(art_gv),
             createTallBlock(art_gv),
             createPictureOnWall(art_gv),
-            createLight(art_gv),
             UNION_END
             );
 
@@ -335,7 +329,7 @@ ARM_MAIN_FUNCTION(CornellBoxImageMap)
 
     [ camera withTwist: -90 DEGREES ];
 
-    id actionsquence =
+    ArObj actionsquence =
         ACTION_SEQUENCE(
             CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
             
