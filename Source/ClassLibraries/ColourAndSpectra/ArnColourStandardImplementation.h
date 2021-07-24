@@ -200,7 +200,7 @@
         : (      ArSpectrum *) outColours \
 { \
     unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
-    for (int i = 0; i < actualNumberOfValues; i++) \
+    for (unsigned int i = 0; i < actualNumberOfValues; i++) \
         spc_s_init_s( \
             art_gv, \
             spectrum, \
@@ -239,7 +239,7 @@
         : (      ArAttenuation *) outAttenuations \
 { \
     unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
-    for (int i = 0; i < actualNumberOfValues; i++) \
+    for (unsigned int i = 0; i < actualNumberOfValues; i++) \
         arattenuation_s_init_a( \
               art_gv, \
               spectrum, \
@@ -267,8 +267,8 @@
         : (const unsigned int) numberOfValues \
         : (      ArAttenuation *) outAttenuations \
 { \
-    unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
-    for (int i = 0; i < actualNumberOfValues; i++) \
+    const unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
+    for (unsigned int i = 0; i < actualNumberOfValues; i++) \
         arattenuation_srr_init_depolarising_a( \
             art_gv, \
             spectrum, \
@@ -303,7 +303,7 @@
         : (      ArAttenuation *) outAttenuations \
 { \
     unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
-    for (int i = 0; i < actualNumberOfValues; i++) \
+    for (unsigned int i = 0; i < actualNumberOfValues; i++) \
         arattenuation_srr_init_nonpolarising_a( \
             art_gv, \
             spectrum, \

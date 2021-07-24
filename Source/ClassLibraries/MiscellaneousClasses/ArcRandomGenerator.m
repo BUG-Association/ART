@@ -1004,7 +1004,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
         : (ArSequenceID) sequenceToUse
 {
   if (sequenceToUse>size1)
-    err(1, "Bad sequence index %llu! We only have %d", sequenceToUse, size1);
+    err(1, "Bad sequence index %lu! We only have %d", sequenceToUse, size1);
     // should never happen...
 
   if (state1[sequenceToUse].i >= tmsNetSize) {

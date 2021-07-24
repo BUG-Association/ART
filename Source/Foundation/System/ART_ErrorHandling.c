@@ -79,7 +79,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 void art_warning_function(
         )
 {
-    printf("");
 }
 
 //   The breakpoint to examine ART stack frames at the point where an

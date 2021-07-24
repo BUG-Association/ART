@@ -421,12 +421,11 @@ unsigned int arplaindirectattenuation_a_valid(
         return 0;
     }
 
-    unsigned int  numberOfChannels =
-        spc_channels( art_gv );
+    const unsigned int  numberOfChannels = spc_channels( art_gv );
 
     unsigned int result = 1;
 
-    for ( int i = 0; i < numberOfChannels; i++ )
+    for ( unsigned int i = 0; i < numberOfChannels; i++ )
     {
         if ( spc_si( art_gv, a0, i ) < -1E-8 )
         {

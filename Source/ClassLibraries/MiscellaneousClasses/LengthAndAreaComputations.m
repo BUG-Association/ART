@@ -176,7 +176,6 @@ double areaOfShape(
         )
 {
     double  area = 0.0;
-    int  i;
     id  mapping = [ shape createMappingFor: 0 ];
     ArSamplingContext2D  context;
 
@@ -185,7 +184,7 @@ double areaOfShape(
     SC2D_MAPPING(context) = mapping;
     SC2D_SHAPE(context) = shape;
 
-    for( i = 0; i < [ mapping numberOfPatches ]; i++ )
+    for( unsigned int i = 0; i < [ mapping numberOfPatches ]; i++ )
     {
         SC2D_PATCHINDEX(context) = i;
         area += areaOfPatch(art_gv,&context, ((ArcObject <ArpSampling2D> *)estimator));

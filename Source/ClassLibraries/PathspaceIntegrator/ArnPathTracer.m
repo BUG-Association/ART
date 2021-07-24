@@ -934,7 +934,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     int lastNonzeroIndex = -1;
     nonzeroContributions[0] = 0;
     
-    for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
+    for(unsigned int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     {
         // set up the indices into buffer arrays
         int mediaContributionIndex = pathLength; // not to be touched by media attenuation, can be initialized from previous iteration

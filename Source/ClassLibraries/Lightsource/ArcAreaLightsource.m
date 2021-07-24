@@ -161,7 +161,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
         if ( radiantPower > 0.0 )
         {
-            for ( int i = 0; i < numberOfPatches; i++ )
+            for ( unsigned int i = 0; i < numberOfPatches; i++ )
             {
                 patch[i].percentOfLightsourceRadiantPower =
                      patch[i].radiantPower  / radiantPower;
@@ -176,7 +176,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             {
                 swap = NO;
 
-                for ( int i = 0; i < numberOfPatches - 1; i++ )
+                for ( unsigned int i = 0; i < numberOfPatches - 1; i++ )
                 {
                     if (   patch[i  ].percentOfLightsourceRadiantPower
                          < patch[i+1].percentOfLightsourceRadiantPower )
@@ -196,7 +196,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             patch[0].lightsourceRadiantPowerPercentile =
                 patch[0].percentOfLightsourceRadiantPower;
 
-            for ( int i = 1; i < numberOfPatches; i++ )
+            for ( unsigned int i = 1; i < numberOfPatches; i++ )
             {
                 patch[i].lightsourceRadiantPowerPercentile =
                       patch[i-1].lightsourceRadiantPowerPercentile
@@ -220,7 +220,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
         clone->patch = ALLOC_ARRAY( ArAreaLightsourcePatch, numberOfPatches );
 
-        for ( int i = 0; i < numberOfPatches; i++ )
+        for ( unsigned int i = 0; i < numberOfPatches; i++ )
             clone->patch[i] = patch[i];
 
         clone->area       = area;

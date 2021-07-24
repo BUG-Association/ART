@@ -87,7 +87,7 @@ void fresnel_polarising_reflective_attenuation_sample_dielectric(
     )
 {
     ArSpectralSample attenuationSampleA, attenuationSampleB, attenuationSampleC, attenuationSampleS;
-    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+    for ( unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
     {
         double  n =
             ARCPHASEINTERFACE_IOR_AT_WAVELENGTH(
@@ -196,7 +196,7 @@ void fresnel_polarising_reflective_attenuation_sample_conductor(
     )
 {
     ArSpectralSample attenuationSampleA, attenuationSampleB, attenuationSampleC, attenuationSampleS;
-    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+    for ( unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
     {
         double  n =
             ARCPHASEINTERFACE_IOR_AT_WAVELENGTH(
@@ -435,7 +435,7 @@ void fresnel_polarising_refractive_attenuation_sample(
     )
 {
     ArSpectralSample attenuationSampleA, attenuationSampleB, attenuationSampleC, attenuationSampleS;
-    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+    for ( unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
     {
         double  n =
             ARCPHASEINTERFACE_IOR_AT_WAVELENGTH(

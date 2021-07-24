@@ -564,7 +564,7 @@ void arcrosstalksample_x_mathematicaprintf(
         const ArCrosstalkSample  * x0
         )
 {
-    int  channels = CROSSTALK_SAMPLE_CHANNELS;
+    const unsigned int  channels = CROSSTALK_SAMPLE_CHANNELS;
 
     printf( "ArCrosstalkSample %dx%d { \n", channels, channels );
 

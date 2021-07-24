@@ -213,8 +213,6 @@ void arfft2dcr(
 {
   double *mybufr, *mybufi;
 
-  int i, j;
-
   mybufr = (double *) malloc(sizeof(double) * nr * nc);
   mybufi = (double *) malloc(sizeof(double) * nr * nc);
 
@@ -223,7 +221,7 @@ void arfft2dcr(
   mybufr[0] = bufr[0];
   mybufi[0] = -bufi[0];
 
-  for(j = 1; j < nc / 2; j++) {
+  for(unsigned long j = 1; j < nc / 2; j++) {
     mybufr[j] = bufr[j];
     mybufi[j] = -bufi[j];
 
@@ -236,12 +234,12 @@ void arfft2dcr(
 
   /* now do the other rows */
 
-  for(i = 1; i < nr; i++) {
+  for(unsigned long i = 1; i < nr; i++) {
 
     mybufr[i * nc] = bufr[i * (nc / 2 + 1)];
     mybufi[i * nc] = -bufi[i * (nc / 2 + 1)];
 
-    for(j = 1; j < nc / 2; j++) {
+    for(unsigned long j = 1; j < nc / 2; j++) {
       mybufr[i * nc + j] = bufr[i * (nc / 2 + 1) + j];
       mybufi[i * nc + j] = -bufi[i * (nc / 2 + 1) + j];
 
@@ -249,21 +247,21 @@ void arfft2dcr(
       mybufi[(nr - i) * nc + (nc - j)] = bufi[i * (nc / 2 + 1) + j];
     }
 
-    mybufr[i * nc + nc - j] = bufr[i * (nc / 2 + 1) + nc/2];
-    mybufi[i * nc + nc - j] = -bufi[i * (nc / 2 + 1) + nc/2];
+    mybufr[i * nc + nc/2] = bufr[i * (nc / 2 + 1) + nc/2];
+    mybufi[i * nc + nc/2] = -bufi[i * (nc / 2 + 1) + nc/2];
   }
 
   arfft2d(mybufr, mybufi, nr, nc, -1);
 
   if (out != NULL) {
-    for(i = 0; i < nr; i++) {
-      for(j = 0; j < nc; j++) {
+    for(unsigned long i = 0; i < nr; i++) {
+      for(unsigned long j = 0; j < nc; j++) {
         out[i * nc + j] = mybufr[i * nc + j];
       }
     }
   } else {
-    for(i = 0; i < nr; i++) {
-      for(j = 0; j < nc; j++) {
+    for(unsigned long i = 0; i < nr; i++) {
+      for(unsigned long j = 0; j < nc; j++) {
         bufr[i * nc + j] = mybufr[i * nc + j];
       }
     }

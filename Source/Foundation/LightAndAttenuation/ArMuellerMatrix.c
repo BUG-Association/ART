@@ -1714,7 +1714,7 @@ unsigned int armuellermatrix_m_nonpol_att_valid(
     const unsigned int channels_count = spc_channels( art_gv );
     const ArSpectrum * colour = ARMUELLER_M_II( *mm0, 0, 0 );
 
-    for ( int channel = 0; channel < channels_count; channel++ )
+    for ( unsigned int channel = 0; channel < channels_count; channel++ )
     {
         double spc_value = spc_si( art_gv, colour, channel );
 
@@ -1803,7 +1803,7 @@ unsigned int armuellermatrix_m_sanity_check(
     spc_ds_mul_s(art_gv, 4, sanity_threshold, sanity_threshold);
     spc_ss_sub_s(art_gv, sanity_sum, sanity_threshold, sanity_diff); // threshold - sum
 
-    for (int channel = 0; channel < channels_count; channel++)
+    for (unsigned int channel = 0; channel < channels_count; channel++)
     {
         double threshold = spc_si( art_gv, sanity_threshold, channel );
         double sum       = spc_si( art_gv, sanity_sum, channel );
@@ -2195,7 +2195,7 @@ void armuellermatrix_d_randomly_damage_m(
     #define DAMAGE_MM_COMPONENT(__component) \
     {\
         colour = ARMUELLER_M_I( *mm, __component ); \
-        for (int channel = 0; channel < channels_count; channel++) \
+        for (unsigned int channel = 0; channel < channels_count; channel++) \
         { \
             const double random_val = ( 2.0 * rand() / (double)RAND_MAX ) - 1.0; \
             double value = spc_si( art_gv, colour, channel ); \

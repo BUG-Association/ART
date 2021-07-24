@@ -189,7 +189,7 @@ void arplainlight_ws_add_l(
     ASSERT_VALID_SPECTRUMTYPE( sps, ArSpectralSample, s0, s )
     ASSERT_VALID_SPECTRUM( lr )
     
-    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+    for ( unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
     {
         ASSERT_DOUBLE_LARGER_THAN(
             NANO_FROM_UNIT(ARWL_WI(*w0,i)),
@@ -347,12 +347,11 @@ unsigned int arplainlight_l_valid(
         return 0;
     }
 
-    unsigned int  numberOfChannels =
-        spc_channels( art_gv );
+    const unsigned int  numberOfChannels = spc_channels( art_gv );
 
     unsigned int result = 1;
 
-    for ( int i = 0; i < numberOfChannels; i++ )
+    for ( unsigned int i = 0; i < numberOfChannels; i++ )
     {
         if ( spc_si( art_gv, l0, i ) < 0.0 )
         {

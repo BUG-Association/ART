@@ -199,7 +199,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTCSPLuminanceClipping)
          Process all pixels in all the source images.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -833,7 +833,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAW_Double_Mul_RAW)
 
     ArStokesVector  * sv0 = arstokesvector_alloc(art_gv);
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -997,7 +997,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyRAWValues)
 
     ArStokesVector  * sv0 = arstokesvector_alloc(art_gv);
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -1143,7 +1143,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleRAW)
 
     unsigned int  averagingArea = M_SQR(downscaleFactor);
     
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -1360,7 +1360,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopRAWValues)
     
     double  num_channels = spc_channels(art_gv);
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {

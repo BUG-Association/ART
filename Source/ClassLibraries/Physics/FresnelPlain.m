@@ -189,7 +189,7 @@ void fresnel_plain_reflective_attenuation_realvalued_IOR(
 
     double n, attenuation_perpendicular, attenuation_parallel;
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
         n =
             spc_si(
@@ -234,7 +234,7 @@ void fresnel_plain_reflective_attenuation_complex_IOR(
 
     double  n, k, attenuation_perpendicular, attenuation_parallel;
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
 
         n =
@@ -289,7 +289,7 @@ void fresnel_plain_absorbance_realvalued_IOR(
 
     double n, attenuation_perpendicular, attenuation_parallel;
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
         n =
             spc_si(
@@ -334,7 +334,7 @@ void fresnel_plain_absorbance_complex_IOR(
 
     double n, k, attenuation_perpendicular, attenuation_parallel;
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
         n =
             spc_si(
@@ -528,7 +528,7 @@ void fresnel_plain_refractive_attenuation(
 
     double n, attenuation_perpendicular, attenuation_parallel;
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
         n =
             spc_si(

@@ -141,7 +141,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -268,7 +268,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnScaleToUnityToneMapper)
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -452,7 +452,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
     
     if ( ! predefined_AB )
     {
-        for ( int i = 0; i < numberOfSourceImages; i++ )
+        for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
         {
             imageMetrics =
                 [ ALLOC_INIT_OBJECT(ArcImageMetrics)
@@ -541,7 +541,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
     }
     else
     {
-        for ( int i = 0; i < numberOfSourceImages; i++ )
+        for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
         {
             aa[i] = a;
             bb[i] = b;
@@ -572,7 +572,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -731,7 +731,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnMonochromeInteractiveCal
     aa = ALLOC_ARRAY( double, numberOfDestinationImages );
     bb = ALLOC_ARRAY( double, numberOfDestinationImages );
     
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         imageMetrics =
             [ ALLOC_INIT_OBJECT(ArcImageMetrics)
@@ -823,7 +823,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnMonochromeInteractiveCal
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {

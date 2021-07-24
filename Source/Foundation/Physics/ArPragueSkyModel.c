@@ -1092,7 +1092,7 @@ void interpolate_elevation_hero(
   const double factor = elevation - (double)elevation_low;
 
   ArSpectralSample res_low;
-  for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+  for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
   {
     const double * control_params_low = control_params_single_config(
       state,
@@ -1122,7 +1122,7 @@ void interpolate_elevation_hero(
   }
 
   ArSpectralSample res_high;
-  for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+  for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
   {
     const double * control_params_high = control_params_single_config(
       state,

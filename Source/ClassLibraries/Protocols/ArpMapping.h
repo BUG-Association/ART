@@ -176,7 +176,7 @@ ArPatchEdge;
         : (BOOL *) outPointValidity \
         : (Pnt2DE *) outPoint2D \
 { \
-    for ( int i = 0; i < numberOfPoints; i++ ) \
+    for ( unsigned int i = 0; i < numberOfPoints; i++ ) \
     { \
         BOOL temp = \
         [ self getPnt2DE_for_ObjectSpacePnt3DE \
@@ -194,7 +194,7 @@ ArPatchEdge;
         : (BOOL *) outPointValidity \
         : (Pnt3DE *) outPoint3D \
 { \
-    for ( int i = 0; i < numberOfPoints; i++ ) \
+    for ( unsigned int i = 0; i < numberOfPoints; i++ ) \
     { \
         BOOL temp = \
         [ self getObjectSpacePnt3DE_for_Pnt2DE \

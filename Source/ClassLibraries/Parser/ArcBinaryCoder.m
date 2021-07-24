@@ -129,8 +129,8 @@ void arcbinarycoder_write_to_stream(
         : (const char *) s
 {
     int found = 0;
-    int i;
-    for (i=0; i < topDict; i++)
+
+    for ( unsigned int i = 0; i < topDict; i++)
     {
         if (strcmp(dict[i],s) == 0) found = 1;
     }
@@ -147,7 +147,7 @@ void arcbinarycoder_write_to_stream(
 {
     int i;
 
-    for (i=0; i < topDict; i++)
+    for (unsigned int i = 0; i < topDict; i++)
     {
         if (strcmp(dict[i],s) == 0) return i;
     }
@@ -602,8 +602,8 @@ void arcbinarycoder_write_to_stream(
         : (const char *) tableName
         : (unsigned long *) codeSize
 {
-    unsigned int j;
-    j = [self lookDict : tableName];
+    const int j = [self lookDict : tableName];
+
     [self codeBinary4 : &j];
 
     if (j == -1)                        // not in dictionary
@@ -752,8 +752,8 @@ void arcbinarycoder_write_to_stream(
         : (const char *) s
 {
     int found = 0;
-    int i;
-    for (i=0; i < topDict; i++)
+
+    for (unsigned i=0; i < topDict; i++)
     {
         if (strcmp(dict[i],s) == 0) found = 1;
     }
@@ -1232,7 +1232,7 @@ void arcbinarycoder_write_to_stream(
         : (unsigned long *) codeSize
 {
 
-    unsigned int j;
+    int j;
     [self codeBinary4 : &j];
 
     if (j == -1)                // tableName not yet in dictionary

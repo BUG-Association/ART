@@ -142,7 +142,7 @@ void arpragueskymodel_polarised_light_sample_halfhero(
     vec3d_vv_cross_v( & base1, & base2, & base3 );
 
     ArSpectralSample dop;
-    for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+    for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
     {
         SPS_CI(dop, i) =
         arpragueskymodel_polarisation(
@@ -290,7 +290,7 @@ void arpragueskymodel_spc(
     }
     else
     {
-        int  num_channels = spc_channels( art_gv );
+        const unsigned int  num_channels = spc_channels( art_gv );
 
         for ( unsigned int i = 0; i < num_channels; i++ )
             spc_set_sid(
@@ -334,7 +334,7 @@ void arpragueskymodel_solar_spc(
     }
     else
     {
-        int  num_channels = spc_channels( art_gv );
+        const unsigned int  num_channels = spc_channels( art_gv );
 
         for ( unsigned int i = 0; i < num_channels; i++ )
             spc_set_sid(

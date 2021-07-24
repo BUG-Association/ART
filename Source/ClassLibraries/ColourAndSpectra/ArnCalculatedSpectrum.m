@@ -149,7 +149,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExtinctionFromAbsorbance)
         :   spectrum
         ];
 
-    for ( int i = 0; i < spc_channels( art_gv ) ; i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ) ; i++ )
     {
         double lambda =  spc_channel_center( art_gv, i );
         double absorbance = spc_si( art_gv, spectrum, i );
@@ -268,7 +268,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExtinctionFromAbsorbance)
         :   spectrum
         ];
 
-    for ( int i = 0; i < spc_channels( art_gv ) ; i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ) ; i++ )
     {
         double lambda =  spc_channel_center( art_gv, i );
         double reflectivity = spc_si( art_gv, spectrum, i );

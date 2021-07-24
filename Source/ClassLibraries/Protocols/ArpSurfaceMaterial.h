@@ -563,7 +563,7 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
     if(ARWL_WI(*incomingWavelength,0) == ARWL_WI(*outgoingWavelength,0)) \
     { \
         *shiftProbability = ARPDFVALUE_UNIT_DIRAC; \
-        for( int i = 1; i < HERO_SAMPLES_TO_SPLAT; ++i) \
+        for( unsigned int i = 1; i < HERO_SAMPLES_TO_SPLAT; ++i) \
         { \
             if(ARWL_WI(*incomingWavelength,i) != ARWL_WI(*outgoingWavelength,i)) \
                 ARPDFVAL_PI(*shiftProbability, i) = 0.0; \

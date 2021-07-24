@@ -288,7 +288,7 @@ do{ \
     : (unsigned long) arraySize
 {
     float ftmp;
-    int i;
+    unsigned long i;
 
     for(i = 0; i < arraySize; i++)
     {

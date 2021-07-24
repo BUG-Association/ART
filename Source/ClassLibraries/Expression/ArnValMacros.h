@@ -44,7 +44,7 @@
     { \
         unsigned int actualNumberOfValues = \
             M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
-        for (int i = 0; i < actualNumberOfValues; i++) \
+        for (unsigned int i = 0; i < actualNumberOfValues; i++) \
             outValues[i] = _value; \
         return actualNumberOfValues; \
     } \

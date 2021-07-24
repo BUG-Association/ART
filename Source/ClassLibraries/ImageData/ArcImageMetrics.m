@@ -119,10 +119,10 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         :   "calculating luminance metrics"
         ];
 
-    for ( unsigned int y = 0; y < YC(size); y++ )
+    for ( int y = 0; y < YC(size); y++ )
     {
         ArCIEXYZA * line = data + y * stride;
-        for ( unsigned int x = 0; x < XC(size); x++ )
+        for ( int x = 0; x < XC(size); x++ )
         {
             ArCIExyY  xyy;
             

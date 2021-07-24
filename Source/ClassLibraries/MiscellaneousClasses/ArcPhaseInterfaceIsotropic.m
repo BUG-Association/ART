@@ -268,7 +268,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
         ARCPHASEINTERFACE_TYPE(*self) = arphaseinterface_simple;
 
-        for ( int i = 0; i < spc_channels( art_gv ); i++ )
+        for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
         {
 
             double delta_IOR =

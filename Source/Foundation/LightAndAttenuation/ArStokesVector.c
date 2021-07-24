@@ -424,7 +424,7 @@ unsigned int arstokesvector_sv_valid(
         );
 
     const unsigned int channels_count = spc_channels( art_gv );
-    for ( int channel = 0; channel < channels_count; channel++ )
+    for ( unsigned int channel = 0; channel < channels_count; channel++ )
     {
         double divisor  = spc_si( art_gv, ARSV_I( *sv0, 0 ), channel );
         double dividend = spc_si( art_gv, temp_0, channel );

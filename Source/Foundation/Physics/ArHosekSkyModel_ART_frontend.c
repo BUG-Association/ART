@@ -73,7 +73,7 @@ void arhosekskymodel_spc(
     }
     else
     {
-        int  num_channels = spc_channels( art_gv );
+        const unsigned int  num_channels = spc_channels( art_gv );
 
         for ( unsigned int i = 0; i < num_channels; i++ )
             spc_set_sid(
@@ -127,7 +127,7 @@ void arhosekskymodel_solar_spc(
     }
     else
     {
-        int  num_channels = spc_channels( art_gv );
+        const unsigned int  num_channels = spc_channels( art_gv );
 
         for ( unsigned int i = 0; i < num_channels; i++ )
             spc_set_sid(
@@ -310,7 +310,7 @@ void  arhosekskymodel_sps(
     }
     else
     {
-        for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+        for ( unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
         {
             SPS_CI( *spectral_sample, i ) =
                 arhosekskymodel_mono_sample(
@@ -340,7 +340,7 @@ void arhosekskymodel_solar_sps(
     }
     else
     {
-        for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+        for ( unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
         {
             SPS_CI( *spectral_sample, i ) =
                 arhosekskymodel_mono_solar_sample(

@@ -210,7 +210,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 {
     area = 0.0;
 
-    for ( unsigned int i = 0; i < numberOfParts; i++ )
+    for ( int i = 0; i < numberOfParts; i++ )
         area += [ estimator[i] area ];
 }
 

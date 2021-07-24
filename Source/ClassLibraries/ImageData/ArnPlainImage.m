@@ -1010,12 +1010,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLightAlphaImage)
 {
     ArLightAlpha  ** image = data + YC(rStart) * stride + XC(rStart);
 
-    for ( unsigned long y = 0; y < YC(rSize); y++ )
+    for ( int y = 0; y < YC(rSize); y++ )
     {
         ArLightAlpha  ** imageLine  = image + y * stride;
         ArLightAlpha  ** regionLine = region + y * rStride;
 
-        for ( unsigned long x = 0; x < XC(rSize); x++ )
+        for ( int x = 0; x < XC(rSize); x++ )
             arlightalpha_to_arlightalpha(
                 art_gv,
                 imageLine[x],
@@ -1032,12 +1032,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLightAlphaImage)
 {
     ArLightAlpha  ** image = data + YC(rStart) * stride + XC(rStart);
 
-    for ( unsigned long y = 0; y < YC(rSize); y++ )
+    for ( int y = 0; y < YC(rSize); y++ )
     {
         ArLightAlpha  ** regionLine = region + y * rStride;
         ArLightAlpha  ** imageLine  = image  + y * stride;
 
-        for ( unsigned long x = 0; x < XC(rSize); x++ )
+        for ( int x = 0; x < XC(rSize); x++ )
             arlightalpha_l_init_l(
                 art_gv,
                 regionLine[x],

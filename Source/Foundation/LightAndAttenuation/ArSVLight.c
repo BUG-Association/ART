@@ -1139,7 +1139,7 @@ void arsvlight_ws_add_l(
         }
     }
 
-    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+    for ( unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
     {
         ASSERT_DOUBLE_LARGER_THAN(
             NANO_FROM_UNIT(ARWL_WI(*w0,i)),
