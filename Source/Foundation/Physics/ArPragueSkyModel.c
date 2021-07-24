@@ -1729,10 +1729,6 @@ double arpragueskymodel_calc_transmittance_svd(
 	return trans[0];
 }
 
-double cbrt(double x)
-{
-	return pow(x, 1.0 / 3.0);
-}
 
 void arpragueskymodel_findInArray(const float *arr, const int arrLength, const double value, int *index, int *inc, double *w)
 {
