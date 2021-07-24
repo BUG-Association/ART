@@ -32,7 +32,7 @@
 typedef struct ArRSSpectrum2D
 {
     unsigned long  size;
-    unsigned long  stride;
+    long           stride;
     double         excitation_start;
     double         excitation_step;
     double         emission_start;
