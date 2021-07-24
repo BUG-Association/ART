@@ -328,7 +328,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
 
     _scanline = ALLOC_ARRAY( ArLightAlpha* , XC(_size) );
 
-    for ( unsigned int i = 0; i < XC(_size); i++ ) {
+    for ( int i = 0; i < XC(_size); i++ ) {
         _scanline[i] =
             arlightalpha_d_alloc_init_unpolarised(
                 art_gv,
@@ -541,7 +541,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
 
     _scanline = ALLOC_ARRAY( ArLightAlpha *, XC(_size) );
 
-    for ( unsigned int i = 0; i < XC(_size); i++ ) {
+    for ( int i = 0; i < XC(_size); i++ ) {
         _scanline[i] =
             arlightalpha_d_alloc_init_unpolarised(
                 art_gv,

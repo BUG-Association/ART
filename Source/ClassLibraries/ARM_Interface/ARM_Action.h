@@ -25,7 +25,9 @@
 =========================================================================== */
 
 // Enable the legacy actions (*ARTRAW*) replaced by general (*RAW*) equivalents
+#ifndef ENABLE_DEPRECATED_ACTIONS
 #define ENABLE_DEPRECATED_ACTIONS
+#endif 
 
 /**
  * @file ARM_Action.h

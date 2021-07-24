@@ -82,6 +82,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
             ART_ERRORHANDLING_FATAL_ERROR(
                 "No suitable image data format"
                 );
+            return [Nil class];
     }
 }
 

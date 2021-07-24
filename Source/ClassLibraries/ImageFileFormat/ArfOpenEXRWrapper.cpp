@@ -923,7 +923,7 @@ int readSpectralOpenEXR(
 
         if (isEmissiveSpectrum(spectrumType) || isReflectiveSpectrum(spectrumType)) {
             // Sort by ascending wavelengths
-            for (size_t s = 0; s < n_stokes_components; s++) {
+            for (int s = 0; s < n_stokes_components; s++) {
                 std::sort(wavelengths_nm_S[s].begin(), wavelengths_nm_S[s].end());
             }
 
@@ -931,7 +931,7 @@ int readSpectralOpenEXR(
             // Wavelength vectors must be of the same size
             const float base_size_emissive = wavelengths_nm_S[0].size();
 
-            for (size_t s = 1; s < n_stokes_components; s++) {
+            for (int s = 1; s < n_stokes_components; s++) {
                 if (wavelengths_nm_S[s].size() != base_size_emissive) {
                     return -1;
                 }
@@ -982,7 +982,7 @@ int readSpectralOpenEXR(
             // We allocate pixel buffers memory
             const size_t n_elems = (*n_spectralBands) * n_pixels;
 
-            for (size_t s = 0; s < n_stokes_components; s++) {
+            for (int s = 0; s < n_stokes_components; s++) {
                 local_data_spectral_buffers[s].resize((*n_spectralBands) * n_data_pixels);
                 (*spectral_buffers)[s] = (float*)calloc(n_elems, sizeof(float));
             }
@@ -1004,8 +1004,8 @@ int readSpectralOpenEXR(
             const size_t xStride = sizeof(float) * (*n_spectralBands);
             const size_t yStride = xStride * data_width;
 
-            for (size_t s = 0; s < n_stokes_components; s++) {
-                for (size_t wl_idx = 0; wl_idx < (*n_spectralBands); wl_idx++) {
+            for (int s = 0; s < n_stokes_components; s++) {
+                for (int wl_idx = 0; wl_idx < (*n_spectralBands); wl_idx++) {
                     char* ptrS = (char*)(&local_data_spectral_buffers[s][wl_idx]);
                     
                     Imf::Slice slice = Imf::Slice::Make(
@@ -1180,7 +1180,7 @@ void writeSpectralOpenEXR(
                 const size_t xStride = sizeof(float) * n_spectralBands;
                 const size_t yStride = xStride * width;
 
-                for (size_t wl_idx = 0; wl_idx < n_spectralBands; wl_idx++) {
+                for (int wl_idx = 0; wl_idx < n_spectralBands; wl_idx++) {
                     // Populate channel name
                     const std::string channelName = getEmissiveChannelName(s, wavelengths_nm[wl_idx]);
                     char* ptrS = (char*)(&spectral_buffers[s][wl_idx]);
