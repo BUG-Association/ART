@@ -125,7 +125,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
             numberOfRenderThreads
             );
 
-    for ( int i = 0; i < numberOfRenderThreads; i++)
+    for ( unsigned int i = 0; i < numberOfRenderThreads; i++)
     {
         ARFREELIST_INIT_FOR_TYPE(
             pathspaceResultFreelist[i],
@@ -185,7 +185,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
             * XC(imageSize) * YC(imageSize)
             );
 
-    for ( int i = 0;
+    for ( unsigned int i = 0;
           i < numberOfRenderThreads * numberOfResultImages;
           i++ )
     {
@@ -199,7 +199,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
     //   For all threads, and all result images in each thread, we
     //   zero out the buffers.
     
-    for ( int threadIdx = 0;
+    for ( unsigned int threadIdx = 0;
           threadIdx < numberOfRenderThreads;
           threadIdx++ )
     {
@@ -349,11 +349,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
             unsigned long int  overallSampleCount = 0;
             unsigned long int  nonzeroPixels = 0;
             
-            for ( unsigned int y = 0; y < YC(imageSize); y++ )
+            for ( int y = 0; y < YC(imageSize); y++ )
             {
                 for ( int x = 0; x < XC(imageSize); x++ )
                 {
-                    int  pixelSampleCount = 0;
+                    unsigned int  pixelSampleCount = 0;
                     
                     for ( unsigned int threadIdx = 0;
                           threadIdx < numberOfRenderThreads;
@@ -450,7 +450,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
             
             FREE( rendertimeString );
 
-            for ( unsigned int y = 0; y < YC(imageSize); y++ )
+            for ( int y = 0; y < YC(imageSize); y++ )
             {
                 for ( int x = 0; x < XC(imageSize); x++ )
                 {

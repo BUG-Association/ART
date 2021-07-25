@@ -264,7 +264,7 @@ ArStochasticSample;
                         :   IVEC2D(XC(imageSize), 1)
                         ];
 
-                for ( unsigned int v = 0; v < XC(imageSize); v++ )
+                for ( int v = 0; v < XC(imageSize); v++ )
                     arlightalpha_l_init_l(
                           art_gv,
                           ARLIGHTALPHA_NONE_A0,

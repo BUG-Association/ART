@@ -502,7 +502,7 @@ static int positionTM[2];
         the scanline_mutex is unlocked and scanline_value == 0.
     ---------------------------------------------------------------aw- */
 
-    for ( unsigned int i = 0; i < YC(imageSize); i++ )
+    for ( int i = 0; i < YC(imageSize); i++ )
     {
         BOOL scanlineReady = NO;
 
@@ -528,14 +528,14 @@ static int positionTM[2];
 
         for ( int im = 0; im < numberOfImagesToWrite; im++ )
         {
-            for ( unsigned int j = 0; j < XC(imageSize); j++ )
+            for ( int j = 0; j < XC(imageSize); j++ )
                 arlightalpha_l_init_l(
                       art_gv,
                       ARLIGHTALPHA_NONE_A0,
                       compositeScanline->data[j]
                     );
 
-            for ( unsigned int j = 0; j < numberOfRenderThreads; j++ )
+            for ( int j = 0; j < numberOfRenderThreads; j++ )
             {
                 if ( THREAD_SCANLINE(i, j, im) )
                 {
@@ -642,7 +642,7 @@ static int positionTM[2];
         secondaryScanlineCache =
             ALLOC_ARRAY( ArnGreyImage *, YC(imageSize) );
 
-        for ( unsigned int i = 0; i < YC(imageSize); i++ )
+        for ( int i = 0; i < YC(imageSize); i++ )
             secondaryScanlineCache[i] =
                 [ ALLOC_OBJECT(ArnGreyImage)
                     initWithSize
@@ -661,7 +661,7 @@ static int positionTM[2];
     for ( unsigned int i = 0; i < YC(imageSize) * NUMBER_OF_RENDERTHREADS * numberOfResultImages; i++ )
         scanlineCache[i] = 0;
 
-    for ( unsigned int i = 0; i < YC(imageSize); i++ )
+    for ( int i = 0; i < YC(imageSize); i++ )
     {
         pthread_mutex_init( & scanlineMutex[i], NULL );
         pthread_mutex_init( & scanlineCounterMutex[i], NULL );

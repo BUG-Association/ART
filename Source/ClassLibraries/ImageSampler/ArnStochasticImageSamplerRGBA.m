@@ -90,7 +90,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSamplerRGBA)
     {
         YC(pixelCoord) = y + YC(imageOrigin);
 
-        for ( unsigned int x = 0; x < XC(imageSize); x++ )
+        for ( int x = 0; x < XC(imageSize); x++ )
         {
             XC(pixelCoord) = x + XC(imageOrigin);
 

@@ -55,20 +55,15 @@ void arstring_s_copy_s(
                 "memory allocation for string copy failed"
                 );
 
-        strncpy(
-            *newString,
-            originalString,
-            originalStringLength
-            );
-
-        strncpy(
-            *newString + originalStringLength,
-            "\0",
-            1
+        memcpy(
+            *newString, 
+            originalString, 
+            (originalStringLength + 1) * sizeof(char)
             );
     }
-    else
+    else {
         *newString = NULL;
+    }
 }
 
 void arstring_sc_copy_without_rightmost_component_s(

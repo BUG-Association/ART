@@ -59,8 +59,8 @@ ART_MODULE_INTERFACE(ArnImageSamplerBase)
     
     //   Internal variables that are used during rendering
     
-    int                                   numberOfRenderThreads;
-    int                                   numberOfImagesToWrite;
+    unsigned int                          numberOfRenderThreads;
+    unsigned int                          numberOfImagesToWrite;
     double                                inverseNumberOfOverallSamples;
     int                                   numberOfSamplesPerThread;
     IVec2D                                imageSize;

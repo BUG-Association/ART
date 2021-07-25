@@ -355,7 +355,7 @@ ArPixelID;
                         {
                             if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
                             {
-                                for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                                for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                                     arlightsample_realign_to_coaxial_refframe_l(
                                           art_gv,
                                         & referenceFrame,
@@ -368,7 +368,7 @@ ArPixelID;
                     }
                     else
                     {
-                        for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                        for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                         {
                             sampleValue[im] =
                                 (ArPathspaceResult*) arfreelist_pop(
@@ -417,11 +417,11 @@ ArPixelID;
                                     && cY >= 0
                                     && cY < YC(imageSize) )
                                 {
-                                    for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                                    for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                                     {
                                         PIXEL_SAMPLE_COUNT( cX, cY, THREAD_INDEX, im ) += SAMPLE_SPLATTING_FACTOR( subpixelIdx, l );
 
-                                        for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                                        for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                                         {
                                             arlightalpha_dwsd_mul_sloppy_add_l(
                                                   art_gv,
@@ -439,7 +439,7 @@ ArPixelID;
                         }
                     }
 
-                    for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                    for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                     {
                         arpathspaceresult_free_to_freelist(
                               art_gv,

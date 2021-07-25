@@ -370,7 +370,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
     x_start = ALLOC_ARRAY(int, YC(imageSize));
     x_end   = ALLOC_ARRAY(int, YC(imageSize));
 
-    for ( unsigned int y = 0; y < YC(imageSize); y++ )
+    for ( int y = 0; y < YC(imageSize); y++ )
     {
         x_start[y] = 0;
         x_end[y]   = XC(imageSize);
@@ -378,7 +378,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
         BOOL  pixelRunHasStarted = NO;
         BOOL  pixelRunHasEnded   = NO;
     
-        for ( unsigned int x = 0; x < XC(imageSize); x++ )
+        for ( int x = 0; x < XC(imageSize); x++ )
         {
             ArReferenceFrame  referenceFrame;
             Ray3D             ray;

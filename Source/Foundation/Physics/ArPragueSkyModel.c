@@ -1849,7 +1849,7 @@ void arpragueskymodel_tau_hero(
 	double d;
 	arpragueskymodel_toAD(theta, distance, altitude, &a, &d);
 
-        for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
         {
            const double wavelength_norm = (NANO_FROM_UNIT(ARWL_WI(*wavelength, i)) - 340.0) / 40.0;
 	   if (wavelength_norm > 10. || wavelength_norm < 0.)
@@ -2213,7 +2213,7 @@ void interpolate_elevation_pol_hero(
   }
 
   ArSpectralSample res_high;
-  for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+  for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
   {
     const double * control_params_high = control_params_single_config(
       state,

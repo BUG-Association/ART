@@ -63,7 +63,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMidpointImageSamplerRGBA)
     int  y_start = threadOffset;
     int  y_end   = threadOffset + threadStripWidth;
     
-    int  centerThread = numberOfRenderThreads / 2;
+    unsigned int  centerThread = numberOfRenderThreads / 2;
     
     if ( centerThread >= numberOfRenderThreads )
         centerThread = 0;
@@ -72,7 +72,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMidpointImageSamplerRGBA)
     {
         YC(pixelCoord) = y + YC(imageOrigin) + 0.5;
 
-        for ( unsigned int x = 0; x < XC(imageSize); x++ )
+        for ( int x = 0; x < XC(imageSize); x++ )
         {
             XC(pixelCoord) = x + XC(imageOrigin) + 0.5;
 

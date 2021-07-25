@@ -166,9 +166,9 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
 
     //   Zero out the buffer.
     
-    for ( unsigned int y = 0; y < YC(imageSize); y++ )
+    for ( int y = 0; y < YC(imageSize); y++ )
     {
-        for ( unsigned int x = 0; x < XC(imageSize); x++ )
+        for ( int x = 0; x < XC(imageSize); x++ )
         {
             RGB_PIXEL_SAMPLE_VALUE( x, y ) = ARRGBA(0, 0, 0, 0);
         }
