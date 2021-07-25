@@ -284,8 +284,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNoClosedFormVolumeMaterial)
         : (      ArLightSample       *) light_r
 {
     ART_ERRORHANDLING_FATAL_ERROR(
-        "This volume does not provide a closed form for emission / extinction",
-        NULL
+        "This volume does not provide a closed form for emission / extinction"
         );
 }
 

@@ -78,12 +78,12 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     debugprintf(
         "Objectspace location: "PNT3D_FORMAT("% 5.3f")"\n",
         PNT3D_P_PRINTF(objectspace_point)
-        )
+        );
 
     debugprintf(
         "Worldspace location:  "PNT3D_FORMAT("% 5.3f")"\n",
         PNT3D_P_PRINTF(worldspace_point)
-        )
+        );
 
     artraversalstate_debugprintf( & traversalState );
 }

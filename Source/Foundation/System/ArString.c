@@ -219,27 +219,21 @@ void arstring_scs_copy_and_add_component_s(
 
     *newString = ALLOC_ARRAY( char, newStringLength );
 
-    strncpy(
+    memcpy(
         *newString,
         originalString,
-        originalStringLength
+        originalStringLength * sizeof(char)
         );
 
-    strncpy(
-        *newString + originalStringLength,
-        (char *) & separatorChar,
-        1
-        );
+    (*newString)[originalStringLength] = separatorChar;
 
-    strcpy(
+    memcpy(
         *newString + originalStringLength + 1,
-        componentString
+        componentString,
+        componentStringLength * sizeof(char)
         );
 
-    strcpy(
-        *newString + originalStringLength + 1 + componentStringLength,
-        "\0"
-        );
+    (*newString)[originalStringLength + 1 + componentStringLength] = '\0';
 }
 
 void arstring_pe_copy_add_extension_p(
@@ -323,23 +317,19 @@ void arstring_sss_copy_replace_from_right_s(
 
     *newString = ALLOC_ARRAY( char, newStringLength );
 
-    strncpy(
+    memcpy(
         *newString,
         originalString,
-        newStringLength - originalRightEndOfStringLength
-        );
+        (newStringLength - originalRightEndOfStringLength) * sizeof(char)
+    );
 
-    strncpy(
+    memcpy(
         *newString + originalStringLength - originalRightEndOfStringLength,
         newRightEndOfString,
-        newRightEndOfStringLength
-        );
+        newRightEndOfStringLength * sizeof(char)
+    );
 
-    strncpy(
-        *newString + newStringLength - 1,
-        "\0",
-        1
-        );
+    (*newString)[newStringLength - 1] = '\0';
 }
 
 void arstring_psss_copy_add_tag_swap_extension_p(

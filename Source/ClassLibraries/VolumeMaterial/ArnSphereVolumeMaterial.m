@@ -239,8 +239,7 @@ ARPVOLUME_MATERIAL_ABSORPTION_ONLY
         : (      ArLightSample       *) light_r
 {
     ART_ERRORHANDLING_FATAL_ERROR(
-        "This volume does not provide a closed form for emission / extinction",
-        NULL
+        "This volume does not provide a closed form for emission / extinction"
         );
 }
 

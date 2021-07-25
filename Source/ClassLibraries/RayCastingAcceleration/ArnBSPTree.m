@@ -2154,7 +2154,7 @@ void opTreeDebugprintSimple(ArOpNode* tree, int size)
 void opTreeDebugprint(int offset, ArOpNode* tree, int index)
 {
         debugprintf("\n");
-        for( int i = 0; i < offset; ++i ) debugprintf("  ");
+        for( int i = 0; i < offset; ++i ) { debugprintf("  "); }
         void (*function) (int, struct ArOpNode*, ArnRayCaster*, ArIntersectionList*);
         function = tree[index].intersectFunction;
 

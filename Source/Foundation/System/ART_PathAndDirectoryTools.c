@@ -63,25 +63,21 @@ void create_envvar_assignment_string(
     *assignment_string_to_create =
         ALLOC_ARRAY( char, assignment_string_length );
 
-    strncpy(
+    memcpy(
         *assignment_string_to_create,
         varname,
-        varname_strlen
-        );
+        varname_strlen * sizeof(char)
+    );
 
-    strncpy(
-        *assignment_string_to_create + varname_strlen,
-        "=",
-        1
-        );
+    (*assignment_string_to_create)[varname_strlen] = '=';
 
-    strncpy(
+    memcpy(
         *assignment_string_to_create + varname_strlen + 1,
         assignment,
-        assignment_strlen
-        );
+        assignment_strlen * sizeof(char)
+    );
 
-    (*assignment_string_to_create)[assignment_string_length-1] = 0;
+    (*assignment_string_to_create)[assignment_string_length-1] = '\0';
 }
 
 void create_pathlist_from_stringarray(
@@ -122,30 +118,25 @@ void create_pathlist_from_stringarray(
                 ART_ERRORHANDLING_FATAL_ERROR("String buffer overflow avoided");
             }
             
-            strncpy(
+            memcpy(
                 *pathlist_to_create + current_insertion_index,
                 stringarray[j],
-                length_of_current_path
+                length_of_current_path * sizeof(char)
                 );
 
-            strncpy(
-                *pathlist_to_create + current_insertion_index
-                + length_of_current_path,
-                ":",
-                1
-                );
+            (*pathlist_to_create)[current_insertion_index + length_of_current_path] = ':';
 
             current_insertion_index += length_of_current_path + 1;
 
             j++;
         }
 
-        (*pathlist_to_create)[combined_pathlist_length-1] = 0;
+        (*pathlist_to_create)[combined_pathlist_length-1] = '\0';
     }
     else
     {
         *pathlist_to_create = ALLOC_ARRAY( char, 1 );
-        (*pathlist_to_create)[0] = 0;
+        (*pathlist_to_create)[0] = '\0';
     }
 }
 

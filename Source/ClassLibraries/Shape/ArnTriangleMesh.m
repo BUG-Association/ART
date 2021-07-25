@@ -369,15 +369,15 @@ ArNode  * arntrianglemesh_heightfield_from_image(
     switch ( imageInfo.fileDataType )
     {
         case ardt_grey8:
-            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey8 image found.\n")
+            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey8 image found.\n");
             break;
     
         case ardt_grey16:
-            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey16 image found.\n")
+            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey16 image found.\n");
             break;
 
         default:
-            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Please provide an image of type arcolour_grey8 or arcolour_grey16.\n")
+            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Please provide an image of type arcolour_grey8 or arcolour_grey16.\n");
             ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
             break;
     }
@@ -416,7 +416,7 @@ ArNode  * arntrianglemesh_heightfield_from_image(
                     break;
                 
                 default:
-                    debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Please provide an arcolour_grey8 or arcolour_grey16 type image.\n")
+                    debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Please provide an arcolour_grey8 or arcolour_grey16 type image.\n");
                     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
                     break;
             }

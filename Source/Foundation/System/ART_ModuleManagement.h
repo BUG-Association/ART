@@ -391,7 +391,11 @@ do{ \
     _moduleName##_module_shutdown( art_gv );
 
 #define debugprintf( args... ) \
-printf( args );fflush(stdout);
+do { \
+    printf( args ); \
+    fflush(stdout); \
+} \
+while(0)
 
 #endif /* _ART_FOUNDATION_SYSTEM_MODULE_MANAGEMENT_H_ */
 /* ======================================================================== */

@@ -576,10 +576,10 @@ ARNODEACTION_CLASS_IMPLEMENTATION(
     ArnPrintCSGTreeAction,
     "printing CSG tree",
 
-    debugprintf("\nCSG 1.0 ")
+    debugprintf("\nCSG 1.0 ");
     [ NODE_TO_ACT_ON printCSGTree
         ];
-    debugprintf("\n")
+    debugprintf("\n");
 
     return node;
     )
