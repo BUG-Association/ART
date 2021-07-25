@@ -113,7 +113,7 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
 
         ArSpectralSample  sky_sample;
 
-        for(int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
             SPS_CI( sky_sample, i) =
                 arpragueskymodel_radiance(
                       skymodel_state,

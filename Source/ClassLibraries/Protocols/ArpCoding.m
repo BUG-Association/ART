@@ -220,7 +220,7 @@ void arpcoder_arrsspectrum2d(
         )
 {
     [ coder codeTableBegin: "rsspectrum2d" : & rss2d->size ];
-    [ coder codeULong:  & rss2d->stride ];
+    [ coder codeLong:  & rss2d->stride ];
     [ coder codeDouble: & rss2d->excitation_start ];
     [ coder codeDouble: & rss2d->excitation_step ];
     [ coder codeDouble: & rss2d->emission_start ];

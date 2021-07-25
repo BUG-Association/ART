@@ -72,7 +72,7 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
     long  instanceID;
 }
 
-- (unsigned long) instanceID
+- (long) instanceID
         ;
 
 - (void) setInstanceID

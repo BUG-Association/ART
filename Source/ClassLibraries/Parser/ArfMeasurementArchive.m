@@ -485,8 +485,8 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
     *stride = seriesLength;
     *array = ALLOC_ARRAY( double, *numberOfEntries );
 
-    for ( int i = 0; i < series; i++ )
-        for ( int j = 0; j < seriesLength; j++ )
+    for ( unsigned long i = 0; i < series; i++ )
+        for ( unsigned long j = 0; j < seriesLength; j++ )
             (*array)[ i * seriesLength + j ] = tempArray[i][j];
 
     for ( int i = 0; i < ARFMA_MAX_SAMPLES; i++ )

@@ -680,7 +680,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
     {
         //   Delete the source image file
 
-        for ( int i = 0; i < numberOfSourceImages; i++ )
+        for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
         {
             #ifdef PATHNAME_DEBUGPRINTF
             debugprintf(

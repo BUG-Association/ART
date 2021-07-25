@@ -261,7 +261,7 @@ ARPVOLUME_MATERIAL_CLOSED_FORM_ONLY_IMPLEMENTATION
         :   extinction
         ];
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
         double power = spc_si( art_gv, extinction, i );
 
@@ -326,7 +326,7 @@ ARPVOLUME_MATERIAL_CLOSED_FORM_ONLY_IMPLEMENTATION
         :   extinction
         ];
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
         double power = spc_si( art_gv, extinction, i );
 
@@ -392,7 +392,7 @@ ARPVOLUME_MATERIAL_CLOSED_FORM_ONLY_IMPLEMENTATION
         :   extinction
         ];
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
         double power = spc_si( art_gv, extinction, i );
 

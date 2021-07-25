@@ -360,7 +360,7 @@ void pss_s_mathematicaprintf(
         printf( "{%4.1f, %f}",
            NANO_FROM_UNIT(XC(ARPSS_ARRAY_I(*pss,0))),YC(ARPSS_ARRAY_I(*pss,0)));
 
-    for ( int i = 1; i < ARPSS_SIZE(*pss); i++ )
+    for ( unsigned long i = 1; i < ARPSS_SIZE(*pss); i++ )
         printf( ", {%4.1f, %f}",
            NANO_FROM_UNIT(XC(ARPSS_ARRAY_I(*pss,i))),YC(ARPSS_ARRAY_I(*pss,i)));
 

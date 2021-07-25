@@ -69,7 +69,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArNode)
     return self;
 }
 
-- (unsigned long) instanceID
+- (long) instanceID
 {
     return instanceID;
 }

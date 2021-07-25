@@ -138,7 +138,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHosekSkyModel)
 {
     if ( skymodel_state )
     {
-        int  num_channels = spc_channels( art_gv );
+        const unsigned int  num_channels = spc_channels( art_gv );
 
         for ( unsigned int i = 0; i < num_channels; i++ )
             arhosekskymodelstate_free( skymodel_state[i] );

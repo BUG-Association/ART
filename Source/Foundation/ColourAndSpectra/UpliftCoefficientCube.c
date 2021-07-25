@@ -131,7 +131,7 @@ void  sps_sigmoid_sample(
               ArSpectralSample  * sps
         )
 {
-    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+    for ( unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
     {
         double  iwl =  NANO_FROM_UNIT(ARWL_WI(*wl, i)) - 380. - 180.;
         

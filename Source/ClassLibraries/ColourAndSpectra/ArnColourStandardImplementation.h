@@ -510,7 +510,7 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS \
     arpdfvalue_d_init_p(1.0, probability); \
     \
     ArSpectralSample probabilities; double pdf = 1.0; \
-    for( int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i ) \
+    for( unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i ) \
     { \
         if(SPS_CI(totalReflectance, i) == 0.0) \
         { \
@@ -672,7 +672,7 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS \
         arpdfvalue_d_init_p(1.0, probability); \
     \
     ArSpectralSample probabilities; double pdf = 1.0; \
-    for( int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i ) \
+    for( unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i ) \
     { \
         if(SPS_CI(totalReflectance, i) == 0.0) \
         { \

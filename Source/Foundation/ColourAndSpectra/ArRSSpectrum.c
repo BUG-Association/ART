@@ -278,7 +278,7 @@ void rss_s_debugprintf(
     printf("rsspectrum( %ld, %f nm, %f nm, %f",
     ARRSS_SIZE(*rss),NANO_FROM_UNIT(ARRSS_START(*rss)),
     NANO_FROM_UNIT(ARRSS_STEP(*rss)),ARRSS_SCALE(*rss));
-    for ( int i = 0; i < ARRSS_SIZE(*rss); i++ )
+    for ( unsigned long i = 0; i < ARRSS_SIZE(*rss); i++ )
        printf(", %f",ARRSS_SAMPLE(*rss,i));
     printf(")\n");
     fflush(stdout);

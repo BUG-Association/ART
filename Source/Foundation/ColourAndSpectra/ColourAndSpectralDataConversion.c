@@ -422,7 +422,7 @@ void xyz_to_rss_new(
     ARRSS_SCALE(*sr) = 0.8;
     ARRSS_ARRAY(*sr) = ALLOC_ARRAY(double, ARRSS_SIZE(*sr));
     
-    for ( int i = 0; i < ARRSS_SIZE(*sr); i++ )
+    for ( unsigned long i = 0; i < ARRSS_SIZE(*sr); i++ )
     {
         ARRSSPECTRUM_ARRAY_I(*sr,i) =
             + ARRGB_R(rgb) * RGB_R_SAMPLES[i]
@@ -443,7 +443,7 @@ void rgb_to_rss_new(
     ARRSS_SCALE(*sr) = 0.8;
     ARRSS_ARRAY(*sr) = ALLOC_ARRAY(double, ARRSS_SIZE(*sr));
     
-    for ( int i = 0; i < ARRSS_SIZE(*sr); i++ )
+    for ( unsigned long i = 0; i < ARRSS_SIZE(*sr); i++ )
     {
         ARRSSPECTRUM_ARRAY_I(*sr,i) =
             + ARRGB_R(*rgb) * RGB_R_SAMPLES[i]
@@ -534,7 +534,7 @@ void xyza_to_rss_new(
     ARRSS_SCALE(*sr) = 0.8;
     ARRSS_ARRAY(*sr) = ALLOC_ARRAY(double, ARRSS_SIZE(*sr));
     
-    for ( int i = 0; i < ARRSS_SIZE(*sr); i++ )
+    for ( unsigned long i = 0; i < ARRSS_SIZE(*sr); i++ )
     {
         ARRSSPECTRUM_ARRAY_I(*sr,i) =
             + ARRGB_R(rgb) * RGB_R_SAMPLES[i]
@@ -1069,8 +1069,8 @@ void rss_to_pss_new(
     sr->size = s0->size;
     sr->array = ALLOC_ARRAY(Pnt2D,sr->size);
 
-    int     i;
-    double  x;
+    unsigned long i;
+    double        x;
 
     for ( i = 0, x = s0->start;
           i < s0->size;

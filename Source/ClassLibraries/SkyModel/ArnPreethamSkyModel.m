@@ -336,7 +336,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPreethamSkyModel)
     impossible. Sorry. So we will combine k_lay and k_aer.
  ----------------------------------------------------------------------------------- */
 
-    for ( int i = 0; i < spc_channels(art_gv); i++ )
+    for ( unsigned int i = 0; i < spc_channels(art_gv); i++ )
     {
         double lambda =  spc_channel_center( art_gv, i );
 

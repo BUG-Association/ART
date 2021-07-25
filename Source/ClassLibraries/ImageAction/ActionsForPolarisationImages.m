@@ -185,7 +185,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWLinearPolarisingFilte
              Process all pixels in the image.
         ---------------------------------------------------------------aw- */
 
-        for ( int i = 0; i < numberOfSourceImages; i++ )
+        for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
         {
             for ( long y = 0; y < YC(destinationImageSize); y++ )
             {
@@ -625,7 +625,7 @@ void  lch_to_lab(
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {

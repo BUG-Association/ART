@@ -159,7 +159,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
         ucc = ucc_srgb( art_gv );
         imageRGBData = ALLOC_ARRAY( ArRGB, sourceImageDataSize );
 
-        double  max;
+        double  max = 0;
         
         for ( int i = 0; i < sourceImageDataSize; i++)
         {
@@ -341,7 +341,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
     
 
     if (isSpectral) {
-        for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++) {
+        for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++) {
             SPS_CI(*outSpectralSample, i) =    
                 spc_sd_value_at_wavelength(
                     art_gv,

@@ -525,7 +525,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     else
     {
         ArSpectralSample tau;
-        for(int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
             SPS_CI( tau, i) =
                 arpragueskymodel_tau(
                       skymodel_state,
@@ -539,7 +539,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
         sps_dd_clamp_s(art_gv, 0.001, MATH_HUGE_DOUBLE, & tau);
 
         ArSpectralSample radianceA;
-        for(int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
             SPS_CI( radianceA, i) =
                 arpragueskymodel_radiance(
                       skymodel_state,
@@ -555,7 +555,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
                     );
     
         ArSpectralSample radianceB;
-        for(int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
             SPS_CI( radianceB, i) =
                 arpragueskymodel_radiance(
                       skymodel_state,
@@ -570,7 +570,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
                       NANO_FROM_UNIT(ARWL_WI(*wavelength,i))
                     );
 
-        for(int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
             if ( isnan(SPS_CI(tau,i)) ) { SPS_CI(tau,i) = 1.0; }
 
         // radianceAB = radianceA - radianceB * tau;
@@ -716,7 +716,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     else
     {
         ArSpectralSample tau;
-        for(int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
             SPS_CI( tau, i) =
                 arpragueskymodel_tau(
                       skymodel_state,
@@ -737,7 +737,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
             );
 
         ArSpectralSample radianceA;
-        for(int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
             SPS_CI( radianceA, i) =
                 arpragueskymodel_radiance(
                       skymodel_state,
@@ -753,7 +753,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
                     );
     
         ArSpectralSample radianceB;
-        for(int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
             SPS_CI( radianceB, i) =
                 arpragueskymodel_radiance(
                       skymodel_state,
@@ -768,7 +768,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
                       NANO_FROM_UNIT(ARWL_WI(*wavelength,i))
                     );
 
-        for(int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
             if ( isnan(SPS_CI(tau,i)) ) { SPS_CI(tau,i) = 1.0; }
 
         // radianceAB = radianceA - radianceB * tau;

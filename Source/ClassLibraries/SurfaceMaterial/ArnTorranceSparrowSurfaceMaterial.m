@@ -499,7 +499,7 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
         SPS_CI(incomingDirectionMicrofacetCosineSample, 0) = incomingDirectionMicrofacetCosine;
         SPS_CI(negativeOutgoingDirectionMicrofacetCosineSample, 0) = -outgoingDirectionMicrofacetCosine;
         
-        for(int i = 1; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 1; i < HERO_SAMPLES_TO_SPLAT; ++i)
         {
             // compute the refraction normals for the other wavelengths
             ArDirectionCosine otherMicrofacetNormalDirection;
@@ -890,7 +890,7 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
                                                  & inverseIOR
                                                  );
                 
-                for(int i = 1; i < HERO_SAMPLES_TO_SPLAT; ++i)
+                for(unsigned int i = 1; i < HERO_SAMPLES_TO_SPLAT; ++i)
                 {
                     // compute the refraction normals for the other wavelengths
                     

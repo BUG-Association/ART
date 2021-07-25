@@ -71,7 +71,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGaussianSpectrum)
     rss_spectrum.size  = 530;
     rss_spectrum.array = ALLOC_ARRAY( double, rss_spectrum.size );
 
-    for ( int i = 0; i < rss_spectrum.size; i++ )
+    for ( unsigned long i = 0; i < rss_spectrum.size; i++ )
     {
         double lambda =   rss_spectrum.start
                         + i * rss_spectrum.step
