@@ -47,7 +47,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSamplerRGBA)
 
 - (void) renderProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     //   Autorelease pool for this thread to keep Cocoa happy
 
@@ -81,7 +81,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSamplerRGBA)
     int  y_start = threadOffset;
     int  y_end   = threadOffset + threadStripWidth;
     
-    int  centerThread = numberOfRenderThreads / 2;
+    unsigned int  centerThread = numberOfRenderThreads / 2;
     
     if ( centerThread >= numberOfRenderThreads )
         centerThread = 0;

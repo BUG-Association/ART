@@ -461,7 +461,7 @@ static int positionTM[2];
 
 
 - (void) writeImage
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     //   Autorelease pool for this thread to keep Cocoa happy
 
@@ -585,12 +585,12 @@ static int positionTM[2];
         : (ArNode <ArpImageWriter> **) newOutImage
         : (int) numberOfResultImages
 {
-    ArcInteger * index =
-        [ ALLOC_INIT_OBJECT(ArcInteger)
+    ArcUnsignedInteger * index =
+        [ ALLOC_INIT_OBJECT(ArcUnsignedInteger)
             :   NUMBER_OF_RENDERTHREADS
             ];
 
-    int  kernelOffset = ( [ RECONSTRUCTION_KERNEL supportSize ] - 1) / 2;
+    const unsigned int  kernelOffset = ( [ RECONSTRUCTION_KERNEL supportSize ] - 1) / 2;
 
     numberOfRenderThreads = NUMBER_OF_RENDERTHREADS;
 
@@ -700,7 +700,7 @@ static int positionTM[2];
 
     for ( unsigned int i = 0; i < NUMBER_OF_RENDERTHREADS; i++ )
     {
-        ArcInteger  * index = [ ALLOC_INIT_OBJECT(ArcInteger) : i ];
+        ArcUnsignedInteger  * index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
 
         [ pathCounter[i] start ];
 

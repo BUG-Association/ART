@@ -192,7 +192,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
 
     for ( unsigned int i = 0; i < numberOfRenderThreads; i++ )
     {
-        ArcInteger  * index = [ ALLOC_INIT_OBJECT(ArcInteger) : i ];
+        ArcUnsignedInteger  * index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
 
         if ( ! art_thread_detach(@selector(renderProc:), self,  index))
             ART_ERRORHANDLING_FATAL_ERROR(
@@ -252,7 +252,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
 }
 
 - (void) renderProcHasFinished
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     threadStatus[ THREAD_INDEX ] = FINISHED;
 

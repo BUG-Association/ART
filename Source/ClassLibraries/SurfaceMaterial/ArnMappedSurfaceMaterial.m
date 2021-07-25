@@ -104,6 +104,46 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
         [self _setupMappedSurface];
 }
 
+- (void) _getCurrentSurfaceIndex
+        :   (ArcObject <ArpEvaluationEnvironment> *) evalEnv
+        :   (ArSurfacePhaseCache *) cache
+{
+    double exprVal;
+    ArNode <ArpSurfacePhase> * surfacePhase1;
+    ArNode <ArpSurfacePhase> * surfacePhase2;
+
+    [ EXPRESSION getDoubleValues
+        :   evalEnv
+        :   1
+        : & exprVal
+        ];
+
+    double index = [ SURFACEMAP calculateIndex: exprVal ];
+
+    surfacePhase1 = [ SURFACEMAP surfacePhaseAt : (int)index ];
+    cache->surface1 = [ surfacePhase1 getSurface ];
+
+    cache->xf = m_d_frac(index);
+
+    if (cache->xf > MATH_TINY_DOUBLE)
+    {
+        surfacePhase2 = [ SURFACEMAP surfacePhaseAt : (int)index + 1 ];
+        cache->surface2 = [ surfacePhase2 getSurface ];
+    }
+    else
+        cache->surface2 = NULL;
+
+    // debug
+    //printf("\t"
+    //       "_getCurrentSurfaceIndex: index: %d, xf: %0.2f, "
+    //       "surface1: %x, surface2: %x"
+    //       "\n",
+    //       (int)index, cache->xf,
+    //       (unsigned int)(void*)(cache->surface1),
+    //       (unsigned int)(void*)(cache->surface2)
+    //       );
+}
+
 - (BOOL) calculateAlbedoSampleAtWavelength
         : (      ArcSurfacePoint *) location
         : (const ArWavelength *) wavelength
@@ -176,46 +216,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     
     return YES;
-}
-
-- (void) _getCurrentSurfaceIndex
-        :   (ArcObject <ArpEvaluationEnvironment> *) evalEnv
-        :   (ArSurfacePhaseCache *) cache
-{
-    double exprVal;
-    ArNode <ArpSurfacePhase> * surfacePhase1;
-    ArNode <ArpSurfacePhase> * surfacePhase2;
-
-    [ EXPRESSION getDoubleValues
-        :   evalEnv
-        :   1
-        : & exprVal
-        ];
-
-    double index = [ SURFACEMAP calculateIndex: exprVal ];
-
-    surfacePhase1 = [ SURFACEMAP surfacePhaseAt : (int)index ];
-    cache->surface1 = [ surfacePhase1 getSurface ];
-
-    cache->xf = m_d_frac(index);
-
-    if (cache->xf > MATH_TINY_DOUBLE)
-    {
-        surfacePhase2 = [ SURFACEMAP surfacePhaseAt : (int)index + 1 ];
-        cache->surface2 = [ surfacePhase2 getSurface ];
-    }
-    else
-        cache->surface2 = NULL;
-
-    // debug
-    //printf("\t"
-    //       "_getCurrentSurfaceIndex: index: %d, xf: %0.2f, "
-    //       "surface1: %x, surface2: %x"
-    //       "\n",
-    //       (int)index, cache->xf,
-    //       (unsigned int)(void*)(cache->surface1),
-    //       (unsigned int)(void*)(cache->surface2)
-    //       );
 }
 
 - (BOOL) noTransmission

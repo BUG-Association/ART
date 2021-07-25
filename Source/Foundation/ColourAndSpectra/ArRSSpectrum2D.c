@@ -133,13 +133,15 @@ ArIntegrationCell2D;
 //   Determines the integer array coordinate for a given double
 //   coordinate in wavelength space, e.g. 430nm -> array index 5
 
-int rss_coord(
+unsigned long rss_coord(
         double  wavelength,
         double  rss_start,
         double  rss_step
         )
 {
-    double  d_from_start = wavelength - rss_start;
+    const double  d_from_start = wavelength - rss_start;
+
+    ASSERT_NONNEGATIVE_FINITE_DOUBLE(d_from_start);
 
     return  (int) ( d_from_start / rss_step );
 }
@@ -154,7 +156,7 @@ double getHeight(
     double excitationFactor = 0.0;
     double emissionFactor = 0.0;
     double factor = 0.0;
-    int i,j;
+    unsigned long i,j;
     double a, b;
     double height = 0.0;
     double eps = UNIT_FROM_NANO(0.001);
@@ -367,7 +369,7 @@ ArRSSpectrum2D  * rss2d_s_alloc_init_denoised_version_free_original(
     //   Step 1 - the original array will be discarded anyway, so we clip
     //   the sample values there (to a maximum value, and zero).
 
-    for ( int i = 0; i < ARRSS2D_SIZE(*rss2d); i++ )
+    for ( unsigned long i = 0; i < ARRSS2D_SIZE(*rss2d); i++ )
     {
         int  x = i % ARRSS2D_STRIDE(*rss2d);
         int  y = i / ARRSS2D_STRIDE(*rss2d);
@@ -388,7 +390,7 @@ ArRSSpectrum2D  * rss2d_s_alloc_init_denoised_version_free_original(
     //   Step 2 - outliers, judged by percent difference to the average of
     //   their surroundings, are clipped to that average as well.
 
-    for ( int i = 0; i < ARRSS2D_SIZE(*rss2d); i++ )
+    for ( unsigned long i = 0; i < ARRSS2D_SIZE(*rss2d); i++ )
     {
         int  x = i % ARRSS2D_STRIDE(*rss2d);
         int  y = i / ARRSS2D_STRIDE(*rss2d);
@@ -430,7 +432,7 @@ void rss2d_to_rss(
               ArRSSpectrum    * rss
         )
 {
-    int  i, offset;
+    int  offset;
 
     rss->start = rss2d->emission_start;
     rss->step  = rss2d->emission_step;
@@ -440,7 +442,7 @@ void rss2d_to_rss(
 
     offset = rss2d->stride - rss->size;
 
-    for ( i = 0; i < rss->size; i++ )
+    for ( unsigned long i = 0; i < rss->size; i++ )
     {
         rss->array[i] = ARRSSPECTRUM2D_SAMPLE(rss2d,i+offset,i);
     }
@@ -486,7 +488,7 @@ unsigned int rss2d_s_valid(
 
     //   finally, a check for degenerate spectrum entries
 
-    for ( int i = 0; i < s0->size; i++ )
+    for ( unsigned long i = 0; i < s0->size; i++ )
         if (   s0->array[i] < 0.0
             || m_d_isInf( s0->array[i] )
             || m_d_isNaN( s0->array[i] ) )

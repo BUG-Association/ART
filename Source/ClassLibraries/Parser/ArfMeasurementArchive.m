@@ -449,7 +449,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
 - (void) _parse2DSampleArray
         : (ArcObject <ArpStream> *) stream
         : (unsigned long *) numberOfEntries
-        : (unsigned long *) stride
+        : (long *) stride
         : (double **) array
 {
     double       * tempArray[ ARFMA_MAX_SAMPLES ];

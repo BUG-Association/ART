@@ -51,7 +51,7 @@ ART_MODULE_INTERFACE(ArnStochasticImageSampler)
     //   As there is overhead associated with sampling locations, it makese
     //   sense to bound their number.
 
-    int             numberOfSubpixelSamples;
+    unsigned int        numberOfSubpixelSamples;
     
     //   The 2D subpixel starting points for each sample. These are
     //   precomputed, and re-used for each pixel.

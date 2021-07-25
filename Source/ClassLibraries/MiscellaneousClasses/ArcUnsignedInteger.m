@@ -24,30 +24,35 @@
 
 =========================================================================== */
 
-#include "ART_Foundation.h"
+#define ART_MODULE_NAME     ArcUnsignedInteger
 
-ART_MODULE_INTERFACE(ArcInteger)
+#import "ArcUnsignedInteger.h"
 
-/* ===========================================================================
-    'ArcInteger'
-     This class is needed as a wrapper argument for thread index values in
-     conjunction with art_thread_detach.
-=========================================================================== */
+ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
-@interface ArcInteger
-        : ArcObject
-{
-@public
-    int  value;
-}
+ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
+
+
+@implementation ArcUnsignedInteger
 
 - init
-        : (int) newValue
-        ;
+        : (unsigned int) newValue
+{
+    self = [ super init  ];
+
+    if ( self )
+    {
+        value = newValue;
+    }
+    
+    return self;
+}
 
 - (void) setValue
-        : (int) newValue
-        ;
+        : (unsigned int) newValue
+{
+    value = newValue;
+}
 
 @end
 

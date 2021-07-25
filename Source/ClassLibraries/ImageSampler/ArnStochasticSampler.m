@@ -94,7 +94,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSampler)
     //   samplePacketSize - size of each of the n sample packets. This is
     //   obviously always DEFAULT_PACKET_SIZE, except for the last one.
 
-    packetSize = ALLOC_ARRAY( int, numberOfSamplePackets );
+    packetSize = ALLOC_ARRAY( unsigned int, numberOfSamplePackets );
 
     for ( unsigned int i = 0; i < ( numberOfSamplePackets - 1 ); i++ )
         packetSize[i] = DEFAULT_PACKET_SIZE;
@@ -262,7 +262,7 @@ ArStochasticSample;
 
 
 - (void) renderProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     //   Autorelease pool for this thread to keep Cocoa happy
 

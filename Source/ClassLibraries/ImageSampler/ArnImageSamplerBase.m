@@ -499,19 +499,19 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
 }
 
 - (void) termIOProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     ART__VIRTUAL_METHOD__EXIT_WITH_ERROR
 }
 
 - (void) renderProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     ART__VIRTUAL_METHOD__EXIT_WITH_ERROR
 }
 
 - (void) renderProcHasFinished
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     threadStatus[ THREAD_INDEX ] = FINISHED;
 
@@ -554,7 +554,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
 {
     [ super code: coder ];
 
-    [ coder codeInt:  & overallNumberOfSamplesPerPixel ];
+    [ coder codeUInt: & overallNumberOfSamplesPerPixel ];
     
     if ( [ coder isReading ] )
     {

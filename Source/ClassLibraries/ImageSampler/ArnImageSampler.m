@@ -241,7 +241,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 
     for ( unsigned int i = 0; i < numberOfRenderThreads; i++ )
     {
-        ArcInteger  * index = [ ALLOC_INIT_OBJECT(ArcInteger) : i ];
+        ArcUnsignedInteger  * index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
 
         if ( ! art_thread_detach(@selector(renderProc:), self,  index))
             ART_ERRORHANDLING_FATAL_ERROR(
@@ -534,8 +534,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
             //   "renderthreads plus one". It doesn't use the index anyway, but
             //   still needs one.
 
-            ArcInteger  * index =
-                [ ALLOC_INIT_OBJECT(ArcInteger)
+            ArcUnsignedInteger  * index =
+                [ ALLOC_INIT_OBJECT(ArcUnsignedInteger)
                     :   numberOfRenderThreads
                     ];
 
@@ -586,7 +586,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 
 
 - (void) tonemapAndOpenProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     //   autorelease pool for this thread to keep Cocoa happy
 
@@ -659,7 +659,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 }
 
 - (void) renderProcHasFinished
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     threadStatus[ THREAD_INDEX ] = FINISHED;
 
@@ -688,7 +688,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 }
 
 - (void) termIOProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     if ( art_interactive_mode_permitted( art_gv ) )
     {
