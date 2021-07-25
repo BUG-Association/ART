@@ -2898,7 +2898,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
     BOOL  * imageHasOnlyPositiveValues =
         ALLOC_ARRAY( BOOL, numberOfSourceImages );
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         //   This cast looks hack-y. But in this context, it is safe.
         //   We know the source images are ArfARTGSCs.

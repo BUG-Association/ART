@@ -200,6 +200,14 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
     [ REPORTER endAction ];
 }
 
+- (void) code
+        : (ArcObject <ArpCoder> *) coder
+{
+    [ super code: coder ];
+
+    [ coder codeDouble: & mappingValue ];
+}
+
 @end
 
 @implementation ArnScaleToUnityToneMapper
@@ -324,6 +332,12 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnScaleToUnityToneMapper)
     RELEASE_OBJECT(imageMetrics);
 
     [ REPORTER endAction ];
+}
+
+- (void) code
+        : (ArcObject <ArpCoder> *) coder
+{
+    [ super code: coder ];
 }
 
 @end
