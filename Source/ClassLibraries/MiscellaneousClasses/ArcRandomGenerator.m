@@ -856,7 +856,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 {
     if (moreSingle){
     state1=REALLOC_ARRAY(state1, ArEffRNGseq1State, 2*size1);
-    for (int i=size1; i<2*size1; i++) {
+    for (UInt32 i=size1; i<2*size1; i++) {
       state1[i].i=0;
       state1[i].r=nrand48(rseed48);
       state1[i].max=0;
@@ -867,7 +867,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     }
     if (moreDouble){
     state2=REALLOC_ARRAY(state2, ArEffRNGseq2State, 2*size2);
-    for (int i=size2; i<2*size2; i++) {
+    for (UInt32 i=size2; i<2*size2; i++) {
       state2[i].i=0;
       state2[i].r=nrand48(rseed48);
       state2[i].s=nrand48(rseed48);

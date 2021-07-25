@@ -122,8 +122,7 @@ _Type ar##_type##dynarray_i( \
         const unsigned int          index  \
         ) \
 { \
-    if (   index >= 0 \
-        && index <= _ARDYNARRAY_STP(*dynArray) ) \
+    if ( index <= _ARDYNARRAY_STP(*dynArray) ) \
     { \
         return _ARDYNARRAY_I( *dynArray, index );\
     }\
@@ -140,8 +139,7 @@ _Type * ar##_type##dynarray_ptr_to_i( \
         const unsigned int          index  \
         ) \
 { \
-    if (   index >= 0 \
-        && index <= _ARDYNARRAY_STP(*dynArray) ) \
+    if ( index <= _ARDYNARRAY_STP(*dynArray) ) \
     { \
         return & _ARDYNARRAY_I( *dynArray, index );\
     }\
@@ -313,8 +311,7 @@ void ar##_type##dynarray_set_i( \
         const unsigned int          index  \
         ) \
 { \
-    if (   index >= 0 \
-        && index <= _ARDYNARRAY_STP(*dynArray) ) \
+    if ( index <= _ARDYNARRAY_STP(*dynArray) ) \
     { \
         _ARDYNARRAY_I( *dynArray, index ) = newValue; \
     }\
@@ -474,8 +471,7 @@ void ar##_type##dynarray_set_i( \
         const unsigned int          index  \
         ) \
 { \
-    if (   index >= 0 \
-        && index <= _ARDYNARRAY_STP(*dynArray) ) \
+    if ( index <= _ARDYNARRAY_STP(*dynArray) ) \
     { \
         _pushFunction( newValue ); \
         _payloadFreeFunction( ar##_type##dynarray_i( dynArray, index ) ); \

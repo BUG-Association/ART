@@ -136,7 +136,7 @@ void pss_s_copy_new_s(
     ARPSS_SCALE(*sr) = ARPSS_SCALE(*s0);
     ARPSS_ARRAY(*sr) = ALLOC_ARRAY( Pnt2D, ARPSS_SIZE(*sr) );
 
-    for ( int i = 0; i < ARPSS_SIZE(*sr); i++ )
+    for ( unsigned long i = 0; i < ARPSS_SIZE(*sr); i++ )
         ARPSS_ARRAY_I(*sr,i) = ARPSS_ARRAY_I(*s0,i);
 }
 
@@ -155,7 +155,7 @@ void pss_d_mul_s(
               ArPSSpectrum  * sr
         )
 {
-    for ( int i = 0; i < ARPSS_SIZE(*sr); i++ )
+    for ( unsigned long i = 0; i < ARPSS_SIZE(*sr); i++ )
         YC( ARPSS_ARRAY_I(*sr,i) ) *= d0;
 }
 
@@ -340,7 +340,7 @@ void pss_s_debugprintf(
 {
     printf("psspectrum( %ld, %f", ARPSS_SIZE(*pss), ARPSS_SCALE(*pss) );
 
-    for ( int i = 0; i < ARPSS_SIZE(*pss); i++ )
+    for ( unsigned long i = 0; i < ARPSS_SIZE(*pss); i++ )
        printf( ", PNT2D( %4.1f nm, % 5.3f)",
        NANO_FROM_UNIT(XC(ARPSS_ARRAY_I(*pss,i))),YC(ARPSS_ARRAY_I(*pss,i)));
 

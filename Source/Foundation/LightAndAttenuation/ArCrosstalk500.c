@@ -408,7 +408,7 @@ void cx500_x_mathematicaprintf(
         const ArCrosstalk500  * x0
         )
 {
-    int  channels = SPECTRAL_CHANNELS;
+    const unsigned int  channels = SPECTRAL_CHANNELS;
 
     printf( "ArCrosstalk500 %dx%d { \n",channels,channels);
 

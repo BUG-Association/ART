@@ -163,7 +163,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSampler)
             {
                 double  dY = 1.0 * u - splattingKernelOffset;
 
-                for ( int v = 0; v < splattingKernelWidth; v++ )
+                for ( unsigned int v = 0; v < splattingKernelWidth; v++ )
                 {
                     double  dX = 1.0 * v - splattingKernelOffset;
 
@@ -185,7 +185,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSampler)
             ALLOC_ARRAY( IPnt2D, splattingKernelArea );
 
         for ( unsigned int u = 0; u < splattingKernelWidth; u++ )
-            for ( int v = 0; v < splattingKernelWidth; v++ )
+            for ( unsigned int v = 0; v < splattingKernelWidth; v++ )
             {
                 XC( sampleSplattingOffset[ u * splattingKernelWidth + v ] )
                     = u - splattingKernelOffset;

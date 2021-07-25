@@ -391,7 +391,7 @@ ArPixelID;
                     {
                         if ( splattingKernelWidth == 1 )
                         {
-                            for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                            for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                             {
                                 PIXEL_SAMPLE_COUNT( x, y, THREAD_INDEX, im ) += 1.0;
                                 

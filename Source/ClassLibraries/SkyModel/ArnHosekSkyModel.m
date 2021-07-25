@@ -46,7 +46,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHosekSkyModel)
                        * cos( solarElevation );
     ZC(sunDirection) =   sin( solarElevation );
 
-    int  num_channels = spc_channels( art_gv );
+    const unsigned int  num_channels = spc_channels( art_gv );
 
     if ( skymodel_state )
     {

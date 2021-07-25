@@ -648,14 +648,19 @@ double cx500_integrate_to_spc_channels(
     y0 -= ARCROSSTALK500_LOWER_BOUND;
     y1 -= ARCROSSTALK500_LOWER_BOUND;
 
+    ASSERT_NONNEGATIVE_INTEGER(x0);
+    ASSERT_NONNEGATIVE_INTEGER(x1);
+    ASSERT_NONNEGATIVE_INTEGER(y0);
+    ASSERT_NONNEGATIVE_INTEGER(y1);
+
     double  result = 0.0;
     double  integrationHeight = x1 -x0;
 
-    for ( unsigned int x = x0; x < x1; x++ )
+    for ( int x = x0; x < x1; x++ )
     {
         double  lineResult = 0.0;
 
-        for ( unsigned int y = y0; y < x; y++ )
+        for ( int y = y0; y < x; y++ )
         {
             lineResult += ARCROSSTALK500_XY( *cx, x, y );
         }
@@ -727,7 +732,7 @@ void arcrosstalk_x_mathematicaprintf(
         const ArCrosstalk  * x0
         )
 {
-    int  channels = spc_channels( art_gv );
+    const unsigned int  channels = spc_channels( art_gv );
 
     printf( "ArCrosstalk %dx%d { \n",channels,channels);
 

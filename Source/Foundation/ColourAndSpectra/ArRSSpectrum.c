@@ -251,7 +251,7 @@ unsigned int rss_s_valid(
         result = 0;
     }
     
-    for ( int i = 0; i < ARRSS_SIZE(*rss); i++ )
+    for ( unsigned long i = 0; i < ARRSS_SIZE(*rss); i++ )
     {
         if (   ARRSS_SAMPLE( *rss, i ) < 0.0
             || m_d_isInf( ARRSS_SAMPLE( *rss, i ) )
@@ -296,7 +296,7 @@ void rss_s_mathematicaprintf(
            NANO_FROM_UNIT(ARRSS_START(*rss)),
            ARRSS_SAMPLE(*rss,0));
 
-    for ( int i = 1; i < ARRSS_SIZE(*rss); i++ )
+    for ( unsigned long i = 1; i < ARRSS_SIZE(*rss); i++ )
        printf(", {%4.1f,%f}",
            NANO_FROM_UNIT(ARRSS_START(*rss)+i*ARRSS_STEP(*rss)),
            ARRSS_SAMPLE(*rss,i));
