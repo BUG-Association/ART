@@ -2419,7 +2419,7 @@ void armuellermatrix_test_damaged_MMs_validity(
 {
     ArMuellerMatrix * mm = armuellermatrix_alloc(art_gv);
 
-    const double damage = 0.0001;
+    //const double damage = 0.0001;
 
     // Damaged plain attenuator (non-polarizing MM)
     //for (double attenuation = -0.5; attenuation <= 1.5; attenuation += 0.1)

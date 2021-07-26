@@ -598,11 +598,6 @@ double arcrosstalk_wl_wl_value(
 
     double  result = 0.0;
     
-    if ( cidx_i >= 0 && cidx_o >= 0 && cidx_i < cidx_o )
-    {
-        int  idx = ( ( cidx_i * ( cidx_i - 1 ) ) / 2 ) + cidx_o;
-    }
-    
     return result;
 }
 

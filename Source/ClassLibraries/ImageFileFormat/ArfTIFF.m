@@ -1235,7 +1235,6 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
 - (void) parseStream
         : (ArNode **) node
         : (ArcObject <ArpStream> *) stream
-        ;
 {
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }

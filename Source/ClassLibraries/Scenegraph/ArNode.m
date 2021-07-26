@@ -1127,7 +1127,6 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnNary)
 SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
 
 - init
-        ;
 {
     self = [ super init ];
 

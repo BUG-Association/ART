@@ -659,20 +659,20 @@ int  art_ev_raw_workflow_format(
         if ( user_choice )
         {
             if ( strcmp( user_choice, "ARTRAW" ) == 0 )
-                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_NATIVE;
+                ART_EV_RAW_WORKFLOW_FORMAT = ART_RAW_WORKFLOW_FORMAT_NATIVE;
             if ( strcmp( user_choice, "artraw" ) == 0 )
-                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_NATIVE;
+                ART_EV_RAW_WORKFLOW_FORMAT = ART_RAW_WORKFLOW_FORMAT_NATIVE;
                 
             if ( strcmp( user_choice, "EXR" ) == 0 )
-                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_OPENEXR;
+                ART_EV_RAW_WORKFLOW_FORMAT = ART_RAW_WORKFLOW_FORMAT_OPENEXR;
             if ( strcmp( user_choice, "exr" ) == 0 )
-                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_OPENEXR;
+                ART_EV_RAW_WORKFLOW_FORMAT = ART_RAW_WORKFLOW_FORMAT_OPENEXR;
             if ( strcmp( user_choice, "OPENEXR" ) == 0 )
-                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_OPENEXR;
+                ART_EV_RAW_WORKFLOW_FORMAT = ART_RAW_WORKFLOW_FORMAT_OPENEXR;
             if ( strcmp( user_choice, "OpenEXR" ) == 0 )
-                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_OPENEXR;
+                ART_EV_RAW_WORKFLOW_FORMAT = ART_RAW_WORKFLOW_FORMAT_OPENEXR;
             if ( strcmp( user_choice, "openexr" ) == 0 )
-                ART_EV_RAW_WORKFLOW_FORMAT == ART_RAW_WORKFLOW_FORMAT_OPENEXR;
+                ART_EV_RAW_WORKFLOW_FORMAT = ART_RAW_WORKFLOW_FORMAT_OPENEXR;
         }
 
         //   we only default to ARTRAW if the user string didn't make sense, or none was specified
@@ -699,25 +699,25 @@ int  art_ev_end_result_image_format(
         if ( user_choice )
         {
             if ( strcmp( user_choice, "TIFF" ) == 0 )
-                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_TIFF;
+                ART_EV_END_RESULT_IMAGE_FORMAT = ART_END_RESULT_IMAGE_FORMAT_TIFF;
             if ( strcmp( user_choice, "Tiff" ) == 0 )
-                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_TIFF;
+                ART_EV_END_RESULT_IMAGE_FORMAT = ART_END_RESULT_IMAGE_FORMAT_TIFF;
             if ( strcmp( user_choice, "tiff" ) == 0 )
-                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_TIFF;
+                ART_EV_END_RESULT_IMAGE_FORMAT = ART_END_RESULT_IMAGE_FORMAT_TIFF;
                 
             if ( strcmp( user_choice, "OPENEXR" ) == 0 )
-                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_OPENEXR;
+                ART_EV_END_RESULT_IMAGE_FORMAT = ART_END_RESULT_IMAGE_FORMAT_OPENEXR;
             if ( strcmp( user_choice, "OpenEXR" ) == 0 )
-                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_OPENEXR;
+                ART_EV_END_RESULT_IMAGE_FORMAT = ART_END_RESULT_IMAGE_FORMAT_OPENEXR;
             if ( strcmp( user_choice, "openexr" ) == 0 )
-                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_OPENEXR;
+                ART_EV_END_RESULT_IMAGE_FORMAT = ART_END_RESULT_IMAGE_FORMAT_OPENEXR;
                 
             if ( strcmp( user_choice, "SPECTRALOPENEXR" ) == 0 )
-                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_SPECTRAL_OPENEXR;
+                ART_EV_END_RESULT_IMAGE_FORMAT = ART_END_RESULT_IMAGE_FORMAT_SPECTRAL_OPENEXR;
             if ( strcmp( user_choice, "SpectralOpenEXR" ) == 0 )
-                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_SPECTRAL_OPENEXR;
+                ART_EV_END_RESULT_IMAGE_FORMAT = ART_END_RESULT_IMAGE_FORMAT_SPECTRAL_OPENEXR;
             if ( strcmp( user_choice, "spectralopenexr" ) == 0 )
-                ART_EV_END_RESULT_IMAGE_FORMAT == ART_END_RESULT_IMAGE_FORMAT_SPECTRAL_OPENEXR;
+                ART_EV_END_RESULT_IMAGE_FORMAT = ART_END_RESULT_IMAGE_FORMAT_SPECTRAL_OPENEXR;
         }
 
         //   we only default to EXR if the user string didn't make sense, or none was specified
@@ -744,18 +744,18 @@ int  art_ev_end_result_tone_mapping(
         if ( user_choice )
         {
             if ( strcmp( user_choice, "YES" ) == 0 )
-                ART_EV_END_RESULT_TONE_MAPPING == 1;
+                ART_EV_END_RESULT_TONE_MAPPING = 1;
             if ( strcmp( user_choice, "Yes" ) == 0 )
-                ART_EV_END_RESULT_TONE_MAPPING == 1;
+                ART_EV_END_RESULT_TONE_MAPPING = 1;
             if ( strcmp( user_choice, "yes" ) == 0 )
-                ART_EV_END_RESULT_TONE_MAPPING == 1;
+                ART_EV_END_RESULT_TONE_MAPPING = 1;
                 
             if ( strcmp( user_choice, "NO" ) == 0 )
-                ART_EV_END_RESULT_TONE_MAPPING == 0;
+                ART_EV_END_RESULT_TONE_MAPPING = 0;
             if ( strcmp( user_choice, "No" ) == 0 )
-                ART_EV_END_RESULT_TONE_MAPPING == 0;
+                ART_EV_END_RESULT_TONE_MAPPING = 0;
             if ( strcmp( user_choice, "no" ) == 0 )
-                ART_EV_END_RESULT_TONE_MAPPING == 0;
+                ART_EV_END_RESULT_TONE_MAPPING = 0;
                 
             if (   ART_END_RESULT_IMAGE_FORMAT_IS_SPECTRAL_OPENEXR
                 && ART_EV_END_RESULT_TONE_MAPPING == 1 )
@@ -766,7 +766,7 @@ int  art_ev_end_result_tone_mapping(
                     "spectral OpenEXR"
                     );
                     
-                ART_EV_END_RESULT_TONE_MAPPING == 0;
+                ART_EV_END_RESULT_TONE_MAPPING = 0;
             }
         }
 

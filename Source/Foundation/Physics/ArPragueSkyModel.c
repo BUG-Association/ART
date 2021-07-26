@@ -1544,7 +1544,6 @@ void arpragueskymodel_toAD(
 	// Ray circle intersection
 	double x_v = sin(theta);
 	double y_v = cos(theta);
-	double x_c = 0;
 	double y_c = PSM_PLANET_RADIUS + altitude;
 	double atmo_edge = PSM_PLANET_RADIUS + 90000;
 	double n;

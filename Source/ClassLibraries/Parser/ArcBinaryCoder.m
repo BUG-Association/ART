@@ -602,8 +602,8 @@ void arcbinarycoder_write_to_stream(
         : (const char *) tableName
         : (unsigned long *) codeSize
 {
-    const int j = [self lookDict : tableName];
-#warning AF passing a const int pointer to a non const void* method
+    int j = [self lookDict : tableName];
+
     [self codeBinary4 : &j];
 
     if (j == -1)                        // not in dictionary

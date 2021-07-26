@@ -59,7 +59,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (const ArSamplingRegion *)             samplingRegion
         : (      ArPDFValue *)                   illuminationProbability /* optional */
         : (      ArPDFValue *)                   emissionProbability /* optional */
-        ;
 {
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
