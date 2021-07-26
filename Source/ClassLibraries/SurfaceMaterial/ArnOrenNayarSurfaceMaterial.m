@@ -33,6 +33,8 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
+ 
     [ ArnOrenNayarSurfaceMaterial registerWithRuntime ];
 )
 
@@ -45,7 +47,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnOrenNayarSurfaceMaterial
 
-- copy
+- (id) copy
 {
     ArnOrenNayarSurfaceMaterial  * copiedInstance = [ super copy ];
 
@@ -54,7 +56,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnOrenNayarSurfaceMaterial  * copiedInstance =
@@ -214,7 +216,7 @@ ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_SHIFTING_SURFACETYPE_IMPLEMENTATION(
     }
 }
 
-- init
+- (id) init
         : (ArNode <ArpNode>*) newColour
         : (ArNode <ArpNode>*) newSigma
 {

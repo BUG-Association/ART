@@ -44,7 +44,7 @@ ART_MODULE_INTERFACE(ArnPixelSampler)
     double                                writeThreadDuration;
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         ;
@@ -94,7 +94,7 @@ ART_MODULE_INTERFACE(ArnPixelSampler)
     int                              * scanlineStatus;
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         ;

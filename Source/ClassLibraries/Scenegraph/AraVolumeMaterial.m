@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ AraVolumeMaterial registerWithRuntime ];
 )
 
@@ -42,7 +43,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraVolumeMaterial)
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRef) newVolumeMaterialRef
 {

@@ -54,7 +54,7 @@ ArAssignmentTable;
     ArAssignmentTable  assignmentTable;
 }
 
-- init
+- (id) init
         : (ArAssignmentTable) newAssignmentTable
         ;
 

@@ -43,7 +43,7 @@ ARPFILE_DEFAULT_IMPLEMENTATION( ArfRasterImage, 0 )
     return arfiletypematch_exact;
 }
 
-- initWithFile: (ArcFile *) newFile
+- (id) initWithFile: (ArcFile *) newFile
 
 {
     file = newFile;

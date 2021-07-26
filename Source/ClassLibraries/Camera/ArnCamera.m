@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnCamera registerWithRuntime ];
 )
 
@@ -47,7 +48,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
     near2world = NULL;
 }
 
-- imageSize
+- (id) imageSize
                 : (IVec2D) newImageSize
         ray     : (Ray3D) newRay
         zoom    : (double) newZoom
@@ -61,7 +62,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
 }
 
 
-- init
+- (id) init
         : (Ray3D) newRay
         : (IVec2D) newImageSize
         : (double) newZoom
@@ -82,28 +83,28 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
     return self;
 }
 
-- withTwist
+- (id) withTwist
         : (double) newTwist
 {
     twist = newTwist;
     return self;
 }
 
-- withNear
+- (id) withNear
         : (double) newNear
 {
     near = newNear;
     return self;
 }
 
-- withRatio
+- (id) withRatio
         : (double) newRatio
 {
     ratio = newRatio;
     return self;
 }
 
-- init
+- (id) init
         : (Ray3D) newRay
         : (IVec2D) newImageSize
         : (double) newZoom
@@ -126,7 +127,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnCamera  * copiedInstance = [ super copy ];
 
@@ -153,7 +154,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnCamera  * copiedInstance =
@@ -446,6 +447,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
         : (      ArReferenceFrame *) outReferenceFrame
         : (      Ray3D *) outRay
 {
+    (void) randomGenerator;
     Vec3D  mainRayVector;
     Vec3D  auxRayVector, auxWorldVector;
 
@@ -552,6 +554,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
         : (const Ray3D *) inputRay
         : (      Vec2D *) pixelCoordinates
 {
+    (void) inputRay;
+    (void) pixelCoordinates;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return NO;
 }

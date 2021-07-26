@@ -42,7 +42,7 @@ ART_MODULE_INTERFACE(ArnVertexSet)
     ArFVec3DArray       normalTable;
 }
 
-- init
+- (id) init
         : (ArPnt3DArray) newPointArray
         : (ArPnt4DArray) newPnt4DArray
         : (ArFloatArray) newValueArray

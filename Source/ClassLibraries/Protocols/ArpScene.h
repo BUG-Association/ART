@@ -40,21 +40,21 @@ ART_MODULE_INTERFACE(ArpScene)
 - (ArNode <ArpWorld> *) world
         ;
 
-- setWorld
+- (id) setWorld
         : (ArNode <ArpWorld> *) newWorld
         ;
 
 - (ArNode <ArpCamera> *) camera
         ;
 
-- setCamera
+- (id) setCamera
         : (ArNode <ArpCamera> *) newCamera
         ;
 
 - (ArNode <ArpActionSequence> *) actionSequence
         ;
 
-- setActionSequence
+- (id) setActionSequence
         : (ArNode <ArpActionSequence> *) newActionSequence
         ;
 

@@ -37,7 +37,7 @@
 #endif
 }
 
-- init_ART_GV
+- (id) init_ART_GV
         : (ART_GV *) art_gv
         ;
 

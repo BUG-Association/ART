@@ -47,7 +47,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcSkydomeLightsource
 
-- init
+- (id) init
         : (ArNode <ArpShape> *) shapeRef
         : (ArTraversalState *) traversalState
         : (ArnLightsourceCollector *) lightsourceCollector
@@ -420,7 +420,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArcSkydomeLightsource  * clone = [ super copy ];
 

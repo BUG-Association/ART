@@ -35,7 +35,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcLightsource
 
-- init
+- (id) init
         : (ArLightsourceType) newLightsourceType
 {
     return
@@ -45,7 +45,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- init
+- (id) init
         : (ArNode <ArpShape> *) newShape
         : (ArLightsourceType) newLightsourceType
 {
@@ -129,7 +129,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return YES;
 }
 
-- copy
+- (id) copy
 {
     ArcLightsource  * clone = [ super copy ];
 

@@ -35,7 +35,7 @@ ART_MODULE_INTERFACE(ArnIsotropicPhaseFunction)
 {
 }
 
-- init
+- (id) init
         : (ArNode <ArpSpectrum> *) newScattering
         ;
 

@@ -79,7 +79,7 @@ ArnDefaultRGBColourSpace  * arndefault_rgb_colourspace_singleton(
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourSpace)
 
-- init
+- (id) init
         : (ArColourSpaceRef) newColourSpaceRef
 {
     self = [ super init ];

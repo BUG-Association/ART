@@ -35,7 +35,7 @@ ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-ART_LIGHT_AND_ATTENUATION_MODULE_INITIALISATION_FUNCTION( )
+ART_LIGHT_AND_ATTENUATION_MODULE_INITIALISATION_FUNCTION( (void) art_gv; )
 
 ART_LIGHT_AND_ATTENUATION_MODULE_NO_SHUTDOWN_FUNCTION_NECESSARY
 
@@ -43,6 +43,8 @@ ArCrosstalkSample  * arcrosstalksample_alloc(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ArCrosstalkSample  * x0 = ALLOC( ArCrosstalkSample );
 
     ASSERT_ALLOCATED_CROSSTALK_SAMPLE( x0 )
@@ -72,6 +74,8 @@ void arcrosstalksample_free(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     FREE( xr );
 }
 
@@ -79,6 +83,8 @@ ArCrosstalkSample const * arcrosstalksample_none(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0;
@@ -90,6 +96,8 @@ void arcrosstalksample_d_init_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_ALLOCATED_CROSSTALK_SAMPLE( xr )
     ASSERT_NONNEGATIVE_DOUBLE( d0 )
 
@@ -105,6 +113,8 @@ void arcrosstalksample_x_init_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_ALLOCATED_CROSSTALK_SAMPLE( xr )
 
@@ -119,6 +129,8 @@ double arcrosstalksample_x_min(
         const ArCrosstalkSample  * x0
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
 
     double  min = MATH_HUGE_DOUBLE;
@@ -137,6 +149,8 @@ double arcrosstalksample_x_max(
         const ArCrosstalkSample  * x0
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
 
     double  max = -MATH_HUGE_DOUBLE;
@@ -155,6 +169,8 @@ double arcrosstalksample_x_avg(
         const ArCrosstalkSample  * x0
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
 
     double  sum = 0.0;
@@ -174,6 +190,9 @@ double arcrosstalksample_x_norm(
         const ArCrosstalkSample  * x0
         )
 {
+    (void) art_gv;
+    (void) x0;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
 
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
@@ -187,6 +206,8 @@ void arcrosstalksample_x_add_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( xr )
 
@@ -202,6 +223,8 @@ void arcrosstalksample_d_mul_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_NONNEGATIVE_DOUBLE( d0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( xr )
 
@@ -218,6 +241,8 @@ void arcrosstalksample_dx_mul_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_NONNEGATIVE_DOUBLE( d0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( xr )
@@ -236,6 +261,8 @@ void arcrosstalksample_dx_mul_add_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_NONNEGATIVE_DOUBLE( d0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( xr )
@@ -254,6 +281,8 @@ void arcrosstalksample_xd_pow_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( xr )
 
@@ -271,6 +300,8 @@ void arcrosstalksample_xd_negpow_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( xr )
 
@@ -288,6 +319,8 @@ void arcrosstalksample_dx_pow_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( xr )
 
@@ -305,6 +338,8 @@ void arcrosstalksample_dx_negpow_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( xr )
 
@@ -322,6 +357,8 @@ void arcrosstalksample_xx_add_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( x1 )
     ASSERT_ALLOCATED_CROSSTALK_SAMPLE( xr )
@@ -340,6 +377,8 @@ void arcrosstalksample_xx_sub_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( x1 )
     ASSERT_ALLOCATED_CROSSTALK_SAMPLE( xr )
@@ -359,6 +398,8 @@ void arcrosstalksample_dxx_interpol_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_UNIT_RANGE_DOUBLE( d0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( x1 )
@@ -383,6 +424,8 @@ void arcrosstalksample_ddx_clamp_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_NONNEGATIVE_DOUBLE( d0 )
     ASSERT_NONNEGATIVE_DOUBLE( d1 )
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
@@ -405,6 +448,8 @@ void arcrosstalksample_x_complement_from_one_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_ALLOCATED_CROSSTALK_SAMPLE( xr )
 
@@ -423,6 +468,8 @@ void arcrosstalksample_ix_singleband_complement_from_one_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_INTEGER_WITHIN_RANGE( i0, 0, CROSSTALK_SAMPLE_CHANNELS )
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_ALLOCATED_CROSSTALK_SAMPLE( xr )
@@ -452,6 +499,8 @@ void arcrosstalksample_d_cwdiv_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_NONZERO_DOUBLE( d0 )
     ASSERT_VALID_CROSSTALK_SAMPLE( xr )
 
@@ -475,6 +524,8 @@ void arcrosstalksample_dix_singleband_mul_copy_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_NONNEGATIVE_DOUBLE( d0 )
     ASSERT_INTEGER_WITHIN_RANGE( i0, 0, CROSSTALK_SAMPLE_CHANNELS )
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
@@ -499,6 +550,8 @@ void arcrosstalksample_inv_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( xr )
 
     for ( unsigned int i = 0; i < CROSSTALK_SAMPLE_CHANNELS; ++i )
@@ -519,6 +572,8 @@ void arcrosstalksample_x_inv_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK_SAMPLE( x0 )
     ASSERT_ALLOCATED_CROSSTALK_SAMPLE( xr )
 
@@ -539,6 +594,8 @@ unsigned int arcrosstalksample_x_valid(
         const ArCrosstalkSample  * x0
         )
 {
+    (void) art_gv;
+    
     if ( ! x0 )
     {
         ART_ERRORHANDLING_WARNING( "ArCrosstalkSample parameter is not allocated" );
@@ -564,6 +621,8 @@ void arcrosstalksample_x_mathematicaprintf(
         const ArCrosstalkSample  * x0
         )
 {
+    (void) art_gv;
+    
     const unsigned int  channels = CROSSTALK_SAMPLE_CHANNELS;
 
     printf( "ArCrosstalkSample %dx%d { \n", channels, channels );
@@ -597,6 +656,10 @@ void arcrosstalksample_s_mul_x(
               ArCrosstalkSample  * xr
         )
 {
+    (void) art_gv;
+    (void) v0;
+    (void) xr;
+    
     ART__CODE_IS_NOT_TESTED__EXIT_WITH_ERROR
 
 }
@@ -607,6 +670,10 @@ void crosstalk_to_crosstalksample(
               ArCrosstalkSample     * hxr
         )
 {
+    (void) art_gv;
+    (void) x0;
+    (void) hxr;
+    
     ASSERT_VALID_CROSSTALK( x0 )
     ASSERT_ALLOCATED_CROSSTALK_SAMPLE( hxr )
     

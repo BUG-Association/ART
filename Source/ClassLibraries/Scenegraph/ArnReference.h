@@ -41,7 +41,7 @@ ART_MODULE_INTERFACE(ArnReference)
     ArSymbol  referencedName;
 }
 
-- init
+- (id) init
         : (ArSymbol) newReferencedName
         ;
 

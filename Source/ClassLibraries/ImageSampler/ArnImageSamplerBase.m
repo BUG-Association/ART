@@ -38,6 +38,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnImageSamplerBase registerWithRuntime ];
 )
 
@@ -121,7 +122,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
     }
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (int) newNumberOfSamples
@@ -146,7 +147,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnImageSamplerBase  * copiedInstance = [ super copy ];
 
@@ -155,7 +156,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnImageSamplerBase  * copiedInstance =

@@ -37,7 +37,7 @@ ART_MODULE_INTERFACE(ArnColourTransform)
     ArColourTransformRef  transformRef;
 }
 
-- init
+- (id) init
         : (ArRenderingIntent)  newRenderingIntent
         ;
 

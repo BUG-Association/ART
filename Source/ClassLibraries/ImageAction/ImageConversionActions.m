@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnImageConverter_RAW_To_ARTCSP                registerWithRuntime ];
     [ ArnImageConverter_RAW_To_Monochrome_ARTCSP     registerWithRuntime ];
     [ ArnImageConverter_TIFF_To_ARTCSP               registerWithRuntime ];
@@ -186,7 +187,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_AR
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_RAW_To_Monochrome_ARTCSP)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Monochrome_ARTCSP)
 
-- wavelength
+- (id) wavelength
         : (double) newWavelength
 {
     [ super init ];
@@ -392,7 +393,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Mo
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_TIFF_To_ARTCSP)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_ARTCSP)
 
-- removeSource
+- (id) removeSource
         : (BOOL) newRemoveOption
 {
     return
@@ -401,7 +402,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
 {
     self =
@@ -612,7 +613,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
         ];
 }
 
-- removeSource : (BOOL) newRemoveOption
+- (id) removeSource : (BOOL) newRemoveOption
 {
     return
         [ self init
@@ -623,7 +624,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             ];
 }
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newRemoveOption
         bitsPerChannel  : (unsigned int) newNumberOfBits
 {
@@ -636,7 +637,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             ];
 }
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newRemoveOption
         colourSpace     : (ArNode <ArpColourSpace> *) newColourSpace
         bitsPerChannel  : (unsigned int) newNumberOfBits
@@ -650,7 +651,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
         : (ArNode <ArpColourSpace> *) newColourSpace
         : (ArnColourTransform *) newColourTransform
@@ -898,7 +899,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
     }
 }
 
-- removeSource
+- (id) removeSource
                                 : (BOOL) newRemoveOption
         stokesComponentsToOutput: (int) newStokesComponentsToOutput
 {
@@ -909,7 +910,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         : (int) newStokesComponentsToOutput
 {
@@ -1241,7 +1242,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_RAW_To_Singlechannel_ARTGSC)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Singlechannel_ARTGSC)
 
-- removeSource
+- (id) removeSource
                   : (BOOL) newRemoveOption
         normalise : (BOOL) newNormalise
         wavelength: (double) newWavelength
@@ -1254,7 +1255,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         : (BOOL) newNormalise
         : (double) newWavelength
@@ -1755,7 +1756,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTGSC_To_TIFF)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To_TIFF)
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newDeleteSourceImageAfterUse
         bitsPerChannel  : (unsigned int) newDestinationBitsPerChannel
         falsecolour     : (BOOL) newFalsecolourOption
@@ -1776,7 +1777,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
         : (unsigned int) newDestinationBitsPerChannel
         : (BOOL) newFalsecolourOption
@@ -2209,7 +2210,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
 
 @implementation ArnImageConverter_ARTGSC_To_GreyCSV
 
-- removeSource
+- (id) removeSource
         : (BOOL) newRemoveOption
 {
     return
@@ -2218,7 +2219,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
 {
     self =
@@ -2435,7 +2436,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
         ];
 }
 
-- removeSource : (BOOL) newRemoveOption
+- (id) removeSource : (BOOL) newRemoveOption
 {
     return
         [ self init
@@ -2445,7 +2446,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             ];
 }
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newRemoveOption
         colourSpace     : (ArNode <ArpColourSpace> *) newColourSpace
 {
@@ -2457,7 +2458,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
         : (ArNode <ArpColourSpace> *) newColourSpace
         : (ArnColourTransform *) newColourTransform
@@ -2629,7 +2630,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_EXR_To_ARTCSP)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_ARTCSP)
 
-- removeSource
+- (id) removeSource
         : (BOOL) newRemoveOption
 {
     return
@@ -2639,7 +2640,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
 }
 
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
 {
     self =
@@ -2825,7 +2826,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTGSC_To_EXR)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To_EXR)
 
-- removeSource : (BOOL) newRemoveOption
+- (id) removeSource : (BOOL) newRemoveOption
 {
     return
         [ self init
@@ -2833,7 +2834,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
 {
     self =

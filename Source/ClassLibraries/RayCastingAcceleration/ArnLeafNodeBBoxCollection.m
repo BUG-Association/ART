@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnLeafNodeBBoxCollection registerWithRuntime ];
 )
 
@@ -42,7 +43,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLeafNodeBBoxCollection)
 
-- init
+- (id) init
 {
     self = [ super init ];
 
@@ -56,7 +57,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLeafNodeBBoxCollection)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnLeafNodeBBoxCollection  * copiedInstance = [ super copy ];
 
@@ -70,7 +71,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLeafNodeBBoxCollection)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnLeafNodeBBoxCollection  * copiedInstance =

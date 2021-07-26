@@ -49,6 +49,8 @@ void rgba_s_debugprintf(
         const ArRGBA  * c_0
         )
 {
+    (void) art_gv;
+    
     printf( "ArRGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
         ARRGBA_R(*c_0),
         ARRGBA_G(*c_0),
@@ -64,6 +66,8 @@ void frgba_s_debugprintf(
         const ArFloatRGBA  * c_0
         )
 {
+    (void) art_gv;
+    
     printf( "ArUTF_RGBA( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
         ARRGBA_R(*c_0),
         ARRGBA_G(*c_0),

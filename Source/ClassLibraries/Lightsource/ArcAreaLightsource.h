@@ -79,7 +79,7 @@ ArAreaLightsourcePatch;
     ArNode <ArpMapping>     * mapping;
 }
 
-- init
+- (id) init
         : (ArNode *) shape
         : (ArTraversalState *) traversalState
         : (ArnLightsourceCollector *) lightsourceCollector

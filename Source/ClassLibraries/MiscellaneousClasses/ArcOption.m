@@ -513,7 +513,7 @@ ARDYNARRAY_IMPLEMENTATION_FOR_ARTYPE(CMDLineInput, cmdli, c, ARCMDLI_EMPTY);
         NUMBER_OF_OPTIONS;
 }
 
-- init
+- (id) init
         : (const char *) newLongName
         : (const char *) newShortName
         : (const char *) newExplanation
@@ -612,7 +612,7 @@ ARDYNARRAY_IMPLEMENTATION_FOR_ARTYPE(CMDLineInput, cmdli, c, ARCMDLI_EMPTY);
 
 @implementation ArcOptionCategoryTitle
 
-- init
+- (id) init
         : (const char *) newDescription
 {
     self =
@@ -637,7 +637,7 @@ ARDYNARRAY_IMPLEMENTATION_FOR_ARTYPE(CMDLineInput, cmdli, c, ARCMDLI_EMPTY);
 
 @implementation ArcOptionParameter
 
-- init
+- (id) init
         : (const char *) newLongName
         : (const char *) newShortName
         : (const char *) newParameterName
@@ -696,7 +696,7 @@ ARDYNARRAY_IMPLEMENTATION_FOR_ARTYPE(CMDLineInput, cmdli, c, ARCMDLI_EMPTY);
 
 @implementation ArcOptionString
 
-- init
+- (id) init
         : (const char *) newLongName
         : (const char *) newShortName
         : (const char *) newParameterName
@@ -741,7 +741,7 @@ ARDYNARRAY_IMPLEMENTATION_FOR_ARTYPE(CMDLineInput, cmdli, c, ARCMDLI_EMPTY);
 
 @implementation ArcOptionInteger
 
-- init
+- (id) init
         : (const char *) newLongName
         : (const char *) newShortName
         : (const char *) newParameterName
@@ -805,7 +805,7 @@ ARDYNARRAY_IMPLEMENTATION_FOR_ARTYPE(CMDLineInput, cmdli, c, ARCMDLI_EMPTY);
 
 @implementation ArcOptionDouble
 
-- init
+- (id) init
         : (const char *) newLongName
         : (const char *) newShortName
         : (const char *) newParameterName

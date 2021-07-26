@@ -34,6 +34,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnGraphTraversal registerWithRuntime ];
 )
 
@@ -97,7 +98,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnGraphTraversal)
             ];
 }
 
-- init
+- (id) init
 {
     self = [ super init ];
 
@@ -109,7 +110,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnGraphTraversal)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnGraphTraversal  * copiedInstance = [ super copy ];
 
@@ -119,7 +120,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnGraphTraversal)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnGraphTraversal  * copiedInstance =

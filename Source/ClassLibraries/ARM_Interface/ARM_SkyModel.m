@@ -39,7 +39,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @interface ArnPreethamSkyModel ( internal )
 
-- init
+- (id) init
         : (double) newElevation
         : (double) newAzimuth
         : (double) newTurbidity
@@ -53,7 +53,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnPreethamSkyModel ( ARM_Interface )
 
-- elevation
+- (id) elevation
                  : (double) newElevation
         azimuth  : (double) newAzimuth
         turbidity: (double) newTurbidity
@@ -71,7 +71,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
-- elevation
+- (id) elevation
                  : (double) newElevation
         azimuth  : (double) newAzimuth
         turbidity: (double) newTurbidity
@@ -94,7 +94,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnHosekSkyModel ( ARM_Interface )
 
-- elevation
+- (id) elevation
                     : (double) newElevation
         azimuth     : (double) newAzimuth
         turbidity   : (double) newTurbidity
@@ -114,7 +114,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
-- elevation
+- (id) elevation
                     : (double) newElevation
         azimuth     : (double) newAzimuth
         solColour   : (double) newKelvin
@@ -136,7 +136,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
-- elevation
+- (id) elevation
                     : (double) newElevation
         azimuth     : (double) newAzimuth
         turbidity   : (double) newTurbidity
@@ -161,7 +161,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnPragueSkyModel ( ARM_Interface )
 
-- elevation
+- (id) elevation
                     : (double) newElevation
         azimuth     : (double) newAzimuth
         turbidity   : (double) newTurbidity

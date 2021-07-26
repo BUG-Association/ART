@@ -36,7 +36,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArNode ( ARM_SpecificAttributes )
 
-- surfaceMaterial
+- (id) surfaceMaterial
         : (ArNode *) newSurfaceMaterial
 {
     if ( [ newSurfaceMaterial conformsToArProtocol
@@ -59,7 +59,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return 0;
 }
 
-- environmentMaterial
+- (id) environmentMaterial
         : (ArNode *) newEnvironmentMaterial
 {
     if ( [ newEnvironmentMaterial conformsToArProtocol
@@ -82,7 +82,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return 0;
 }
 
-- volumeMaterial
+- (id) volumeMaterial
         : (ArNode *) newVolumeMaterial
 {
     if ( [ newVolumeMaterial conformsToArProtocol
@@ -105,7 +105,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return 0;
 }
 
-- vertices
+- (id) vertices
         : (ArNode *) newSetOfVertices
 {
     if ( [ newSetOfVertices conformsToArProtocol: ARPROTOCOL(ArpVertices) ] )
@@ -127,7 +127,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return 0;
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo
 {
     if ( [ newTrafo conformsToArProtocol: ARPROTOCOL(ArpTrafo2D) ] )
@@ -170,7 +170,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return 0;
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
 {
@@ -184,7 +184,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -203,7 +203,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -227,7 +227,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -256,7 +256,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -291,7 +291,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -331,7 +331,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2

@@ -188,6 +188,8 @@ ArSpectralSample * sps_alloc(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ArSpectralSample  * sr = ALLOC(ArSpectralSample);
 
     return sr;
@@ -210,6 +212,8 @@ ArSpectralSample * sps_s_alloc_init(
         const ArSpectralSample  * s0
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_SPECTRUMTYPE( sps, ArSpectralSample,  s0, s )
 
     ArSpectralSample  * hr = ALLOC( ArSpectralSample );

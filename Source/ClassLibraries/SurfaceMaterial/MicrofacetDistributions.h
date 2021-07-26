@@ -50,7 +50,7 @@ ART_MODULE_INTERFACE(MicrofacetDistributions)
 {
 }
 
-- init
+- (id) init
         : (ArNode *) expressionForBeta
         ;
 

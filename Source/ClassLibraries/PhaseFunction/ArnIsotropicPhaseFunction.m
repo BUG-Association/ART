@@ -35,6 +35,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+     (void) art_gv;
      [ ArnIsotropicPhaseFunction registerWithRuntime ];
 )
 
@@ -44,14 +45,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnIsotropicPhaseFunction)
 
-- copy
+- (id) copy
 {
     ArnIsotropicPhaseFunction  * copiedInstance = [ super copy ];
 
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnIsotropicPhaseFunction  * copiedInstance =
@@ -62,7 +63,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnIsotropicPhaseFunction)
     return copiedInstance;
 }
 
-- init
+- (id) init
         : (ArNode <ArpSpectrum> *) newScattering
 {
     self =

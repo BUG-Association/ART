@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnPhongSurfaceMaterial registerWithRuntime ];
 )
 
@@ -74,7 +75,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             );
 }
 
-- init
+- (id) init
         : (ArNode <ArpNode>*) newColour
         : (ArNode <ArpNode>*) newShininess
 {
@@ -92,7 +93,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnPhongSurfaceMaterial  * copiedInstance = [ super copy ];
 
@@ -101,7 +102,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnPhongSurfaceMaterial  * copiedInstance =

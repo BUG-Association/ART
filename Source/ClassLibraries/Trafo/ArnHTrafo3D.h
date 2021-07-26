@@ -40,12 +40,12 @@ ART_MODULE_INTERFACE(ArnHTrafo3D)
     HTrafo3D    backward;
 }
 
-- init
+- (id) init
         : (HTrafo3D) newForward
         : (HTrafo3D) newBackward
         ;
 
-- initFrom
+- (id) initFrom
         : (const HTrafo3D *) newForward
         : (const HTrafo3D *) newBackward
         ;

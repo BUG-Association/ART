@@ -528,8 +528,6 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
     if (_writtingMode) {
         // Gather metadata
         const IVec2D size = [ _imageInfo size ];
-        const int width = XC(size);
-        const int height = YC(size);
             
         char * createdByString = NULL;
         char * creationDateStr = NULL;

@@ -49,13 +49,13 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 @interface ArnStochasticSampler ( ARM_Interface )
 
-- sampleProvider
+- (id) sampleProvider
                                 : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         samplesPerPixel         : (unsigned int) newNumberOfSamples
         randomValueGeneration   : (int) newRandomValueGeneration
         ;
 
-- sampleProvider
+- (id) sampleProvider
                                 : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         sampleSplattingKernel   : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         samplesPerPixel         : (unsigned int) newNumberOfSamples
@@ -67,13 +67,13 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 @interface ArnStochasticImageSampler ( ARM_Interface )
 
-- sampleProvider
+- (id) sampleProvider
                                 : (ArNode <ArpPathspaceIntegrator> *) newPathspaceIntegrator
         samplesPerPixel         : (unsigned int) newNumberOfSamples
         randomValueGeneration   : (int) newRandomValueGeneration
         ;
 
-- sampleProvider
+- (id) sampleProvider
                                 : (ArNode <ArpPathspaceIntegrator> *) newPathspaceIntegrator
         sampleSplattingKernel   : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         samplesPerPixel         : (unsigned int) newNumberOfSamples
@@ -122,7 +122,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 @interface ArnStochasticImageSamplerRGBA ( ARM_Interface )
 
-- sampleProvider
+- (id) sampleProvider
                          : (ArNode <ArpPathspaceIntegratorRGBA> *) newEstimator
         samplesPerPixel  : (unsigned int) newNumberOfSamples
         ;
@@ -135,7 +135,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 @interface ArnMidpointImageSamplerRGBA ( ARM_Interface )
 
-- sampleProvider
+- (id) sampleProvider
         : (ArNode <ArpPathspaceIntegratorRGBA> *) newEstimator
         ;
 
@@ -147,13 +147,13 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 @interface ArnStochasticSamplerVerticalMirror ( ARM_Interface )
 
-- sampleProvider
+- (id) sampleProvider
                                 : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         samplesPerPixel         : (unsigned int) newNumberOfSamples
         randomValueGeneration   : (int) newRandomValueGeneration
         ;
 
-- sampleProvider
+- (id) sampleProvider
                                 : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         sampleSplattingKernel   : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         samplesPerPixel         : (unsigned int) newNumberOfSamples

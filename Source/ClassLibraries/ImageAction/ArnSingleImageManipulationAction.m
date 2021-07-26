@@ -39,6 +39,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSingleImageManipulationAction registerWithRuntime ];
 )
 
@@ -49,7 +50,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
 
-- removeSource
+- (id) removeSource
         : (BOOL) newRemoveSource
 {
     return
@@ -58,7 +59,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
             ];
 }
 
-- init
+- (id) init
 {
     return
         [ self init
@@ -68,7 +69,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newRemoveSource
 {
     return
@@ -79,7 +80,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newRemoveSource
         : (ArNode *) newSubnode0
         : (ArNode *) newSubnode1

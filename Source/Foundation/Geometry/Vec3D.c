@@ -556,6 +556,8 @@ void vec3d_v_debugprintf(
         const Vec3D   * v0
         )
 {
+    (void) art_gv;
+    
     printf(
         VEC3D_FORMAT( "%10.9f" ),
         VEC3D_V_PRINTF( *v0 )

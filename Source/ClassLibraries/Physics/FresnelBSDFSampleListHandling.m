@@ -212,6 +212,13 @@ int add_birefringent_fresnel_refraction_samples_to_bsdfsamplelist(
               struct ArBSDFSampleList        * bsdfsampleList
         )
 {
+    (void) art_gv;
+    (void) bsdfsampleFreelists;
+    (void) incomingDirectionAndLocation;
+    (void) pathDirection;
+    (void) wavelength;
+    (void) bsdfsampleList;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
     return 0;
 }

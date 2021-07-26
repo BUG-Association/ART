@@ -50,7 +50,7 @@ int int_num_digits(int x)
 
 @implementation ArcSampleCounter
 
-- init
+- (id) init
         : (ArcObject <ArpReporter> *) newReporter
         : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
         : (ArnImageSamplerBase *) newImageSampler

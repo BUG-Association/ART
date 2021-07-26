@@ -230,6 +230,8 @@ void testing_context_release(
         ArBlendedSurfacesTestingContext   * testingContext
         )
 {
+    (void) art_gv;
+    
     RELEASE_OBJECT(testingContext->intersection);
 
     arbsdfsamplefreelists_free_contents(
@@ -298,6 +300,14 @@ void tests_for_incoming_direction(
         const char *                        sampleSourceStr
         )
 {
+#ifndef NEVERMORE
+    (void) art_gv;
+    (void) testingContext;
+    (void) firstSurface;
+    (void) secondSurface;
+    (void) sampleSourceStr;
+#endif
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 #ifdef NEVERMORE
     ArBSDFSampleList bsdfsampleList = ARFULLIGHTBSDFSAMPLELIST_EMPTY;

@@ -37,7 +37,7 @@ ART_MODULE_INTERFACE(ArnActionSequence)
     ArSymbol  message;
 }
 
-- init
+- (id) init
         : (ArNodeRefDynArray *) newActions
         : (const ArSymbol) newMessage
         ;

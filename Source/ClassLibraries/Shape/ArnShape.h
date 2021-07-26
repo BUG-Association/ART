@@ -45,7 +45,7 @@ ART_MODULE_INTERFACE(ArnShape)
     ArShapeGeometry  shapeGeometry;
 }
 
-- init
+- (id) init
         : (ArShapeGeometry) newGeometry
         ;
 
@@ -67,7 +67,7 @@ ART_MODULE_INTERFACE(ArnShape)
     double  parameter;
 }
 
-- init
+- (id) init
         : (ArShapeGeometry) newGeometry
         : (double) newParameter
         ;

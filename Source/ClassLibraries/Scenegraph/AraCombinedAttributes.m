@@ -36,6 +36,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ AraCombinedAttributes registerWithRuntime ];
     [ AraCombinedReference registerWithRuntime ];
 )
@@ -64,7 +65,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraCombinedAttributes)
 
-- init
+- (id) init
         : (ArNode *) newGeometry
         : (ArNode *) newVolumeMaterial
         : (ArNode *) newSurfaceMaterial
@@ -213,7 +214,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraCombinedAttributes)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraCombinedReference)
 
-- init
+- (id) init
         : (ArNode *) newVolumeMaterial
         : (ArNode *) newSurfaceMaterial
         : (ArNode *) newEnvironmentMaterial
@@ -242,7 +243,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraCombinedReference)
             ];
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     return

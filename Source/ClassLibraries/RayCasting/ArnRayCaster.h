@@ -84,11 +84,11 @@ ArHashedMailboxEntry;
     BOOL                   * activeNodes;
 }
 
-- init
+- (id) init
         : (double) newHitEps
         ;
 
-- init
+- (id) init
         : (double) newHitEps
         : (unsigned int) newOptions
         ;

@@ -138,7 +138,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     reporter = newReporter;
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
 {
     self = [ super init ];
@@ -181,7 +181,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     [ super setReporter: newReporter ];
 }
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -189,7 +189,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
 {
     self = [ super init ];
@@ -275,7 +275,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     [ super setReporter: newReporter ];
 }
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -283,7 +283,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
 {
     self = [ super init ];
@@ -369,7 +369,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     [ super setReporter: newReporter ];
 }
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -377,7 +377,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
 {
     self = [ super init ];
@@ -451,7 +451,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 
 @implementation ArcHaltonRandomGenerator
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -460,7 +460,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             ];
 }
 
-- init
+- (id) init
         : (unsigned int) newMaxNumberOfSamples
 {
     return
@@ -470,7 +470,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
         : (unsigned int) newMaxNumberOfSamples
 {
@@ -620,7 +620,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 
 @implementation ArcGaussianRandomGenerator
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -628,7 +628,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
 {
     self = [ super init ];
@@ -761,7 +761,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 
 @implementation ArcEfficientRandomGenerator
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -769,7 +769,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             :   ARCEFFICIENTRANDOMGENERATOR_DEFAULTNETSIZE ];
 }
 
-- init
+- (id) init
         : (unsigned int) newTmsNetSize
 {
     return
@@ -778,7 +778,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             :   newTmsNetSize ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
         : (unsigned int) newTmsNetSize
 {
@@ -851,7 +851,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 
 // in case all sequences are used up, create some new ones.
 //  (called internally)
-- _createMoreSequencesSingle: (BOOL) moreSingle
+- (id) _createMoreSequencesSingle: (BOOL) moreSingle
                       Double: (BOOL) moreDouble
 {
     if (moreSingle){
@@ -1066,7 +1066,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     Before, we reset indices. This ensures that we can make sub-images
     with the same noise pattern!
 </p> */
-- _shuffleIndices
+- (id) _shuffleIndices
 {
   for (UInt32 i=0; i<size1; ++i) {
     for (UInt32 j=0; j<tmsNetSize; ++j) state1[i].shuffledIndices[j]=j;

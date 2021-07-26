@@ -37,7 +37,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcIntersection
 
-- init
+- (id) init
 {
     self = [ super init ];
 

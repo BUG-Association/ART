@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnShearXY3D registerWithRuntime ];
     [ ArnShearYZ3D registerWithRuntime ];
     [ ArnShearZX3D registerWithRuntime ];
@@ -48,7 +49,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearXY3D)
 
-- init
+- (id) init
 {
     self = [ super init ];
     
@@ -60,7 +61,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearXY3D)
     return self;
 }
 
-- init
+- (id) init
         : (ShearXY3D) newShear
 {
     self = [ super init ];
@@ -73,7 +74,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearXY3D)
     return self;
 }
 
-- initFrom
+- (id) initFrom
         : (const ShearXY3D *) newShear
 {
     self = [ super init ];
@@ -86,7 +87,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearXY3D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnShearXY3D  * copiedInstance = [ super copy ];
 
@@ -95,7 +96,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearXY3D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnShearXY3D  * copiedInstance =
@@ -273,7 +274,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearXY3D)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearYZ3D)
 
-- init
+- (id) init
 {
     self = [ super init ];
 
@@ -285,7 +286,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearYZ3D)
     return self;
 }
 
-- init
+- (id) init
         : (ShearYZ3D) newShear
 {
     self = [ super init ];
@@ -298,7 +299,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearYZ3D)
     return self;
 }
 
-- initFrom
+- (id) initFrom
         : (const ShearYZ3D *) newShear
 {
     self = [ super init ];
@@ -311,7 +312,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearYZ3D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnShearYZ3D  * copiedInstance = [ super copy ];
 
@@ -320,7 +321,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearYZ3D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnShearYZ3D  * copiedInstance =
@@ -498,7 +499,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearYZ3D)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearZX3D)
 
-- init
+- (id) init
 {
     self = [ super init ];
     
@@ -510,7 +511,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearZX3D)
     return self;
 }
 
-- init
+- (id) init
         : (ShearZX3D) newShear
 {
     self = [ super init ];
@@ -523,7 +524,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearZX3D)
     return self;
 }
 
-- initFrom
+- (id) initFrom
         : (const ShearZX3D *) newShear
 {
     self = [ super init ];
@@ -536,7 +537,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearZX3D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnShearZX3D  * copiedInstance = [ super copy ];
 
@@ -545,7 +546,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnShearZX3D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnShearZX3D  * copiedInstance =

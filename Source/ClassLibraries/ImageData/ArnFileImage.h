@@ -49,16 +49,16 @@ ArnFileImageAction;
     char                   * fileName;
 }
 
-- init
+- (id) init
         : (const char *) newFileName
         ;
 
-- init
+- (id) init
         : (const char *) newFileName
         : (ArnImageInfo *) newImageInfo
         ;
 
-- init
+- (id) init
         : (const char *) newFileName
         : (Class) instanceOf
         : (ArnImageInfo *) newImageInfo

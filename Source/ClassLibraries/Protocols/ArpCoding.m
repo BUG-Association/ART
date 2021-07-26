@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     RUNTIME_REGISTER_PROTOCOL(ArpCoding);
 )
 
@@ -118,7 +119,7 @@ void arpcoder_##__type ( \
         __Type         * c \
         ) \
 { \
-    ArSymbol  colourspaceName;  \
+    (void) art_gv;\
 \
     [ coder codeDouble: & C3_CI(c->c,0) ]; \
     [ coder codeDouble: & C3_CI(c->c,1) ]; \
@@ -179,6 +180,8 @@ void arpcoder_arpsspectrum(
         ArPSSpectrum   * pss
         )
 {
+    (void) art_gv;
+    
     [ coder codeTableBegin: "psspectrum" : & ARPSS_SIZE(*pss) ];
     [ coder codeDouble: & ARPSS_SCALE(*pss) ];
 
@@ -199,6 +202,8 @@ void arpcoder_arrsspectrum(
         ArRSSpectrum   * rss
         )
 {
+    (void) art_gv;
+    
     [ coder codeTableBegin: "rsspectrum" : & ARRSS_SIZE(*rss) ];
     [ coder codeDouble: & ARRSS_START(*rss) ];
     [ coder codeDouble: & ARRSS_STEP(*rss) ];
@@ -219,6 +224,8 @@ void arpcoder_arrsspectrum2d(
         ArRSSpectrum2D  * rss2d
         )
 {
+    (void) art_gv;
+    
     [ coder codeTableBegin: "rsspectrum2d" : & rss2d->size ];
     [ coder codeLong:  & rss2d->stride ];
     [ coder codeDouble: & rss2d->excitation_start ];

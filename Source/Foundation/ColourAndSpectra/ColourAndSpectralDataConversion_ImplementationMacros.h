@@ -61,6 +61,8 @@ void _type##_to_##_type( \
               Ar##_Type  * cr  \
         ) \
 { \
+    (void) art_gv; \
+\
     CC_START_DEBUGPRINTF( _type##_to_##_type ) \
     CC_OPERAND_DEBUGPRINTF( _type, c0 ) \
     CC_OPERAND_DEBUGPRINTF( _type, cr ) \
@@ -76,6 +78,8 @@ void _type0##_to_##_type1( \
               Ar##_Type1  * cr  \
         ) \
 { \
+   (void) art_gv; \
+\
     CC_START_DEBUGPRINTF( _type0##_to_##_type1 ) \
     CC_OPERAND_DEBUGPRINTF( _type0, c0 ) \
     (*cr) = AR##_TYPE1##_OF_AR##_TYPE0(*c0); \

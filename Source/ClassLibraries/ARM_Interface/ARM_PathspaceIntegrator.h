@@ -37,7 +37,7 @@ ART_MODULE_INTERFACE(ARM_PathspaceIntegrator)
 
 @interface ArnFirstHitNormalShadingTracer ( ARM_Interface )
 
-- rayCaster
+- (id) rayCaster
                         : (ArNode <ArpRayCaster> *) newRayCaster
         ;
 
@@ -65,7 +65,7 @@ ART_MODULE_INTERFACE(ARM_PathspaceIntegrator)
  * @param rayCaster         RayCaster       The raycaster to use.
  * @param maximalRecursion  int             The maxmium bounces of the path before terminating.
  */
-- rayCaster
+- (id) rayCaster
                         : (ArNode <ArpRayCaster> *) newRayCaster
         maximalRecursion: (unsigned int) newMaximalRecursion
         ;
@@ -78,7 +78,7 @@ ART_MODULE_INTERFACE(ARM_PathspaceIntegrator)
  * @param maximalRecursion  int             The maxmium bounces of the path before terminating.
  * @param mode              PathTracerMode  The sampling mode to use.
  */
-- rayCaster
+- (id) rayCaster
                         : (ArNode <ArpRayCaster> *) newRayCaster
         maximalRecursion: (unsigned int) newMaximalRecursion
         mode            : (ArPathTracerMode) newMode
@@ -93,7 +93,7 @@ ART_MODULE_INTERFACE(ARM_PathspaceIntegrator)
  * @param mode              PathTracerMode          The sampling mode to use.
  * @param distanceTracking  DistanceTrackingMode    The distance tracking mode, defines the technique that should be used to sample scattering events in mediums.
  */
-- rayCaster
+- (id) rayCaster
                         : (ArNode <ArpRayCaster> *) newRayCaster
         maximalRecursion: (unsigned int) newMaximalRecursion
         mode            : (ArPathTracerMode) newMode
@@ -107,7 +107,7 @@ ART_MODULE_INTERFACE(ARM_PathspaceIntegrator)
 
 @interface ArnSimplePathTracer : ArnPathTracer
 
-- rayCaster
+- (id) rayCaster
                         : (ArNode <ArpRayCaster> *) newRayCaster
         maximalRecursion: (unsigned int) newMaximalRecursion
         ;

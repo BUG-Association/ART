@@ -43,11 +43,11 @@ ART_MODULE_INTERFACE(ArnShearXYZ3D)
     ShearXY3D  shear;
 }
 
-- init
+- (id) init
         : (ShearXY3D) newShear
         ;
 
-- initFrom
+- (id) initFrom
         : (const ShearXY3D *) newShear
         ;
 
@@ -64,11 +64,11 @@ ART_MODULE_INTERFACE(ArnShearXYZ3D)
     ShearYZ3D  shear;
 }
 
-- init
+- (id) init
         : (ShearYZ3D) newShear
         ;
 
-- initFrom
+- (id) initFrom
         : (const ShearYZ3D *) newShear
         ;
 
@@ -85,11 +85,11 @@ ART_MODULE_INTERFACE(ArnShearXYZ3D)
     ShearZX3D  shear;
 }
 
-- init
+- (id) init
         : (ShearZX3D) newShear
         ;
 
-- initFrom
+- (id) initFrom
         : (const ShearZX3D *) newShear
         ;
 

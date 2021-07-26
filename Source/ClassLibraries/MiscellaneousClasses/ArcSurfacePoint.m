@@ -36,7 +36,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcSurfacePoint
 
-- init
+- (id) init
 {
     self = [ super init ];
 

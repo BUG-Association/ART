@@ -38,6 +38,8 @@ void xyy_c_debugprintf(
         const ArCIExyY  * c0
         )
 {
+    (void) art_gv;
+    
     printf(
         "CIE xyY ( % 5.3f, % 5.3f, % 5.3f )\n",
         ARCIExyY_x(*c0),

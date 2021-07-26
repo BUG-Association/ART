@@ -113,7 +113,7 @@ ArSpectrum const * art_absorptionCoefficient(
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHNSVolumeMaterial)
 ARPVOLUME_MATERIAL_CLOSED_FORM_ONLY_IMPLEMENTATION
 
-- copy
+- (id) copy
 {
     ArnHNSVolumeMaterial  * copiedInstance = [ super copy ];
 
@@ -122,7 +122,7 @@ ARPVOLUME_MATERIAL_CLOSED_FORM_ONLY_IMPLEMENTATION
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnHNSVolumeMaterial  * copiedInstance =
@@ -184,7 +184,7 @@ ARPVOLUME_MATERIAL_CLOSED_FORM_ONLY_IMPLEMENTATION
     [ self _precomputeMaterial ];
 }
 
-- init
+- (id) init
         : (ArNode <ArpSpectrum> *) newIOR
         : (ArNode <ArpSpectrum> *) newExtinction
 {

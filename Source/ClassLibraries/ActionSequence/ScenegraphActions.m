@@ -38,6 +38,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnNOPAction               registerWithRuntime ];
     [ ArnRemoveExternalsAction   registerWithRuntime ];
     [ ArnReadExtraDataAction     registerWithRuntime ];
@@ -81,7 +82,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNOPAction)
 \
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(_class) \
 \
-- init \
+- (id) init \
 { \
     self = \
         [ super init \
@@ -215,7 +216,7 @@ ARNODEACTION_CLASS_IMPLEMENTATION(
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnEnlargeBBoxesAction)
 
-- init
+- (id) init
         : (double) newBBoxEpsilon
 {
     self = [super init :arsymbol(art_gv,"enlarging bounding boxes")];
@@ -260,7 +261,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnEnlargeBBoxesAction)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSaveScenegraphAction)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnSaveScenegraphAction)
 
-- init
+- (id) init
         : (const char *) newFileName
 {
     self = [ super init ];
@@ -312,7 +313,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSaveScenegraphAction)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSetISRAction)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetISRAction)
 
-- init
+- (id) init
         : (ArDataType) newISR
 {
     self = [ super init ];
@@ -484,7 +485,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCollectLeafNodeBBoxesAction)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnCreateBSPTreeAction)
 
-- init
+- (id) init
 {
     self = [ super init ];
 

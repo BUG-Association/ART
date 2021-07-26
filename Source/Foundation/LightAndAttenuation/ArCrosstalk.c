@@ -104,6 +104,8 @@ void arcrosstalk_free(
               ArCrosstalk  * xr
         )
 {
+    (void) art_gv;
+    
     FREE(xr->c);
     FREE(xr);
 }
@@ -112,6 +114,8 @@ ArCrosstalk const * arcrosstalk_none(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0;
@@ -207,7 +211,9 @@ double arcrosstalk_x_norm(
         const ArCrosstalk  * x0
         )
 {
-    ASSERT_VALID_CROSSTALK( x0 )
+    (void) art_gv;
+    (void) x0;
+//    ASSERT_VALID_CROSSTALK( x0 )
 
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 

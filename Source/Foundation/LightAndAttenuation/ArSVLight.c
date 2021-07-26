@@ -156,6 +156,8 @@ const char * arsvlight_lct_string(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     return "Stokes vector light";
 }
 
@@ -346,6 +348,8 @@ unsigned int  arsvlight_l_polarised(
         const ArSVLight  * l0
         )
 {
+    (void) art_gv;
+    
     return ARSVLIGHT_POLARISED( *l0 );
 }
 
@@ -354,6 +358,8 @@ ArReferenceFrame const * arsvlight_l_refframe(
         const ArSVLight  * l0
         )
 {
+    (void) art_gv;
+    
     if ( ARSVLIGHT_POLARISED( *l0 ) )
         return & ARSVLIGHT_REFFRAME( *l0 );
     else

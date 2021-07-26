@@ -116,6 +116,8 @@ void arsvlightsample_li_sv(
               ArStokesVectorSample  * sr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_SV_LIGHT_SAMPLE(l0);
     ASSERT_ALLOCATED_STOKES_VECTOR(sr);
 
@@ -144,6 +146,11 @@ void arsvlightsample_svi_set_l(
               ArSVLightSample       * l0
         )
 {
+    (void) art_gv;
+    (void) sr;
+    (void) i0;
+    (void) l0;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -151,6 +158,8 @@ const char * arsvlightsample_lct_string(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     return "Stokes vector light";
 }
 
@@ -158,6 +167,8 @@ ArSVLightSample * arsvlightsample_alloc(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ArSVLightSample  * newSVLight = ALLOC( ArSVLightSample );
 
     return newSVLight;
@@ -168,6 +179,8 @@ void arsvlightsample_free(
               ArSVLightSample  * lr
         )
 {
+    (void) art_gv;
+    
     FREE(lr);
 }
 
@@ -333,6 +346,8 @@ unsigned int  arsvlightsample_l_polarised(
         const ArSVLightSample  * l0
         )
 {
+    (void) art_gv;
+    
     return ARSVLIGHTSAMPLE_POLARISED( *l0 );
 }
 
@@ -341,6 +356,8 @@ ArReferenceFrame const * arsvlightsample_l_refframe(
         const ArSVLightSample  * l0
         )
 {
+    (void) art_gv;
+    
     if ( ARSVLIGHTSAMPLE_POLARISED( *l0 ) )
         return & ARSVLIGHTSAMPLE_REFFRAME( *l0 );
     else

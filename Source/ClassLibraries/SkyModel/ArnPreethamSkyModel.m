@@ -370,7 +370,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPreethamSkyModel)
     [ self _setup ];
 }
 
-- init
+- (id) init
         : (double) newElevation
         : (double) newAzimuth
         : (double) newTurbidity

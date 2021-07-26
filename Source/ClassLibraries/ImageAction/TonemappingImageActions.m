@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnExponentialToneMapper            registerWithRuntime ];
     [ ArnInteractiveCalibrationToneMapper registerWithRuntime ];
 )
@@ -47,7 +48,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExponentialToneMapper)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
 
-- mappingValue
+- (id) mappingValue
         : (double) newMappingValue
 {
     return
@@ -56,7 +57,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
             ];
 }
 
-- init
+- (id) init
         : (double) newMappingValue
 {
     self =
@@ -72,7 +73,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
     return self;
 }
 
-- init
+- (id) init
 {
     return
         [ self init
@@ -348,7 +349,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnScaleToUnityToneMapper)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnInteractiveCalibrationToneMapper)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationToneMapper)
 
-- aperture
+- (id) aperture
                 : (double) newAperture
         contrast: (double) newContrast
 {
@@ -362,7 +363,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
             ];
 }
 
-- a
+- (id) a
          : (double) newA
         b: (double) newB
 {
@@ -376,7 +377,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
             ];
 }
 
-- init
+- (id) init
         : (double) newAperture
         : (double) newContrast
         : (BOOL) newPredefined_AB
@@ -401,7 +402,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
 }
 
 
-- init
+- (id) init
 {
     self =
         [ self init
@@ -679,7 +680,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMonochromeInteractiveCalibrationToneMapper)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnMonochromeInteractiveCalibrationToneMapper)
 
-- aperture
+- (id) aperture
                   : (double) newAperture
         wavelength: (double) newWavelength
 {

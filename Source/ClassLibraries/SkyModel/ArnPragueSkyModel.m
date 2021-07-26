@@ -125,7 +125,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPragueSkyModel)
     return self;
 }
 
-- init
+- (id) init
         : (double) newElevation
         : (double) newAzimuth
         : (double) newTurbidity

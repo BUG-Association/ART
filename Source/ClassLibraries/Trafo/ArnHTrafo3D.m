@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnHTrafo3D registerWithRuntime ];
 )
 
@@ -55,7 +56,7 @@ ArnHTrafo3D * create_arnhtrafo3d(
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHTrafo3D)
 
-- init
+- (id) init
 {
     self = [ super init ];
 
@@ -68,7 +69,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHTrafo3D)
     return self;
 }
 
-- init
+- (id) init
         : (HTrafo3D) newForward
         : (HTrafo3D) newBackward
 {
@@ -83,7 +84,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHTrafo3D)
     return self;
 }
 
-- initFrom
+- (id) initFrom
         : (const HTrafo3D *) newForward
         : (const HTrafo3D *) newBackward
 {
@@ -98,7 +99,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHTrafo3D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnHTrafo3D  * copiedInstance = [ super copy ];
 
@@ -108,7 +109,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHTrafo3D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnHTrafo3D  * copiedInstance =

@@ -81,7 +81,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcEvaluationEnvironment
 
-- init
+- (id) init
 {
     self = [ super init ];
     
@@ -100,7 +100,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         );
 }
 
-- copy
+- (id) copy
 {
     ArcEvaluationEnvironment  * copiedInstance = [ super copy ];
 

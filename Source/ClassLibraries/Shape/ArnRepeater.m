@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnRepeater registerWithRuntime ];
 )
 
@@ -48,7 +49,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     ready = 0;
 }
 
-- init
+- (id) init
         : (ArNode *) newRepNode
         : (Vec3D) newShift
         : (unsigned int) newRepeat
@@ -65,7 +66,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnRepeater  * copiedInstance = [ super copy ];
 
@@ -81,7 +82,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnRepeater  * copiedInstance =

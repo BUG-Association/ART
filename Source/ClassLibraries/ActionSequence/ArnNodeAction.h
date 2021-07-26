@@ -36,7 +36,7 @@ ART_MODULE_INTERFACE(ArnNodeAction)
     ArSymbol  message;
 }
 
-- init
+- (id) init
         : (ArSymbol) newMessage
         ;
 

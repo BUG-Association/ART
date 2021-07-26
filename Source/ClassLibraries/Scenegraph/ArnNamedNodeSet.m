@@ -35,6 +35,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnNamedNodeSet registerWithRuntime ];
 )
 
@@ -62,7 +63,7 @@ unsigned int artable_get_nn_with_key(
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNamedNodeSet)
 
-- init
+- (id) init
 {
     self = [ super init ];
 
@@ -74,7 +75,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNamedNodeSet)
     return self;
 }
 
-- init
+- (id) init
         : (ArTable) newNamedNodeTable
 {
     self = [ super init ];
@@ -87,7 +88,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNamedNodeSet)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnNamedNodeSet  * copiedInstance = [ super copy ];
 
@@ -101,7 +102,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNamedNodeSet)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArNode  * nodeRefStore;

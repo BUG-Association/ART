@@ -213,7 +213,7 @@ ArcPhaseInterfaceType;
 }
 
 
-- init
+- (id) init
         : (ArNode <ArpVolumeMaterial> *) fromMaterial
         : (ArNode <ArpVolumeMaterial> *) intoMaterial
         ;

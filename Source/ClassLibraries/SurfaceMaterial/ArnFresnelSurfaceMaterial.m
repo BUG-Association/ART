@@ -34,6 +34,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnFresnelSurfaceMaterial  registerWithRuntime ];
 )
 
@@ -49,7 +50,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFresnelSurfaceMaterial)
 ARPSURFACEMATERIAL_DEFAULT_NONDIFFUSE_NONEMISSIVE_IMPLEMENTATION
 ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_PRESERVING_IMPLEMENTATION
 
-- copy
+- (id) copy
 {
     ArnFresnelSurfaceMaterial  * copiedInstance = [ super copy ];
 
@@ -58,7 +59,7 @@ ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_PRESERVING_IMPLEMENTATION
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnFresnelSurfaceMaterial  * copiedInstance =
@@ -88,6 +89,8 @@ ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_PRESERVING_IMPLEMENTATION
         : (ArcSurfacePoint *) location
         : (UInt32 *) hash
 {
+    (void) hash;
+    
     if ( ARCPHASEINTERFACE_HAS_REALVALUED_IOR(*ARCSURFACEPOINT_PHASEINTERFACE(location) ) )
         return arsurface_generates_perfectly_specular_reflections
                | arsurface_generates_perfectly_specular_refractions;
@@ -98,6 +101,7 @@ ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_PRESERVING_IMPLEMENTATION
 - (void) finishSurface
     : (ArcSurfacePoint *) location
 {
+    (void) location;
 }
 
 - (BOOL) calculateBidirectionalAttenuationSample
@@ -111,6 +115,10 @@ ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_PRESERVING_IMPLEMENTATION
         : (      ArPDFValue *) reverseSampleProbability
         : (      ArAttenuationSample *) attenuationSample
 {
+    (void) context;
+    (void) incomingWavelength;
+    (void) outgoingWavelength;
+    
     /* ------------------------------------------------------------------
         The BRDF for a perfect mirror is a Dirac pulse in the mirror
         direction. Since the probability of hitting *exactly* this
@@ -316,7 +324,7 @@ ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_PRESERVING_IMPLEMENTATION
             ];
 }
 
-- init
+- (id) init
 {
     self =
         [ super init

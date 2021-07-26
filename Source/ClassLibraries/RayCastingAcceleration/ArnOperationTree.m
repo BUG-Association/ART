@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnOperationTree registerWithRuntime ];
 )
 
@@ -40,7 +41,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnOperationTree)
 
-- init
+- (id) init
 {
     self = [ super init ];
 
@@ -65,7 +66,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnOperationTree)
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnOperationTree  * copiedInstance = [ super copy ];
 
@@ -74,7 +75,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnOperationTree)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnOperationTree  * copiedInstance =

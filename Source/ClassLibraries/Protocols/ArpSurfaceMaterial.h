@@ -393,6 +393,10 @@ ArBSDFSamplingConstraint;
         : (ArDirectionCosine *) emissionDirection \
         : (ArPDFValue *) sampleProbability \
 { \
+    (void) emissionLocation; \
+    (void) context; \
+    (void) emissionDirection; \
+    (void) sampleProbability; \
 }
 
 #define ARPSURFACEMATERIAL_DEFAULT_NONDIFFUSE_NONEMISSIVE_IMPLEMENTATION \
@@ -416,6 +420,13 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (      ArWavelength *) sampledWavelength \
         : (      ArPDFValue *) shiftProbability \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) sampledWavelength; \
+    (void) shiftProbability; \
+    \
     return NO; \
 } \
  \
@@ -427,6 +438,13 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (const ArWavelength *) outgoingWavelength \
         : (      ArPDFValue *) shiftProbability \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) outgoingWavelength; \
+    (void) shiftProbability; \
+    \
     return NO; \
 } \
  \
@@ -441,6 +459,8 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (ArPDFValue *) reverseSampleProbability \
         : (ArAttenuationSample *) attenuation \
 { \
+    (void) incomingWavelength; \
+    \
     if(sampleProbability) *sampleProbability = ARPDFVALUE_ZERO; \
     if(reverseSampleProbability) *reverseSampleProbability = ARPDFVALUE_ZERO; \
 \
@@ -466,6 +486,16 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (      ArPDFValue *) reverseSampleProbability \
         : (      ArAttenuationSample *) attenuationSample \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) sampledWavelength; \
+    (void) sampledDirection; \
+    (void) sampleProbability; \
+    (void) reverseSampleProbability; \
+    (void) attenuationSample; \
+    \
     return NO; \
 } \
 \
@@ -483,6 +513,19 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (      ArPDFValue *) alternateReverseSampleProbability \
         : (      ArAttenuationSample *) attenuationSample \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) constraint; \
+    (void) sampledWavelength; \
+    (void) sampledDirection; \
+    (void) sampleProbability; \
+    (void) reverseSampleProbability; \
+    (void) alternateSampleProbability; \
+    (void) alternateReverseSampleProbability; \
+    (void) attenuationSample; \
+    \
     return NO; \
 } \
 \
@@ -546,6 +589,10 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (      ArWavelength *) sampledWavelength \
         : (      ArPDFValue *) shiftProbability \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    \
     *sampledWavelength = *incomingWavelength; \
     *shiftProbability = ARPDFVALUE_UNIT_DIRAC; \
     \

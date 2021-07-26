@@ -103,7 +103,7 @@ int compute_pp_coefs_from_float(const int nbreaks, const double * breaks, const 
 }
 
 void printErrorAndExit(const char * message) {
-	fprintf(stderr, message);
+    fprintf(stderr, "%s", message);
 	fprintf(stderr, "\n");
 	fflush(stderr);
 	exit(-1);

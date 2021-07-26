@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnShape registerWithRuntime ];
     [ ArnParameterShape registerWithRuntime ];
 )
@@ -46,7 +47,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
 
-- init
+- (id) init
         : (ArShapeGeometry) newGeometry
 {
     self = [ super init ];
@@ -59,7 +60,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnShape  * copiedInstance = [ super copy ];
 
@@ -68,7 +69,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnShape)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnShape  * copiedInstance =
@@ -277,7 +278,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnParameterShape)
 
-- init
+- (id) init
         : (ArShapeGeometry) newGeometry
         : (double) newParameter
 {
@@ -292,7 +293,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnParameterShape)
 }
 
 
-- copy
+- (id) copy
 {
     ArnParameterShape  * copiedInstance = [ super copy ];
 
@@ -301,7 +302,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnParameterShape)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnParameterShape  * copiedInstance =

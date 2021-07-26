@@ -94,7 +94,7 @@ ART_MODULE_INTERFACE(ArnStochasticSamplerVerticalMirror)
     ArSequenceID    startingSequenceID;
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> * ) newRaySampler
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples

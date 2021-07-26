@@ -35,7 +35,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcPointContext
 
-- init
+- (id) init
 {
     self = [ super init ];
 

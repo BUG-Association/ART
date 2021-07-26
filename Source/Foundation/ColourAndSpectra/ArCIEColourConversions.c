@@ -117,6 +117,8 @@ void xyz_mat_to_xyz(
               ArCIEXYZ  * xyz_r
         )
 {
+   (void) art_gv;
+    
     c3_cm_mul_c(
         & ARCIEXYZ_C(*xyz_0),
           mat_0,
@@ -131,6 +133,8 @@ void xyz_mat_to_rgb(
               ArRGB     * rgb_r
         )
 {
+   (void) art_gv;
+    
     c3_cm_mul_c(
         & ARCIEXYZ_C(*xyz_0),
           mat_0,
@@ -145,6 +149,8 @@ void rgb_mat_to_xyz(
               ArCIEXYZ  * xyz_r
         )
 {
+    (void) art_gv;
+    
     c3_cm_mul_c(
         & ARRGB_C(*rgb_0),
           mat_0,
@@ -461,6 +467,9 @@ void lab_conversion_to_rgb(
               ArRGB                 * rgb_r
         )
 {
+    (void) art_gv;
+    (void) rgb_colourspace_ref;
+    
     CC_START_DEBUGPRINTF( lab_conversion_to_rgb )
     ArCIELab  labValue = *lab_0;
 
@@ -494,6 +503,8 @@ void xyy_to_xyz(
               ArCIEXYZ  * xyz_r
         )
 {
+    (void) art_gv;
+    
     CC_START_DEBUGPRINTF( xyy_to_xyz )
     double Yy = ARCIExyY_Y(*xyy_0) / ARCIExyY_y(*xyy_0);
 
@@ -512,6 +523,8 @@ void xyz_to_xyy(
               ArCIExyY  * xyy_r
         )
 {
+    (void) art_gv;
+    
     CC_START_DEBUGPRINTF( xyz_to_xyy )
     double xyz =   ARCIEXYZ_X(*xyz_0)
                  + ARCIEXYZ_Y(*xyz_0)
@@ -543,6 +556,8 @@ void lab_wp_to_xyz(
               ArCIEXYZ  * xyz_r
         )
 {
+    (void) art_gv;
+    
     CC_START_DEBUGPRINTF( lab_wp_to_xyz )
     double f_Y = ( ARCIELab_L(*lab_0) + 16.0 ) / 116.0;
     double f_X = f_Y + ARCIELab_a(*lab_0) / 500.0;
@@ -597,6 +612,8 @@ void xyz_wp_to_lab(
               ArCIELab  * lab_r
         )
 {
+    (void) art_gv;
+    
     CC_START_DEBUGPRINTF( xyz_wp_to_lab )
     
     if ( ARCIEXYZ_Y(*xyz_0) > 0. )
@@ -642,6 +659,8 @@ double luv_u_prime_from_xyz(
         const ArCIEXYZ  * xyz_0
         )
 {
+    (void) art_gv;
+    
     double  result = 0.;
     
     if ( ARCIEXYZ_Y(*xyz_0) > 0. )
@@ -661,6 +680,8 @@ double luv_v_prime_from_xyz(
         const ArCIEXYZ  * xyz_0
         )
 {
+    (void) art_gv;
+    
     double  result = 0.;
     
     if ( ARCIEXYZ_Y(*xyz_0) > 0. )

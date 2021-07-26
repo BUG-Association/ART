@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnBasicImageInfo registerWithRuntime ];
 )
 
@@ -44,13 +45,13 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBasicImageInfo)
 
-- init
+- (id) init
         : (IVec2D) newSize
 {
     return [self init :newSize :ardt_unknown];
 }
 
-- init
+- (id) init
         : (IVec2D) newSize
         : (unsigned int) newDataType
 {
@@ -65,7 +66,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBasicImageInfo)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnBasicImageInfo * copiedInstance = [ super copy ];
 
@@ -74,7 +75,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBasicImageInfo)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnBasicImageInfo * copiedInstance =
@@ -118,7 +119,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBasicImageInfo)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageInfo)
 
-- init
+- (id) init
         : (IVec2D) newSize
         : (unsigned int) newDataType
 {
@@ -135,7 +136,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageInfo)
     return self;
 }
 
-- init
+- (id) init
         : (IVec2D) newSize
         : (ArDataType) newDataType
         : (ArDataType) newFileDataType
@@ -154,7 +155,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageInfo)
     return self;
 }
 
-- init
+- (id) init
         : (IVec2D) newSize
         : (ArDataType) newDataType
         : (ArDataType) newFileDataType
@@ -174,7 +175,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageInfo)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnImageInfo * copiedInstance = [ super copy ];
 
@@ -183,7 +184,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageInfo)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnImageInfo * copiedInstance =

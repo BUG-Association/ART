@@ -93,7 +93,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
         return arfiletypematch_impossible;
 }
 
-- initWithFile: (ArcFile *) newFile
+- (id) initWithFile: (ArcFile *) newFile
 {
     file = newFile;
     return self;

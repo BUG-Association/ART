@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnRayCaster registerWithRuntime ];
 )
 
@@ -90,7 +91,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRayCaster)
     activeNodes = NULL;
 }
 
-- init
+- (id) init
         : (double) newHitEps
         : (unsigned int) newOptions
 {
@@ -107,7 +108,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRayCaster)
     return self;
 }
 
-- init
+- (id) init
         : (double) newHitEps
 {
     self = [ super init ];
@@ -162,7 +163,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRayCaster)
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnRayCaster  * copiedInstance = [ super copy ];
 
@@ -194,7 +195,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRayCaster)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnRayCaster  * copiedInstance =

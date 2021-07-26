@@ -74,7 +74,7 @@ ArSkydomeLightsourcePatch;
     HTrafo3D                     world2skydome;
 }
 
-- init
+- (id) init
         : (ArNode <ArpShape> *) shapeRef
         : (ArTraversalState *) traversalState
         : (ArnLightsourceCollector *) lightsourceCollector

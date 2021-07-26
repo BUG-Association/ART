@@ -38,6 +38,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnImageSamplerRGBA registerWithRuntime ];
 )
 
@@ -54,7 +55,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegratorRGBA> * ) newPathspaceIntegrator
 {
     self =
@@ -68,7 +69,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
     return  self;
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegratorRGBA> * ) newPathspaceIntegrator
         : (unsigned int) newNumberOfSamplesPerPixel
 {
@@ -90,7 +91,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
     return  self;
 }
 
-- copy
+- (id) copy
 {
     ArnImageSamplerRGBA  * copiedInstance = [ super copy ];
 
@@ -99,7 +100,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnImageSamplerRGBA  * copiedInstance =

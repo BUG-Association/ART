@@ -67,12 +67,12 @@ ART_MODULE_INTERFACE(ArnDualImageManipulationAction)
     BOOL              hasDestinationImage;
 }
 
-- init
+- (id) init
         : (const char *) newOutputName
         : (const char *) newOutputTag
         ;
 
-- init
+- (id) init
         : (const char *) newOutputName
         : (const char *) newOutputTag
         : (ArNode *) newSubnode0

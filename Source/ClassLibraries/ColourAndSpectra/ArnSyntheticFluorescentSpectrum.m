@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSyntheticFluorescentSpectrum registerWithRuntime ];
 )
 
@@ -116,7 +117,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
 //    arcrosstalk_x_mathematicaprintf( art_gv, crosstalk );
 }
 
-- init
+- (id) init
         : (ArNodeRef) newMainDiagonal
         : (double) newCrosstalkMaximum
         : (Pnt2D) newCrosstalkCenter

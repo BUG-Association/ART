@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSurfaceMaterialConst          registerWithRuntime ];
     [ ArnColouredSurfaceMaterialConst  registerWithRuntime ];
     [ ArnParameterSurfaceMaterialConst registerWithRuntime ];
@@ -46,7 +47,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnSurfaceMaterialConst)
 
-- copy
+- (id) copy
 {
     ArnSurfaceMaterialConst  * copiedInstance = [ super copy ];
 
@@ -55,7 +56,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnSurfaceMaterialConst)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnSurfaceMaterialConst  * copiedInstance =
@@ -93,7 +94,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnColouredSurfaceMaterialConst)
         );
 }
 
-- init
+- (id) init
         : (ArNode *) newColour
 {
     self =
@@ -130,7 +131,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnColouredSurfaceMaterialConst)
 
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnParameterSurfaceMaterialConst)
 
-- init
+- (id) init
         : (ArNode *) newColour
         : (double) newParameter
 {

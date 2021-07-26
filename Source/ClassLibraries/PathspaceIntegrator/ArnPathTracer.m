@@ -35,6 +35,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnPathTracer registerWithRuntime ];
 )
 
@@ -176,7 +177,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     [ self _setupPathTracer ];
 }
 
-- init
+- (id) init
         : (ArNode <ArpRayCaster> *) newRayCaster
         : (unsigned int) newMaximalRecursion
         : (ArPathTracerMode) newMode
@@ -200,7 +201,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnPathTracer  * copiedInstance = [ super copy ];
     
@@ -211,7 +212,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnPathTracer  * copiedInstance =

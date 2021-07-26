@@ -42,6 +42,8 @@ const char * arplainlight_lct_string(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     return "plain light";
 }
 
@@ -52,6 +54,8 @@ void arplainlight_s_rf_init_polarised_l(
               ArPlainLight      * lr
         )
 {
+    (void) r0;
+    
     arplainlight_s_init_unpolarised_l(
         art_gv,
         ARSV_I( *s0, 0 ),
@@ -64,6 +68,9 @@ unsigned int arplainlight_l_polarised(
         const ArPlainLight  * l0
         )
 {
+    (void) art_gv;
+    (void) l0;
+    
     return 0;
 }
 
@@ -72,6 +79,9 @@ ArReferenceFrame const * arplainlight_l_refframe(
         const ArPlainLight  * l0
         )
 {
+    (void) art_gv;
+    (void) l0;
+    
     return 0;
 }
 
@@ -96,6 +106,9 @@ void arplainlight_ld_realign_to_coaxial_refframe_sv(
               ArStokesVector    * sr
         )
 {
+    (void) d0;
+    (void) r0;
+    
     arplainlight_l_to_sv(
         art_gv,
         l0,
@@ -109,6 +122,10 @@ void arplainlight_realign_to_coaxial_refframe_l(
               ArPlainLight      * lr
         )
 {
+    (void) art_gv;
+    (void) r0;
+    (void) lr;
+    
     //   This space intentionally left blank; this should really
     //   do nothing except leave 'lr' exactly as the way it is.
 }
@@ -120,6 +137,8 @@ void arplainlight_l_realign_to_coaxial_refframe_l(
               ArPlainLight      * lr
         )
 {
+    (void) r0;
+    
     arplainlight_l_init_l(
         art_gv,
         l0,
@@ -134,6 +153,8 @@ void arplainlight_dl_sloppy_add_l(
               ArPlainLight  * lr
         )
 {
+    (void) d0;
+    
     arplainlight_l_add_l(
           art_gv,
           l0,
@@ -149,6 +170,8 @@ void arplainlight_lld_sloppy_add_l(
               ArPlainLight  * lr
         )
 {
+    (void) d0;
+    
     arplainlight_ll_add_l(
           art_gv,
           l0,
@@ -165,6 +188,8 @@ void arplainlight_dld_mul_sloppy_add_l(
               ArPlainLight  * lr
         )
 {
+    (void) d1;
+    
     arplainlight_dl_mul_add_l(
           art_gv,
           d0,
@@ -274,6 +299,8 @@ void arplainlight_wsd_sloppy_add_l(
               ArPlainLight                   * lr
         )
 {
+    (void) d0;
+    
     //  For plain light, we ignore the angular tolerance
     //  specified in d0 - this is only checked for polarised light
 
@@ -323,6 +350,8 @@ void arplainlight_dwsd_mul_sloppy_add_l(
               ArPlainLight                   * lr
         )
 {
+    (void) d1;
+    
     //  For plain light, we ignore the angular tolerance
     //  specified in d1 - this is only checked for polarised light
 
@@ -373,6 +402,10 @@ unsigned int arplainlight_ll_collinear(
         const ArPlainLight  * l1
         )
 {
+    (void) art_gv;
+    (void) l0;
+    (void) l1;
+    
     return 1;
 }
 

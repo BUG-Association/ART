@@ -42,13 +42,13 @@ ART_MODULE_INTERFACE(ActionsForPolarisationImages)
     BOOL        cloneOption;
 }
 
-- angle
+- (id) angle
                    : (double) newAngle
         strength   : (double) newStrength
         cloneSource: (BOOL) newCloneOption
         ;
 
-- angle
+- (id) angle
                 : (double) newAngle
         strength: (double) newStrength
         ;
@@ -89,7 +89,7 @@ ArPolVisColour;
     double            wavelength;
 }
 
-- sv1
+- (id) sv1
            : (ArPolVisColour) newSC1Colour
         sv2: (ArPolVisColour) newSC2Colour
         sv3: (ArPolVisColour) newSC3Colour
@@ -103,7 +103,7 @@ ArPolVisColour;
         rms: (BOOL) newRemoveSource
         ;
 
-- init
+- (id) init
         : (ArPolVisColour) newSC1Colour
         : (ArPolVisColour) newSC2Colour
         : (ArPolVisColour) newSC3Colour

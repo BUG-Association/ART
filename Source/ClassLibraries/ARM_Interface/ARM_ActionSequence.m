@@ -38,7 +38,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnScene ( ARM_Interface )
 
-- object
+- (id) object
         :               (ArNode *) newWorld
         camera:         (ArNode <ArpCamera> *) newCamera
         actionSequence: (ArNode <ArpActionSequence> *) newActionSequence
@@ -59,7 +59,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- object
+- (id) object
         :               (ArNode *) newWorld
         skylight:       (ArNode <ArpSkyModel> *) newSkyModel
         camera:         (ArNode <ArpCamera> *) newCamera
@@ -82,7 +82,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- sceneGeometry
+- (id) sceneGeometry
         :               (ArNode *) sceneGeometry
         camera:         (ArNode <ArpCamera> *) newCamera
         actionSequence: (ArNode <ArpActionSequence> *) newActionSequence
@@ -97,7 +97,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- sceneGeometry
+- (id) sceneGeometry
         :               (ArNode *) sceneGeometry
         skyModel:       (ArNode <ArpSkyModel> *) newSkyModel
         camera:         (ArNode <ArpCamera> *) newCamera
@@ -120,7 +120,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- sceneGeometry
+- (id) sceneGeometry
         :                    (ArNode *) sceneGeometry
         environmentMaterial: (ArNode <ArpEnvironmentMaterial> *) newEnvironmentMaterial
         camera:              (ArNode <ArpCamera> *) newCamera
@@ -136,7 +136,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- sceneGeometry
+- (id) sceneGeometry
         :                    (ArNode *) sceneGeometry
         environmentMaterial: (ArNode <ArpEnvironmentMaterial> *) newEnvironmentMaterial
         worldVolumeMaterial: (ArNode <ArpVolumeMaterial> *) newWorldVolumeMaterial

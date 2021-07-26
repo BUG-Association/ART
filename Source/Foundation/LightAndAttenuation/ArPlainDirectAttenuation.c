@@ -42,6 +42,8 @@ const char * arplaindirectattenuation_act_string(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     return "plain attenuation";
 }
 
@@ -53,6 +55,11 @@ ArPlainDirectAttenuation *
         const ArReferenceFrame    * r1
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) r0;
+    (void) r1;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -69,6 +76,11 @@ ArPlainDirectAttenuation *
         const ArReferenceFrame    * r1
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) r0;
+    (void) r1;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -83,6 +95,10 @@ ArPlainDirectAttenuation * arplaindirectattenuation_rr_alloc_init_none(
         const ArReferenceFrame    * r1
         )
 {
+    (void) art_gv;
+    (void) r0;
+    (void) r1;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -97,6 +113,10 @@ ArPlainDirectAttenuation * arplaindirectattenuation_rr_alloc_init_total(
         const ArReferenceFrame    * r1
         )
 {
+    (void) art_gv;
+    (void) r0;
+    (void) r1;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -113,6 +133,12 @@ void arplaindirectattenuation_drr_init_depolarising_a(
               ArPlainDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) r0;
+    (void) r1;
+    (void) ar;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -127,6 +153,12 @@ void arplaindirectattenuation_drr_init_nonpolarising_a(
               ArPlainDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) r0;
+    (void) r1;
+    (void) ar;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -141,6 +173,12 @@ void arplaindirectattenuation_srr_init_depolarising_a(
               ArPlainDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) c0;
+    (void) r0;
+    (void) r1;
+    (void) ar;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -155,6 +193,12 @@ void arplaindirectattenuation_srr_init_nonpolarising_a(
               ArPlainDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) c0;
+    (void) r0;
+    (void) r1;
+    (void) ar;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -168,6 +212,11 @@ void arplaindirectattenuation_mm_rf_init_polarising_a(
               ArPlainDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) m0;
+    (void) r0;
+    (void) ar;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -182,6 +231,12 @@ void arplaindirectattenuation_mm_rr_init_polarising_a(
               ArPlainDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) m0;
+    (void) r0;
+    (void) r1;
+    (void) ar;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -197,6 +252,13 @@ void arplaindirectattenuation_ddrr_init_linear_polariser_a(
               ArPlainDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) d1;
+    (void) r0;
+    (void) r1;
+    (void) ar;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -208,6 +270,9 @@ unsigned int arplaindirectattenuation_a_polarising(
         const ArPlainDirectAttenuation  * a0
         )
 {
+    (void) art_gv;
+    (void) a0;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -221,6 +286,9 @@ ArReferenceFrame const * arplaindirectattenuation_a_entry_rf(
         const ArPlainDirectAttenuation  * a0
         )
 {
+    (void) art_gv;
+    (void) a0;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -234,6 +302,9 @@ ArReferenceFrame const * arplaindirectattenuation_a_exit_rf(
         const ArPlainDirectAttenuation  * a0
         )
 {
+    (void) art_gv;
+    (void) a0;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -248,6 +319,10 @@ void arplaindirectattenuation_a_to_mm(
               ArMuellerMatrix           * mm
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) mm;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -261,6 +336,11 @@ void arplaindirectattenuation_a_realign_to_coaxial_exit_rf_mm(
               ArMuellerMatrix           * mm
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) r0;
+    (void) mm;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -273,6 +353,10 @@ void arplaindirectattenuation_realign_to_coaxial_exit_rf_a(
               ArPlainDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) r0;
+    (void) ar;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -286,6 +370,11 @@ void arplaindirectattenuation_a_realign_to_coaxial_exit_rf_a(
               ArPlainDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) r0;
+    (void) ar;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "polarisation related functionality accessed for plain "
         "attenuation data"
@@ -320,6 +409,11 @@ void arplaindirectattenuation_ia_singleband_complement_from_one_a(
               ArPlainDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) i0;
+    (void) a0;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -331,6 +425,12 @@ void arplaindirectattenuation_dia_singleband_mul_copy_a(
               ArPlainDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) i0;
+    (void) a0;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -386,6 +486,12 @@ void arplaindirectattenuation_axl_mul_l(
               ArPlainLight        * lr
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) x0;
+    (void) l0;
+    (void) lr;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -396,6 +502,11 @@ void arplaindirectattenuation_ax_mul_i(
               ArLightIntensity    * lr
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) x0;
+    (void) lr;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -407,6 +518,12 @@ void arplaindirectattenuation_axi_mul_i(
               ArLightIntensity    * lr
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) x0;
+    (void) l0;
+    (void) lr;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 

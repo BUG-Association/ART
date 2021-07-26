@@ -46,7 +46,7 @@ ArBBoxCacheEntry;
 @implementation ArcBBoxCache
 
 
-- init
+- (id) init
         : (unsigned int) initialSize
 {
     self = [ super init ];
@@ -66,7 +66,7 @@ ArBBoxCacheEntry;
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArcBBoxCache  * copiedInstance = [ super copy ];
 

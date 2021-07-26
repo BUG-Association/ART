@@ -40,6 +40,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnImageSampler registerWithRuntime ];
 )
 
@@ -56,7 +57,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 
-- copy
+- (id) copy
 {
     ArnImageSampler  * copiedInstance = [ super copy ];
 
@@ -65,7 +66,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnImageSampler  * copiedInstance =

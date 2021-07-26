@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnPlainImage       registerWithRuntime ];
 
     [ ArnGreyImage        registerWithRuntime ];
@@ -98,7 +99,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     data = ALLOC_ARRAY(Ar##_Type, XC(size) * YC(size)); \
 } \
 \
-- initWithSize \
+- (id) initWithSize \
         :(IVec2D) newSize \
 { \
     self = \
@@ -125,7 +126,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 #define _ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(_class,_Type) \
 \
-- initAsCopyOf \
+- (id) initAsCopyOf \
         : (ArNode <ArpBasicImage> *) baseImage \
 { \
     self = [self initWithSize :[baseImage size]]; \
@@ -133,7 +134,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self; \
 } \
 \
-- initAsCopyOf \
+- (id) initAsCopyOf \
         : (ArNode <ArpBasicImage> *) baseImage \
         : (IPnt2D) newOffset \
         : (IVec2D) newSize \
@@ -143,14 +144,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self; \
 } \
 \
-- initAsPartOf \
+- (id) initAsPartOf \
         : (ArNode <ArpBasicImage> *) baseImage \
 { \
     self = [self initAsPartOf :baseImage :IPNT2D(0,0) :[baseImage size]]; \
     return self; \
 } \
 \
-- initAsPartOf \
+- (id) initAsPartOf \
         : (ArNode <ArpBasicImage> *) baseImage \
         : (IPnt2D) newOffset \
         : (IVec2D) newSize \
@@ -309,7 +310,7 @@ _ARPPLAINIMAGE_DEFAULT_MEMORY_IMPLEMENTATION(_class,_Type)
 
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnPlainImage)
 
-+ new
++ (id) new
         : (ART_GV *) new_art_gv
         : (IVec2D) s
         : (ArDataType) newSpectrumType
@@ -430,7 +431,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnPlainImage)
     return 0;
 }
 
-- init
+- (id) init
         : (ArNode <ArpBasicImage> *) baseImage
         : (IPnt2D) newOffset
         : (IVec2D) newSize
@@ -452,7 +453,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnPlainImage)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnPlainImage  * copiedInstance = [ super copy ];
 
@@ -461,7 +462,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnPlainImage)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnPlainImage  * copiedInstance =
@@ -833,7 +834,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLightAlphaImage)
     }
 }
 
-- initWithSize :(IVec2D) newSize
+- (id) initWithSize :(IVec2D) newSize
 {
     self =
         [ super init
@@ -857,7 +858,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLightAlphaImage)
 }
 
 
-- initAsCopyOf
+- (id) initAsCopyOf
         : (ArNode <ArpBasicImage> *) baseImage
 {
     self = [self initWithSize: [baseImage size]];
@@ -870,7 +871,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLightAlphaImage)
     return self;
 }
 
-- initAsCopyOf
+- (id) initAsCopyOf
         : (ArNode <ArpBasicImage> *) baseImage
         : (IPnt2D) newOffset
         : (IVec2D) newSize
@@ -885,7 +886,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLightAlphaImage)
     return self;
 }
 
-- initAsPartOf
+- (id) initAsPartOf
         : (ArNode <ArpBasicImage> *) baseImage
 {
     self = [self initAsPartOf :baseImage :IPNT2D(0,0) :[baseImage size]];
@@ -893,7 +894,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLightAlphaImage)
     return self;
 }
 
-- initAsPartOf
+- (id) initAsPartOf
         : (ArNode <ArpBasicImage> *) baseImage
         : (IPnt2D) newOffset
         : (IVec2D) newSize

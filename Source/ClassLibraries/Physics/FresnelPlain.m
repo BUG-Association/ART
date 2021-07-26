@@ -473,6 +473,17 @@ void fresnel_plain_reflective_attenuation_birefringent(
               double              ne_var
         )
 {
+#ifndef NEVERMORE
+    (void) art_gv;
+    (void) incomingDirectionAndLocation;
+    (void) attenuation_r_reflect;
+    (void) attenuation_r_refract_o;
+    (void) attenuation_r_refract_e;
+    (void) localCa;
+    (void) cos_e;
+    (void) ne_var;
+#endif
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 
 #ifdef NEVERMORE

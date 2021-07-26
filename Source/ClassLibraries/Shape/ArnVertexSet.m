@@ -30,6 +30,8 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
+ 
     [ ArnVertexSet registerWithRuntime ];
 )
 
@@ -397,7 +399,7 @@ ArnVertexSet * arncontrolvertexweightedset(
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVertexSet)
 
-- init
+- (id) init
         : (ArPnt3DArray) newPointTable
         : (ArPnt4DArray) newPnt4DTable
         : (ArFloatArray) newValueTable
@@ -418,7 +420,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVertexSet)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnVertexSet  * copiedInstance = [ super copy ];
 

@@ -45,7 +45,7 @@ ART_MODULE_INTERFACE(ArnRepeater)
     Box3D         bbox;
 }
 
-- init
+- (id) init
         : (ArNode *) newRepNode
         : (Vec3D) newShift
         : (unsigned int) newRepeat

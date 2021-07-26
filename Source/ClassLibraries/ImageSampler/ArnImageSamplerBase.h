@@ -74,7 +74,7 @@ ART_MODULE_INTERFACE(ArnImageSamplerBase)
     int                                 * x_end;
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (int) newNumberOfSamples

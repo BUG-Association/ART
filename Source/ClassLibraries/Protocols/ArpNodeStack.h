@@ -34,7 +34,7 @@ ART_MODULE_INTERFACE(ArpNodeStack)
 
 @protocol ArpNodeStack
 
-- init
+- (id) init
         : (const char *) newMasterOutputFilename
         ;
 

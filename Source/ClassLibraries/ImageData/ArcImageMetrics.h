@@ -57,7 +57,7 @@ ArcImageMetricsState;
     double adaptationLuminance;
 }
 
-- init
+- (id) init
         : (ArNode <ArpImageReader> *) newImage
         : (ArcObject <ArpReporter> *) newReporter
         ;

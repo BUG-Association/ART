@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ AraEnvironmentMaterial registerWithRuntime ];
 )
 
@@ -41,7 +42,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraEnvironmentMaterial)
 
-- init
+- (id) init
         : (ArNodeRef) newNode
         : (ArNodeRef) newEnvironmentMaterial
 {

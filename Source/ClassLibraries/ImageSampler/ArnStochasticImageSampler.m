@@ -34,6 +34,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnStochasticImageSampler registerWithRuntime ];
 )
 
@@ -56,7 +57,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSampler)
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> * ) newPathspaceIntegrator
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples
@@ -185,7 +186,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSampler)
     }
 }
 
-- copy
+- (id) copy
 {
     ArnStochasticImageSampler  * copiedInstance = [ super copy ];
 
@@ -194,7 +195,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSampler)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnStochasticImageSampler  * copiedInstance =

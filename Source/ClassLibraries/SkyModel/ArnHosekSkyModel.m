@@ -159,7 +159,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHosekSkyModel)
     return NO;
 }
 
-- init
+- (id) init
         : (double) newElevation
         : (double) newAzimuth
         : (double) newTurbidity

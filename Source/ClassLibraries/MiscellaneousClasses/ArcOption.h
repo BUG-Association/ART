@@ -148,7 +148,7 @@ ART_MODULE_INTERFACE(ArcOption)
 - (void) setNoWrite
         ;
 
-- init
+- (id) init
         : (const char *) newLongName
         : (const char *) newShortName
         : (const char *) newExplanation
@@ -190,7 +190,7 @@ ART_MODULE_INTERFACE(ArcOption)
 {
 }
 
-- init
+- (id) init
         : (const char *) newDescription
         ;
 
@@ -211,7 +211,7 @@ ART_MODULE_INTERFACE(ArcOption)
 
 // @private
 
-- init
+- (id) init
         : (const char *) newLongName
         : (const char *) newShortName
         : (const char *) newParameterName
@@ -240,7 +240,7 @@ ART_MODULE_INTERFACE(ArcOption)
                                         //  supplied as default parameter.
 }
 
-- init
+- (id) init
         : (const char *) newLongName
         : (const char *) newShortName
         : (const char *) newParameterName
@@ -264,7 +264,7 @@ ART_MODULE_INTERFACE(ArcOption)
     int   defaultValue;
 }
 
-- init
+- (id) init
         : (const char *) newLongName
         : (const char *) newShortName
         : (const char *) newParameterName
@@ -295,7 +295,7 @@ ART_MODULE_INTERFACE(ArcOption)
     double doubleValue;
 }
 
-- init
+- (id) init
         : (const char *) newLongName
         : (const char *) newShortName
         : (const char *) newParameterName

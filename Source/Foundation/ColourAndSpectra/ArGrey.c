@@ -86,6 +86,8 @@ void g_to_plusminus_rgb(
               ArRGB   * r_r
         )
 {
+    (void) art_gv;
+    
     double  d = ARGREY_G(*g_0);
 
     if ( d > 0. )
@@ -149,6 +151,9 @@ double g_sd_value_at_wavelength(
         const double    d_0
         )
 {
+    (void) art_gv;
+    (void) d_0;
+    
     return ARGREY_G(*g_0);
 }
 
@@ -159,6 +164,8 @@ void g_dd_clamp_s(
               ArGrey  * c_0
         )
 {
+    (void) art_gv;
+    
     m_dd_clamp_d( d_0, d_1, & ARGREY_G(*c_0) );
 }
 
@@ -167,6 +174,8 @@ void g_s_debugprintf(
         const ArGrey  * c_0
         )
 {
+    (void) art_gv;
+    
     if ( ARGREY_S(*c_0) )
         printf( "ArGrey( % 5.3f, %s )\n",
             ARGREY_G(*c_0),
@@ -207,6 +216,8 @@ void ga_s_debugprintf(
         const ArGreyAlpha  * c_0
         )
 {
+    (void) art_gv;
+    
     if ( ARGREYALPHA_S(*c_0) )
         printf( "ArGreyAlpha( % 5.3f, %s )\n",
             ARGREYALPHA_G(*c_0),

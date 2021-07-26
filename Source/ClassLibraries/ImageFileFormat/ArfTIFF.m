@@ -93,7 +93,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(tiff)
     */
 }
 
-- initWithFile: (ArcFile *) newFile
+- (id) initWithFile: (ArcFile *) newFile
 {
     file = newFile;
     return self;

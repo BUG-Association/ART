@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnNodeStack registerWithRuntime ];
 )
 
@@ -42,7 +43,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNodeStack)
 
-- init
+- (id) init
         : (const char *) newMasterOutputFilename
 {
     self = [ super init ];
@@ -59,7 +60,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNodeStack)
     return self;
 }
 
-- init
+- (id) init
 {
     self = [ super init ];
 
@@ -82,7 +83,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNodeStack)
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnNodeStack  * copiedInstance = [ super copy ];
 
@@ -92,7 +93,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNodeStack)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnNodeStack  * copiedInstance =

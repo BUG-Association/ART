@@ -43,14 +43,14 @@ ART_MODULE_INTERFACE(ArnSellmeierDispersion)
     double  coefficient[6];
 }
 
-- init
+- (id) init
         : (double) newA
         : (double) newB
         : (double) newC
         : (double) newD
         ;
 
-- init
+- (id) init
         : (double) newA
         : (double) newB
         : (double) newC
@@ -58,7 +58,7 @@ ART_MODULE_INTERFACE(ArnSellmeierDispersion)
         : (double) newE
         ;
 
-- init
+- (id) init
         : (double) newA
         : (double) newB
         : (double) newC

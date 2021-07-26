@@ -86,12 +86,12 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
     double  whiteLuminance;
 }
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newRemoveOption
         whiteLuminance  : (double) newWhiteLuminance
         ;
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         : (double) newWhiteLuminance
         ;
@@ -108,7 +108,7 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
     ArSymbol ditherFileName;
 }
 
-- init
+- (id) init
         : (const char *) newDitherFileName
         ;
 
@@ -136,7 +136,7 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
     ArSymbol  wp_desc;
 }
 
-- init
+- (id) init
         : (char *) newWP_Desc
         : (ArNode <ArpSpectrum> *) newIlluminantSpectrum
         ;
@@ -156,7 +156,7 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
     BOOL    requirePolarisedRAW;
 }
 
-- init
+- (id) init
         : (double) newWavelengthToCheckAgainstISRBounds
         : (BOOL) newRequirePolarisedRAW
         ;
@@ -186,12 +186,12 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
     BOOL    cloneOption;
 }
 
-- multiplyBy
+- (id) multiplyBy
                    : (double) newFactor
         cloneSource: (BOOL) newCloneOption
         ;
 
-- multiplyBy
+- (id) multiplyBy
                    : (double) newFactor
         ;
 
@@ -208,7 +208,7 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
     unsigned int  downscaleFactor;
 }
 
-- downscaleFactor
+- (id) downscaleFactor
                    : (unsigned int) newDownscaleFactor
         ;
 
@@ -226,12 +226,12 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
     BOOL    cloneOption;
 }
 
-- thresholdValue
+- (id) thresholdValue
                    : (double) newThresholdValue
         cloneSource: (BOOL) newCloneOption
         ;
 
-- thresholdValue
+- (id) thresholdValue
                    : (double) newThresholdValue
         ;
 
@@ -249,17 +249,17 @@ ART_MODULE_INTERFACE(MiscellaneousImageActions)
     BOOL    cloneOption;
 }
 
-- thresholdValue
+- (id) thresholdValue
                    : (double) newThresholdValue
         cloneSource: (BOOL) newCloneOption
         ;
 
-- thresholdValue
+- (id) thresholdValue
                     : (double) newThresholdValue
         removeSource: (BOOL) newRemoveOption
         ;
 
-- thresholdValue
+- (id) thresholdValue
                    : (double) newThresholdValue
         ;
 

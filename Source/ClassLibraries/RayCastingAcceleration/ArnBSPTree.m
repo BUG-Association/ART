@@ -38,6 +38,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnBSPTree registerWithRuntime ];
 )
 
@@ -708,14 +709,14 @@ void bspTree_debugprintf(
         bboxForSubTree[0] = *bboxForCurrentScenegraphLeaves;
         bboxForSubTree[1] = *bboxForCurrentScenegraphLeaves;
 
-        //   Dynarrays for the two subtrees - initally empty.
+        //   Dynarrays for the two subtrees - (id) initally empty.
 
         ArSGLptrDynArray  leavesInSubTree[2];
 
         leavesInSubTree[0] = arsglptrdynarray_init(0);
         leavesInSubTree[1] = arsglptrdynarray_init(0);
 
-                //      Dynarrays for the two subtree plausible splits - initally empty.
+                //      Dynarrays for the two subtree plausible splits - (id) initally empty.
 
                 ArplausibleSplitptrDynArray splitsInSubTree[2];
 
@@ -1414,7 +1415,7 @@ void bspTree_debugprintf(
         ];
 }
 
-- init
+- (id) init
         : (ArNodeRef) originalScenegraphRef
         : (ArnLeafNodeBBoxCollection *) leafNodeBBoxes
         : (ArnOperationTree*) operationTree
@@ -1496,7 +1497,7 @@ void bspTree_debugprintf(
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnBSPTree  * copiedInstance = [ super copy ];
 
@@ -1505,7 +1506,7 @@ void bspTree_debugprintf(
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnBSPTree  * copiedInstance =

@@ -39,7 +39,7 @@ ART_MODULE_INTERFACE(ArcBBoxCache)
     ArTable  * bboxCache;
 }
 
-- init
+- (id) init
         : (unsigned int) initialSize
         ;
 

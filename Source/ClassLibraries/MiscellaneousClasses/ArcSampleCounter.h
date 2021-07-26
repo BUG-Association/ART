@@ -48,7 +48,7 @@ ART_MODULE_INTERFACE(ArcSampleCounter)
     int                        digits;
 }
 
-- init
+- (id) init
         : (ArcObject <ArpReporter> *) newReporter
         : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
         : (ArnImageSamplerBase *) newImageSampler

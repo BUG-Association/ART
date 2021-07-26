@@ -125,7 +125,7 @@ ART_MODULE_INTERFACE(ArnStochasticSampler)
     IPnt2D        * sampleSplattingOffset;
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> * ) newRaySampler
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples

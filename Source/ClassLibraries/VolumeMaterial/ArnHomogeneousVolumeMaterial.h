@@ -48,7 +48,7 @@ ART_MODULE_INTERFACE(ArnHomogeneousVolumeMaterial)
 {
 }
 
-- init
+- (id) init
         : (ArNode <ArpSpectrum>      *) newIOR
         : (ArNode <ArpSpectrum>      *) newAbsorption
         : (ArNode <ArpPhaseFunction> *) newPhaseFunction

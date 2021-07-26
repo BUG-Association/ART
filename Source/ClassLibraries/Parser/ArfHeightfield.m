@@ -161,7 +161,7 @@ ARPFILE_DEFAULT_IMPLEMENTATION( ArfHeightfield, arfiletypecapabilites_read )
     }
 }
 
-- initWithFile: (ArcFile *) newFile
+- (id) initWithFile: (ArcFile *) newFile
 {
     file = newFile;
     return self;

@@ -42,7 +42,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcFileStream
 
-- init
+- (id) init
         : (FILE *) newFile
 {
     self = [ super init ];
@@ -246,7 +246,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return YES;
 }
 
-- init
+- (id) init
         : (const char *) newName
 {
     self = [ super init ];

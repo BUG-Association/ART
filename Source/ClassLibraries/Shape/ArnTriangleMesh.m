@@ -39,6 +39,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnTriangleMesh registerWithRuntime ];
 )
 
@@ -539,7 +540,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         shapeGeometry & arshape_singular,
         1)
 
-- init
+- (id) init
         : (ArShapeGeometry) newGeometry
         : (ArLongArray) faces_
         : (Pnt3D) minPoint_
@@ -568,7 +569,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnTriangleMesh  * copiedInstance = [ super copy ];
 
@@ -583,7 +584,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnTriangleMesh  * copiedInstance =

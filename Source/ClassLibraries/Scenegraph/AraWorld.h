@@ -41,7 +41,7 @@ ART_MODULE_INTERFACE(AraWorld)
 {
 }
 
-- init
+- (id) init
         : (ArNodeRef) newSceneGeometry
         : (ArNodeRef) newWorldVolumeMaterial
         : (ArNodeRef) newDefaultVolumeMaterial

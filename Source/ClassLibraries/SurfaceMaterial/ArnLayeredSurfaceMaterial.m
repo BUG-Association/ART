@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnLayeredSurfaceMaterial registerWithRuntime ];
 )
 
@@ -44,7 +45,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLayeredSurfaceMaterial)
 
-- deepSemanticCopy:(ArnGraphTraversal *)traversal {
+- (id) deepSemanticCopy:(ArnGraphTraversal *)traversal {
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     ArnLayeredSurfaceMaterial * copiedInstance = [ super deepSemanticCopy: traversal ];
     
@@ -57,7 +58,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLayeredSurfaceMaterial)
 #define LAYER_THICKNESS  ((ArNode <ArpDoubleValues> *)   ARNQUATERNARY_SUBNODE_2)
 #define LOWER_SURFACE    ((ArNode <ArpSurfaceMaterial> *)ARNQUATERNARY_SUBNODE_3)
 
-- init
+- (id) init
         : (ArNode <ArpSurfaceMaterial> *) newUpperSurfaceMaterial
         : (ArNode <ArpVolumeMaterial>  *) newVolumeMaterial
         : (ArNode <ArpDoubleValues>    *) newLayerThickness

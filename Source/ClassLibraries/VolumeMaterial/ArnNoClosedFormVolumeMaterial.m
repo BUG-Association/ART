@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnNoClosedFormVolumeMaterial registerWithRuntime ];
 )
 
@@ -42,7 +43,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNoClosedFormVolumeMaterial)
 
-- copy
+- (id) copy
 {
     ArnNoClosedFormVolumeMaterial  * copiedInstance = [ super copy ];
 
@@ -51,7 +52,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNoClosedFormVolumeMaterial)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnNoClosedFormVolumeMaterial  * copiedInstance =
@@ -64,7 +65,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNoClosedFormVolumeMaterial)
     return copiedInstance;
 }
 
-- init
+- (id) init
         : (ArNodeRefDynArray         *) newArray
         : (ArNode <ArpPhaseFunction> *) newPhaseFunction
 {

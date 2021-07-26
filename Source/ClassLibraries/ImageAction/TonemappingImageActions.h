@@ -42,11 +42,11 @@ void tonemappingimageactions_initialise();
     double  mappingValue;
 }
 
-- mappingValue
+- (id) mappingValue
         : (double) newMappingValue
         ;
 
-- init
+- (id) init
         : (double) newMappingValue
         ;
 
@@ -73,17 +73,17 @@ void tonemappingimageactions_initialise();
     double  b;
 }
 
-- aperture
+- (id) aperture
                 : (double) newAperture
         contrast: (double) newContrast
         ;
 
-- a
+- (id) a
          : (double) newA
         b: (double) newB
         ;
 
-- init
+- (id) init
         : (double) newAperture
         : (double) newContrast
         : (BOOL) newPredefined_AB
@@ -101,7 +101,7 @@ void tonemappingimageactions_initialise();
     double  wavelength;
 }
 
-- aperture
+- (id) aperture
                   : (double) newAperture
         wavelength: (double) newWavelength
         ;

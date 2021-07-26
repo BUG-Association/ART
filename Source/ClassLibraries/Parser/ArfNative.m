@@ -104,7 +104,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
     return 0;
 }
 
-- initWithFile: (ArcFile *) newFile
+- (id) initWithFile: (ArcFile *) newFile
 {
     file = newFile;
 

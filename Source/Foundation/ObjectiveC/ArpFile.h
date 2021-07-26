@@ -93,7 +93,7 @@ ArFiletypeCapabilities;
         : (ArcObject <ArpStream> *) stream
         ;
 
-- initWithFile
+- (id) initWithFile
         : (ArcFile *) newFile
         ;
 

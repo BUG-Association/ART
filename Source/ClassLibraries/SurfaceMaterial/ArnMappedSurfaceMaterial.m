@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     RUNTIME_REGISTER_PROTOCOL(ArpSurfaceMap);
     RUNTIME_REGISTER_PROTOCOL(ArpSurfacePhase);
 
@@ -75,7 +76,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
 //      cellIndexType = 0;
 }
 
-- init
+- (id) init
         : (ArNode <ArpNode>*) newExpression
         : (ArNode <ArpNode>*) newCellIndices
         : (ArNode <ArpNode>*) newSurfaceMap
@@ -928,7 +929,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSurfaceMap)
 
-- copy
+- (id) copy
 {
     ArnSurfaceMap  * copiedInstance = [ super copy ];
 
@@ -937,7 +938,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSurfaceMap)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnSurfaceMap  * copiedInstance =
@@ -981,7 +982,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSurfaceMap)
     }
 }
 
-- init
+- (id) init
         : (ArNodeRefDynArray *) newSurfacePhases
 {
     self =
@@ -1158,7 +1159,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSurfacePhase)
     // ...
 }
 
-- init
+- (id) init
         : (ArNode <ArpSurfaceMaterial>*) newSurface
         : (double) newPhase
 {

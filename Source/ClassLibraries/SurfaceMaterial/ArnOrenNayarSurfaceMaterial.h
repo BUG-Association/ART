@@ -69,7 +69,7 @@ ART_MODULE_INTERFACE(ArnOrenNayarSurfaceMaterial)
     double          c1;
 }
 
-- init
+- (id) init
         : (ArNode <ArpNode>*) newColour
         : (ArNode <ArpNode>*) newSigma
         ;

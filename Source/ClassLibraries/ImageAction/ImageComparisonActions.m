@@ -35,6 +35,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ Arn2xARTCSP_To_ARTGSC_DifferenceImage registerWithRuntime ];
     [ Arn2xRAW_SNR registerWithRuntime ];
 )
@@ -53,7 +54,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xRAW_Add_RAW)
 ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_Add_RAW)
 
-- outputName
+- (id) outputName
         : (const char *) newOutputName
 {
     return
@@ -62,7 +63,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_Add_RAW)
         ];
 }
 
-- init
+- (id) init
         : (const char *) newOutputName
 {
     self =
@@ -174,7 +175,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_Add_RAW)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_Add_ARTCSP)
 ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_Add_ARTCSP)
 
-- init
+- (id) init
         : (const char *) newOutputName
         : (const char *) newOutputTag
 {
@@ -187,7 +188,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_Add_ARTCSP)
     return self;
 }
 
-- outputTag
+- (id) outputTag
         : (const char *) newOutputTag
 {
     return
@@ -323,7 +324,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_Add_ARTCSP)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_AddMul_ARTCSP)
 ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_AddMul_ARTCSP)
 
-- init
+- (id) init
         : (const char *) newOutputName
         : (const char *) newOutputTag
 {
@@ -336,7 +337,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_AddMul_ARTCSP)
     return self;
 }
 
-- outputTag
+- (id) outputTag
         : (const char *) newOutputTag
 {
     return
@@ -488,7 +489,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_AddMul_ARTCSP)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_To_ARTGSC_DifferenceImage)
 ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_To_ARTGSC_DifferenceImage)
 
-- outputName          : (const char *) newOutputName
+- (id) outputName     : (const char *) newOutputName
         features      : (ArDifferenceImageFeatures) newFeatures
 {
     return
@@ -498,7 +499,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_To_ARTGSC_DifferenceImage)
             ];
 }
 
-- init
+- (id) init
         : (const char *) newOutputName
         : (ArDifferenceImageFeatures) newFeatures
 {
@@ -678,7 +679,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_To_ARTGSC_DifferenceImage)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xRAW_To_ARTGSC_DifferenceImage)
 ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_To_ARTGSC_DifferenceImage)
 
-- outputName      : (const char *) newOutputName
+- (id) outputName      : (const char *) newOutputName
         wavelength: (double) newWavelength
 {
     return
@@ -688,7 +689,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_To_ARTGSC_DifferenceImage)
             ];
 }
 
-- init
+- (id) init
         : (const char *) newOutputName
         : (double) newWavelength
 {
@@ -918,7 +919,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_To_ARTGSC_DifferenceImage)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xRAW_SNR)
 ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_SNR)
 
-- outputName: (const char *) newFilename
+- (id) outputName: (const char *) newFilename
 {
     return
         [ self init
@@ -926,7 +927,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_SNR)
             ];
 }
 
-- init
+- (id) init
         : (const char *) newFilename
 {
     self = [ super init ];
@@ -1079,7 +1080,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_SNR)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_avg_diff)
 ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_avg_diff)
 
-- outputName: (const char *) newFilename
+- (id) outputName: (const char *) newFilename
 {
     return
         [ self init
@@ -1087,7 +1088,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xARTCSP_avg_diff)
             ];
 }
 
-- init
+- (id) init
         : (const char *) newFilename
 {
     self = [ super init ];

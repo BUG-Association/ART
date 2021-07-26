@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnFisheyeCamera registerWithRuntime ];
 )
 
@@ -47,7 +48,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFisheyeCamera)
     near2world = NULL;
 }
 
-- imageSize
+- (id) imageSize
                 : (IVec2D) newImageSize
         ray     : (Ray3D) newRay
         zoom    : (double) newZoom
@@ -60,11 +61,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFisheyeCamera)
     ];
 }
 
-- init
+- (id) init
         : (Ray3D) newRay
         : (IVec2D) newImageSize
         : (double) newZoom
 {
+    (void) newZoom;
+    
     self = [super init];
     
     if ( self )
@@ -81,7 +84,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFisheyeCamera)
     return self;
 }
 
-- init
+- (id) init
         : (Ray3D) newRay
         : (IVec2D) newImageSize
         : (double) newZoom
@@ -89,6 +92,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFisheyeCamera)
         : (double) newNear
         : (double) newRatio
 {
+    (void) newZoom;
+    (void) newNear;
+    (void) newRatio;
+    
     self = [super init];
     
     if ( self )
@@ -105,7 +112,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFisheyeCamera)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnFisheyeCamera  * copiedInstance = [ super copy ];
 
@@ -132,7 +139,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFisheyeCamera)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnFisheyeCamera  * copiedInstance =
@@ -284,6 +291,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFisheyeCamera)
         : (      ArReferenceFrame *) outReferenceFrame
         : (      Ray3D *) outRay
 {
+    (void) randomGenerator;
+    
     Vec3D       getRayVector;
 
     /* make circular image area in center of image */
@@ -339,20 +348,25 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFisheyeCamera)
         : (const Ray3D *) inputRay
         : (      Vec2D *) pixelCoordinates
 {
+    (void) inputRay;
+    (void) pixelCoordinates;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return NO;
 }
 
-- withNear
+- (id) withNear
         : (double) newNear
 {
+    (void) newNear;
     near = 0.0; // ignore  newNear;
     return self;
 }
 
-- withRatio
+- (id) withRatio
         : (double) newRatio
 {
+    (void) newRatio;
     ratio = 1.0; // ignore
     return self;
 }
@@ -369,7 +383,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFisheyeCamera)
     imageSize = *inImageSize;
 }
 
-- withTwist
+- (id) withTwist
         : (double) newTwist
 {
     twist = newTwist;

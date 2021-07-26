@@ -38,6 +38,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnRayleighVolumeMaterial registerWithRuntime ];
 )
 
@@ -49,14 +50,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRayleighVolumeMaterial)
 ARPVOLUME_MATERIAL_HOMOGENEOUS_IMPLEMENTATION
 
-- copy
+- (id) copy
 {
     ArnRayleighVolumeMaterial  * copiedInstance = [ super copy ];
     
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnRayleighVolumeMaterial  * copiedInstance =
@@ -67,7 +68,7 @@ ARPVOLUME_MATERIAL_HOMOGENEOUS_IMPLEMENTATION
     return copiedInstance;
 }
 
-- init
+- (id) init
         : (ArNode <ArpSpectrum> *) newIOR
         : (ArNode <ArpSpectrum> *) newExtinction
         : (double                ) newParticlesPerM3

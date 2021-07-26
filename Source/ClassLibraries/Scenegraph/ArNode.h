@@ -122,7 +122,7 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
     ArNodeRef  subnodeRef;
 }
 
-- init
+- (id) init
         : (ArNodeRef) newSubnodeRef
         ;
 
@@ -137,7 +137,7 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
     ArNodeRef  subnodeRefArray[2];
 }
 
-- init
+- (id) init
         : (ArNodeRef) newSubnodeRef0
         : (ArNodeRef) newSubnodeRef1
         ;
@@ -155,7 +155,7 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
     ArNodeRef  subnodeRefArray[3];
 }
 
-- init
+- (id) init
         : (ArNodeRef) newSubnodeRef0
         : (ArNodeRef) newSubnodeRef1
         : (ArNodeRef) newSubnodeRef2
@@ -176,7 +176,7 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
     ArNodeRef  subnodeRefArray[4];
 }
 
-- init
+- (id) init
         : (ArNodeRef) newSubnodeRef0
         : (ArNodeRef) newSubnodeRef1
         : (ArNodeRef) newSubnodeRef2
@@ -200,7 +200,7 @@ ARLIST_INTERFACE_FOR_OBJECT_TYPE(ArNode,node);
     ArNodeRefDynArray  subnodeRefArray;
 }
 
-- init
+- (id) init
         : (ArNodeRefDynArray *) newSubnodeRefArray
         ;
 

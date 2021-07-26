@@ -48,7 +48,7 @@ ART_MODULE_INTERFACE(ArnSyntheticFluorescentSpectrum)
     ArCrosstalk500 * hiresVerticalSums;
 }
 
-- init
+- (id) init
         : (ArNodeRef) newMainDiagonal
         : (double) newCrosstalkMaximum
         : (Pnt2D) newCrosstalkCenter

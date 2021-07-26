@@ -282,7 +282,7 @@ ART_MODULE_INIT_FUNCTION_HEADER \
 //  Convenient "empty" declarations of the module startup function.
 
 #define ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY \
-    ART_MODULE_INITIALISATION_FUNCTION( )
+    ART_MODULE_INITIALISATION_FUNCTION( (void) art_gv; )
 
 
 //   Module shutdown - same comments as for the startup functions
@@ -333,10 +333,10 @@ ART_MODULE_SHUTDOWN_FUNCTION_HEADER \
 }
 
 #define ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY \
-    ART_MODULE_SHUTDOWN_FUNCTION( )
+    ART_MODULE_SHUTDOWN_FUNCTION( (void)art_gv; )
 
 #define ART_NO_EXEC_ONLY_ONCE_MODULE_SHUTDOWN_FUNCTION_NECESSARY \
-    ART_MODULE_SHUTDOWN_FUNCTION_EXEC_ONLY_ONCE( , )
+ART_MODULE_SHUTDOWN_FUNCTION_EXEC_ONLY_ONCE( , (void) art_gv; )
 
 
 /* ---------------------------------------------------------------------------

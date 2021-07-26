@@ -68,7 +68,7 @@ ArLightsourceEntry;
     ArLightsourceEntry  * light;
 }
 
-- init
+- (id) init
         : (ArcObject <ArpSampling2D> *) newSampler2D
         : (double) newResolution
         ;

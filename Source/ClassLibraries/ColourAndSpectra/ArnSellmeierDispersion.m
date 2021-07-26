@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSellmeierDispersion registerWithRuntime ];
 )
 
@@ -157,7 +158,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSellmeierDispersion)
 
 ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
 
-- init
+- (id) init
         : (double) newA
         : (double) newB
         : (double) newC
@@ -181,7 +182,7 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
     return self;
 }
 
-- init
+- (id) init
         : (double) newA
         : (double) newB
         : (double) newC
@@ -206,7 +207,7 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
     return self;
 }
 
-- init
+- (id) init
         : (double) newA
         : (double) newB
         : (double) newC

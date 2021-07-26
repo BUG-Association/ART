@@ -55,6 +55,7 @@ ART_MODULE_INITIALISATION_FUNCTION_EXEC_ONLY_ONCE
           1
           );
 ,
+    (void) art_gv;
     // module has no code that gets executed on every startup
 )
 
@@ -72,6 +73,7 @@ ART_MODULE_SHUTDOWN_FUNCTION_EXEC_ONLY_ONCE
         & art_objc_protocol_table
           );
 ,
+    (void) art_gv;
     // module has no code that gets executed during every shutdown
 )
 

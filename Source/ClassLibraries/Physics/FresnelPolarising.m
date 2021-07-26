@@ -558,8 +558,16 @@ void fresnel_polarising_reflective_attenuation_realvalued_IOR(
               ArAttenuation     * attenuation_r
         )
 {
-ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
-//this functionality will be removed anyway
+#ifndef NEVERMORE
+    (void) art_gv;
+    (void) incomingDirectionAndLocation;
+    (void) pathDirection;
+    (void) attenuation_r;
+#endif
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
+    //this functionality will be removed anyway
 #ifdef NEVERMORE
 
     ArSpectrum  *attenuationColourA = spc_alloc(art_gv);
@@ -716,6 +724,12 @@ void fresnel_polarising_reflective_attenuation_complex_IOR(
               ArAttenuation     * attenuation_r
         )
 {
+#ifndef NEVERMORE
+    (void) art_gv;
+    (void) incomingDirectionAndLocation;
+    (void) pathDirection;
+    (void) attenuation_r;
+#endif
 ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 //this functionality will be removed anyway
 #ifdef NEVERMORE
@@ -1126,8 +1140,16 @@ void fresnel_polarising_absorbance_realvalued_IOR(
               ArAttenuation     * attenuation_r
     )
 {
-ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
-//this functionality will be removed anyway
+#ifndef NEVERMORE
+    (void) art_gv;
+    (void) incomingDirectionAndLocation;
+    (void) pathDirection;
+    (void) attenuation_r;
+#endif
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
+    //this functionality will be removed anyway
 #ifdef NEVERMORE
 
     ArSpectrum  *attenuationColourA = spc_alloc(art_gv);
@@ -1289,8 +1311,16 @@ void fresnel_polarising_absorbance_complex_IOR(
               ArAttenuation     * attenuation_r
     )
 {
-ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
-//this functionality will be removed anyway
+#ifndef NEVERMORE
+    (void) art_gv;
+    (void) incomingDirectionAndLocation;
+    (void) pathDirection;
+    (void) attenuation_r;
+#endif
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
+    //this functionality will be removed anyway
 #ifdef NEVERMORE
     ArSpectrum  *attenuationColourA = spc_alloc(art_gv);
     ArSpectrum  *attenuationColourB = spc_alloc(art_gv);
@@ -1467,7 +1497,17 @@ void fresnel_polarising_reflective_attenuation_birefringent
               double              ne_var
         )
 {
-#ifdef NEVERMORE
+#ifndef NEVERMORE
+    (void) art_gv;
+    (void) incomingDirectionAndLocation;
+    (void) pathDirection;
+    (void) attenuation_r_reflect;
+    (void) attenuation_r_refract_o;
+    (void) attenuation_r_refract_e;
+    (void) localCa;
+    (void) cos_e;
+    (void) ne_var;
+#else
 //Me
         Colour  attenuationColour_reflect;
         Colour  attenuationColour_refract_o;
@@ -1516,8 +1556,17 @@ void fresnel_polarising_refractive_attenuation(
               ArAttenuation     * attenuation_r
         )
 {
-ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
-//this functionality will be removed anyway
+#ifndef NEVERMORE
+    (void) art_gv;
+    (void) incomingDirectionAndLocation;
+    (void) pathDirection;
+    (void) cosTheta_T;
+    (void) attenuation_r;
+#endif
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
+    //this functionality will be removed anyway
 #ifdef NEVERMORE
     ArSpectrum  *attenuationColourA = spc_alloc(art_gv);
     ArSpectrum  *attenuationColourB = spc_alloc(art_gv);

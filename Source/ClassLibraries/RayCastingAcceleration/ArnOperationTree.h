@@ -45,7 +45,7 @@ ART_MODULE_INTERFACE(ArnOperationTree)
         int nextFreeId;
 }
 
-- init
+- (id) init
 ;
 
 - ( long ) getOpNodeCount

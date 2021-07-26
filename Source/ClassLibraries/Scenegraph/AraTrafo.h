@@ -39,7 +39,7 @@ ART_MODULE_INTERFACE(AraTrafo)
 {
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNode
         : (ArNodeRef) newTrafo
         ;
@@ -55,15 +55,15 @@ ART_MODULE_INTERFACE(AraTrafo)
 {
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNode
         : (ArNodeRef) newTrafo
         ;
 /*
-- copy
+- (id) copy
         ;
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
         ;
 
@@ -89,7 +89,7 @@ ART_MODULE_INTERFACE(AraTrafo)
 {
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNode
         : (ArNodeRef) newTrafo
         ;
@@ -101,7 +101,7 @@ ART_MODULE_INTERFACE(AraTrafo)
 
 @interface ArNode ( Trafo )
 
-- createTrafoAttribute
+- (id) createTrafoAttribute
         : (ArNode *) newTrafo
         ;
 

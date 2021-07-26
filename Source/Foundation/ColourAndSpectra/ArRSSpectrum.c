@@ -114,6 +114,8 @@ void rss_free_contents(
               ArRSSpectrum  * rss
         )
 {
+    (void) art_gv;
+    
     FREE_ARRAY( ARRSS_ARRAY(*rss) );
 }
 
@@ -130,6 +132,8 @@ double rss_integrate(
         const double          xmax
         )
 {
+    (void) art_gv;
+    
     double fraction = (xmin - rss->start) / rss->step;
     ASSERT_NONNEGATIVE_DOUBLE(fraction);
 
@@ -166,6 +170,8 @@ double rss_sd_value_at_wavelength(
         const double          d0
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_RSS(s0)
     
     //   Early exit - is the requested wavelength within the spectral bounds?
@@ -190,6 +196,8 @@ unsigned int rss_s_valid(
         const ArRSSpectrum  * rss
         )
 {
+    (void) art_gv;
+    
     //   Null pointer? Direct return in that case.
     
     if ( ! rss )
@@ -277,6 +285,8 @@ void rss_s_debugprintf(
         const ArRSSpectrum  * rss
         )
 {
+    (void) art_gv;
+    
     printf("rsspectrum( %ld, %f nm, %f nm, %f",
     ARRSS_SIZE(*rss),NANO_FROM_UNIT(ARRSS_START(*rss)),
     NANO_FROM_UNIT(ARRSS_STEP(*rss)),ARRSS_SCALE(*rss));
@@ -291,6 +301,8 @@ void rss_s_mathematicaprintf(
         const ArRSSpectrum  * rss
         )
 {
+    (void) art_gv;
+    
     printf("rsspectrum{ ");
 
     if ( ARRSS_SIZE(*rss) > 0 )

@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnCylinderCamera registerWithRuntime ];
 )
 
@@ -47,11 +48,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCylinderCamera)
     near2world = NULL;
 }
 
-- init
+- (id) init
         : (Ray3D) newRay
         : (IVec2D) newImageSize
         : (double) newZoom
 {
+    (void) newZoom;
+    
     self = [super init];
     
     if ( self )
@@ -68,7 +71,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCylinderCamera)
     return self;
 }
 
-- init
+- (id) init
         : (Ray3D) newRay
         : (IVec2D) newImageSize
         : (double) newZoom
@@ -76,6 +79,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCylinderCamera)
         : (double) newNear
         : (double) newRatio
 {
+    (void) newNear;
+    (void) newZoom;
+    
     self = [super init];
     
     if ( self )
@@ -230,6 +236,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCylinderCamera)
         : (ArReferenceFrame *) outReferenceFrame
         : (Ray3D *) outRay
 {
+    (void) randomGenerator;
+    (void) outReferenceFrame;
+    
     Vec3D       getRayVector;
 
     double scaledx= (x - xscale)/(2*xscale) * MATH_2_MUL_PI;
@@ -256,9 +265,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCylinderCamera)
     return YES;
 }
 
-- withNear
+- (id) withNear
         : (double) newNear
 {
+    (void) newNear;
     near = 0.0; // ignore  newNear;
     return self;
 }

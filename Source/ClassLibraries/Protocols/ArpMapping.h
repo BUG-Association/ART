@@ -300,6 +300,8 @@ ArPatchEdge;
 - (Class) parameterisationOfPatch \
     : (unsigned int) patchIndex \
 { \
+    (void) patchIndex; \
+\
     return [ __parameterisation class ]; \
 }
 
@@ -312,6 +314,8 @@ ArPatchEdge;
 - (unsigned int) numberOfPatchesOnFace \
     : (unsigned int) faceIndex \
 { \
+    (void) faceIndex; \
+\
     return 1; \
 } \
 - (int) faceIndexOfPatch \
@@ -331,6 +335,8 @@ ArPatchEdge;
         : (ArPatchEdge *)  inEdge \
         : (ArPatchEdge *)  outEdge \
 { \
+    (void) inEdge; \
+\
     outEdge->patch = ARPATCHINDEX_INVALID; \
     outEdge->edge  = AREDGEINDEX_INVALID; \
     return NO; \

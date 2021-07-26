@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnColourTransform registerWithRuntime ];
 )
 
@@ -40,7 +41,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnColourTransform)
 
-- init
+- (id) init
         : (ArRenderingIntent)  newRenderingIntent
 {
     self = [ super init ];

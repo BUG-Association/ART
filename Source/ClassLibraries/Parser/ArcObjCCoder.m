@@ -121,7 +121,7 @@ void arcobjccoder_write_to_stream(
 
 @implementation ArcObjCWritingCoder
 
-- init
+- (id) init
         : (ArcObject <ArpOutputStream> *) newStream
 {
     stream = newStream;
@@ -773,7 +773,7 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
     return arfiletypematch_exact;
 }
 
-- init
+- (id) init
         : (ArcObject <ArpInputStream> *) newStream
 {
     stream = newStream;

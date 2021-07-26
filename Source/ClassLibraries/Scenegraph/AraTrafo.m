@@ -34,6 +34,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ AraTrafo2D    registerWithRuntime ];
     [ AraTrafo3D    registerWithRuntime ];
     [ AraVarTrafo3D registerWithRuntime ];
@@ -49,7 +50,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraTrafo2D)
 
-- init
+- (id) init
         : (ArNodeRef) newNode
         : (ArNodeRef) newTrafo
 {
@@ -79,7 +80,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraTrafo2D)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraTrafo3D)
 
-- init
+- (id) init
         : (ArNodeRef) newNode
         : (ArNodeRef) newTrafo
 {
@@ -97,7 +98,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraTrafo3D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     AraTrafo3D  * copiedInstance = [ super copy ];
 
@@ -106,7 +107,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraTrafo3D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArNodeRef  nodeRefStore;
@@ -211,7 +212,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraTrafo3D)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraVarTrafo3D)
 
-- init
+- (id) init
         : (ArNodeRef) newNode
         : (ArNodeRef) newTrafo
 {
@@ -229,7 +230,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraVarTrafo3D)
     return self;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArNodeRef  nodeRefStore;
@@ -313,7 +314,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraVarTrafo3D)
 
 @implementation ArNode ( Trafo )
 
-- createTrafoAttribute
+- (id) createTrafoAttribute
         : (ArNode *) newTrafo
 {
     if ( [ newTrafo conformsToArProtocol: ARPROTOCOL(ArpTrafo2D) ] )

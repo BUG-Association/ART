@@ -45,7 +45,7 @@ ART_MODULE_INTERFACE(ArnRSSpectrum2D)
     ArCrosstalk500 * hiresVerticalSums;
 }
 
-- init
+- (id) init
         : (ArRSSpectrum2D) newNativeValue
         ;
 

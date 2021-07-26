@@ -684,6 +684,8 @@ void arattenuation_a_deactivate(
               ArAttenuation  * ar
         )
 {
+    (void) art_gv;
+    
     ARATTENUATION_INITIALISED(ar) = NO;
 }
 
@@ -853,6 +855,11 @@ void arattenuation_aa_max_a(
               ArAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) a1;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -883,6 +890,11 @@ void arattenuation_aa_min_a(
               ArAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) a1;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -912,6 +924,10 @@ double arattenuation_aa_maxdiff(
         const ArAttenuation  * a1
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) a1;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0.0;

@@ -50,7 +50,7 @@ void fputspaces(int n, FILE * file)
 
 @implementation ArcReporter
 
-- init
+- (id) init
         : (ArcFileReporter *) newFileReporter
 {
     fileReporterArray[0] = RETAIN_OBJECT(newFileReporter);
@@ -58,7 +58,7 @@ void fputspaces(int n, FILE * file)
     return self;
 }
 
-- init
+- (id) init
         : (ArcFileReporter *) newFileReporter0
         : (ArcFileReporter *) newFileReporter1
 {
@@ -312,7 +312,7 @@ void fputspaces(int n, FILE * file)
 
 @implementation ArcFileReporter
 
-- init
+- (id) init
         : (FILE *) newFile
 {
     file = newFile;
@@ -541,7 +541,7 @@ void fputspaces(int n, FILE * file)
 
 @implementation ArcShortFileReporter
 
-- init
+- (id) init
         : (FILE *) newFile
 {
     file = newFile;

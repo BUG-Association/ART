@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnValWorldSpaceCoords    registerWithRuntime ];
     [ ArnValObjectSpaceCoords   registerWithRuntime ];
     [ ArnValWorldSpaceNormal    registerWithRuntime ];

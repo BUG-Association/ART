@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnRotX3D registerWithRuntime ];
     [ ArnRotY3D registerWithRuntime ];
     [ ArnRotZ3D registerWithRuntime ];
@@ -48,7 +49,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotX3D)
 
-- init
+- (id) init
 {
     self = [ super init ];
     
@@ -60,7 +61,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotX3D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnRotX3D  * copiedInstance = [ super copy ];
 
@@ -69,7 +70,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotX3D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnRotX3D  * copiedInstance =
@@ -88,7 +89,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotX3D)
     rot.s = sin(rot.a);
 }
 
-- init
+- (id) init
         : (double) alpha
 {
     self = [ super init ];
@@ -222,7 +223,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotX3D)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotY3D)
 
-- init
+- (id) init
 {
     self = [ super init ];
     
@@ -234,7 +235,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotY3D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnRotY3D  * copiedInstance = [ super copy ];
 
@@ -243,7 +244,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotY3D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnRotY3D  * copiedInstance =
@@ -262,7 +263,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotY3D)
     rot.s = sin(rot.a);
 }
 
-- init
+- (id) init
         : (double) alpha
 {
     self = [ super init ];
@@ -396,7 +397,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotY3D)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotZ3D)
 
-- init
+- (id) init
 {
     self  = [ super init ];
     
@@ -408,7 +409,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotZ3D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnRotZ3D  * copiedInstance = [ super copy ];
 
@@ -417,7 +418,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotZ3D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnRotZ3D  * copiedInstance =
@@ -436,7 +437,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotZ3D)
     rot.s = sin(rot.a);
 }
 
-- init
+- (id) init
         : (double) alpha
 {
     self = [ super init ];
@@ -569,7 +570,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRotZ3D)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRot3D)
 
-- init
+- (id) init
 {
     self = [ super init ];
     
@@ -581,7 +582,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRot3D)
     return self;
 }
 
-- init
+- (id) init
         : (Rot3D) newRot
 {
     self = [super init];
@@ -594,7 +595,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRot3D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnRot3D  * copiedInstance = [ super copy ];
 
@@ -603,7 +604,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRot3D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnRot3D  * copiedInstance =
@@ -742,7 +743,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVarRotX3D)
 {
 }
 
-- init
+- (id) init
         : (ArNode *) alpha
 {
     self = [ super init : HARD_NODE_REFERENCE(alpha) ];
@@ -785,7 +786,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVarRotY3D)
 {
 }
 
-- init
+- (id) init
         : (ArNode *) alpha
 {
     self = [ super init : HARD_NODE_REFERENCE(alpha) ];
@@ -828,7 +829,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVarRotZ3D)
 {
 }
 
-- init
+- (id) init
         : (ArNode *) alpha
 {
     self = [ super init : HARD_NODE_REFERENCE(alpha) ];

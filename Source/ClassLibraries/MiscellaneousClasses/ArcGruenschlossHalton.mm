@@ -51,7 +51,7 @@ ArcGruenschlossHalton_members;
 
 @implementation ArcGruenschlossHalton
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -60,7 +60,7 @@ ArcGruenschlossHalton_members;
             ];
 }
 
-- init
+- (id) init
         : (int) newMaxNumberOfSamples
 {
     return
@@ -70,7 +70,7 @@ ArcGruenschlossHalton_members;
             ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
         : (int) newMaxNumberOfSamples
 {

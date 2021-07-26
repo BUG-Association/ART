@@ -54,7 +54,7 @@ void blackbody_d_spc(
     double  temperature;
 }
 
-- init
+- (id) init
         : (double) newTemperature
         ;
 

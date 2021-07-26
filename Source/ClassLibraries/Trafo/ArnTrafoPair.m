@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnTrafo2DPair registerWithRuntime ];
     [ ArnTrafo3DPair registerWithRuntime ];
 )
@@ -82,7 +83,7 @@ ArNode  * create_arntrafopair(
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTrafo2DPair)
 
-- init
+- (id) init
         : (ArNodeRef) node0
         : (ArNodeRef) node1
 {
@@ -291,7 +292,7 @@ ArnTrafo2DPair * create_arntrafo2dpair(
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTrafo3DPair)
 
-- init
+- (id) init
         : (ArNodeRef) node0
         : (ArNodeRef) node1
 {

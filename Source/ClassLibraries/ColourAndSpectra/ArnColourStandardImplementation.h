@@ -30,6 +30,8 @@
         : (ArcPointContext *) locationInfo \
         : (ArSpectrum *) outSpectrum \
 { \
+    (void) locationInfo; \
+\
     spc_s_init_s( \
         art_gv, \
         spectrum, \
@@ -41,6 +43,8 @@
         : (ArcPointContext *) locationInfo \
         : (ArSpectrum500 *) outSpectrum \
 { \
+    (void) locationInfo; \
+    \
     s500_s_init_s( \
         art_gv, \
         internalHiresSpectrum, \
@@ -53,6 +57,8 @@
         : (const ArWavelength *) wavelength \
         : (      ArSpectralSample *) outSpectralSample \
 { \
+    (void) locationInfo; \
+    \
     sps_s500w_init_s( \
           art_gv, \
           internalHiresSpectrum, \
@@ -65,6 +71,8 @@
         : (ArcPointContext *) locationInfo \
         : (ArAttenuation *) outAttenuation \
 { \
+    (void) locationInfo; \
+    \
     arattenuation_s_init_a( \
         art_gv, \
         spectrum, \
@@ -77,6 +85,8 @@
         : (const ArWavelength *) wavelength \
         : (      ArAttenuationSample *) outAttenuationSample \
 { \
+    (void) locationInfo; \
+    \
     ArSpectralSample  temp_ss; \
 \
     sps_s500w_init_s( \
@@ -99,6 +109,8 @@
         : (ArReferenceFrame *) refframeExit \
         : (ArAttenuation *) outAttenuation \
 { \
+    (void) locationInfo; \
+    \
     arattenuation_srr_init_depolarising_a( \
         art_gv, \
         spectrum, \
@@ -115,6 +127,8 @@
         : (const ArWavelength *) wavelength \
         : (      ArAttenuationSample *) outAttenuationSample \
 { \
+    (void) locationInfo; \
+    \
     ArSpectralSample  temp_sps; \
 \
     sps_s500w_init_s( \
@@ -139,6 +153,8 @@
         : (ArReferenceFrame *) refframeExit \
         : (ArAttenuation *) outAttenuation \
 { \
+    (void) locationInfo; \
+    \
     arattenuation_srr_init_nonpolarising_a( \
         art_gv, \
         spectrum, \
@@ -155,6 +171,8 @@
         : (const ArWavelength *) wavelength \
         : (      ArAttenuationSample *) outAttenuationSample \
 { \
+    (void) locationInfo; \
+    \
     ArSpectralSample  temp_sps; \
 \
     sps_s500w_init_s( \
@@ -199,6 +217,8 @@
         : (const unsigned int) numberOfValues \
         : (      ArSpectrum *) outColours \
 { \
+    (void) evalEnv; \
+    \
     unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
     for (unsigned int i = 0; i < actualNumberOfValues; i++) \
         spc_s_init_s( \
@@ -213,6 +233,8 @@
         : (const ArcObject <ArpEvaluationEnvironment> *) evalEnv \
         : (      ArSpectrum *) outSpectrum \
 { \
+    (void) evalEnv; \
+    \
     spc_s_init_s( \
         art_gv, \
         spectrum, \
@@ -225,6 +247,8 @@
         : (const ArcObject <ArpEvaluationEnvironment> *) evalEnv \
         : (      ArSpectrum500 *) outSpectrum \
 { \
+    (void) evalEnv; \
+    \
     s500_s_init_s( \
         art_gv, \
         internalHiresSpectrum, \
@@ -238,6 +262,8 @@
         : (const unsigned int) numberOfValues \
         : (      ArAttenuation *) outAttenuations \
 { \
+    (void) evalEnv; \
+    \
     unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
     for (unsigned int i = 0; i < actualNumberOfValues; i++) \
         arattenuation_s_init_a( \
@@ -252,6 +278,8 @@
         : (const ArcObject <ArpEvaluationEnvironment> *) evalEnv \
         : (      ArAttenuation *) outAttenuation \
 { \
+    (void) evalEnv; \
+    \
     arattenuation_s_init_a( \
         art_gv, \
         spectrum, \
@@ -267,6 +295,8 @@
         : (const unsigned int) numberOfValues \
         : (      ArAttenuation *) outAttenuations \
 { \
+    (void) evalEnv; \
+    \
     const unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
     for (unsigned int i = 0; i < actualNumberOfValues; i++) \
         arattenuation_srr_init_depolarising_a( \
@@ -285,6 +315,8 @@
         : (const ArReferenceFrame *) refframeExit \
         : (      ArAttenuation *) outAttenuation \
 { \
+    (void) evalEnv; \
+    \
     arattenuation_srr_init_depolarising_a( \
         art_gv, \
         spectrum, \
@@ -302,6 +334,8 @@
         : (const unsigned int) numberOfValues \
         : (      ArAttenuation *) outAttenuations \
 { \
+    (void) evalEnv; \
+    \
     unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
     for (unsigned int i = 0; i < actualNumberOfValues; i++) \
         arattenuation_srr_init_nonpolarising_a( \
@@ -320,6 +354,8 @@
         : (const ArReferenceFrame *) refframeExit \
         : (      ArAttenuation *) outAttenuation \
 { \
+    (void) evalEnv; \
+\
     arattenuation_srr_init_nonpolarising_a( \
         art_gv, \
         spectrum, \
@@ -366,7 +402,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVal_const_##_classtype) \
 \
 ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS \
 \
-- init \
+- (id) init \
     : (Ar##_Type) newNativeValue \
 { \
     self = [ super init ]; \
@@ -415,6 +451,8 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS \
         : (      ArPathDirection) pathDirection \
         : (      ArSpectralSample *) reflectance \
 { \
+    (void) locationInfo; \
+    \
     ArCrosstalk500* crosstalkSums = (pathDirection == arpathdirection_from_eye ? hiresHorizontalSums : hiresVerticalSums); \
     int shift_in_x = (pathDirection == arpathdirection_from_eye ? 1 : 0), shift_in_y = 1 - shift_in_x; \
     \
@@ -465,6 +503,8 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS \
         : (      ArSpectralSample *) attenuation \
         : (      ArPDFValue *) probability \
 { \
+    (void) locationInfo; \
+    \
     ArCrosstalk500* crosstalkSums = (pathDirection == arpathdirection_from_eye ? hiresHorizontalSums : hiresVerticalSums); \
     int shift_in_x = (pathDirection == arpathdirection_from_eye ? 1 : 0), shift_in_y = 1 - shift_in_x; \
     \
@@ -626,6 +666,8 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS \
         : (      ArSpectralSample *) attenuation \
         : (      ArPDFValue *) probability \
 { \
+    (void) locationInfo; \
+    \
     ArCrosstalk500* crosstalkSums = (pathDirection == arpathdirection_from_eye ? hiresHorizontalSums : hiresVerticalSums); \
     int shift_in_x = (pathDirection == arpathdirection_from_eye ? 1 : 0), shift_in_y = 1 - shift_in_x; \
     \

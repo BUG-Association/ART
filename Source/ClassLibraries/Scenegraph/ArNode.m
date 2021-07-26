@@ -36,6 +36,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArNode         registerWithRuntime ];
     [ ArnUnary       registerWithRuntime ];
     [ ArnBinary      registerWithRuntime ];
@@ -57,7 +58,7 @@ ARLIST_IMPLEMENTATION_FOR_OBJECT_TYPE(ArNode,node);
 
 ARPNODE_DEFAULT_IMPLEMENTATION(ArNode)
 
-- init
+- (id) init
 {
     self = [ super init ];
 
@@ -85,7 +86,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArNode)
     return 0;
 }
 
-- copy
+- (id) copy
 {
     ArNode  * copiedInstance = [ super copy ];
 
@@ -94,7 +95,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArNode)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArNode  * copiedInstance = [ super copy ];
@@ -232,7 +233,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArNode)
 
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnUnary)
 
-- init
+- (id) init
         : (ArNodeRef) newSubNodeRef
 {
     self = [ super init ];
@@ -252,7 +253,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnUnary)
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnUnary  * copiedInstance = [ super copy ];
 
@@ -270,7 +271,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnUnary)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnUnary  * copiedInstance = [ super copy ];
@@ -450,7 +451,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnUnary)
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnBinary)
 SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
 
-- init
+- (id) init
         : (ArNodeRef) newSubNodeRef0
         : (ArNodeRef) newSubNodeRef1
 {
@@ -473,7 +474,7 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnBinary  * copiedInstance = [ super copy ];
 
@@ -495,7 +496,7 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnBinary  * copiedInstance = [ super copy ];
@@ -673,7 +674,7 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnTernary)
 SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
 
-- init
+- (id) init
         : (ArNodeRef) newSubnodeRef0
         : (ArNodeRef) newSubnodeRef1
         : (ArNodeRef) newSubnodeRef2
@@ -699,7 +700,7 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnTernary  * copiedInstance = [ super copy ];
 
@@ -721,7 +722,7 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnTernary  * copiedInstance = [ super copy ];
@@ -897,7 +898,7 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnQuaternary)
 SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
 
-- init
+- (id) init
         : (ArNodeRef) newSubnodeRef0
         : (ArNodeRef) newSubnodeRef1
         : (ArNodeRef) newSubnodeRef2
@@ -927,7 +928,7 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
 }
 
 
-- copy
+- (id) copy
 {
     ArnQuaternary  * copiedInstance = [ super copy ];
 
@@ -949,7 +950,7 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnQuaternary  * copiedInstance = [ super copy ];
@@ -1126,7 +1127,7 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnNary)
 SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
 
-- init
+- (id) init
 {
     self = [ super init ];
 
@@ -1138,7 +1139,7 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
     return self;
 }
 
-- init
+- (id) init
         : (ArNodeRefDynArray *) newSubnodeRefArray
 {
     self = [ super init ];
@@ -1158,7 +1159,7 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnNary  * copiedInstance = [ super copy ];
 
@@ -1203,7 +1204,7 @@ SUBNODE_QUERY_BRANCHING_IMPLEMENTATION
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnNary  * copiedInstance = [ super copy ];

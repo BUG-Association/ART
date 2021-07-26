@@ -43,7 +43,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcAreaLightsource
 
-- init
+- (id) init
         : (ArNode *) shapeRef
         : (ArTraversalState *) state
         : (ArnLightsourceCollector *) lightsourceCollector
@@ -210,7 +210,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArcAreaLightsource  * clone = [ super copy ];
 

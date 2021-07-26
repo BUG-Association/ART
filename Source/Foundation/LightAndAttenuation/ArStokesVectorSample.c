@@ -37,6 +37,8 @@ ArStokesVectorSample * arstokesvectorsample_alloc(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ArStokesVectorSample  * newSV = ALLOC( ArStokesVectorSample );
 
     return newSV;
@@ -47,6 +49,8 @@ void arstokesvectorsample_free(
               ArStokesVectorSample  * svr
         )
 {
+    (void) art_gv;
+    
     FREE( svr );
 }
 

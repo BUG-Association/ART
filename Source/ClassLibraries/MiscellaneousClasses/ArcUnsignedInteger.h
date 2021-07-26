@@ -41,7 +41,7 @@ ART_MODULE_INTERFACE(ArcUnsignedInteger)
     unsigned int  value;
 }
 
-- init
+- (id) init
         : (unsigned int) newValue
         ;
 

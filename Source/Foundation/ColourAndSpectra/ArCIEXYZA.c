@@ -37,6 +37,8 @@ void xyza_c_debugprintf(
         const ArCIEXYZA  * c_0
         )
 {
+    (void) art_gv;
+    
     printf( "CIE XYZ Alpha ( % 5.3f, % 5.3f, % 5.3f, % 5.3f )\n",
         ARCIEXYZA_X(*c_0),
         ARCIEXYZA_Y(*c_0),

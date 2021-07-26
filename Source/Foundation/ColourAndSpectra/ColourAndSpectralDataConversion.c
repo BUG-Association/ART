@@ -116,6 +116,8 @@ void g_to_rgb(
               ArRGB   * cr
         )
 {
+    (void) art_gv;
+    
     CC_START_DEBUGPRINTF( g_to_rgb )
     CC_OPERAND_DEBUGPRINTF( g, c0 )
     ARRGB_R(*cr) = ARGREY_G(*c0);
@@ -131,6 +133,8 @@ void g_to_rgba(
               ArRGBA  * cr
         )
 {
+    (void) art_gv;
+    
     CC_START_DEBUGPRINTF( g_to_rgba )
     ARRGBA_R(*cr) = ARGREY_G(*c0);
     ARRGBA_G(*cr) = ARGREY_G(*c0);
@@ -174,6 +178,8 @@ void ga_to_rgb(
               ArRGB        * cr
         )
 {
+    (void) art_gv;
+    
     CC_START_DEBUGPRINTF( g_to_rgb )
     CC_OPERAND_DEBUGPRINTF( ga, c0 )
     ARRGB_R(*cr) = ARGREYALPHA_G(*c0);
@@ -189,6 +195,8 @@ void ga_to_rgba(
               ArRGBA       * cr
         )
 {
+    (void) art_gv;
+    
     CC_START_DEBUGPRINTF( g_to_rgba )
     ARRGBA_R(*cr) = ARGREYALPHA_G(*c0);
     ARRGBA_G(*cr) = ARGREYALPHA_G(*c0);
@@ -437,6 +445,8 @@ void rgb_to_rss_new(
               ArRSSpectrum  * sr
         )
 {
+    (void) art_gv;
+    
     ARRSS_SIZE(*sr) = 109;
     ARRSS_START(*sr) = 370 NM;
     ARRSS_STEP(*sr) = 3.3 NM;
@@ -458,9 +468,11 @@ void xyz_to_pss_new(
               ArPSSpectrum  * sr
         )
 {
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "xyz_to_pss_new not implemented yet"
-        );
+    (void) art_gv;
+    (void) xyz0;
+    (void) sr;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 
@@ -550,9 +562,11 @@ void xyza_to_pss_new(
               ArPSSpectrum  * sr
         )
 {
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "xyz_to_pss_new not implemented yet"
-        );
+    (void) art_gv;
+    (void) xyz0;
+    (void) sr;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 // =====   ArRGB   ===========================================================
@@ -604,6 +618,8 @@ void rgb_to_rgba(
               ArRGBA  * rgba
         )
 {
+    (void) art_gv;
+    
     CC_START_DEBUGPRINTF( rgb_to_rgba )
     ARRGBA_C(*rgba) = *rgb;
     ARRGBA_A(*rgba) = 1.0;
@@ -665,6 +681,8 @@ void rgba_to_rgb(
               ArRGB   * rgb
         )
 {
+    (void) art_gv;
+    
     CC_START_DEBUGPRINTF( rgba_to_rgb )
     *rgb = ARRGBA_C(*rgba);
     CC_END_DEBUGPRINTF( rgba_to_rgb )
@@ -1063,6 +1081,8 @@ void rss_to_pss_new(
               ArPSSpectrum  * sr
         )
 {
+    (void) art_gv;
+    
     CC_START_DEBUGPRINTF( rss_to_pss_new )
     ARPSS_SCALE(*sr) = ARRSS_SCALE(*s0);
 
@@ -1127,9 +1147,11 @@ void pss_to_pss_new(
               ArPSSpectrum  * sr
         )
 {
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "pss_to_pss_new not implemented yet"
-        );
+    (void) art_gv;
+    (void) s0;
+    (void) sr;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 

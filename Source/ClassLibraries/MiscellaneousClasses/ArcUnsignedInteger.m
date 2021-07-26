@@ -35,7 +35,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcUnsignedInteger
 
-- init
+- (id) init
         : (unsigned int) newValue
 {
     self = [ super init  ];

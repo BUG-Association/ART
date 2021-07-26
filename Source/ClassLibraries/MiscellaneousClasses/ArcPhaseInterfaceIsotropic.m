@@ -44,7 +44,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 #define EXTINCTION_SPECTRUM_INTO \
     (( ArNode <ArpSpectrum> *) [intoMaterial subnodeWithIndex : 1])
 
-- init
+- (id) init
         : (ArNode <ArpVolumeMaterial> *) fromMaterial
         : (ArNode <ArpVolumeMaterial> *) intoMaterial
 {

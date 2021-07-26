@@ -37,7 +37,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcImageMetrics
 
-- init
+- (id) init
         : (ArNode <ArpImageReader> *) newImage
         : (ArcObject <ArpReporter> *) newReporter
 {
@@ -56,7 +56,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArcImageMetrics  * copiedInstance = [ super copy ];
 

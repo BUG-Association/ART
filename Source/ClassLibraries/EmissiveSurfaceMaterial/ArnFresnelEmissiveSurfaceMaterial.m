@@ -34,6 +34,8 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
+ 
     [ ArnFresnelEmissiveSurfaceMaterial  registerWithRuntime ];
 )
 
@@ -60,6 +62,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFresnelEmissiveSurfaceMaterial)
         : (ArcSurfacePoint *) location
         : (UInt32 *) hash
 {
+    (void) hash;
+    
     if ( ARCPHASEINTERFACE_HAS_REALVALUED_IOR(*ARCSURFACEPOINT_PHASEINTERFACE(location) ) )
         return
               arsurface_generates_perfectly_specular_reflections
@@ -74,6 +78,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFresnelEmissiveSurfaceMaterial)
 - (void) finishSurface
     : (ArcSurfacePoint *) location
 {
+    (void) location;
 }
 
 - (void) _setupBlackbodyEmission
@@ -117,7 +122,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFresnelEmissiveSurfaceMaterial)
 
 }
 
-- init
+- (id) init
     : (double)  newTemperature
 {
     self = [ super init ];
@@ -137,6 +142,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFresnelEmissiveSurfaceMaterial)
         : (ArSamplingRegion *) outSamplingRegion
         : (ArLightIntensity *) outLightIntensity
 {
+    (void) emissionLocation;
+    
     if ( outSamplingRegion ) *outSamplingRegion = 0;
 
     arlight_l_init_i(
@@ -158,7 +165,15 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFresnelEmissiveSurfaceMaterial)
         : (ArSamplingRegion *) outSamplingRegion
         : (ArLight *) outLight
 {
+#ifndef NEVERMORE
+    (void) emissionLocation;
+    (void) outgoingDirection;
+    (void) outSamplingRegion;
+    (void)outLight;
+#endif
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+
 #ifdef NEVERMORE
     if ( outSamplingRegion ) *outSamplingRegion = 0;
 
@@ -189,8 +204,15 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFresnelEmissiveSurfaceMaterial)
         : (ArSamplingRegion *) outSamplingRegion
         : (ArLight *) outLight
 {
-ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
-//this functionality will be removed anyway
+#ifndef NEVERMORE
+    (void) emissionLocationAndIncidentDirection;
+    (void) outSamplingRegion;
+    (void) outLight;
+#endif
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+
+    //this functionality will be removed anyway
 #ifdef NEVERMORE
     if ( outSamplingRegion ) *outSamplingRegion = 0;
 
@@ -280,6 +302,13 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
         : (ArDirectionCosine *) emissionDirection
         : (ArPDFValue *) sampleProbability
 {
+#ifndef NEVERMORE
+    (void) emissionLocation;
+    (void) context;
+    (void) emissionDirection;
+    (void) sampleProbability;
+#endif
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 #ifdef NEVERMORE
     Vec3D     localVec;

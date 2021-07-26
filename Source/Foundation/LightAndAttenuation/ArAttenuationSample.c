@@ -744,6 +744,8 @@ void arattenuationsample_a_deactivate(
               ArAttenuationSample  * ar
         )
 {
+    (void) art_gv;
+    
     ARATTENUATIONSAMPLE_INITIALISED(ar) = NO;
 }
 
@@ -915,6 +917,11 @@ void arattenuationsample_aa_max_a(
               ArAttenuationSample  * ar
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) a1;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -945,6 +952,11 @@ void arattenuationsample_aa_min_a(
               ArAttenuationSample  * ar
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) a1;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -974,6 +986,10 @@ double arattenuationsample_aa_maxdiff(
         const ArAttenuationSample  * a1
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) a1;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0.0;

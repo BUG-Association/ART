@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnLambertEmissiveSurfaceMaterial registerWithRuntime ];
 )
 
@@ -45,7 +46,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnLambertEmissiveSurfaceMaterial
 
-- copy
+- (id) copy
 {
     ArnLambertEmissiveSurfaceMaterial  * copiedInstance = [ super copy ];
 
@@ -54,7 +55,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnLambertEmissiveSurfaceMaterial  * copiedInstance =
@@ -94,7 +95,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             "intensity");
 }
 
-- init
+- (id) init
         : (ArNode <ArpNode>*) newColour
         : (ArNode <ArpNode>*) newParameter
 {

@@ -36,6 +36,7 @@ ART_MODULE_INITIALISATION_FUNCTION_EXEC_ONLY_ONCE
 (
     IC4_C_ZERO = ICRD4( 0, 0, 0, 0 );
 ,
+    (void) art_gv;
     // module has no code that gets executed on every startup
 )
 

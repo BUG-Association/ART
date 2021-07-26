@@ -76,7 +76,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 @implementation ArnStochasticSampler ( ARM_Interface )
 
-- sampleProvider
+- (id) sampleProvider
 
                                 : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         samplesPerPixel         : (unsigned int) newNumberOfSamples
@@ -95,7 +95,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
     return self;
 }
 
-- sampleProvider
+- (id) sampleProvider
 
                                 : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         sampleSplattingKernel    : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
@@ -115,7 +115,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 @implementation ArnStochasticImageSampler ( ARM_Interface )
 
-- sampleProvider
+- (id) sampleProvider
 
                                 : (ArNode <ArpPathspaceIntegrator> *) newPathspaceIntegrator
         samplesPerPixel         : (unsigned int) newNumberOfSamples
@@ -134,7 +134,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
     return self;
 }
 
-- sampleProvider
+- (id) sampleProvider
 
                                 : (ArNode <ArpPathspaceIntegrator> *) newPathspaceIntegrator
         sampleSplattingKernel   : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
@@ -154,7 +154,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 @implementation ArnStochasticImageSamplerRGBA ( ARM_Interface )
 
-- sampleProvider
+- (id) sampleProvider
                          : (ArNode <ArpPathspaceIntegratorRGBA> *) newEstimator
         samplesPerPixel  : (unsigned int) newNumberOfSamples
 {
@@ -170,7 +170,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 @implementation ArnMidpointImageSamplerRGBA ( ARM_Interface )
 
-- sampleProvider
+- (id) sampleProvider
         : (ArNode <ArpPathspaceIntegratorRGBA> *) newEstimator
 {
     [ self init
@@ -185,7 +185,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 @implementation ArnStochasticSamplerVerticalMirror ( ARM_Interface )
 
-- sampleProvider
+- (id) sampleProvider
 
                                 : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         samplesPerPixel         : (unsigned int) newNumberOfSamples
@@ -204,7 +204,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
     return self;
 }
 
-- sampleProvider
+- (id) sampleProvider
 
                                 : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         sampleSplattingKernel   : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel

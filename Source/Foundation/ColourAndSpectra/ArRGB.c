@@ -176,6 +176,11 @@ void rgb_ss_convolve_d(
               double    * dr
         )
 {
+    (void) art_gv;
+    (void) r0;
+    (void) r1;
+    (void) dr;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "convolution operation not defined in colour space - "
         "switch ART to a spectral ISR to avoid this error"
@@ -188,6 +193,10 @@ double rgb_sd_value_at_wavelength(
         const double      d_0
         )
 {
+    (void) art_gv;
+    (void) r_0;
+    (void) d_0;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "ArSpectrum value queries for a specific wavelength not "
         "defined in colour space - "
@@ -205,6 +214,12 @@ void rgb_sdd_sample_at_wavelength_s(
               ArRGB  * r_r
         )
 {
+    (void) art_gv;
+    (void) r_0;
+    (void) d_0;
+    (void) d_1;
+    (void) r_r;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "ArSpectrum sample queries for a specific wavelength not "
         "defined in colour space - "
@@ -218,6 +233,8 @@ double rgb_cc_dist(
         const ArRGB   * c1
         )
 {
+    (void) art_gv;
+    
     return c3_cc_dist( & c0->c, & c1->c );
 }
 
@@ -227,6 +244,10 @@ double rgb_ss_convolve(
         const ArRGB  * c1
         )
 {
+    (void) art_gv;
+    (void) c0;
+    (void) c1;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "ArSpectrum value convolution not defined in colour space - "
         "switch ART to a spectral ISR to avoid this error"
@@ -268,6 +289,8 @@ void frgb_c_debugprintf(
         const ArFloatRGB  * c_0
         )
 {
+    (void) art_gv;
+    
     printf( "ArFloatRGB( % 5.3f, % 5.3f, % 5.3f )\n",
         ARRGB_R(*c_0),
         ARRGB_G(*c_0),

@@ -84,7 +84,7 @@ newARTRandomGenerator( \
     ArcObject <ArpReporter>  * reporter;
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
         ;
 
@@ -157,11 +157,11 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     double  * inverseBase;
 }
 
-- init
+- (id) init
         : (unsigned int) newMaxNumberOfSamples
         ;
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
         : (unsigned int) newMaxNumberOfSamples
         ;
@@ -288,11 +288,11 @@ ArEffRNGseq2State;
 
 // default constructor: newTmsNetSize should be a power of 2, 64 seems
 // reasonable, if not, will be increased to next larger power of 2.
-- init
+- (id) init
         : (unsigned int) newTmsNetSize
         ;
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
         : (unsigned int) newTmsNetSize
         ;
@@ -300,13 +300,13 @@ ArEffRNGseq2State;
 
 // in case sequences are used up, create some new ones.
 // (will be called internally)
-- _createMoreSequencesSingle: (BOOL) moreSingle
+- (id) _createMoreSequencesSingle: (BOOL) moreSingle
                       Double: (BOOL) moreDouble
 
   ;
 // shuffle TMS net access sequence to avoid problems with partially
 // called nets
-- _shuffleIndices;
+- (id) _shuffleIndices;
 
 @end
 

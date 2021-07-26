@@ -40,6 +40,7 @@ void ardirectioncosine_reflect(
               ArDirectionCosine  * outgoing
         )
 {
+    (void) art_gv;
 
     ARDIRECTIONCOSINE_COSINE(*outgoing) =
             ARDIRECTIONCOSINE_COSINE(*incoming);
@@ -61,6 +62,8 @@ void ardirectioncosine_reflection_normal(
               Vec3D              * normal
         )
 {
+    (void) art_gv;
+    
     vec3d_vv_sub_v(
         & ARDIRECTIONCOSINE_VECTOR(*incoming),
         & ARDIRECTIONCOSINE_VECTOR(*outgoing),
@@ -107,6 +110,8 @@ void ardirectioncosine_refract(
               ArDirectionCosine  * outgoing
         )
 {
+    (void) art_gv;
+    
     double tmp = eta * ARDIRECTIONCOSINE_COSINE(*incoming) + dotNT;
 
     ARDIRECTIONCOSINE_COSINE(*outgoing) = dotNT;
@@ -128,6 +133,8 @@ void ardirectioncosine_refraction_normal(
               Vec3D              * normal
         )
 {
+    (void) art_gv;
+    
     // the incoming vector is pointing into the surface and outgoing away,
     // thus the possible different signs
     vec3d_dv_mul_v_add_v(

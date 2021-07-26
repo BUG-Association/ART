@@ -44,14 +44,14 @@ ART_MODULE_INTERFACE(ArnScaleTranslation)
     Scale3D  invScale;
 }
 
-- init
+- (id) init
         ;
 
-- init
+- (id) init
         : (Scale3D) newScale
         ;
 
-- initFrom
+- (id) initFrom
         : (const Scale3D *) newScale
         ;
 
@@ -68,14 +68,14 @@ ART_MODULE_INTERFACE(ArnScaleTranslation)
     Translation3D  translation;
 }
 
-- init
+- (id) init
         ;
 
-- init
+- (id) init
         : (Translation3D) newTranslation
         ;
 
-- initFrom
+- (id) initFrom
         : (const Translation3D *) newTranslation
         ;
 
@@ -93,14 +93,14 @@ ART_MODULE_INTERFACE(ArnScaleTranslation)
     Scale2D  invScale;
 }
 
-- init
+- (id) init
         ;
 
-- init
+- (id) init
         : (Scale2D) newScale
         ;
 
-- initFrom
+- (id) initFrom
         : (const Scale2D *) newScale
         ;
 
@@ -117,14 +117,14 @@ ART_MODULE_INTERFACE(ArnScaleTranslation)
     Translation2D  translation;
 }
 
-- init
+- (id) init
         ;
 
-- init
+- (id) init
         : (Translation2D) newTranslation
         ;
 
-- initFrom
+- (id) initFrom
         : (const Translation2D *) newTranslation
         ;
 
@@ -140,7 +140,7 @@ ART_MODULE_INTERFACE(ArnScaleTranslation)
 {
 }
 
-- init
+- (id) init
         : (ArNode <ArpDoubleValues> *) xScale
         : (ArNode <ArpDoubleValues> *) yScale
         : (ArNode <ArpDoubleValues> *) zScale
@@ -158,7 +158,7 @@ ART_MODULE_INTERFACE(ArnScaleTranslation)
 {
 }
 
-- init
+- (id) init
         : (ArNode <ArpDoubleValues> *) xTranslation
         : (ArNode <ArpDoubleValues> *) yTranslation
         : (ArNode <ArpDoubleValues> *) zTranslation

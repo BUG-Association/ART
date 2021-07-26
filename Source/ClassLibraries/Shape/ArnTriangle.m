@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnTriangle registerWithRuntime ];
 )
 
@@ -61,7 +62,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(1,1,1)
     triangleData = 0;
 }
 
-- init
+- (id) init
         : (long) idx0
         : (long) idx1
         : (long) idx2
@@ -76,7 +77,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(1,1,1)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnTriangle  * copiedInstance = [ super copy ];
 
@@ -86,7 +87,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(1,1,1)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnTriangle  * copiedInstance =

@@ -102,7 +102,7 @@ void arcbinarycoder_write_to_stream(
 
 @implementation ArcBinaryWritingCoder
 
-- init
+- (id) init
         : (ArcObject <ArpOutputStream> *)newStream
 {
     stream = newStream;
@@ -145,8 +145,6 @@ void arcbinarycoder_write_to_stream(
 - (int) lookDict
         : (const char *) s
 {
-    int i;
-
     for (unsigned int i = 0; i < topDict; i++)
     {
         if (strcmp(dict[i],s) == 0) return i;
@@ -709,7 +707,7 @@ void arcbinarycoder_write_to_stream(
 
 @implementation ArcBinaryReadingCoder
 
-- init
+- (id) init
         : (ArcObject <ArpInputStream> *) newStream
 {
     stream = newStream;

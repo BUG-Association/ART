@@ -39,7 +39,7 @@ ART_MODULE_INTERFACE(ArnRotate)
     RotX3D  rot;
 }
 
-- init
+- (id) init
         : (double) alpha
         ;
 
@@ -52,7 +52,7 @@ ART_MODULE_INTERFACE(ArnRotate)
     RotY3D  rot;
 }
 
-- init
+- (id) init
         : (double) alpha
         ;
 
@@ -65,7 +65,7 @@ ART_MODULE_INTERFACE(ArnRotate)
     RotZ3D  rot;
 }
 
-- init
+- (id) init
         : (double) alpha
         ;
 
@@ -78,7 +78,7 @@ ART_MODULE_INTERFACE(ArnRotate)
     Rot3D  rot;
 }
 
-- init
+- (id) init
         : (Rot3D) newRot
         ;
 
@@ -90,7 +90,7 @@ ART_MODULE_INTERFACE(ArnRotate)
 {
 }
 
-- init
+- (id) init
         : (ArNode *) alpha
         ;
 
@@ -102,7 +102,7 @@ ART_MODULE_INTERFACE(ArnRotate)
 {
 }
 
-- init
+- (id) init
         : (ArNode *) alpha
         ;
 
@@ -114,7 +114,7 @@ ART_MODULE_INTERFACE(ArnRotate)
 {
 }
 
-- init
+- (id) init
         : (ArNode *) alpha
         ;
 

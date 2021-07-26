@@ -35,7 +35,7 @@ ART_MODULE_INTERFACE(ArcAmbientLightsource)
 {
 }
 
-- init
+- (id) init
         : (ArSpectralIntensity *)  newSpectralPower
         ;
 

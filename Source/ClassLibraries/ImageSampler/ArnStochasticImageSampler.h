@@ -110,7 +110,7 @@ ART_MODULE_INTERFACE(ArnStochasticImageSampler)
     int             wavelengthSteps;
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> * ) newPathspaceIntegrator
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples

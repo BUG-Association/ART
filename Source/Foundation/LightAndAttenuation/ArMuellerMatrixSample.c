@@ -64,6 +64,8 @@ ArMuellerMatrixSample * armuellermatrixsample_alloc(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ArMuellerMatrixSample  * newMM = ALLOC( ArMuellerMatrixSample );
 
     return newMM;
@@ -74,6 +76,8 @@ void armuellermatrixsample_free(
               ArMuellerMatrixSample  * mmr
         )
 {
+    (void) art_gv;
+    
     FREE( mmr );
 }
 

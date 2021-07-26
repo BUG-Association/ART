@@ -134,7 +134,7 @@ int altitudeOfPoint(
 
 @implementation ArcComplexSkydomeLightsource
 
-- init
+- (id) init
         : (ArNode <ArpShape> *) shapeRef
         : (ArTraversalState *) traversalState
         : (ArnLightsourceCollector *) lightsourceCollector
@@ -567,7 +567,7 @@ int altitudeOfPoint(
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArcComplexSkydomeLightsource  * clone = [ super copy ];
 

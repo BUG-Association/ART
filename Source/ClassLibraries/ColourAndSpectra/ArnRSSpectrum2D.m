@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnRSSpectrum2D registerWithRuntime ];
 )
 
@@ -90,7 +91,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
 //    arcrosstalk_x_mathematicaprintf( art_gv, crosstalk );
 }
 
-- init
+- (id) init
         : (ArRSSpectrum2D) newSpectrum
 {
     self = [ super init ];
@@ -151,6 +152,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (const ArWavelength *) wavelength
         : (      ArSpectralSample *) outSpectrum
 {
+    (void) locationInfo;
+    (void) wavelength;
+    (void) outSpectrum;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -158,6 +163,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (ArcPointContext *) locationInfo
         : (ArLightIntensity *) outLightIntensity
 {
+    (void) locationInfo;
+    
     arlightintensity_s_init_i(
           art_gv,
           mainDiagonal,
@@ -169,6 +176,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (ArcPointContext *) locationInfo
         : (ArLight *) outLight
 {
+    (void) locationInfo;
+    
     arlight_s_init_unpolarised_l(
           art_gv,
           mainDiagonal,
@@ -180,6 +189,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (ArcPointContext *) locationInfo
         : (ArAttenuation *) attenuation_r
 {
+    (void) locationInfo;
+    
     arattenuation_sx_init_a(
            art_gv,
            mainDiagonal,
@@ -193,6 +204,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (const ArWavelength *) wavelength
         : (      ArAttenuationSample *) outAttenuation
 {
+    (void) locationInfo;
+    (void) wavelength;
+    (void) outAttenuation;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -219,6 +234,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (const ArWavelength *) wavelength
         : (      ArAttenuationSample *) outAttenuation
 {
+    (void) locationInfo;
+    (void) refframeEntry;
+    (void) refframeExit;
+    (void) wavelength;
+    (void) outAttenuation;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -228,6 +249,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (ArReferenceFrame *) refframeExit
         : (ArAttenuation *) attenuation_r
 {
+    (void) locationInfo;
+    
     arattenuation_sxrr_init_nonpolarising_a(
            art_gv,
            mainDiagonal,
@@ -245,6 +268,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (const ArWavelength *) wavelength
         : (      ArAttenuationSample *) outAttenuation
 {
+    (void) locationInfo;
+    (void) refframeEntry;
+    (void) refframeExit;
+    (void) wavelength;
+    (void) outAttenuation;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -253,6 +282,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (unsigned long) numberOfValues
         : (ArSpectrum *) outSpectrum
 {
+    (void) evalEnv;
+    
     numberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES);
 
     for ( unsigned int i = 0; i < numberOfValues; i++)
@@ -269,6 +300,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (ArcObject <ArpEvaluationEnvironment> *) evalEnv
         : (ArSpectrum *) outSpectrum
 {
+    (void) evalEnv;
+    
     spc_s_init_s(
           art_gv,
           mainDiagonal,
@@ -282,6 +315,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (const ArcObject <ArpEvaluationEnvironment> *) evalEnv
         : (ArSpectrum500 *) outSpectrum
 {
+    (void) evalEnv;
+    
     s500_s_init_s(
           art_gv,
           hiresMainDiagonal,
@@ -296,6 +331,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (unsigned long) numberOfValues
         : (ArAttenuation *) outAttenuations
 {
+    (void) evalEnv;
+    
     numberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES);
 
     for ( unsigned int i = 0; i < numberOfValues; i++)
@@ -313,6 +350,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (ArcObject <ArpEvaluationEnvironment> *) evalEnv
         : (ArAttenuation *) outAttenuation
 {
+    (void) evalEnv;
+    
     arattenuation_sx_init_a(
           art_gv,
           mainDiagonal,
@@ -330,6 +369,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (unsigned long) numberOfValues
         : (ArAttenuation *) outAttenuations
 {
+    (void) evalEnv;
+    
     numberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES);
 
     for ( unsigned int i = 0; i < numberOfValues; i++)
@@ -351,6 +392,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (ArReferenceFrame *) refframeExit
         : (ArAttenuation *) outAttenuation
 {
+    (void) evalEnv;
+    
     arattenuation_sxrr_init_depolarising_a(
           art_gv,
           mainDiagonal,
@@ -370,6 +413,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (unsigned long) numberOfValues
         : (ArAttenuation *) outAttenuations
 {
+    (void) evalEnv;
+    
     numberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES);
 
     for ( unsigned int i = 0; i < numberOfValues; i++)
@@ -391,6 +436,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (ArReferenceFrame *) refframeExit
         : (ArAttenuation *) outAttenuation
 {
+    (void) evalEnv;
+    
     arattenuation_sxrr_init_nonpolarising_a(
           art_gv,
           mainDiagonal,

@@ -38,7 +38,7 @@ ART_MODULE_INTERFACE(ArnRayleighPhaseFunction)
     double depolarisationFactor;
 }
 
-- init
+- (id) init
         : (double                ) newParticlesPerM3
         : (double                ) newVolumePolarisability
         : (double                ) newDepolarisationFactor

@@ -98,6 +98,8 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(0,0,3)
         : (const ArTraversalState *) traversalState
         : (Pnt3D *) outCentroid
 {
+    (void) traversalState;
+    
     *outCentroid = PNT3D_ZERO;
 }
 
@@ -105,14 +107,17 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(0,0,3)
         : (const ArTraversalState *) traversalState
         : (Pnt3DE *) point
 {
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "calculateNormalForLocalPnt3DE:: not implemented"
-        );
+    (void) traversalState;
+    (void) point;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 - (ArNode <ArpMapping> *) createMappingFor
         : (ArMappingCriteria) criteria
 {
+    (void) criteria;
+    
     return
         [ ALLOC_INIT_OBJECT(ArnHyperboloidQuadrangularMapping)
             :   HARD_NODE_REFERENCE(self)
@@ -146,6 +151,8 @@ ARPMAPPING_NO_ADJACENT_PATCHES
         : (const Pnt3DE *) inPoint3D
         : (Pnt2DE *) outPoint2D
 {
+    (void) traversalState;
+    
     OUT_2D_PATCHINDEX = IN_3D_FACEINDEX;
 
     OUT_2D_U = MATH_1_DIV_2_PI * atan2( IN_3D_YC, IN_3D_XC );
@@ -185,10 +192,12 @@ ARPMAPPING_NO_ADJACENT_PATCHES
         : (const Pnt2DE *) inPoint2D
         : (Pnt3DE *) outPoint3D
 {
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "getObjectSpacePnt3DE_for_Pnt2DE:: not implemented"
-        );
-
+    (void) traversalState;
+    (void) inPoint2D;
+    (void) outPoint3D;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
     return NO;
 }
 

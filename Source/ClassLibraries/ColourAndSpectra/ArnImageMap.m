@@ -35,6 +35,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnImageMap registerWithRuntime ];
 )
 
@@ -226,7 +227,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
     RELEASE_OBJECT(sourceImageBuffer);
 }
 
-- init
+- (id) init
         : (ArNode *) newImage
         : (double)   newScaleFactor
 {

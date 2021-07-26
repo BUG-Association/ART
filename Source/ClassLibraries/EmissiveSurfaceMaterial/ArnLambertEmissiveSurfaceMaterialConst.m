@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnLambertEmissiveSurfaceMaterialConst  registerWithRuntime ];
 )
 
@@ -131,8 +132,15 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
         : (ArSamplingRegion *) outSamplingRegion
         : (ArLight *) outLight
 {
-ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
-//this functionality will be removed anyway
+#ifndef NEVERMORE
+    (void) emissionLocationAndIncidentDirection;
+    (void) outSamplingRegion;
+    (void) outLight;
+#endif
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
+    //this functionality will be removed anyway
 #ifdef NEVERMORE
     if ( outSamplingRegion ) *outSamplingRegion = 0;
 

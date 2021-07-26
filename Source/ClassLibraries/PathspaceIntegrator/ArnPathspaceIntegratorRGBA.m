@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnPathspaceIntegratorRGBA registerWithRuntime ];
 )
 
@@ -67,7 +68,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathspaceIntegratorRGBA)
     return YES;
 }
 
-- init
+- (id) init
         : (ArNode <ArpRayCaster> *) newRayCaster
 {
     ART_ERRORHANDLING_MANDATORY_ARPROTOCOL_CHECK(
@@ -95,7 +96,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathspaceIntegratorRGBA)
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnPathspaceIntegratorRGBA  * copiedInstance = [ super copy ];
 
@@ -106,7 +107,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathspaceIntegratorRGBA)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnPathspaceIntegratorRGBA  * copiedInstance =

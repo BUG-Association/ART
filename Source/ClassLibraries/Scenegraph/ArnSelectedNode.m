@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSelectedNode registerWithRuntime ];
 )
 
@@ -47,7 +48,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSelectedNode)
 
-- init
+- (id) init
         : (ArNodeRef) newExpression
         : (ArNodeRef) newNodeTable
 {
@@ -70,7 +71,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSelectedNode)
     return self;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     int  i;

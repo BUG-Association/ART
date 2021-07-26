@@ -320,6 +320,7 @@ ART_MODULE_INITIALISATION_FUNCTION_EXEC_ONLY_ONCE
     crc32_8bit_table[254] = 0x5a05df1bL;
     crc32_8bit_table[255] = 0x2d02ef8dL;
 ,
+    (void) art_gv;
     // module has no code that gets executed on every startup
 )
 
@@ -329,6 +330,7 @@ ART_MODULE_SHUTDOWN_FUNCTION_EXEC_ONLY_ONCE
     FREE_ARRAY( crc32_4bit_table );
     FREE_ARRAY( crc32_8bit_table );
 ,
+    (void) art_gv;
     // module has no code that gets executed during every shutdown
 )
 
@@ -336,6 +338,8 @@ void crc32_verify_tables    (
         ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     int pattern;
 
     for (pattern = 0; pattern < 4; pattern++)

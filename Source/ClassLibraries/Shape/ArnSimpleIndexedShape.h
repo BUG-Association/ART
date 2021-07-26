@@ -40,7 +40,7 @@ ART_MODULE_INTERFACE(ArnSimpleIndexedShape)
     ArLongArray indexTable;
 }
 
-- init
+- (id) init
         : (ArLongArray) newIndexTable
         ;
 

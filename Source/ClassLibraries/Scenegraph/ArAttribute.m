@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArAttribute registerWithRuntime ];
     [ AraSingle registerWithRuntime ];
     [ AraTriple registerWithRuntime ];
@@ -79,7 +80,7 @@ ARPVISITING_DEFAULT_IMPLEMENTATION(ArAttribute)
 
 ARPNODE_DEFAULT_IMPLEMENTATION(AraSingle)
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRef) newAttributeRef
 {
@@ -96,7 +97,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraSingle)
     return self;
 }
 
-- copy
+- (id) copy
 {
     AraSingle  * copiedInstance = [ super copy ];
 
@@ -105,7 +106,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraSingle)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     AraSingle  * copiedInstance =
@@ -258,7 +259,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraSingle)
 
 ARPNODE_DEFAULT_IMPLEMENTATION(AraDouble)
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRef) newAttributeRef0
         : (ArNodeRef) newAttributeRef1
@@ -277,7 +278,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraDouble)
     return self;
 }
 
-- copy
+- (id) copy
 {
     AraDouble  * copiedInstance = [ super copy ];
 
@@ -289,7 +290,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraDouble)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     AraDouble  * copiedInstance =
@@ -460,7 +461,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraDouble)
 
 ARPNODE_DEFAULT_IMPLEMENTATION(AraTriple)
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRef) newAttributeRef0
         : (ArNodeRef) newAttributeRef1
@@ -481,7 +482,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraTriple)
     return self;
 }
 
-- copy
+- (id) copy
 {
     AraTriple  * copiedInstance = [ super copy ];
 
@@ -495,7 +496,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraTriple)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     AraTriple  * copiedInstance =
@@ -686,7 +687,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraTriple)
 
 ARPNODE_DEFAULT_IMPLEMENTATION(AraQuaternary)
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRef) newAttributeRef0
         : (ArNodeRef) newAttributeRef1
@@ -709,7 +710,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraQuaternary)
     return self;
 }
 
-- copy
+- (id) copy
 {
     AraQuaternary  * copiedInstance = [ super copy ];
 
@@ -725,7 +726,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraQuaternary)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     AraQuaternary  * copiedInstance =
@@ -936,7 +937,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraQuaternary)
 
 ARPNODE_DEFAULT_IMPLEMENTATION(AraMultiple)
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRefDynArray *) newAttributeRefArray
 {
@@ -953,7 +954,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraMultiple)
     return self;
 }
 
-- copy
+- (id) copy
 {
     AraMultiple  * copiedInstance = [ super copy ];
 
@@ -963,7 +964,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(AraMultiple)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     AraMultiple  * copiedInstance =

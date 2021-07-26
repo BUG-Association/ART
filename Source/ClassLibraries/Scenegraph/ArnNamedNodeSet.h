@@ -51,7 +51,7 @@ TYPEDEF_ARHASH(ArHashNamedNode, entry, data, ArHashHashNamedNode);
     ArHashNamedNode  * lastIteratedNamedNode;
 }
 
-- init
+- (id) init
         : (ArTable) newNamedNodeTable
         ;
 

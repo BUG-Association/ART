@@ -53,7 +53,7 @@ ART_MODULE_INTERFACE(ArnTriangleMesh)
 * param minPoint_: Extremal minimum point for the mesh.
 * param maxPoint_: Extremal maximum point for the mesh.
 */
-- init
+- (id) init
         : (ArShapeGeometry) newGeometry
         : (ArLongArray) faces_
         : (Pnt3D) minPoint_

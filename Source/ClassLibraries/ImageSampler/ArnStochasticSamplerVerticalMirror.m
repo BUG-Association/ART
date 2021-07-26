@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnStochasticSamplerVerticalMirror registerWithRuntime ];
 )
 
@@ -141,7 +142,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSamplerVerticalMirror)
     startingSequenceID = [ randomGenerator[0] currentSequenceID ];
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples
@@ -162,7 +163,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSamplerVerticalMirror)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnStochasticSamplerVerticalMirror  * copiedInstance = [ super copy ];
 
@@ -171,7 +172,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSamplerVerticalMirror)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnStochasticSamplerVerticalMirror  * copiedInstance =

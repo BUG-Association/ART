@@ -244,6 +244,8 @@ double rss2d_integrate(
         const double            ymax
         )
 {
+    (void) art_gv;
+    
     ASSERT_NONNEGATIVE_FINITE_DOUBLE( xmin )
     ASSERT_NONNEGATIVE_FINITE_DOUBLE( xmax )
     ASSERT_NONNEGATIVE_FINITE_DOUBLE( ymin )

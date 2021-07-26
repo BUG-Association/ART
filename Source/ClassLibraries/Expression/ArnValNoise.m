@@ -33,6 +33,7 @@ void arnperlinturbulence_init_matrix();
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     arnperlinnoise_init_tables();
     arnperlinturbulence_init_matrix();
 

@@ -39,7 +39,7 @@ ART_MODULE_INTERFACE(AraRules)
 {
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNode
         : (ArNodeRef) newRules
         ;

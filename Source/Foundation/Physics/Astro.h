@@ -68,7 +68,7 @@ void solarPosition(const double JDE,
                          double *elevationRad);
 
 /* Example usage in SkyModel models, e.g. Preetham:
-- init
+- (id) init
     : (double) JDE
     : (double) eastLongitudeRad
     : (double) latitudeRad

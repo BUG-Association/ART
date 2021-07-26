@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
      [ ArnVolumeDataConst registerWithRuntime ];
 )
 
@@ -39,7 +40,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataConst)
 
-- copy
+- (id) copy
 {
     ArnVolumeDataConst  * copiedInstance = [ super copy ];
 
@@ -51,7 +52,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataConst)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnVolumeDataConst  * copiedInstance =
@@ -72,7 +73,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataConst)
 //  - Use a proper spectrum instead of a single double
 //  - More ARTistic implementation way 
     
-- init
+- (id) init
         : (double) value
 {
     ArNodeRefDynArray array = arnoderefdynarray_init(0);
@@ -85,7 +86,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataConst)
     return self;
 }
 
-- init
+- (id) init
 // TODO    : (ArNode <ArpSpectrum> *) value
         : (double) value
         : (Pnt3D) min

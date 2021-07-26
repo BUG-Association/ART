@@ -58,6 +58,7 @@ ART_MODULE_INITIALISATION_FUNCTION_EXEC_ONLY_ONCE
 
     primetable_size = 3;
 ,
+    (void) art_gv;
     // module has no code that gets executed on every startup
 )
 
@@ -68,6 +69,7 @@ ART_MODULE_SHUTDOWN_FUNCTION_EXEC_ONLY_ONCE
     FREE_ARRAY(prime_array);
     FREE_ARRAY(prime_inverse_array);
 ,
+    (void) art_gv;
     // module has no code that gets executed during every shutdown
 )
 

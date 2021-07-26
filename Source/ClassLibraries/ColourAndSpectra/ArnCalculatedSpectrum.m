@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnCalculatedSpectrum registerWithRuntime ];
     [ ArnExtinctionFromAbsorbance registerWithRuntime ];
     [ ArnAbsorbanceFromReflectivity registerWithRuntime ];
@@ -73,7 +74,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
 ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
 
-- init
+- (id) init
         : (ArNode *) newColour
         : (double) newExponent
 {
@@ -196,7 +197,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExtinctionFromAbsorbance)
 
 ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
 
-- init
+- (id) init
         : (ArNode *) newColour
         : (double) newLength
 {
@@ -315,7 +316,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExtinctionFromAbsorbance)
 
 ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
 
-- init
+- (id) init
         : (ArNode *) newColour
 {
     self =
@@ -335,6 +336,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
+    (void) locationInfo;
+    (void) outPSSpectrum;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -342,6 +346,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    (void) wavelength;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0.0;

@@ -69,11 +69,11 @@ ART_MODULE_INTERFACE(ArcReporter)
     int numberOfFailures;
 }
 
-- init
+- (id) init
         : (ArcFileReporter *) newFileReporter
         ;
 
-- init
+- (id) init
         : (ArcFileReporter *) newFileReporter0
         : (ArcFileReporter *) newFileReporter1
         ;
@@ -111,7 +111,7 @@ ART_MODULE_INTERFACE(ArcReporter)
     int indent;
 }
 
-- init
+- (id) init
         : (FILE *) newFile
         ;
 

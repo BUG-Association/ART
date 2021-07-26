@@ -43,7 +43,7 @@ ART_MODULE_INTERFACE(ArnLeafNodeBBoxCollection)
     ArSGLDynArray     sgl_dynarray;
 }
 
-- init
+- (id) init
         ;
 
 - (void) addInfSphere

@@ -35,6 +35,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnPixelSampler registerWithRuntime ];
     [ ArnNonLockingIndependentPixelSampler registerWithRuntime ];
 )
@@ -60,7 +61,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnPixelSampler)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnPixelSampler)
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
 {
@@ -73,7 +74,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnPixelSampler)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnPixelSampler  * copiedInstance = [ super copy ];
 
@@ -82,7 +83,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnPixelSampler)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnPixelSampler  * copiedInstance =
@@ -264,7 +265,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnPixelSampler)
 
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnNonLockingIndependentPixelSampler)
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
 {
@@ -277,7 +278,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnNonLockingIndependentPixelSampler)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnNonLockingIndependentPixelSampler  * copiedInstance = [ super copy ];
 
@@ -286,7 +287,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnNonLockingIndependentPixelSampler)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnNonLockingIndependentPixelSampler  * copiedInstance =

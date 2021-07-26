@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnTorranceSparrowSurfaceMaterial  registerWithRuntime ];
 )
 
@@ -95,7 +96,7 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
     ARSURFACETYPE_GENERIC_REFLECTIONS | ARSURFACETYPE_GENERIC_REFRACTIONS,
     NO
                                                       )
-- init
+- (id) init
         : (ArNode *) newMicrofacetDistribution
 {
     self =
@@ -197,7 +198,7 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
             ];               
 }
 
-- copy
+- (id) copy
 {
     ArnTorranceSparrowSurfaceMaterial  * copiedInstance = [ super copy ];
     
@@ -206,7 +207,7 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
 : (ArnGraphTraversal *) traversal
 {
     ArnTorranceSparrowSurfaceMaterial  * copiedInstance =

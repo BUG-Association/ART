@@ -38,6 +38,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSphereVolumeMaterial registerWithRuntime ];
 )
 
@@ -49,7 +50,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSphereVolumeMaterial)
 ARPVOLUME_MATERIAL_ABSORPTION_ONLY
 
-- copy
+- (id) copy
 {
     ArnSphereVolumeMaterial  * copiedInstance = [ super copy ];
 
@@ -58,7 +59,7 @@ ARPVOLUME_MATERIAL_ABSORPTION_ONLY
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnSphereVolumeMaterial  * copiedInstance =
@@ -75,7 +76,7 @@ ARPVOLUME_MATERIAL_ABSORPTION_ONLY
 {
 }
 
-- init
+- (id) init
         : (Pnt3D                 ) newSphereCenter
         : (double                ) newSphereSize
         : (ArNode <ArpSpectrum> *) outerAbsorbCrossSection

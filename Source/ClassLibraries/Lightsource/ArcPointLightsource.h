@@ -38,7 +38,7 @@ ART_MODULE_INTERFACE(ArcPointLightsource)
     Pnt3D  position;
 }
 
-- init
+- (id) init
         : (ArNode <ArpShape> *) shape
         : (ArTraversalState *) traversalState
         : (ArnLightsourceCollector *) lightsourceCollector

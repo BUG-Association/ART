@@ -651,8 +651,6 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
     if (_writtingMode) {
         // Gather metadata
         const IVec2D size = [ _imageInfo size ];
-        const int width = XC(size);
-        const int height = YC(size);
             
         char * createdByString = NULL;
         char * creationDateStr = NULL;
