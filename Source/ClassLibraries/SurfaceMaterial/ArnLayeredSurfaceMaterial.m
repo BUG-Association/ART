@@ -1220,6 +1220,17 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLayeredSurfaceMaterial)
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
+
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) location
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+
+    return FALSE;
+}
+
 @end
 
 // ===========================================================================

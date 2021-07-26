@@ -461,7 +461,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 }
 
 - init
-        : (int) newMaxNumberOfSamples
+        : (unsigned int) newMaxNumberOfSamples
 {
     return
         [ self initWithReporter
@@ -472,7 +472,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 
 - initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
-        : (int) newMaxNumberOfSamples
+        : (unsigned int) newMaxNumberOfSamples
 {
     self =
         [ super initWithReporter
@@ -770,7 +770,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 }
 
 - init
-        : (int) newTmsNetSize
+        : (unsigned int) newTmsNetSize
 {
     return
         [ self initWithReporter
@@ -780,7 +780,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 
 - initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
-        : (int) newTmsNetSize
+        : (unsigned int) newTmsNetSize
 {
     self  = [ super init ];
     
@@ -805,8 +805,8 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
         //if (reporter)
 #ifdef RANDOM_GENERATOR_DEBUG_PRINTFS
         [ reporter printf
-            :   "ArcEfficientrandomGenerator: TMS net size requested: %d, "
-                "created: %d\n"
+            :   "ArcEfficientrandomGenerator: TMS net size requested: %ud, "
+                "created: %ud\n"
             ,   newTmsNetSize
             ,   tmsNetSize ];
 #endif

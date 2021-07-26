@@ -281,6 +281,19 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) location
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    return
+        [ SURFACE_SUBNODE calculateAlbedoSampleAtWavelength
+            :   location
+            :   wavelength
+            :   albedo
+            ];
+}
+
 #undef SURFACE_SUBNODE
 
 @end

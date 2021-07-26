@@ -1021,6 +1021,16 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
 }
 
 
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) location
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+
+    return FALSE;
+}
+
 - (void) code
         : (ArcObject <ArpCoder> *) coder
 {

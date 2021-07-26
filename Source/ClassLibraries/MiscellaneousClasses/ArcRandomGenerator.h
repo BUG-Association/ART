@@ -158,12 +158,12 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 }
 
 - init
-        : (int) newMaxNumberOfSamples
+        : (unsigned int) newMaxNumberOfSamples
         ;
 
 - initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
-        : (int) newMaxNumberOfSamples
+        : (unsigned int) newMaxNumberOfSamples
         ;
 
 @end
@@ -289,12 +289,12 @@ ArEffRNGseq2State;
 // default constructor: newTmsNetSize should be a power of 2, 64 seems
 // reasonable, if not, will be increased to next larger power of 2.
 - init
-        : (int) newTmsNetSize
+        : (unsigned int) newTmsNetSize
         ;
 
 - initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
-        : (int) newTmsNetSize
+        : (unsigned int) newTmsNetSize
         ;
 
 
