@@ -58,7 +58,7 @@ ArRSSpectrum2D rss2d_v(
 
     double  sample = RSS2D_LINE_END;
 
-    unsigned long stride = 0;
+    long stride = 0;
     ARRSS2D_STRIDE(s) = -1; // mark as undefined
     while ( sample != RSS2D_END )
     {

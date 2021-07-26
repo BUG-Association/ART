@@ -579,11 +579,11 @@ int altitudeOfPoint(
         {
             clone->patch[i] = patch[i];
             clone->patch[i].spectralPower =
-                ALLOC_ARRAY( ArLightIntensity *, PSM_ARRAYSIZE );
+                ALLOC_ARRAY( ArSpectralIntensity *, PSM_ARRAYSIZE );
         }
         
         clone->spectralPowerAlt =
-            ALLOC_ARRAY( ArLightIntensity *, PSM_ARRAYSIZE );
+            ALLOC_ARRAY( ArSpectralIntensity *, PSM_ARRAYSIZE );
         
         clone->skyModel         = skyModel;
         clone->solarRadius      = solarRadius;
@@ -597,7 +597,7 @@ int altitudeOfPoint(
             
             for ( int i = 0; i < 2; i++ )
             {
-                arlightintensity_i_init_i(
+                arspectralintensity_i_init_i(
                     art_gv,
                     patch[i].spectralPower[a],
                     clone->patch[i].spectralPower[a]

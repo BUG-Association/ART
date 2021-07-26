@@ -737,6 +737,8 @@ double map_parameter(const double param, const int value_count, const double * v
 			}
 		}
 	}
+
+  #warning AF: This can return an unitialized value (third branch, no else case)
 	return mapped;
 }
 
@@ -1396,6 +1398,7 @@ void arpragueskymodel_radiance_hero(
   const double elevation_control = map_parameter(elevation * MATH_RAD_TO_DEG, state->elevations, state->elevation_vals);
 
   ArSpectralSample channel_control;
+  #warning channel_control type is incompatible with sps_s_init_s
   sps_s_init_s(art_gv, wavelength, &channel_control);
   sps_d_mul_s(art_gv, 1.0E9, &channel_control);
   sps_d_add_s(art_gv, -state->channel_start, &channel_control);
@@ -2185,7 +2188,7 @@ void interpolate_elevation_pol_hero(
   const double factor = elevation - (double)elevation_low;
 
   ArSpectralSample res_low;
-  for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+  for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
   {
     const double * control_params_low = control_params_single_config(
       state,
@@ -2463,6 +2466,7 @@ void arpragueskymodel_polarisation_hero(
   const double elevation_control = map_parameter(elevation * MATH_RAD_TO_DEG, state->elevations, state->elevation_vals);
 
   ArSpectralSample channel_control;
+  #warning channel_control type is incompatible with sps_s_init_s
   sps_s_init_s(art_gv, wavelength, &channel_control);
   sps_d_mul_s(art_gv, 1.0E9, &channel_control);
   sps_d_add_s(art_gv, -state->channel_start, &channel_control);

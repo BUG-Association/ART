@@ -352,11 +352,15 @@ int m_ddi_equal(
         || ( !signbit(d0) &&  signbit(d1) ) )
      return d0 == d1;
 
+#warning AF: dereferencing type-punned pointer will break strict-aliasing rules [-Wstrict-aliasing] \
+         Quite scared about touching them... using an union and then querying the right \
+         members is probably the right way of doing it
     Int64 d0_long = *(Int64*)&d0;
 
     if (d0_long < 0)
         d0_long = 0x8000000000000000LL - d0_long;
 
+#warning AF: Same as above
     Int64 d1_long = *(Int64*)&d1;
 
     if (d1_long < 0)

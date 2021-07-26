@@ -1091,7 +1091,7 @@ void bspTree_debugprintf(
 
     bspTree = ALLOC_ARRAY( BSPNode, numberOfAllocatedBSPNodes );
 
-    for ( unsigned int i = 0; i < numberOfAllocatedBSPNodes; i++ )
+    for ( int i = 0; i < numberOfAllocatedBSPNodes; i++ )
         BSP_NODE_INNER(bspTree[i]) = BSP_NODE_INNER_EMPTY;
 
     //   This is also a rough initial guess, and probably too low as well.

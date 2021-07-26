@@ -332,8 +332,8 @@ void rss2d_to_cx500(
 
     cx500_d_init_x(art_gv, 0.0, xr);
 
-    int  rss_s_x = RSS2D_SIZE_X(*rss2d);
-    int  rss_s_y = RSS2D_SIZE_Y(*rss2d);
+    unsigned int  rss_s_x = RSS2D_SIZE_X(*rss2d);
+    unsigned int  rss_s_y = RSS2D_SIZE_Y(*rss2d);
 
     double  sampleSize =
           NANO_FROM_UNIT(ARRSS2D_EX_STEP(*rss2d));
@@ -354,12 +354,17 @@ void rss2d_to_cx500(
             y0 -= RSS2D_TO_X_START;
             y1 -= RSS2D_TO_X_START;
 
+            ASSERT_NONNEGATIVE_INTEGER(x0);
+            ASSERT_NONNEGATIVE_INTEGER(x1);
+            ASSERT_NONNEGATIVE_INTEGER(y0);
+            ASSERT_NONNEGATIVE_INTEGER(y1);
+
             double sampleValue = ARRSSPECTRUM2D_SAMPLE(rss2d,x,y);
 
             sampleValue /= sampleSize;
 
-            for ( unsigned int xx = x0; xx < x1; xx++ )
-                for ( unsigned int yy = y0; yy < y1; yy++ )
+            for ( int xx = x0; xx < x1; xx++ )
+                for ( int yy = y0; yy < y1; yy++ )
                     ARCROSSTALK500_SET_XYD( *xr, xx, yy, sampleValue );
 
         }

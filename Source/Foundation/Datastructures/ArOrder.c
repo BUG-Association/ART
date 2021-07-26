@@ -474,11 +474,11 @@ void arorder_scramble(
 {
     void  * temp = ALLOC_ARRAY( Byte, size );
 
-    for ( int i = 0; i < number; i++ )
+    for ( unsigned long i = 0; i < number; i++ )
     {
-        int  newIndex = RANDOM_UNIFORM(art_gv) * number;
+        unsigned long  newIndex = RANDOM_UNIFORM(art_gv) * number;
         
-        if ( newIndex > number - 1 )
+        if ( newIndex + 1 > number )
         {
             newIndex = 0;
         }

@@ -78,7 +78,7 @@ ArFaceOnShape;
     'ARSHAPEFACE...'
         Various macros to access and operate on an 'ArFaceOnShape'.
 --------------------------------------------------------------------------- */
-#define ARFACE_ON_SHAPE(_s,_i,_t,_f)        ((ArFaceOnShape){(_s),(_i),(_t),(_f)})
+#define ARFACE_ON_SHAPE(_s,_i,_t,_f)        ((ArFaceOnShape){(_s),(_i),(_t),(_f), NULL})
 #define ARFACE_ON_SHAPE_NONE                ARFACE_ON_SHAPE(0,-1,0,0)
 #define ARFACE_ON_SHAPE_INVALID_INDEX       (-1)
 #define ARFACE_ON_SHAPE_SHAPE(__sf)         (__sf).shape

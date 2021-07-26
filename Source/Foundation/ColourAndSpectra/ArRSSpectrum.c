@@ -131,7 +131,9 @@ double rss_integrate(
         )
 {
     double fraction = (xmin - rss->start) / rss->step;
-    unsigned int index = (int)floor(fraction);
+    ASSERT_NONNEGATIVE_DOUBLE(fraction);
+
+    unsigned int index = (unsigned int)floor(fraction);
     double x = rss->start + rss->step * (double)index;
     double sum;
 
@@ -180,7 +182,7 @@ double rss_sd_value_at_wavelength(
     
     ASSERT_NONNEGATIVE_FINITE_DOUBLE( ARRSS_SAMPLE(*s0,index) );
     
-    return ARRSS_SAMPLE(*s0,index);
+    return ARRSS_SAMPLE(*s0, (unsigned int)index);
 }
 
 unsigned int rss_s_valid(
@@ -258,7 +260,7 @@ unsigned int rss_s_valid(
             || m_d_isNaN( ARRSS_SAMPLE( *rss, i ) ) )
         {
             ART_ERRORHANDLING_WARNING(
-                "RSS sample %d is invalid (%f)",
+                "RSS sample %ld is invalid (%f)",
                 i,
                 ARRSS_SAMPLE( *rss, i )
                 );
