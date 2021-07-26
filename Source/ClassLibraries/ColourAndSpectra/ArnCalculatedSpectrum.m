@@ -97,6 +97,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
+    (void) locationInfo;
+    (void) outPSSpectrum;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -104,6 +107,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    (void) wavelength;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0.0;
@@ -220,6 +226,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
+    (void) locationInfo;
+    (void) outPSSpectrum;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -227,6 +236,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    (void) wavelength;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0.0;

@@ -264,6 +264,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,artraw)
         : (ArNode **) objectPtr
         : (ArList *) externals
 {
+    (void) externals;
+    
     *objectPtr =
         [ ALLOC_INIT_OBJECT(ArnFileImage)
             :   [ file name ]
@@ -920,6 +922,8 @@ while (0);
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
+    (void) start;
+    
     for ( long y = 0; y < YC(image->size); y++ )
     {
         if ( fileContainsPolarisationData )
@@ -1293,6 +1297,8 @@ while (0);
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
+    (void) start;
+    
     for ( long y = 0; y < YC(image->size); y++ )
     {
 

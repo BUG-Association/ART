@@ -40,6 +40,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (unsigned long) key \
         : (const _Type *) value \
 { \
+    (void) key; \
+    (void) value; \
 } \
 \
 - (void) add ## _Type ## s \
@@ -47,12 +49,18 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (unsigned long) number \
         : (const _Type *) valueArray \
 { \
+    (void) key; \
+    (void) number; \
+    (void) valueArray; \
 } \
 \
 - (unsigned long) get ## _Type \
         : (unsigned long) key \
         : (_Type *) value \
 { \
+    (void) key; \
+    (void) value; \
+\
     return 0; \
 } \
 \
@@ -61,6 +69,10 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (unsigned long) number \
         : (_Type *) valueArray \
 { \
+    (void) key; \
+    (void) number; \
+    (void) valueArray; \
+\
     return 0; \
 } \
 \
@@ -68,6 +80,9 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (unsigned long) key \
         : (_Type *) value \
 { \
+    (void) key; \
+    (void) value; \
+\
     return 0; \
 } \
 \
@@ -76,6 +91,10 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (unsigned long) number \
         : ( _Type *) valueArray \
 { \
+    (void) key; \
+    (void) number; \
+    (void) valueArray; \
+\
     return 0; \
 }
 

@@ -82,6 +82,8 @@ void channelIndicesForFrequency(
 - (double) meanFreeFlightPath
         : (const Ray3D *) ray_worldspace
 {
+    (void) ray_worldspace;
+    
     return MATH_HUGE_DOUBLE;
 }
 
@@ -91,6 +93,11 @@ void channelIndicesForFrequency(
         : (ArAttenuation *) attenuation_r
         : (ArLight *) outLight
 {
+    (void) ray_worldspace;
+    (void) path_direction;
+    (void) attenuation_r;
+    (void) outLight;
+    
 //    ARLIGHT_INIT_AS_NONE( outLight );
 //    
 //    Pnt3D  centerOfTheEarth = PNT3D(0,0,-PLANET_RADIUS);
@@ -157,6 +164,12 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
         : (ArAttenuation *) attenuation_r
         : (ArLight *) outLight
 {
+    (void) ray_worldspace;
+    (void) ray_t;
+    (void) pathDirection;
+    (void) attenuation_r;
+    (void) outLight;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -167,7 +180,16 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
         : (ArAttenuation *) attenuation_r
         : (ArLight *) light_r
 {
+#ifndef NEVERMORE
+    (void) ray_worldspace;
+    (void) endpoint_worldspace;
+    (void) pathDirection;
+    (void) attenuation_r;
+    (void) light_r;
+#endif
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+
 #ifdef NEVERMORE
     //   we connect both ray endpoints to the center of the earth, and measure
     //   distance from there. reason for this is of course that we might be
@@ -957,49 +979,144 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 	}
 }
 
-- (void)absorptionCoefficient:(const Pnt3D *)pointWorldspace :(const ArWavelength *)wavelength :(ArSpectralSample *)absorptionCoefficient {
+- (void)absorptionCoefficient
+        : (const Pnt3D *) pointWorldspace
+        : (const ArWavelength *) wavelength
+        : (ArSpectralSample *) absorptionCoefficient
+{
+    (void) pointWorldspace;
+    (void) wavelength;
+    (void) absorptionCoefficient;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 
-- (BOOL)calculatePhaseFunctionSample:(ArcRayEndpoint *)incomingDirectionAndLocation :(ArPathDirection)pathDirection :(ArBSDFSampleGenerationContext *)context :(const ArWavelength *)incomingWavelength :(ArWavelength *)sampledWavelength :(Vec3D *)sampledDirection :(ArPDFValue *)sampleProbability :(ArPDFValue *)reverseSampleProbability :(ArAttenuationSample *)attenuationSample {
+- (BOOL) calculatePhaseFunctionSample
+        : (ArcRayEndpoint *) incomingDirectionAndLocation
+        : (ArPathDirection) pathDirection
+        : (ArBSDFSampleGenerationContext *) context
+        : (const ArWavelength *) incomingWavelength
+        : (ArWavelength *) sampledWavelength
+        : (Vec3D *) sampledDirection
+        : (ArPDFValue *) sampleProbability
+        : (ArPDFValue *) reverseSampleProbability
+        : (ArAttenuationSample *) attenuationSample
+{
+    (void) incomingDirectionAndLocation;
+    (void) pathDirection;
+    (void) context;
+    (void) incomingWavelength;
+    (void) sampledWavelength;
+    (void) sampledDirection;
+    (void) sampleProbability;
+    (void) reverseSampleProbability;
+    (void) attenuationSample;
+
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return NO;
 }
 
 
-- (void)crossSection:(const Pnt3D *)pointWorldspace :(const ArWavelength *)wavelength :(ArPathDirection)pathDirection :(ArSpectralSample *)crossSection {
+- (void) crossSection
+        : (const Pnt3D *) ÎpointWorldspace
+        : (const ArWavelength *) wavelength
+        : (ArPathDirection) pathDirection
+        : (ArSpectralSample *) crossSection
+{
+    (void) ÎpointWorldspace;
+    (void) wavelength;
+    (void) pathDirection;
+    (void) crossSection;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 
-- (BOOL)evaluatePhaseFunction:(ArcRayEndpoint *)incomingDirectionAndLocation :(const Vec3D *)outgoingDirection :(ArPathDirection)pathDirection :(ArBSDFSampleGenerationContext *)context :(const ArWavelength *)incomingWavelength :(const ArWavelength *)outgoingWavelength :(ArPDFValue *)sampleProbability :(ArPDFValue *)reverseSampleProbability :(ArAttenuationSample *)attenuationSample {
+- (BOOL) evaluatePhaseFunction
+        : (ArcRayEndpoint *) incomingDirectionAndLocation
+        : (const Vec3D *) outgoingDirection
+        : (ArPathDirection) pathDirection
+        : (ArBSDFSampleGenerationContext *) context
+        : (const ArWavelength *) incomingWavelength
+        : (const ArWavelength *) outgoingWavelength
+        : (ArPDFValue *) sampleProbability
+        : (ArPDFValue *) reverseSampleProbability
+        : (ArAttenuationSample *) attenuationSample
+{
+    (void) incomingDirectionAndLocation;
+    (void) outgoingDirection;
+    (void) pathDirection;
+    (void) context;
+    (void) incomingWavelength;
+    (void) outgoingWavelength;
+    (void) sampleProbability;
+    (void) reverseSampleProbability;
+    (void) attenuationSample;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return NO;
 }
 
 
-- (BOOL)isHomogeneous {
+- (BOOL) isHomogeneous
+{
     return NO;
 }
 
 
-- (void)maxAbsorptionCoefficientForRay:(const Ray3D *)rayWorldspace :(const ArWavelength *)wavelength :(ArSpectralSample *)maxAbsorptionCoefficient {
+- (void) maxAbsorptionCoefficientForRay
+        : (const Ray3D *) rayWorldspace
+        : (const ArWavelength *) wavelength
+        : (ArSpectralSample *) maxAbsorptionCoefficient
+{
+    (void) rayWorldspace;
+    (void) wavelength;
+    (void) maxAbsorptionCoefficient;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 
-- (void)maxCrossSectionForRay:(const Ray3D *)rayWorldspace :(const ArWavelength *)wavelength :(ArPathDirection)pathDirection :(ArSpectralSample *)maxCrossSection {
+- (void) maxCrossSectionForRay
+        : (const Ray3D *) rayWorldspace
+        : (const ArWavelength *) wavelength
+        : (ArPathDirection) pathDirection
+        : (ArSpectralSample *) maxCrossSection
+{
+    (void) rayWorldspace;
+    (void) wavelength;
+    (void) pathDirection;
+    (void) maxCrossSection;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 
-- (void)maxScatteringCoefficientForRay:(const Ray3D *)rayWorldspace :(const ArWavelength *)wavelength :(ArPathDirection)pathDirection :(ArSpectralSample *)maxScatteringCoefficient {
+- (void) maxScatteringCoefficientForRay
+        : (const Ray3D *) rayWorldspace
+        : (const ArWavelength *) wavelength
+        : (ArPathDirection) pathDirection
+        : (ArSpectralSample *) maxScatteringCoefficient
+{
+    (void) rayWorldspace;
+    (void) wavelength;
+    (void) pathDirection;
+    (void) maxScatteringCoefficient;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 
-- (BOOL)rayIntersect:(const Ray3D *)rayWorldspace :(double *)near :(double *)far {
+- (BOOL) rayIntersect
+        : (const Ray3D *) rayWorldspace
+        : (double *) near
+        : (double *) far
+{
+    (void) rayWorldspace;
+    (void) near;
+    (void) far;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return NO;
 }
@@ -1011,7 +1128,17 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 */
 
-- (void)scatteringCoefficient:(const Pnt3D *)pointWorldspace :(const ArWavelength *)wavelength :(ArPathDirection)pathDirection :(ArSpectralSample *)scatteringCoefficient {
+- (void) scatteringCoefficient
+        : (const Pnt3D *) pointWorldspace
+        : (const ArWavelength *) wavelength
+        : (ArPathDirection) pathDirection
+        : (ArSpectralSample *) scatteringCoefficient
+{
+    (void) pointWorldspace;
+    (void) wavelength;
+    (void) pathDirection;
+    (void) scatteringCoefficient;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 /*

@@ -194,6 +194,9 @@ int xfilelength(int fd)
         : (ArNode **) objectPtr
         : (ArcObject <ArpStream> *) stream
 {
+    (void) objectPtr;
+    (void) stream;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 

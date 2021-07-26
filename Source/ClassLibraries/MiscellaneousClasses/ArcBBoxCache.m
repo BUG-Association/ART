@@ -81,6 +81,9 @@ ArBBoxCacheEntry;
         : (ArTreePath *) treepath
         : (Box3D *) inBBox
 {
+    (void) treepath;
+    (void) inBBox;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 /*
     ArBBoxCacheEntry * hrln = NULL;
@@ -97,6 +100,9 @@ ArBBoxCacheEntry;
         : (ArTreePath *) treepath
         : (Box3D *) outBBox
 {
+    (void) treepath;
+    (void) outBBox;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 /*
     ArBBoxCacheEntry * hrln = NULL;

@@ -421,6 +421,8 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS \
     : (ArcPointContext *) locationInfo \
     : (ArPSSpectrum *) outPSSpectrum \
 { \
+    (void) locationInfo; \
+\
     _type##_to_pss_new( art_gv, & nativeValue, outPSSpectrum ); \
 } \
 \
@@ -428,6 +430,8 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS \
     : (ArcPointContext *) locationInfo \
     : (const double) wavelength \
 { \
+    (void) locationInfo; \
+\
     return s500_sd_value_at_wavelength( art_gv, internalHiresSpectrum, wavelength ); \
 } \
 \

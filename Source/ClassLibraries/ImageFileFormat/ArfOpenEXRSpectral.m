@@ -144,6 +144,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
         : (ArNode **) objectPtr
         : (ArList *) externals
 {
+    (void) externals;
+    
     *objectPtr =
         [ ALLOC_INIT_OBJECT(ArnFileImage)
             :   [ file name ]
@@ -363,7 +365,9 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
 - (void) getPlainImage
         : (IPnt2D) start
         : (ArnPlainImage *) image
-{     
+{
+    (void) start;
+    
     ArSpectrum *colBufS0 = spc_d_alloc_init( art_gv, 0.0 );
     ArSpectrum *colBufS1 = spc_d_alloc_init( art_gv, 0.0 );
     ArSpectrum *colBufS2 = spc_d_alloc_init( art_gv, 0.0 );

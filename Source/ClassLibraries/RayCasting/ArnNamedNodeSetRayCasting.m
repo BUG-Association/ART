@@ -44,6 +44,8 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(ArnNamedNodeSet)
 - (ArNode <ArpVolumeMaterial> *) volumeMaterial_at_WorldPnt3D
         : (ArnRayCaster *) rayCaster
 {
+    (void) rayCaster;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 /*
     ArNode  * rulesStore;
@@ -71,6 +73,9 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(ArnNamedNodeSet)
         : (ArnRayCaster *) rayCaster
         : (ArcSurfacePoint **) surfacePoint
 {
+    (void) rayCaster;
+    (void) surfacePoint;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 /*
     ArNodeRefStore              rules_store;
@@ -89,6 +94,10 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(ArnNamedNodeSet)
         : (Range) range_of_t
         : (struct ArIntersectionList *) intersectionList
 {
+    (void) rayCaster;
+    (void) range_of_t;
+    (void) intersectionList;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 /*
     ArNodeRefStore              rules_store;

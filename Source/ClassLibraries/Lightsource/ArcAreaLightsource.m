@@ -278,6 +278,9 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : ( ArSamplingRegion *)  samplingRegion
         : ( double * ) probability
 {
+    (void) samplingRegion;
+    (void) probability;
+    
     return NO;
 }
 

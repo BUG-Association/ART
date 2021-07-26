@@ -184,6 +184,8 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
         : (ArSamplingRegion *) outSamplingRegion
         : (ArLightSample *) outLightSample
 {
+    (void) emissionLocation;
+    
     if ( outSamplingRegion ) *outSamplingRegion = 0;
 
     if ( OUTGOING_COSINE_WORLDSPACE > 0.0 )

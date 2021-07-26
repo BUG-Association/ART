@@ -2058,6 +2058,8 @@ void _typeShort##_##_vtype##dd_sample_at_wavelength_##_vtype( \
               _Type   * cr  \
         ) \
 { \
+    (void) d1; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_NONNEGATIVE_DOUBLE( d0 ) \
     ASSERT_POSITIVE_DOUBLE( d1 ) \

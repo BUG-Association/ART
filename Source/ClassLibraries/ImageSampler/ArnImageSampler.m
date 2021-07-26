@@ -589,6 +589,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 - (void) tonemapAndOpenProc
         : (ArcUnsignedInteger *) threadIndex
 {
+    (void) threadIndex;
+    
     //   autorelease pool for this thread to keep Cocoa happy
 
     NSAutoreleasePool  * threadPool;
@@ -691,6 +693,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 - (void) termIOProc
         : (ArcUnsignedInteger *) threadIndex
 {
+    (void) threadIndex;
+    
     if ( art_interactive_mode_permitted( art_gv ) )
     {
         setvbuf(stdout,NULL,_IONBF,0);

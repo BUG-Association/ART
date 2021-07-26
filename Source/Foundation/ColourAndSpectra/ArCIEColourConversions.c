@@ -454,6 +454,11 @@ void lab_conversion_to_rgb(
               ArRGB                 * rgb_r
         )
 {
+    (void) lab_0;
+    (void) rgb_colourspace_ref;
+    (void) transform;
+    (void) rgb_r;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 

@@ -79,6 +79,9 @@ void artable_copy(
         ArTable  * destination
         )
 {
+    (void) source;
+    (void) destination;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 

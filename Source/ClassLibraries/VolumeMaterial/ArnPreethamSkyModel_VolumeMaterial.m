@@ -108,6 +108,11 @@ void calculateABCD( double aX, double bX, double cX, double dX, double eX,
         : (ArAttenuation *) attenuation_r
         : (ArLight *) outLight
 {
+    (void) ray_worldspace;
+    (void) path_direction;
+    (void) attenuation_r;
+    (void) outLight;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -118,6 +123,14 @@ void calculateABCD( double aX, double bX, double cX, double dX, double eX,
         : (ArAttenuation *) attenuation_r
         : (ArLight *) outLight
 {
+#ifndef NEVERMORE
+    (void) ray_worldspace;
+    (void) ray_t;
+    (void) pathDirection;
+    (void) attenuation_r;
+    (void) outLight;
+#endif
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 #ifdef NEVERMORE
     ArSpectrum *attenuationColour = spc_alloc( art_gv );
@@ -389,6 +402,12 @@ void calculateABCD( double aX, double bX, double cX, double dX, double eX,
         : (ArAttenuation *) attenuation_r
         : (ArLight *) outLight
 {
+    (void) ray_worldspace;
+    (void) endpoint_worldspace;
+    (void) pathDirection;
+    (void) attenuation_r;
+    (void) outLight;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 

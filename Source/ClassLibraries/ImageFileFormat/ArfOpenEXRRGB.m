@@ -160,6 +160,8 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
         : (ArNode **) objectPtr
         : (ArList *) externals
 {
+    (void) externals;
+    
     *objectPtr =
         [ ALLOC_INIT_OBJECT(ArnFileImage)
             :   [ file name ]
@@ -266,7 +268,9 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
 - (void) getPlainImage
         : (IPnt2D) start
         : (ArnPlainImage *) image
-{    
+{
+    (void) start;
+    
     switch (_fileDataType) {
         case ardt_rgb: {
             ArRGB * outScanline = ALLOC_ARRAY(ArRGB, XC(image->size));

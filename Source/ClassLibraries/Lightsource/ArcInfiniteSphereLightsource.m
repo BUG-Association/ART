@@ -127,6 +127,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 - (double) selectionProbabilityOfRegion
         : ( ArSamplingRegion *)  lightsourceSamplingRegion
 {
+    (void) lightsourceSamplingRegion;
+    
     return 1.0;
 }
 
@@ -134,6 +136,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : ( ArSamplingRegion *)  samplingRegion
         : ( double * ) probability
 {
+    (void) samplingRegion;
+    
     *probability = infSphereSampleProbability;
     return YES;
     // return NO;

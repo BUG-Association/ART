@@ -72,6 +72,8 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(tiff)
 + (ArFiletypeMatch) matchWithStream
         : (ArcObject <ArpStream> *) stream
 {
+    (void) stream;
+    
     return arfiletypematch_exact;
     /*
     char  buffer[6];
@@ -1226,6 +1228,8 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
         : (ArNode **) objectPtr
         : (ArList *) externals
 {
+    (void) externals;
+    
     *objectPtr =
         [ ALLOC_INIT_OBJECT(ArnFileImage)
             :   [ file name ]
@@ -1236,6 +1240,9 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
         : (ArNode **) node
         : (ArcObject <ArpStream> *) stream
 {
+    (void) node;
+    (void) stream;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 

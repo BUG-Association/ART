@@ -53,6 +53,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnUniformEnvironmentMaterial)
         : (ArSamplingRegion *) resultSamplingRegion
         : (ArLight *) resultLight
 {
+    (void) queryLocation_worldspace;
+    (void) queryDirection_worldspace;
+    
     if ( resultSamplingRegion ) *resultSamplingRegion = 0;
 
     ArSpectrum  * lightColour = spc_alloc( art_gv );
@@ -83,6 +86,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnUniformEnvironmentMaterial)
         : (ArSamplingRegion *) resultSamplingRegion
         : (ArSpectralIntensity *) resultIntensity
 {
+    (void) queryLocation_worldspace;
+    (void) queryDirection_worldspace;
+    
     if ( resultSamplingRegion ) *resultSamplingRegion = 0;
 
     ArSpectrum500 * lightColour = s500_alloc( art_gv );
@@ -114,6 +120,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnUniformEnvironmentMaterial)
         : (ArSamplingRegion *) resultSamplingRegion
         : (ArLightSample *) resultLightSample
 {
+    (void) queryLocation_worldspace;
+    (void) queryDirection_worldspace;
+    
     if ( resultSamplingRegion ) *resultSamplingRegion = 0;
 
     ArSpectralSample  lightColourSample;

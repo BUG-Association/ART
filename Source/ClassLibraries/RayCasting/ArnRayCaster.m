@@ -299,6 +299,8 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 - (ArNode <ArpRayCasting> *) referencedObjectFor
         : (ArnReference *) reference
 {
+    (void) reference;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 /*
     return [ referenceCache referencedObjectFor: reference : self ];
@@ -309,6 +311,8 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
 - (ArNode <ArpRayCasting> *) referencedObjectForCombined
         : (AraCombinedReference *) combinedReference
 {
+    (void) combinedReference;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 /*
     return [ referenceCache referencedObjectForCombined:
@@ -323,6 +327,11 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         : (const Range *) range_t
         : (struct ArIntersectionList *) intersectionList
 {
+    (void) geometryToIntersectRayWith;
+    (void) ray_WorldCoordinates;
+    (void) range_t;
+    (void) intersectionList;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 /*
     rayinfo_init(&rayInfo, inRay);
@@ -343,6 +352,10 @@ THIS ONLY HAS TO BE RE-ACTIVATED IF AND WHEN THE REFERENCE CACHE IS ADDED BACK
         : (const Ray3D *) ray_WorldCoordinates
         : (const Range *) range_t
 {
+    (void) geometryToIntersectRayWith;
+    (void) ray_WorldCoordinates;
+    (void) range_t;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 /*
     ArHit * outHit;

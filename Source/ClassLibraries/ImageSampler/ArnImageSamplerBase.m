@@ -66,6 +66,8 @@ void image_sampler_sigusr1_handler(
         int  sig
         )
 {
+    (void) sig;
+    
     received_signal = 1;
     pthread_mutex_lock( signal_handler_mutex );
     pthread_cond_signal( signal_handler_cond );
@@ -76,6 +78,8 @@ void image_sampler_sigusr2_handler(
         int  sig
         )
 {
+    (void) sig;
+    
     received_signal = 2;
     pthread_mutex_lock( signal_handler_mutex );
     pthread_cond_signal( signal_handler_cond );
@@ -86,6 +90,8 @@ void image_sampler_sigint_handler(
         int  sig
         )
 {
+    (void) sig;
+    
     received_signal = 3;
     pthread_mutex_lock( signal_handler_mutex );
     pthread_cond_signal( signal_handler_cond );
@@ -300,6 +306,9 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
         : (ArNode <ArpImageWriter> **) image
         : (int) numberOfResultImages
 {
+    (void) newWorld;
+    (void) newCamera;
+    
     sampleCounter =
         [ ALLOC_INIT_OBJECT(ArcSampleCounter)
             :  ART_GLOBAL_REPORTER
@@ -477,6 +486,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
         : (ArNode <ArpImageWriter> **) image
         : (int) numberOfResultImages
 {
+    (void) newWorld;
+    (void) newCamera;
+    (void) image;
+    (void) numberOfResultImages;
+    
     ART__VIRTUAL_METHOD__EXIT_WITH_ERROR
 }
 
@@ -486,6 +500,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
         : (ArNode <ArpImageWriter> **) image
         : (int) numberOfResultImages
 {
+    (void) world;
+    (void) camera;
+    (void) image;
+    (void) numberOfResultImages;
+    
     RELEASE_OBJECT( sampleCounter );
 
     for ( unsigned int i = 0; i < numberOfRenderThreads; i++ )
@@ -502,12 +521,16 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
 - (void) termIOProc
         : (ArcUnsignedInteger *) threadIndex
 {
+    (void) threadIndex;
+    
     ART__VIRTUAL_METHOD__EXIT_WITH_ERROR
 }
 
 - (void) renderProc
         : (ArcUnsignedInteger *) threadIndex
 {
+    (void) threadIndex;
+    
     ART__VIRTUAL_METHOD__EXIT_WITH_ERROR
 }
 

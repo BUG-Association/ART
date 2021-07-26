@@ -76,13 +76,23 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
                 : (IVec2D) regionSize \
                 : (Ar##_Type *) target \
                 : (long) regionStride \
-            {} \
+            { \
+                (void) regionOffset; \
+                (void) regionSize; \
+                (void) target; \
+                (void) regionStride; \
+            } \
         - (void) set##_Type##Region \
                 : (IPnt2D) regionOffset \
                 : (IVec2D) regionSize \
                 : (const Ar##_Type *) source \
                 : (long) regionStride \
-            {}
+            { \
+                (void) regionOffset; \
+                (void) regionSize; \
+                (void) source; \
+                (void) regionStride; \
+            }
 
 /* ---------------------------------------------------------------------------
     'ARPPLAINIMAGE_..._IMPLEMENTATION'
@@ -507,12 +517,18 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnPlainImage)
         : (IPnt2D) offset
         : (ArnPlainImage *) image
 {
+    (void) offset;
+    (void) image;
+#warning AF is this function is intentionally empty?
 }
 
 - (void) setPlainImage
         : (IPnt2D) offset
         : (ArnPlainImage *) image
 {
+    (void) offset;
+    (void) image;
+#warning AF is this function is intentionally empty?
 }
 
 GETSET_REGION_DUMMY_IMPLEMENTATION(Grey)

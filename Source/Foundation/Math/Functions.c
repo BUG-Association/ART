@@ -700,7 +700,7 @@ double m_i_factorial_ln(
 }
 
 
-double m_i0_dbinomial(double x) { return 1.0; }
+double m_i0_dbinomial(double x) { (void) x; return 1.0; }
 double m_i1_dbinomial(double x) { return x; }
 double m_i2_dbinomial(double x) { return x*(x-1)/2; }
 double m_i3_dbinomial(double x) { return x*(x-1)*(x-2)/6; }

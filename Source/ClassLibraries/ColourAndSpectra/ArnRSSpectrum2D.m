@@ -130,6 +130,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (ArcPointContext *) locationInfo
         : (ArSpectrum *) outSpectrum
 {
+    (void) locationInfo;
+    
     spc_s_init_s(
           art_gv,
           mainDiagonal,
@@ -140,6 +142,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (ArcPointContext *) locationInfo
         : (ArSpectrum500 *) outSpectrum
 {
+    (void) locationInfo;
+    
     s500_s_init_s(
           art_gv,
           hiresMainDiagonal,
@@ -217,6 +221,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         : (ArReferenceFrame *) refframeExit
         : (ArAttenuation *) attenuation_r
 {
+    (void) locationInfo;
+    
     arattenuation_sxrr_init_depolarising_a(
            art_gv,
            mainDiagonal,
@@ -464,6 +470,8 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_none)
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
+    (void) locationInfo;
+    
     rss2d_to_pss_new( art_gv, nativeValue, outPSSpectrum );
 }
 
@@ -471,9 +479,10 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_none)
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "valueAtWavelength:: not implemented yet"
-        );
+    (void) locationInfo;
+    (void) wavelength;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0.0;
 }

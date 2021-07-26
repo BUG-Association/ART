@@ -1021,6 +1021,8 @@ double arpragueskymodel_radiance(
         const double                   wavelength
         )
 {
+  (void) theta;
+    
   // Translate parameter values to indices
 
   const double turbidity_control = map_parameter(turbidity, state->turbidities, state->turbidity_vals);
@@ -2183,6 +2185,9 @@ void interpolate_elevation_pol_hero(
         ArSpectralSample      * result
 )
 {
+  (void) zero;
+  (void) zero_segment;
+    
   const int elevation_low = (int)elevation;
   const double factor = elevation - (double)elevation_low;
 

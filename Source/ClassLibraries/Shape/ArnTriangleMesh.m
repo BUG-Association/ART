@@ -607,6 +607,9 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         : (const ArTraversalState *) traversalState
         : (Pnt3D *) outCentroid
 {
+    (void) traversalState;
+    (void) outCentroid;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -636,12 +639,17 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         : (const ArTraversalState *) traversalState
         : (Pnt3DE *) point
 {
+    (void) traversalState;
+    (void) point;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 - (ArNode <ArpMapping> *) createMappingFor
         : (ArMappingCriteria) criteria
 {
+    (void) criteria;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return nil;

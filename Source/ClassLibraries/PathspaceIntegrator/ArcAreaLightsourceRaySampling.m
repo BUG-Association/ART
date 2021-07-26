@@ -203,6 +203,11 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (      ArPDFValue *)                   illuminationProbability /* optional */
         : (      ArPDFValue *)                   emissionProbability /* optional */
 {
+    (void) illuminatedPoint;
+    (void) lightSamplePoint;
+    (void) lightSampleDirection;
+    (void) wavelength;
+    
     if(illuminationProbability)
     {
         double pdf =

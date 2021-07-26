@@ -278,6 +278,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
         : (ArcPointContext *) locationInfo
         : (ArSpectrum *) outSpectrum
 {
+    (void) locationInfo;
+    
     // if (isSpectral) {
     //     //   Casting this is safe insofar as something is very, very wrong
     //     //   if this gets called in a situation where anything except an
@@ -303,7 +305,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
 - (void) getHiresSpectrum
         : (ArcPointContext *) locationInfo
         : (ArSpectrum500 *) outSpectrum
-{    
+{
+    (void) locationInfo;
+    
     // if (isSpectral) {
     //     //   Casting this is safe insofar as something is very, very wrong
     //     //   if this gets called in a situation where anything except an
@@ -515,15 +519,19 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "getNewPSSpectrum::: not implemented yet"
-        );
+    (void) locationInfo;
+    (void) outPSSpectrum;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 - (double) valueAtWavelength
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    (void) wavelength;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return 0.;
 }

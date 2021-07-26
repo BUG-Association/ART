@@ -241,6 +241,9 @@ ARPVOLUME_MATERIAL_CLOSED_FORM_ONLY_IMPLEMENTATION
     : (const Ray3D *) inRay
     : (double) distance
 {
+    (void) inRay;
+    (void) distance;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 

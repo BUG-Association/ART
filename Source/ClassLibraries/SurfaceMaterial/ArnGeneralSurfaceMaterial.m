@@ -246,7 +246,14 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArSamplingRegion *) outSamplingRegion
         : (ArLightIntensity *) outLightIntensity
 {
+#ifndef NEVERMORE
+    (void) emissionLocation;
+    (void) outSamplingRegion;
+    (void) outLightIntensity;
+#endif
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
 #ifdef NEVERMORE
     ArGeneralSurface * surface;
 
@@ -294,7 +301,15 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArSamplingRegion *) outSamplingRegion
         : (ArLight *) outLight
 {
+#ifndef NEVERMORE
+    (void) emissionLocation;
+    (void) outgoingDirection;
+    (void) outSamplingRegion;
+    (void) outLight;
+#endif
+
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
 #ifdef NEVERMORE
     ArGeneralSurface * surface;
 
@@ -342,7 +357,14 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArSamplingRegion *) outSamplingRegion
         : (ArLight *) outLight
 {
+#ifndef NEVERMORE
+    (void) emissionLocationAndIncidentDirection;
+    (void) outSamplingRegion;
+    (void) outLight;
+#endif
+
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
 #ifdef NEVERMORE
     ArGeneralSurface * surface;
 
@@ -390,7 +412,15 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArDirectionCosine *) emissionDirection
         : (ArPDFValue *) sampleProbability
 {
+#ifndef NEVERMORE
+    (void) emissionLocation;
+    (void) context;
+    (void) emissionDirection;
+    (void) sampleProbability;
+#endif
+
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
 #ifdef NEVERMORE
     ArGeneralSurface * surface;
 
@@ -1009,6 +1039,19 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArPDFValue *) alternateReverseSampleProbability
         : (ArAttenuationSample *) attenuationSample
 {
+    (void) incomingDirectionAndLocation;
+    (void) pathDirection;
+    (void) context;
+    (void) incomingWavelength;
+    (void) constraint;
+    (void) sampledWavelength;
+    (void) sampledDirection;
+    (void) sampleProbability;
+    (void) reverseSampleProbability;
+    (void) alternateSampleProbability;
+    (void) alternateReverseSampleProbability;
+    (void) attenuationSample;
+
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return NO;
 }
@@ -1019,6 +1062,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArSamplingRegion *) samplingRegion
         : (ArSpectralIntensity *) spectralIntensity
 {
+    (void) emissionLocation;
+    (void) samplingRegion;
+    (void) spectralIntensity;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -1028,6 +1075,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (const ArWavelength *) wavelength
         : (      ArSpectralSample *) albedo
 {
+    (void) location;
+    (void) wavelength;
+    (void) albedo;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return FALSE;

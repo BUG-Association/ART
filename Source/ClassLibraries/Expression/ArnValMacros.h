@@ -42,6 +42,8 @@
         : (const unsigned int) numberOfValues \
         : (_otype *) outValues \
     { \
+        (void) evalEnv; \
+        \
         unsigned int actualNumberOfValues = \
             M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
         for (unsigned int i = 0; i < actualNumberOfValues; i++) \
@@ -53,6 +55,8 @@
         : (const ArcObject <ArpEvaluationEnvironment> *) evalEnv \
         : (_otype *) outValue \
     { \
+        (void) evalEnv; \
+        \
         if (outValue == NULL) \
             return 0; \
         *outValue = _value; \

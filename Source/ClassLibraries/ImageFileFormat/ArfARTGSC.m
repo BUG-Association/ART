@@ -401,6 +401,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(GreyAlpha,artgsc)
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
+    (void) start;
+    
     for ( long y = 0; y < YC(image->size); y++ )
     {
         for ( long x = 0; x < XC(image->size); x++ )
@@ -494,6 +496,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(GreyAlpha,artgsc)
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
+    (void) start;
+    
     for ( long y = 0; y < YC(image->size); y++ )
     {
         [ (ArNode <ArpGetGreyAlphaRegion> *)image getGreyAlphaRegion

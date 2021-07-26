@@ -865,6 +865,10 @@ ARPBBOXES_DEFAULT_ENLARGE_IMPLEMENTATION
 :       (ArnLeafNodeBBoxCollection *) bboxCollection
 :       (ArnOperationTree*) opTree
 {
+    (void) traversal;
+    (void) bboxCollection;
+    (void) opTree;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -1033,6 +1037,10 @@ ARPBBOXES_DEFAULT_OPTIMISE_IMPLEMENTATION
 :       (ArnLeafNodeBBoxCollection *) bboxCollection
 :       (ArnOperationTree*) opTree
 {
+    (void) traversal;
+    (void) bboxCollection;
+    (void) opTree;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -1943,6 +1951,10 @@ ARPBBOXES_DEFAULT_OPTIMISE_IMPLEMENTATION
 :       (ArnLeafNodeBBoxCollection *) bboxCollection
 :       (ArnOperationTree*) opTree
 {
+    (void) traversal;
+    (void) bboxCollection;
+    (void) opTree;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 

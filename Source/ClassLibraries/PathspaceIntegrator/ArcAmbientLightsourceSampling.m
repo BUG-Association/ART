@@ -47,6 +47,16 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (      ArPDFValue *)                   emissionProbability /* optional */
         : (      ArLightSample *)                lightSample
 {
+    (void) illuminatedPoint;
+    (void) samplingContext;
+    (void) wavelength;
+    (void) samplingRegion;
+    (void) sampledPoint;
+    (void) sampledDirection;
+    (void) illuminationProbability;
+    (void) emissionProbability;
+    (void) lightSample;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return NO;
 }
@@ -60,6 +70,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (      ArPDFValue *)                   illuminationProbability /* optional */
         : (      ArPDFValue *)                   emissionProbability /* optional */
 {
+    (void) illuminatedPoint;
+    (void) lightSamplePoint;
+    (void) lightSampleDirection;
+    (void) wavelength;
+    (void) samplingRegion;
+    (void) illuminationProbability;
+    (void) emissionProbability;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 

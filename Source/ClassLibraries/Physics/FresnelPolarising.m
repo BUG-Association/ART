@@ -41,6 +41,10 @@ void ardirectattenuation_rr_realign_and_reflect_a(
               ArDirectAttenuation     * ar
         )
 {
+    (void) oldRef;
+    (void) newRef;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
  /*   ardirectattenuation_a_with_ref_to_a( a_r, oldRef, a_r );
@@ -730,8 +734,10 @@ void fresnel_polarising_reflective_attenuation_complex_IOR(
     (void) pathDirection;
     (void) attenuation_r;
 #endif
-ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
-//this functionality will be removed anyway
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+
+    //this functionality will be removed anyway
 #ifdef NEVERMORE
     ArSpectrum  *attenuationColourA = spc_alloc(art_gv);
     ArSpectrum  *attenuationColourB = spc_alloc(art_gv);

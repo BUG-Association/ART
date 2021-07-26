@@ -237,15 +237,18 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "getNewPSSpectrum::: not implemented yet"
-        );
+    (void) locationInfo;
+    (void) outPSSpectrum;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 - (double) valueAtWavelength
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    
     double value = 0.0;
 
     switch ( numberOfCoefficients )

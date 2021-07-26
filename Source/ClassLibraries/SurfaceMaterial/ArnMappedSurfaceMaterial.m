@@ -214,6 +214,19 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
         : (      ArPDFValue *) alternateReverseSampleProbability
         : (      ArAttenuationSample *) attenuationSample
 {
+    (void) incomingDirectionAndLocation;
+    (void) pathDirection;
+    (void) context;
+    (void) incomingWavelength;
+    (void) constraint;
+    (void) sampledWavelength;
+    (void) sampledDirection;
+    (void) sampleProbability;
+    (void) reverseSampleProbability;
+    (void) alternateSampleProbability;
+    (void) alternateReverseSampleProbability;
+    (void) attenuationSample;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     
     return YES;
@@ -327,6 +340,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
 - (void) finishSurface
         : (ArcSurfacePoint *) location
 {
+    (void) location;
     // TODO: ...
 
 //    ArSurfacePhaseCache cache;
@@ -504,7 +518,11 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
         : (ArSamplingRegion *) samplingRegion
         : (ArLightSample *) lightSample
 {
-ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    (void) emissionLocation;
+    (void) outgoingDirection;
+    (void) wavelength;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     //  This is a temporary workaround for non-emmisive surfaces
 
     //  TODO: Add support for emmiters

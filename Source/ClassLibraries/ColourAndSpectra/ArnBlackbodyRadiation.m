@@ -148,6 +148,8 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    
     return art_blackbody_dd_value( temperature, wavelength );
 }
 

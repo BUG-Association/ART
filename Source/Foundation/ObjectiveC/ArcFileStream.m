@@ -65,6 +65,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 - (int) getPath
         : (char *) outPath
 {
+    (void) outPath;
     return 0;
 }
 

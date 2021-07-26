@@ -576,6 +576,8 @@ void arcbinarycoder_write_to_stream(
 - (void) codeSubnodeRef
         : (ArNodeRef*) codeSubnodeRef
 {
+    (void) codeSubnodeRef;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -723,6 +725,8 @@ void arcbinarycoder_write_to_stream(
 + (ArFiletypeMatch) matchWithStream
         : (ArcObject <ArpStream> *) stream
 {
+    (void) stream;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return arfiletypematch_impossible;
@@ -1161,6 +1165,8 @@ void arcbinarycoder_write_to_stream(
 - (void) codeSubnode
         : (ArNode **) codeSubnode
 {
+    (void) codeSubnode;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 
 #ifdef NEVERMORE
@@ -1188,6 +1194,8 @@ void arcbinarycoder_write_to_stream(
 - (void) codeSubnodeRef
         : (ArNodeRef*) codeSubnodeRef
 {
+    (void) codeSubnodeRef;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -1250,6 +1258,11 @@ void arcbinarycoder_write_to_stream(
         : (ArNode **) objectPtr
         : (ArList *) externalList
 {
+#ifndef NEVERMORE
+    (void) objectPtr;
+    (void) externalList;
+#endif
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 
 #ifdef NEVERMORE
