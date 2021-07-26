@@ -121,6 +121,9 @@ configure_file (
   "${PROJECT_BINARY_DIR}/Source/Foundation/LightAndAttenuation/ArMuellerMatrix_GSLSettings.h"
   )
 
+include_directories (
+  "${PROJECT_BINARY_DIR}/Source/Foundation/LightAndAttenuation/"
+)
 
 if ( OPENEXR_FOUND )
     set ( OPENEXR_FOUND_INT 1 )

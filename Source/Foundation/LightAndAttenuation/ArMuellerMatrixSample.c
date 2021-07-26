@@ -1869,8 +1869,9 @@ unsigned int armuellermatrixsample_m_realisable(
 
     unsigned int result = YES;
 
+#warning AF: is that really what we want? not spc_channels( art_gv )?
     unsigned int channels_count = 1;
-    for ( int channel = 0; channel < channels_count; channel++ )
+    for ( unsigned int channel = 0; channel < channels_count; channel++ )
     {
         // Prepare nicely accessible components of the Mueller matrix.
         // Names of the variables are indexed from 1 instead of from 0 so that

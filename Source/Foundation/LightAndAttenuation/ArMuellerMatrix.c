@@ -27,7 +27,7 @@
 #define ART_MODULE_NAME     ArMuellerMatrix
 
 #include "ArMuellerMatrix.h"
-#include "ArMuellerMatrix_GSLSettings.h"
+#include <ArMuellerMatrix_GSLSettings.h>
 #include "ArStokesVector.h"
 #include "ArString.h"
 
@@ -1906,8 +1906,8 @@ unsigned int armuellermatrix_m_realisable(
 
     unsigned int result = YES;
 
-    unsigned int channels_count = spc_channels( art_gv );
-    for ( int channel = 0; channel < channels_count; channel++ )
+    const unsigned int channels_count = spc_channels( art_gv );
+    for ( unsigned int channel = 0; channel < channels_count; channel++ )
     {
         // Prepare nicely accessible components of the Mueller matrix.
         // Names of the variables are indexed from 1 instead of from 0 so that
