@@ -40,7 +40,9 @@ render:
     stage: test
 #    needs: ["linux"]
     script:
+        - mkdir build
         - cd build
+	- cmake ..
         - make install
         - cd ..
         - git clone https://gitlab.com/art-development-team/art-functionality-test.git
