@@ -58,7 +58,7 @@ render:
         - cd ..
         - cd reference
         - rm *.artcsp *.artraw *.tiff
-	- cd ..
+        - cd ..
         - if [ $(cat output/report/success) = 'FALSE' ]; then exit 1; fi
     artifacts:
         when: always
