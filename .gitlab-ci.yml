@@ -42,7 +42,7 @@ render:
     needs: ["linux"]
     script:
         - cd build
-        - sudo make install
+        - make install
         - cd ..
         - git clone https://gitlab.com/art-development-team/art-functionality-test.git
         - git checkout v2.1
