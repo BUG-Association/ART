@@ -1,5 +1,4 @@
 stages:
-    - build
     - test
     
 before_script:
@@ -14,39 +13,39 @@ before_script:
         libgsl-dev
         libopenexr-dev
 
-linux:
-    stage: build
-    script:
-        - apt-get update
-        - apt-get -y install
-            cmake
-            gobjc
-            gobjc++
-            libtiff-dev
-            liblcms2-dev
-            libgnustep-base-dev
-            libgsl-dev
-            libopenexr-dev
-        - mkdir build
-        - cd build
-        - cmake ..
-        - make
-    artifacts:
-        paths:
-            - build
-    tags:
-        - linux
+# linux:
+#     stage: build
+#     script:
+#         - apt-get update
+#         - apt-get -y install
+#             cmake
+#             gobjc
+#             gobjc++
+#             libtiff-dev
+#             liblcms2-dev
+#             libgnustep-base-dev
+#             libgsl-dev
+#             libopenexr-dev
+#         - mkdir build
+#         - cd build
+#         - cmake ..
+#         - make
+#     artifacts:
+#         paths:
+#             - build
+#     tags:
+#         - linux
 
 render:
     stage: test
-    needs: ["linux"]
+#    needs: ["linux"]
     script:
         - cd build
         - make install
         - cd ..
         - git clone https://gitlab.com/art-development-team/art-functionality-test.git
-        - git checkout v2.1
         - cd art-functionality-test
+        - git checkout v2.1
         - python art_functionality_test.py
         - mv output ..
     artifacts:
