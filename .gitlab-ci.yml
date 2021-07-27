@@ -1,6 +1,7 @@
-stages:   
+stages:
     - build
-
+    - test
+    
 before_script:
     - apt-get update
     - apt-get -y install
@@ -23,3 +24,25 @@ linux:
     artifacts:
     tags: 
         - linux
+
+render:
+    stage: test
+    script:
+        - mkdir build
+	- cd build
+	- cmake .. -DCMAKE_INSTALL_PREFIX=~
+	- make install
+	- cd ..
+	- git clone https://gitlab.com/art-development-team/art-functionality-test.git
+	- git checkout v2.1
+	- cd art-functionality-test
+	- python art_functionality_test.py
+	- mv output ..
+    artifacts:
+        when: always
+	paths:
+	    - output
+	reports:
+	    junit: output/report/junit.xml
+    tags:
+        - render
