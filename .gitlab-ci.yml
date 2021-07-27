@@ -50,6 +50,11 @@ render:
         - git checkout v2.1
         - python art_functionality_test.py
         - mv output ..
+    environment:
+      PATH=${PATH}:/usr/local/bin
+      LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+      ART_LIBRARY_PATH=/usr/local/lib
+      ART_RESOURCE_PATH=${ART_LIBRARY_PATH}/ART_Resources
     artifacts:
         when: always
         paths:
