@@ -53,11 +53,16 @@ render:
         - cd art-functionality-test
         - git checkout v2.1
         - python art_functionality_test.py
+        - mv reference ..
         - mv output ..
+        - cd ..
+        - cd reference
+        - rm *.artcsp *.artraw *.tiff
     artifacts:
         when: always
         paths:
             - output
+            - reference
         reports:
             junit: output/report/junit.xml
     tags:
