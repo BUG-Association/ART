@@ -1,18 +1,18 @@
 stages:
     - build
-#    - test
+    - test
     
-#before_script:
-#    - apt-get update
-#    - apt-get -y install
-#        cmake
-#        gobjc
-#        gobjc++
-#        libtiff-dev
-#        liblcms2-dev
-#        libgnustep-base-dev
-#        libgsl-dev
-#        libopenexr-dev
+before_script:
+    - apt-get update
+    - apt-get -y install
+        cmake
+        gobjc
+        gobjc++
+        libtiff-dev
+        liblcms2-dev
+        libgnustep-base-dev
+        libgsl-dev
+        libopenexr-dev
 
 linux:
     stage: build
@@ -32,16 +32,17 @@ linux:
         - cmake ..
         - make
     artifacts:
-    tags: 
+        paths:
+            - build
+    tags:
         - linux
 
 render:
-    stage: build
+    stage: test
+    needs: ["linux"]
     script:
-        - mkdir build
         - cd build
-        - cmake .. -DCMAKE_INSTALL_PREFIX=~
-        - make install
+        - sudo make install
         - cd ..
         - git clone https://gitlab.com/art-development-team/art-functionality-test.git
         - git checkout v2.1
@@ -55,4 +56,4 @@ render:
         reports:
             junit: output/report/junit.xml
     tags:
-        - render
+        - linux
