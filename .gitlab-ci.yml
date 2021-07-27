@@ -42,7 +42,7 @@ render:
     script:
         - mkdir build
         - cd build
-	- cmake ..
+        - cmake ..
         - make install
         - cd ..
         - git clone https://gitlab.com/art-development-team/art-functionality-test.git
