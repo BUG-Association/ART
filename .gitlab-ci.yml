@@ -18,15 +18,15 @@ linux:
     stage: build
     script:
         - apt-get update
-		- apt-get -y install
-		    cmake
-		    gobjc
-		    gobjc++
-		    libtiff-dev
-		    liblcms2-dev
-		    libgnustep-base-dev
-		    libgsl-dev
-		    libopenexr-dev
+        - apt-get -y install
+            cmake
+            gobjc
+            gobjc++
+            libtiff-dev
+            liblcms2-dev
+            libgnustep-base-dev
+            libgsl-dev
+            libopenexr-dev
         - mkdir build
         - cd build
         - cmake ..
