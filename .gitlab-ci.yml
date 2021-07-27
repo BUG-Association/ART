@@ -40,9 +40,9 @@ render:
         - mv output ..
     artifacts:
         when: always
-    paths:
-        - output
-    reports:
-        junit: output/report/junit.xml
+        paths:
+            - output
+        reports:
+            junit: output/report/junit.xml
     tags:
         - render
