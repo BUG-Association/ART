@@ -30,7 +30,7 @@ before_script:
 #         - mkdir build
 #         - cd build
 #         - cmake .. -GNinja
-#         - cmake --build . 
+#         - ninja 
 #     artifacts:
 #         paths:
 #             - build
@@ -48,7 +48,7 @@ render:
         - mkdir build
         - cd build
         - cmake .. -GNinja
-        - cmake --install .
+        - ninja install
         - cd ..
         - git clone https://gitlab.com/art-development-team/art-functionality-test.git
         - cd art-functionality-test
