@@ -218,8 +218,6 @@ void ucc_alloc_and_read_from_file(
 
     double  stepsize = 1. / ( UCC_DIMENSION(cc) - 1.);
 
-    int  untreated_points = 0;
-    
     for ( int i = 0; i < UCC_OVERALL_SIZE(cc); i++ )
     {
         //   Lattice point RGB values are computed

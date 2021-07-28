@@ -129,6 +129,12 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return YES;
 }
 
+- (double)selectionProbabilityOfRegion:(ArSamplingRegion *)lightsourceSamplingRegion :(const Pnt3D *)queryLocationWorldspace {
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    return 0.;
+}
+
+
 - (id) copy
 {
     ArcLightsource  * clone = [ super copy ];

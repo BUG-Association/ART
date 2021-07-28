@@ -600,7 +600,7 @@ void arcbinarycoder_write_to_stream(
 
 - (void) codeTableBegin
         : (const char *) tableName
-        : (unsigned long *) codeSize
+        : (unsigned int *) codeSize
 {
     int j = [self lookDict : tableName];
 
@@ -1235,7 +1235,7 @@ void arcbinarycoder_write_to_stream(
 
 - (void) codeTableBegin
         : (const char *) tableName
-        : (unsigned long *) codeSize
+        : (unsigned int *) codeSize
 {
 
     int j;

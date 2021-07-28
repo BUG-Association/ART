@@ -190,7 +190,6 @@ double arpragueskymodel_radiance(
 void arpragueskymodel_radiance_hero(
         const ART_GV                 * art_gv,
         const ArPragueSkyModelState  * state,
-        const double                   theta,
         const double                   gamma,
         const double                   shadow,
         const double                   zero,

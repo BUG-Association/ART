@@ -363,7 +363,7 @@ void pss_s_debugprintf(
 {
     (void) art_gv;
 
-    printf("psspectrum( %ld, %f", ARPSS_SIZE(*pss), ARPSS_SCALE(*pss) );
+    printf("psspectrum( %d, %f", ARPSS_SIZE(*pss), ARPSS_SCALE(*pss) );
 
     for ( unsigned long i = 0; i < ARPSS_SIZE(*pss); i++ )
        printf( ", PNT2D( %4.1f nm, % 5.3f)",

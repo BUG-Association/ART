@@ -52,7 +52,6 @@ double lengthOfLine(
 double areaOfParameterRange(
         ART_GV                     * art_gv,
         ArcParameterRange          * range,
-        Line2D                     * line,
         ArSamplingContext2D        * context,
         ArcObject <ArpSampling2D>  * sampler
         );

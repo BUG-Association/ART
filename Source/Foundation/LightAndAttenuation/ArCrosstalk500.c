@@ -314,7 +314,7 @@ void rss2d_strip_noncrosstalk_data(
 
     for ( unsigned int i = 0; i < rss2d->size; i++ )
     {
-        int lineadd = i / rss2d->stride;
+        unsigned int lineadd = i / rss2d->stride;
 
         if (    rss2d->array[i] < 0.0
              || (    i - lineadd * rss2d->stride

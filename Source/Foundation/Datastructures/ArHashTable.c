@@ -491,6 +491,7 @@ void arnamedptrtable_free_contents(
         ArNamedPtrTable * npt
         )
 {
+    (void) npt;
 }
 
 /* ======================================================================== */

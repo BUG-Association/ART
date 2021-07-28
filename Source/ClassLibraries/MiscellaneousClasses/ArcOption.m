@@ -192,14 +192,26 @@ ArCMDLineInput;
 ARDYNARRAY_INTERFACE_FOR_ARTYPE(CMDLineInput, cmdli, c);
 ARDYNARRAY_IMPLEMENTATION_FOR_ARTYPE(CMDLineInput, cmdli, c, ARCMDLI_EMPTY);
 
+#define MAX_INPUTS  96
+
 + (int) parse
         : (ART_GV *) art_gv
         : (int) argc
         : (char **) argv
 {
+    if ( argc > MAX_INPUTS - 1 )
+    {
+        ART_ERRORHANDLING_FATAL_ERROR("too many command line arguments, raise MAX_INPUTS");
+    }
+    
     //   Initialised to a value that will likely suffice for most cases
     
-    ArCMDLineInputDynArray  inputDynArray = arcmdlidynarray_init(42);
+    ArCMDLineInputDynArray  inputDynArray = arcmdlidynarray_init(MAX_INPUTS);
+    
+    for ( int i = 0; i < MAX_INPUTS; i++ )
+    {
+        arcmdlidynarray_push( & inputDynArray, ARCMDLI_EMPTY );
+    }
 
     ArCMDLineInput  * currentInput = NULL;
     

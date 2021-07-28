@@ -373,7 +373,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSuppliedMaterialSurfaceMaterial)
         : (const ArWavelength *) wavelength
         : (      ArSpectralSample *) albedo
 {
-    #warning AF Missing implementation. Double check if this is correct
     return
         [ SURFACE_SUBNODE calculateAlbedoSampleAtWavelength
             :   location

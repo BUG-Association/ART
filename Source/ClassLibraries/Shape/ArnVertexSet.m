@@ -244,6 +244,12 @@ ArnVertexSet * arnvertexset_from_files(
         coord_array = read_fpnt2d_file(coord_file_name);
     if (normal_file_name)
         normal_array = read_fvec3d_file(normal_file_name);
+    if (pnt4D_file_name){
+        ART_ERRORHANDLING_FATAL_ERROR("unsupported feature");
+    }
+    if (value_file_name){
+        ART_ERRORHANDLING_FATAL_ERROR("unsupported feature");
+    }
 
 
     return

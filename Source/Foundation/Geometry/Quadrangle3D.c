@@ -34,6 +34,8 @@ void quadrangledata_init(
         const Pnt3D * point3
         )
 {
+    (void) point2;
+    
     Vec3D edgein[2];
     Vec3D edge[2];
     int i;

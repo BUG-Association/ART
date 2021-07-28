@@ -155,7 +155,7 @@ ArcGruenschlossHalton_members;
     //  If a sequence > the max provided by the sampler is requested,
     //  we revert to NR2 values.
     
-    if ( sequenceID >= MAX_HALTON_SEQUENCE )
+    if ( (int) sequenceID >= MAX_HALTON_SEQUENCE )
         return [ super valueFromNewSequence ];
 
     double  value =

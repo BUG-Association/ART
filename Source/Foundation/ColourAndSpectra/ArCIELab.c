@@ -108,10 +108,6 @@ double lab_delta_E2000(
     double asample = ARCIELab_a(*lab_1);
     double bsample = ARCIELab_b(*lab_1);
 
-    double _kL = 1.0;
-    double _kC = 1.0;
-    double _kH = 1.0;
-
     double Cabstd= sqrt(astd*astd+bstd*bstd);
     double Cabsample= sqrt(asample*asample+bsample*bsample);
 

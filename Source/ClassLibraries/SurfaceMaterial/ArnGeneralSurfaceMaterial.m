@@ -195,7 +195,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     ArSurfaceType localSurfaceType = arsurface_undefined;
 
     ArNode <ArpGeneralSurfaceComponent> * surfaceComp;
+    
     unsigned int surfaceCounter;
+    
     ARNARY_FOR_EACH_SUBNODE(
         surfaceCounter,
         surfaceComp,
@@ -222,7 +224,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArcSurfacePoint *) location
 {
     ArNode <ArpGeneralSurfaceComponent> * surfaceComp;
+    
     unsigned int surfaceCounter;
+
     ARNARY_FOR_EACH_SUBNODE(
         surfaceCounter,
         surfaceComp,
@@ -454,7 +458,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (      ArPDFValue *) shiftProbability
 {
     ArNode <ArpGeneralSurfaceComponent> * surfaceComp;
-    int surfaceCounter;
 
     //  We first select which surface component we will generate the main sample
     //  from.                                                               -mm-
@@ -463,6 +466,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     double currentPercentile = 0;
     int selectedSurfaceCounter = -1;
     
+    unsigned int surfaceCounter;
+
     ARNARY_FOR_EACH_SUBNODE(
         surfaceCounter,
         surfaceComp,
@@ -526,7 +531,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     {
         // Skip over the surface we sampled the shift from, as its probability
         // was the first one calculated.                                        -mm-
-        if (surfaceCounter != selectedSurfaceCounter && surfaceComp != NULL)
+        if ((int)surfaceCounter != selectedSurfaceCounter && surfaceComp != NULL)
         {
             ArNode <ArpSurfaceMaterial> * surface = [ surfaceComp getSurface ];
             double surfaceWeight = [ surfaceComp getWeight ];
@@ -844,7 +849,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     ASSERT_ALLOCATED_ATTENUATION_SAMPLE(attenuationSample);
 
     ArNode <ArpGeneralSurfaceComponent> * surfaceComp;
-    int surfaceCounter;
 
     //  We first select which surface component we will generate the main sample
     //  from.                                                               -mm-
@@ -853,6 +857,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     double currentPercentile = 0;
     int selectedSurfaceCounter = -1;
     
+    unsigned int surfaceCounter;
+
     ARNARY_FOR_EACH_SUBNODE(
         surfaceCounter,
         surfaceComp,
@@ -954,7 +960,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     {
         // Skip over the surface we sampled the direction from, as its contribution
         // was the first one calculated.                                        -mm-
-        if (surfaceCounter != selectedSurfaceCounter && surfaceComp != NULL)
+        if ((int)surfaceCounter != selectedSurfaceCounter && surfaceComp != NULL)
         {
             ArNode <ArpSurfaceMaterial> * surface = [ surfaceComp getSurface ];
             double surfaceWeight = [ surfaceComp getWeight ];

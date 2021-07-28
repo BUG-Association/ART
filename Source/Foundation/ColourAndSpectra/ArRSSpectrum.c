@@ -212,7 +212,7 @@ unsigned int rss_s_valid(
     if ( ARRSS_SIZE(*rss) <= 0 )
     {
         ART_ERRORHANDLING_WARNING(
-            "invalid RSS size (%ld entries)"
+            "invalid RSS size (%d entries)"
             ,   ARRSS_SIZE(*rss)
             );
 
@@ -261,14 +261,14 @@ unsigned int rss_s_valid(
         result = 0;
     }
     
-    for ( unsigned long i = 0; i < ARRSS_SIZE(*rss); i++ )
+    for ( unsigned int i = 0; i < ARRSS_SIZE(*rss); i++ )
     {
         if (   ARRSS_SAMPLE( *rss, i ) < 0.0
             || m_d_isInf( ARRSS_SAMPLE( *rss, i ) )
             || m_d_isNaN( ARRSS_SAMPLE( *rss, i ) ) )
         {
             ART_ERRORHANDLING_WARNING(
-                "RSS sample %ld is invalid (%f)",
+                "RSS sample %d is invalid (%f)",
                 i,
                 ARRSS_SAMPLE( *rss, i )
                 );
@@ -287,7 +287,7 @@ void rss_s_debugprintf(
 {
     (void) art_gv;
     
-    printf("rsspectrum( %ld, %f nm, %f nm, %f",
+    printf("rsspectrum( %d, %f nm, %f nm, %f",
     ARRSS_SIZE(*rss),NANO_FROM_UNIT(ARRSS_START(*rss)),
     NANO_FROM_UNIT(ARRSS_STEP(*rss)),ARRSS_SCALE(*rss));
     for ( unsigned long i = 0; i < ARRSS_SIZE(*rss); i++ )

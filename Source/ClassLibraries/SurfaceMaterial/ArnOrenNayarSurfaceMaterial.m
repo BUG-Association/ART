@@ -673,6 +673,12 @@ void orenNayarReflectanceSpectralSample(
     return YES;
 }
 
+- (BOOL)calculateAlbedoSampleAtWavelength:(ArcSurfacePoint *)emissionLocation :(const ArWavelength *)wavelength :(ArSpectralSample *)albedo {
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    return NO;
+}
+
+
 
 @end
 

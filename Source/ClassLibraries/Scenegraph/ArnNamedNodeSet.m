@@ -350,7 +350,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnNamedNodeSet)
         :   coder
         ];
 
-    unsigned long  tableSize;
+    unsigned int  tableSize;
 
     if ( ! [ coder isReading ] )
         tableSize = artable_size( & namedNodeTable );

@@ -217,14 +217,6 @@ ArStochasticSample;
 
     threadPool = [ [ NSAutoreleasePool alloc ] init ];
 
-    //   If the splatting kernel is of size > 1, we maintain a temp array the
-    //   size of the splatting kernel, into which all samples are written during
-    //   the inner loop. Only after the loop is finished are the contents of the
-    //   temp array scaled ( 1 / numberOfValidSamples), and added to the actual
-    //   target image.
-
-    ArLightAlpha  ** splattingTempArray = NULL;
-
     //   The value for individual samples
 
     ArPathspaceResult  ** sampleValue =

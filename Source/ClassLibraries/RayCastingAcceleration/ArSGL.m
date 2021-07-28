@@ -49,8 +49,6 @@ ArSGL _sgl_release(
     return sgl;
 }
 
-#warning AF missing intializer \
-    missing initializer for field ‘sel_getIntersectionList’ of ‘ArSGL’ [-Wmissing-field-initializers]
 ARDYNARRAY_IMPLEMENTATION_FOR_MANAGED_TYPE(
     ArSGL,SGL,sgl,sgl,ARSGL_EMPTY,
     _sgl_retain,,_sgl_release

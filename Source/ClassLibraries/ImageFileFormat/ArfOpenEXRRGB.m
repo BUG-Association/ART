@@ -82,7 +82,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
             ART_ERRORHANDLING_FATAL_ERROR(
                 "No suitable image data format"
                 );
-            return [Nil class];
+        return NULL;
     }
 }
 
@@ -189,7 +189,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
 
 - (ArnImageInfo *) open
 {
-    _writtingMode = NO;
+    _writingMode = NO;
 
     // Get current native chromaticities
     float *chromaticities = NULL;
@@ -375,7 +375,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
 - (void) open
         : (ArnImageInfo *) imageInfo
 {
-    _writtingMode = YES;
+    _writingMode = YES;
     
     _imageInfo = [imageInfo retain];
 
@@ -529,9 +529,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
 
 - (void) close
 {
-    if (_writtingMode) {
-        // Gather metadata
-        const IVec2D size = [ _imageInfo size ];
+    if (_writingMode) {
             
         char * createdByString = NULL;
         char * creationDateStr = NULL;

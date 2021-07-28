@@ -58,7 +58,7 @@ ArRSSpectrum2D rss2d_v(
 
     double  sample = RSS2D_LINE_END;
 
-    long stride = 0;
+    int stride = 0;
     ARRSS2D_STRIDE(s) = -1; // mark as undefined
     while ( sample != RSS2D_END )
     {
@@ -70,7 +70,7 @@ ArRSSpectrum2D rss2d_v(
                 ARRSS2D_STRIDE(s) = stride;
             else if( ARRSS2D_STRIDE(s) != stride && ( stride != 0 || sample == RSS2D_LINE_END ) )
                 ART_ERRORHANDLING_FATAL_ERROR(
-                    "ArRSSpectrum2D: incompatible stride -- %lu at first, %lu then",
+                    "ArRSSpectrum2D: incompatible stride -- %u at first, %u then",
                     ARRSSPECTRUM2D_STRIDE(s),
                     stride
                 );
@@ -156,7 +156,7 @@ double getHeight(
     double excitationFactor = 0.0;
     double emissionFactor = 0.0;
     double factor = 0.0;
-    unsigned long i,j;
+    unsigned int i,j;
     double a, b;
     double height = 0.0;
     double eps = UNIT_FROM_NANO(0.001);
@@ -194,8 +194,7 @@ double getHeight(
                        excitationFactor);
         if (fabs(excitationFactor) <= eps) factor = emissionFactor;
         else factor = emissionFactor/excitationFactor;
-        height = M_INTERPOL(a,                                                                          b,
-                       factor);
+        height = M_INTERPOL(a, b,  factor);
     }
     //Lower left triangle
     else
@@ -208,8 +207,7 @@ double getHeight(
                        excitationFactor);
         if (fabs(excitationFactor) <= eps) factor = emissionFactor;
         else factor = (1.0 - emissionFactor)/excitationFactor;
-        height = M_INTERPOL(a,                                                                          b,
-                       factor);
+        height = M_INTERPOL(a, b, factor);
     }
 
     height = M_MAX(height,0.0);
@@ -444,7 +442,7 @@ void rss2d_to_rss(
 
     offset = rss2d->stride - rss->size;
 
-    for ( unsigned long i = 0; i < rss->size; i++ )
+    for ( unsigned int i = 0; i < rss->size; i++ )
     {
         rss->array[i] = ARRSSPECTRUM2D_SAMPLE(rss2d,i+offset,i);
     }
@@ -472,7 +470,7 @@ unsigned int rss2d_s_valid(
 
     //   stride larger than size
 
-    if ( s0->stride > s0->size )
+    if ( s0->stride > (int) s0->size )
         return 0;
 
     //   zero or negative double parameters

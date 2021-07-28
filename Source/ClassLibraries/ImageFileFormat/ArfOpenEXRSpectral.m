@@ -173,7 +173,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
 
 - (ArnImageInfo *) open
 {
-    _writtingMode = NO;
+    _writingMode = NO;
     
     float** spectral_buffers[4] = { 
         &_bufferS0, 
@@ -460,7 +460,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
 - (void) open
         : (ArnImageInfo *) imageInfo
 {
-    _writtingMode = YES;
+    _writingMode = YES;
     
     // ART only write emissive images
     _isEmissive = YES;
@@ -652,9 +652,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
 
 - (void) close
 {
-    if (_writtingMode) {
+    if (_writingMode) {
         // Gather metadata
-        const IVec2D size = [ _imageInfo size ];
             
         char * createdByString = NULL;
         char * creationDateStr = NULL;

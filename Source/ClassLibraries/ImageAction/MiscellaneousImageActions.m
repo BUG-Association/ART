@@ -1146,8 +1146,6 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleRAW)
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    unsigned int  averagingArea = M_SQR(downscaleFactor);
-    
     for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )

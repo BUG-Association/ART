@@ -490,11 +490,8 @@ ArPixelID;
     
     if ([coder isReading])
     {
-#warning  this whole thing is fragile and should not be in a release version of ART (aw)
-        if ( ! deterministicWavelengths )
-            wavelengthSteps = 1;
-        else
-            wavelengthSteps = spc_channels(art_gv) / 4;
+        if ( deterministicWavelengths )
+            [ self useDeterministicWavelengths ];
     }
 }
 

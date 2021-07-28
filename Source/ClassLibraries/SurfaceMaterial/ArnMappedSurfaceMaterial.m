@@ -169,8 +169,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
 
     if ( 1.0 - x > 0.0 )
     {
-        double  thisAlbedo;
-
         resultBOOL1 =
             [ cache.surface1 calculateAlbedoSampleAtWavelength
                 :   location
@@ -183,8 +181,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
 
     if ( x > 0.0)
     {
-        double  thisAlbedo;
-
         resultBOOL2 =
             [ cache.surface2 calculateAlbedoSampleAtWavelength
                 :   location

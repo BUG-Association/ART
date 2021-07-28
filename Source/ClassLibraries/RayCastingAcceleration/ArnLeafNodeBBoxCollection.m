@@ -119,8 +119,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLeafNodeBBoxCollection)
     newLeafNode.sel_getIntersectionList =
         @selector(getIntersectionList:::);
 
-#warning AF signatures does not match \
-        cast between incompatible function types from ‘IMP’ {aka ‘struct objc_object * (*)(struct objc_object *, const struct objc_selector *, ...)’} to ‘void (*)(struct objc_object *, const struct objc_selector *, struct ArnRayCaster *, Range,  ArIntersectionList *)’ [-Wcast-function-type]
     newLeafNode.imp_getIntersectionList = (void(*)
         (id, SEL, ArnRayCaster *,Range,ArIntersectionList *))
         [ ARNODEREF_POINTER(object_to_raycast_ref) methodForSelector

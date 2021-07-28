@@ -109,6 +109,8 @@ void fresnel_plain_refractive_attenuation_single_sample(
               ArAttenuationSample  * attenuation_r
     )
 {
+    (void) pathDirection;
+    (void) refractedDirection;
     double  n =
         ARCPHASEINTERFACE_IOR_AT_WAVELENGTH(
             *ARCINTERSECTION_PHASEINTERFACE(incomingDirectionAndLocation),
@@ -145,6 +147,9 @@ void fresnel_plain_refractive_attenuation_sample(
               ArAttenuationSample  * attenuation_r
     )
 {
+    (void) pathDirection;
+    (void) refractedDirection;
+
     ArSpectralSample  attenuationSpectralSample;
     
     for ( int i = 0; i < 4; i++ )
@@ -534,6 +539,7 @@ void fresnel_plain_refractive_attenuation(
               ArAttenuation     * attenuation_r
         )
 {
+    (void) cosTheta_T;
 
     ArSpectrum  *attenuationColour = spc_alloc( art_gv );
 

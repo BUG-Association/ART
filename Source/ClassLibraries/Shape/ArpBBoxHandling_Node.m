@@ -534,7 +534,7 @@ ARPBBOXES_DEFAULT_ENLARGE_IMPLEMENTATION
     if (! leftNode) return 0;
 
     rightNode = [ SUBNODE_1 clipToBox :inBox];
-    if (! rightNode) { leftNode = RELEASE_OBJECT(leftNode); return 0; }
+    if (! rightNode) { leftNode = RELEASE_OBJECT_RETURN_ID(leftNode); return 0; }
 
     instanceID = leftNode->instanceID + rightNode->instanceID;
 

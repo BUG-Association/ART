@@ -70,7 +70,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
-- obtainInstance
+- (id) obtainInstance
 {
     id  objectFromFreelist;
 

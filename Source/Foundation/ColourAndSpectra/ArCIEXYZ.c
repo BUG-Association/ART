@@ -268,6 +268,7 @@ void xyz_sdd_sample_at_wavelength_s(
               ArCIEXYZ  * c_r
         )
 {
+    (void) d_1;
     //   Note: this is probably not what should be done: a gradual shift
     //         between channels would likely be much better.
     

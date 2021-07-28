@@ -650,12 +650,12 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
 
 - (void) codeTableBegin
         : (const char *) tableName
-        : (unsigned long *) codeSize
+        : (unsigned int *) codeSize
 {
     [stream prints :prefix];
     [stream prints :tableName];
     [stream prints :"("];
-    [stream printf :"%lu", *codeSize];
+    [stream printf :"%u", *codeSize];
     prefix = ARCOBJCCODER_VARIABLE_PREFIX;
 }
 
@@ -687,10 +687,10 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
     [stream printf: "ArNode  * n = ALLOC_ARRAY(ArNode *,%lu);\n",
                     nodeArraySize ];
 
-    for ( unsigned long i = 0; i < nodeArraySize; i++)
+    for ( unsigned int i = 0; i < nodeArraySize; i++)
     {
         [ stream printf
-            :   "n[%lu]="
+            :   "n[%u]="
             ,   i ];
 
         ArNodeRef  currentObjRef =
@@ -1237,10 +1237,10 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
 
     if ( ch == 'n' )
     {
-        unsigned long  nodeID;
+        unsigned int  nodeID;
 
         [ stream scanf
-            :   "[%lu]"
+            :   "[%u]"
             , & nodeID ];
 
 #ifdef OBJC_READING_CODER_DEBUGPRINTF
@@ -1287,7 +1287,7 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
 
     int  ch = [ stream getc ];
 
-    unsigned long  nodeID;
+    unsigned int  nodeID;
 
     switch ( ch )
     {
@@ -1303,7 +1303,7 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
 
         case 'H':
             [ stream scanf
-                :   "_NODE_REF(n[%lu])"
+                :   "_NODE_REF(n[%u])"
                 , & nodeID
                 ];
 
@@ -1407,12 +1407,12 @@ COLOURTYPE_DEFAULT_IO(ArPSSpectrum,arpsspectrum);
 
 - (void) codeTableBegin
         : (const char *) tableName
-        : (unsigned long *) codeSize
+        : (unsigned int *) codeSize
 {
     [stream scans :prefix];
     [stream scans :tableName];
     [stream scans :"("];
-    [stream scanf :"%lu", codeSize];
+    [stream scanf :"%u", codeSize];
     prefix = ARCOBJCCODER_VARIABLE_PREFIX;
 }
 

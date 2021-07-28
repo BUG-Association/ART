@@ -419,7 +419,8 @@ void arsvlightsample_ld_realign_to_coaxial_refframe_sv(
     ASSERT_VALID_REFERENCE_FRAME(r0)
     ASSERT_ALLOCATED_STOKES_VECTOR(sr)
     ASSERT_COAXIAL_SAMPLE_REFERENCE_FRAMES_R_SVL( r0, l0, d0 )
-
+    (void) d0; // only used when assertions are on
+    
     if ( ARSVLIGHTSAMPLE_POLARISED( *l0 ) )
     {
         double  cos_phi =
@@ -876,6 +877,10 @@ void arsvlightsample_l_inv_l(
               ArSVLightSample  * lr
         )
 {
+    (void) art_gv;
+    (void) l0;
+    (void) lr;
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 /* ---------------------------------------------------------------------------
@@ -1831,6 +1836,10 @@ unsigned int arsvlightsample_ll_collinear(
         const ArSVLightSample  * l1
         )
 {
+    (void) art_gv;
+    (void) l0;
+    (void) l1;
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return 1;
 }
 

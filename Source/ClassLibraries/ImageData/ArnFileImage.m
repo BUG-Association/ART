@@ -351,7 +351,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     {
         if (action == arnfileimage_writing)
             [ imageFile close ];
-        imageFile = RELEASE_OBJECT( imageFile );
+        imageFile = RELEASE_OBJECT_RETURN_ID( imageFile );
     }
 }
 

@@ -256,6 +256,7 @@ void arplaindirectattenuationsample_ddrr_init_linear_polariser_a(
     (void) d0;
     (void) d1;
     (void) r0;
+    (void) r1;
     (void) d1;
     (void) ar;
     

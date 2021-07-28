@@ -63,8 +63,8 @@ ArStreamState;
 --------------------------------------------------------------------------- */
 - (BOOL) read
         : (void *) data
-        : (unsigned long) size
-        : (unsigned long) number
+        : (unsigned int) size
+        : (unsigned int) number
         ;
 
 /* ---------------------------------------------------------------------------
@@ -73,9 +73,9 @@ ArStreamState;
         'data'.  The terminating '\n' is read of the stream, but not placed
         in the buffer.  A terminating 0 char is always placed in the buffer.
 --------------------------------------------------------------------------- */
-- (unsigned long) readline
+- (unsigned int) readline
         : (void *) data
-        : (unsigned long) size
+        : (unsigned int) size
         ;
 
 - (int) vscanf
@@ -121,10 +121,10 @@ ArStreamState;
         Writes 'number' elements of 'data', each 'size' bytes long to the
         stream.
 --------------------------------------------------------------------------- */
-- (unsigned long) write
+- (unsigned int) write
         : (const void *) data
-        : (unsigned long) size
-        : (unsigned long) number
+        : (unsigned int) size
+        : (unsigned int) number
         ;
 
 - (void) vprintf

@@ -166,24 +166,6 @@ static int order_split(
     }
 }
 
-static int order_split_old(
-        const void  * a,
-        const void  * b
-        )
-{
-    double firstCoordinate = ((const plausibleSplit*) a)->splitCoordinate;
-    int firstAxist = ((const plausibleSplit*) a)->axis;
-    double secondCoordinate = ((const plausibleSplit*) b)->splitCoordinate;
-    int secondAxis = ((const plausibleSplit*) b)->axis;
-
-    return
-    (firstCoordinate < secondCoordinate ? arorder_lessthan
-        : (firstCoordinate > secondCoordinate ? arorder_greaterthan
-            : (firstAxist < secondAxis ? arorder_lessthan
-                : (firstAxist > secondAxis ? arorder_greaterthan
-                    : arorder_equal))));
-}
-
 #define CURRENT_BSP_NODE  bspTree[indexOfCurrentBSPNode]
 
 //   This macro returns the current split coordinate (CSC) of the
@@ -1620,6 +1602,7 @@ void getLeafArrayIntersectionList_UseOpTree(
         Ray3D         * worldViewingRay3D
         )
 {
+    (void) worldViewingRay3D;
     // mark the leaf nodes for the operation tree.
 
     for( int i = 0; i < SGLPARRAY_N(*leafArray); i++ )
@@ -2122,7 +2105,11 @@ void intersectRayWithBSPTree_UseOpTree(
 }
 
 void opTreeDebugprintSimple(ArOpNode* tree, int size)
-{/*
+{
+    (void) tree;
+    (void) size;
+ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+/*
         void (*function) (int, struct ArOpNode*, ArnRayCaster*, ArIntersectionList*);
         for( int i = 0; i < size; ++i )
         {

@@ -1805,8 +1805,6 @@ unsigned int armuellermatrix_m_sanity_check(
 
     for (unsigned int channel = 0; channel < channels_count; channel++)
     {
-        double threshold = spc_si( art_gv, sanity_threshold, channel );
-        double sum       = spc_si( art_gv, sanity_sum, channel );
         double diff      = spc_si( art_gv, sanity_diff, channel );
         if (diff < diff_threshold)
         {

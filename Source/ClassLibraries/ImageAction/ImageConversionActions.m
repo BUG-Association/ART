@@ -256,10 +256,6 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Mo
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    double  visibleRangeLength =
-          XC(ARPSSPECTRUM_ARRAY_I(*VISIBLE_RANGE,1))
-        - XC(ARPSSPECTRUM_ARRAY_I(*VISIBLE_RANGE,0));
-
     ArSpectrum      * temp_col = spc_alloc( art_gv );
     ArStokesVector  * temp_sc  = arstokesvector_alloc( art_gv );
     
@@ -1330,8 +1326,6 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
 
     destinationImageDataType = ardt_grey;
     destinationFileDataType  = ardt_grey;
-    
-    unsigned int  numberOfISRChannels = spc_channels(art_gv);
     
     numberOfDestinationsPerSource = 1;
 

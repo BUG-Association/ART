@@ -546,7 +546,6 @@ double f_z(
 double f_dev_z(
     double cti,
     double cti2,
-    double u1,
     double z
     )
 {
@@ -573,13 +572,13 @@ double compute_cos_theta(
     int ind;
 
     z = 0.99;
-    new_z = z - f_z(cti,cti2,u1,z) / f_dev_z(cti,cti2,u1,z);
+    new_z = z - f_z(cti,cti2,u1,z) / f_dev_z(cti,cti2,z);
     ind = 0;
 
     while (fabs(new_z - z) > 0.00001  &&  ind < 70)
     {
         z = new_z;
-        new_z = z - f_z(cti,cti2,u1,z) / f_dev_z(cti,cti2,u1,z);
+        new_z = z - f_z(cti,cti2,u1,z) / f_dev_z(cti,cti2,z);
         ind++;
     }
 

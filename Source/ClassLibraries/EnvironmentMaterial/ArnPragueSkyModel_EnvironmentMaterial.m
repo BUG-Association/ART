@@ -38,9 +38,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnPragueSkyModel(EnvironmentMaterial)
 
-ARPSURFACEMATERIAL_DEFAULT_BLACKBODY_EMITTER_IMPLEMENTATION
-ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
-
 - (void) lightSampleEmittedTowardsPointFromDirection
         : (ArcPointContext *) queryLocation
         : (Vec3D *) queryDirection_worldspace

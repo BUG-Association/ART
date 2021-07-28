@@ -84,9 +84,9 @@ ART_MODULE_INTERFACE(ArPSSpectrum)
 
 typedef struct ArPSSpectrum
 {
-    unsigned long    size;
-    double           scale;
-    Pnt2D          * array;
+    unsigned int    size;
+    double          scale;
+    Pnt2D         * array;
 }
 ArPSSpectrum;
 

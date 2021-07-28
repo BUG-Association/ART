@@ -204,9 +204,6 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
         if ( resultSamplingRegion ) *resultSamplingRegion =
             ARNSKYLIGHT_SAMPLINGREGION_SKYDOME;
 
-        ArSpectrum  * temp_colour = spc_alloc(art_gv);
-
-
         for ( int i = 0; i < 500 ; i++ )
         {
             ArWavelength  lambda;

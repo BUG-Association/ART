@@ -264,9 +264,6 @@ int isRGBEXR(const char* filename)
         Imf::InputFile file(filename);
         const Imf::ChannelList& exrChannels = file.header().channels();
 
-        // Check if there is a spectral channel in the image
-        SpectrumType spectrumType = UNDEFINED;
-
         bool hasR = false;
         bool hasG = false;
         bool hasB = false;

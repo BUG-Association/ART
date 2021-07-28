@@ -505,7 +505,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             //   This is why there is no reference to the global
             //   randseed in here.
 
-            for ( unsigned int i = 0; i < maxPrime; i++ )
+            for ( unsigned int i = 0; (int) i < maxPrime; i++ )
             {
                 int  prime;
 
@@ -560,7 +560,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 {
     double  quasiRnd = 0.0;
 
-    if ( sequenceToUse >= maxPrime )
+    if ( (int) sequenceToUse >= maxPrime )
         return [ super valueFromNewSequence ];
 
     quasiRnd = quasi_halton( inverseBase[ sequenceToUse ] ,
@@ -1004,7 +1004,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
         : (ArSequenceID) sequenceToUse
 {
   if (sequenceToUse>size1)
-    err(1, "Bad sequence index %lu! We only have %d", sequenceToUse, size1);
+    err(1, "Bad sequence index %lu! We only have %d", (unsigned long) sequenceToUse, size1);
     // should never happen...
 
   if (state1[sequenceToUse].i >= tmsNetSize) {

@@ -336,7 +336,7 @@ void fputspaces(int n, FILE * file)
             for (i = 0; i < length; i++)
             {
                 int ch = string[i];
-                if (ch == '"') nochange = ~nochange;
+                if (ch == '"') nochange = !nochange;
                 buffer[i] = (nochange || isupper(ch)) ? ch : toupper(ch);
             }
             buffer[length] = 0;
@@ -369,7 +369,7 @@ void fputspaces(int n, FILE * file)
             for (i = 0; i < length; i++)
             {
                 int ch = string[i];
-                if (ch == '"') nochange = ~nochange;
+                if (ch == '"') nochange = !nochange;
                 buffer[i] = (nochange || isupper(ch)) ? ch : toupper(ch);
             }
             buffer[length] = 0;
@@ -402,7 +402,7 @@ void fputspaces(int n, FILE * file)
             for (i = 0; i < length; i++)
             {
                 int ch = string[i];
-                if (ch == '"') nochange = ~nochange;
+                if (ch == '"') nochange = !nochange;
                 buffer[i] = (nochange || isupper(ch)) ? ch : toupper(ch);
             }
             buffer[length] = 0;
@@ -435,7 +435,7 @@ void fputspaces(int n, FILE * file)
             for (i = 0; i < length; i++)
             {
                 int ch = string[i];
-                if (ch == '"') nochange = ~nochange;
+                if (ch == '"') nochange = !nochange;
                 buffer[i] = (nochange || isupper(ch)) ? ch : toupper(ch);
             }
             buffer[length] = 0;

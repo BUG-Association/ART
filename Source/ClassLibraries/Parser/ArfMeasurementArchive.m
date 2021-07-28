@@ -416,7 +416,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
 
 - (void) _parseSampleArray
         : (ArcObject <ArpStream> *) stream
-        : (unsigned long *) numberOfEntries
+        : (unsigned int *) numberOfEntries
         : (double **) array
 {
     double  tempArray[ ARFMA_MAX_SAMPLES ];
@@ -448,12 +448,12 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
 
 - (void) _parse2DSampleArray
         : (ArcObject <ArpStream> *) stream
-        : (unsigned long *) numberOfEntries
-        : (long *) stride
+        : (unsigned int *) numberOfEntries
+        : (int *) stride
         : (double **) array
 {
     double       * tempArray[ ARFMA_MAX_SAMPLES ];
-    unsigned long  series = 0, seriesLength;
+    unsigned int   series = 0, seriesLength;
     BOOL           endOfSeries = NO;
 
     [ stream getc ];   // remove leading curly brace

@@ -24,10 +24,14 @@
 
 =========================================================================== */
 
+#ifndef _ART_CLASSLIBRARIES_VOLUMEMATERIAL_ARNPRAGUESKYMODEL_VOLUME_MATERIAL_H_
+#define _ART_CLASSLIBRARIES_VOLUMEMATERIAL_ARNPRAGUESKYMODEL_VOLUME_MATERIAL_H_
+
 #include "ART_Foundation.h"
 
 ART_MODULE_INTERFACE(ArnPragueSkyModel_VolumeMaterial)
 
+#import "ART_Scenegraph.h"
 #import "ART_SkyModel.h"
 
 
@@ -42,6 +46,6 @@ ART_MODULE_INTERFACE(ArnPragueSkyModel_VolumeMaterial)
 
 @interface ArnPragueSkyModel(VolumeMaterial) < ArpVolumeMaterial > @end
 
-
+#endif
 // ===========================================================================
 

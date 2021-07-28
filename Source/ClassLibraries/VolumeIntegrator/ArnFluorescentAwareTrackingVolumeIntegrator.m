@@ -546,7 +546,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFluorescentAwareTrackingVolumeIntegra
         const double rd = [ randomGenerator valueFromNewSequence ];
         
         double step;
-        BOOL skip = NO;
         
         if(SPS_CI(maxExtinction, 0) == 0.0)
         {

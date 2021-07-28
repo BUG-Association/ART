@@ -181,9 +181,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
             );
     }
 
-    ArSymbol   externalFileName =
-        arsymbol( art_gv, complete_path_to_external );
-
     ArNode   * auxiliaryNode    = [ self auxiliaryNode ];
 
     ArNode <ArpFiletype, ArpParser> * nativeFile =

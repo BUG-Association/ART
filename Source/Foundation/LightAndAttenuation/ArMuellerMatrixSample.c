@@ -1777,8 +1777,6 @@ unsigned int armuellermatrixsample_m_sanity_check(
 
     for (unsigned int channel = 0; channel < channels_count; channel++)
     {
-        double threshold = sps_si( art_gv, & sanity_threshold, channel );
-        double sum       = sps_si( art_gv, & sanity_sum, channel );
         double diff      = sps_si( art_gv, & sanity_diff, channel );
         if (diff < diff_threshold)
         {
@@ -1873,8 +1871,8 @@ unsigned int armuellermatrixsample_m_realisable(
 
     unsigned int result = YES;
 
-#warning AF: is that really what we want? not spc_channels( art_gv )?
-    unsigned int channels_count = 1;
+    unsigned int channels_count = spc_channels( art_gv );
+
     for ( unsigned int channel = 0; channel < channels_count; channel++ )
     {
         // Prepare nicely accessible components of the Mueller matrix.
@@ -2257,7 +2255,6 @@ void armuellermatrixsample_test_synthetic_MMs_validity(
         )
 {
     ArMuellerMatrixSample mm;
-    ArSpectralSample  colour;
 
     // Tests of correct synthetical MMs:
 
@@ -2387,7 +2384,6 @@ void armuellermatrixsample_test_damaged_MMs_validity(
 {
     ArMuellerMatrixSample * mm = armuellermatrixsample_alloc(art_gv);
 
-    const double damage = 0.0001;
 
     // Damaged plain attenuator (non-polarizing MM)
     //for (double attenuation = -0.5; attenuation <= 1.5; attenuation += 0.1)

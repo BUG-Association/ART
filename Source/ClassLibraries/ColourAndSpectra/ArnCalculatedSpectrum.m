@@ -283,7 +283,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExtinctionFromAbsorbance)
 
     for ( unsigned int i = 0; i < spc_channels( art_gv ) ; i++ )
     {
-        double lambda =  spc_channel_center( art_gv, i );
         double reflectivity = spc_si( art_gv, spectrum, i );
 
         spc_set_sid(

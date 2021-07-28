@@ -39,7 +39,7 @@ ART_MODULE_INTERFACE(ArfOpenEXRRGB)
 @interface ArfOpenEXRRGB
            : ArfRasterImage
 {
-    BOOL                  _writtingMode;
+    BOOL                  _writingMode;
     ArnImageInfo        * _imageInfo;
     IVec2D                _size;
     ArDataType            _fileDataType;

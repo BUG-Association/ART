@@ -421,7 +421,8 @@ void arsvlight_ld_realign_to_coaxial_refframe_sv(
     ASSERT_VALID_REFERENCE_FRAME(r0)
     ASSERT_ALLOCATED_STOKES_VECTOR(sr)
     ASSERT_COAXIAL_REFERENCE_FRAMES_R_SVL( r0, l0, d0 )
-
+    (void) d0;  // d0 is only used if assertions are on
+    
     if ( ARSVLIGHT_POLARISED( *l0 ) )
     {
         double  cos_phi =
@@ -902,6 +903,10 @@ void arsvlight_l_inv_l(
               ArSVLight  * lr
         )
 {
+    (void) art_gv;
+    (void) l0;
+    (void) lr;
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 /* ---------------------------------------------------------------------------
@@ -1315,6 +1320,7 @@ void arsvlight_wsd_sloppy_add_l(
             );
     }
 #endif
+    (void) d0;  // d0 is only used if assertions are on
 
     arsvlight_ws_add_l(
           art_gv,
@@ -1353,19 +1359,20 @@ void arsvlight_dws_mul_add_l(
 }
 
 void arsvlight_dwsd_mul_sloppy_add_l(
-        const ART_GV                       * art_gv,
-        const double                         d0,
+        const ART_GV                         * art_gv,
+        const double                           d0,
         const ArSVLightSample                * h0,
-        const ArWavelength            * w0,
+        const ArWavelength                   * w0,
         const ArSpectralSampleSplattingData  * s0,
-        const double                         d1,
-              ArSVLight                    * lr
+        const double                           d1,
+              ArSVLight                      * lr
         )
 {
     ASSERT_VALID_SV_LIGHT_SAMPLE(h0)
     ASSERT_VALID_WAVELENGTH(w0)
     ASSERT_NONNEGATIVE_DOUBLE(d1)
     ASSERT_VALID_SV_LIGHT(lr)
+    (void) d1;
 
     arsvlight_dws_mul_add_l(
           art_gv,
@@ -2127,6 +2134,10 @@ unsigned int arsvlight_ll_collinear(
         const ArSVLight  * l1
         )
 {
+    (void) art_gv;
+    (void) l0;
+    (void) l1;
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return 1;
 }
 
