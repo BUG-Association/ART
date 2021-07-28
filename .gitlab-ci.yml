@@ -12,6 +12,7 @@ before_script:
         libgnustep-base-dev
         libgsl-dev
         libopenexr-dev
+        ninja
 
 # linux:
 #     stage: build
@@ -28,8 +29,8 @@ before_script:
 #             libopenexr-dev
 #         - mkdir build
 #         - cd build
-#         - cmake ..
-#         - make
+#         - cmake .. -GNinja
+#         - cmake --build . 
 #     artifacts:
 #         paths:
 #             - build
@@ -46,8 +47,8 @@ render:
         - export ART_RESOURCE_PATH=${ART_LIBRARY_PATH}/ART_Resources
         - mkdir build
         - cd build
-        - cmake ..
-        - make install
+        - cmake .. -GNinja
+        - cmake --install .
         - cd ..
         - git clone https://gitlab.com/art-development-team/art-functionality-test.git
         - cd art-functionality-test
