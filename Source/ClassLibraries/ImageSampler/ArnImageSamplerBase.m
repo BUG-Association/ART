@@ -495,14 +495,14 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
 }
 
 - (void) cleanupAfterImageSampling
-        : (ArNode <ArpWorld> *) world
-        : (ArNode <ArpCamera > *) camera
-        : (ArNode <ArpImageWriter> **) image
+        : (ArNode <ArpWorld> *) pWorld
+        : (ArNode <ArpCamera > *) pCamera
+        : (ArNode <ArpImageWriter> **) ppImage
         : (int) numberOfResultImages
 {
-    (void) world;
-    (void) camera;
-    (void) image;
+    (void) pWorld;
+    (void) pCamera;
+    (void) ppImage;
     (void) numberOfResultImages;
     
     RELEASE_OBJECT( sampleCounter );

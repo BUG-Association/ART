@@ -264,7 +264,7 @@ int art_imagesnr(
     double sumRefSquaredRGB = 0;
     double sumDiffSquaredRGB = 0;
     
-    for (size_t y = 0; y < YC(sizeReference); y++)
+    for (int y = 0; y < YC(sizeReference); y++)
     {
         [ lightAlphaImageReference getPlainImage
              :   IPNT2D( 0, y )
@@ -276,7 +276,7 @@ int art_imagesnr(
              :   lightAlphaLineCompare
              ];
 
-        for (size_t x = 0; x < XC(sizeReference); x++)
+        for (int x = 0; x < XC(sizeReference); x++)
         {
             ArLightAlpha  * valueReference = lightAlphaLineReference->data[ x ];
             ArLightAlpha  * valueCompare   = lightAlphaLineCompare->data[ x ];
