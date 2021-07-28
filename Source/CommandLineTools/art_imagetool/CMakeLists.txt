@@ -8,6 +8,8 @@ target_link_libraries(
 	${art_generic_link_libraries}
 	)
 
+target_compile_options(art_imagetool PRIVATE -Wall -Wextra)
+
 install (
 	TARGETS
 		art_imagetool
