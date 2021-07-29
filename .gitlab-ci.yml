@@ -14,42 +14,37 @@ before_script:
         libopenexr-dev
         ninja-build
 
-# linux:
-#     stage: build
-#     script:
-#         - apt-get update
-#         - apt-get -y install
-#             cmake
-#             gobjc
-#             gobjc++
-#             libtiff-dev
-#             liblcms2-dev
-#             libgnustep-base-dev
-#             libgsl-dev
-#             libopenexr-dev
-#         - mkdir build
-#         - cd build
-#         - cmake .. -GNinja
-#         - ninja 
-#     artifacts:
-#         paths:
-#             - build
-#     tags:
-#         - linux
+linux:
+    stage: build
+    script:
+        - apt-get update
+        - apt-get -y install
+            cmake
+            gobjc
+            gobjc++
+            libtiff-dev
+            liblcms2-dev
+            libgnustep-base-dev
+            libgsl-dev
+            libopenexr-dev
+        - mkdir build
+        - cd build
+        - cmake .. -GNinja
+        - ninja install
+    artifacts:
+        paths:
+            - /usr/local
+    tags:
+        - linux
 
 render:
     stage: test
-#    needs: ["linux"]
+    needs: ["linux"]
     script:
         - export PATH=${PATH}:/usr/local/bin
         - export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
         - export ART_LIBRARY_PATH=/usr/local/lib
         - export ART_RESOURCE_PATH=${ART_LIBRARY_PATH}/ART_Resources
-        - mkdir build
-        - cd build
-        - cmake .. -GNinja
-        - ninja install
-        - cd ..
         - git clone https://gitlab.com/art-development-team/art-functionality-test.git
         - cd art-functionality-test
         - git checkout v2.1
