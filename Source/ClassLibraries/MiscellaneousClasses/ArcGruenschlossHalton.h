@@ -52,11 +52,11 @@ ART_MODULE_INTERFACE(ArcGruenschlossHalton)
     struct ArcGruenschlossHalton_members  * member_vars;
 }
 
-- init
+- (id) init
         : (int) newMaxNumberOfSamples
         ;
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
         : (int) newMaxNumberOfSamples
         ;

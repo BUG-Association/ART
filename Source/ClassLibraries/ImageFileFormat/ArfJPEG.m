@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+     (void) art_gv;
 #ifndef _ART_WITHOUT_JPEGLIB_
     [ ArfJPEG registerWithFileProbe
         :   art_gv

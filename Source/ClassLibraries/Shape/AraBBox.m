@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ AraBBox registerWithRuntime ];
 )
 
@@ -42,7 +43,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraBBox)
 
-- init
+- (id) init
         : (ArNodeRef) newSubnodeRef
 {
     self =
@@ -64,7 +65,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraBBox)
     return self;
 }
 
-- copy
+- (id) copy
 {
     AraBBox  * copiedInstance = [ super copy ];
 
@@ -79,7 +80,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraBBox)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     AraBBox  * copiedInstance =

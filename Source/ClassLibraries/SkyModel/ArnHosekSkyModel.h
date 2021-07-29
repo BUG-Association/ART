@@ -56,7 +56,7 @@ ART_MODULE_INTERFACE(ArnHosekSkyModel)
     Vec3D  sunDirection;
 }
 
-- init
+- (id) init
         : (double) newElevation
         : (double) newAzimuth
         : (double) newTurbidity

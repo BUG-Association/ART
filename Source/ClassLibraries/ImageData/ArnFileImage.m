@@ -36,6 +36,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnFileImage registerWithRuntime ];
 )
 
@@ -75,7 +76,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     return file;
 }
 
-- init
+- (id) init
         : (const char *) newFileName
         : (ArnImageInfo *) newImageInfo
 {
@@ -94,7 +95,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     return self;
 }
 
-- init
+- (id) init
         : (const char *) newFileName
 {
     self = [super init];
@@ -112,7 +113,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     return self;
 }
 
-- init
+- (id) init
         : (const char *) newFileName
         : (Class) instanceOf
         : (ArnImageInfo *) newImageInfo
@@ -145,7 +146,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnFileImage * copiedInstance = [ super copy ];
 
@@ -154,7 +155,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnFileImage  * copiedInstance =
@@ -350,7 +351,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFileImage)
     {
         if (action == arnfileimage_writing)
             [ imageFile close ];
-        imageFile = RELEASE_OBJECT( imageFile );
+        imageFile = RELEASE_OBJECT_RETURN_ID( imageFile );
     }
 }
 

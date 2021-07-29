@@ -43,7 +43,7 @@ ARLIST_INTERFACE_FOR_TYPE(ArAssignment,arassignment)
 typedef struct ArAssignmentTable
 {
     ArAssignment   * array;
-    unsigned long    size;
+    unsigned int     size;
 }
 ArAssignmentTable;
 
@@ -54,7 +54,7 @@ ArAssignmentTable;
     ArAssignmentTable  assignmentTable;
 }
 
-- init
+- (id) init
         : (ArAssignmentTable) newAssignmentTable
         ;
 

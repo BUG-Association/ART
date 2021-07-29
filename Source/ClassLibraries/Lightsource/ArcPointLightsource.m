@@ -41,7 +41,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcPointLightsource
 
-- init
+- (id) init
         : (ArNode <ArpShape> *) shapeRef
         : (ArTraversalState *) traversalState
         : (ArnLightsourceCollector *) lightsourceCollector

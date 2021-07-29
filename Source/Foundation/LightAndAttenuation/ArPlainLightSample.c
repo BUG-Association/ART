@@ -42,6 +42,8 @@ const char * arplainlightsample_lct_string(
         const ART_GV                * art_gv
         )
 {
+    (void) art_gv;
+    
     return " plain light";
 }
 
@@ -52,6 +54,8 @@ void arplainlightsample_s_rf_init_polarised_l(
               ArPlainLightSample      * lr
         )
 {
+    (void) r0;
+    
     arplainlightsample_s_init_unpolarised_l(
           art_gv,
         & ARSVS_I( *s0, 0 ),
@@ -64,6 +68,9 @@ unsigned int arplainlightsample_l_polarised(
         const ArPlainLightSample      * l0
         )
 {
+    (void) art_gv;
+    (void) l0;
+    
     return 0;
 }
 
@@ -72,6 +79,9 @@ ArReferenceFrame const * arplainlightsample_l_refframe(
         const ArPlainLightSample      * l0
         )
 {
+    (void) art_gv;
+    (void) l0;
+    
     return 0;
 }
 
@@ -96,6 +106,9 @@ void arplainlightsample_ld_realign_to_coaxial_refframe_sv(
               ArStokesVectorSample    * sr
         )
 {
+    (void) d0;
+    (void) r0;
+    
     arplainlightsample_l_to_sv(
         art_gv,
         l0,
@@ -109,6 +122,10 @@ void arplainlightsample_realign_to_coaxial_refframe_l(
               ArPlainLightSample      * lr
         )
 {
+    (void) art_gv;
+    (void) r0;
+    (void) lr;
+    
     //   This space intentionally left blank; this should really
     //   do nothing except leave 'lr' exactly as the way it is.
 }
@@ -120,6 +137,8 @@ void arplainlightsample_l_realign_to_coaxial_refframe_l(
               ArPlainLightSample      * lr
         )
 {
+    (void) r0;
+    
     arplainlightsample_l_init_l(
         art_gv,
         l0,
@@ -134,6 +153,8 @@ void arplainlightsample_dl_sloppy_add_l(
               ArPlainLightSample      * lr
         )
 {
+    (void) d0;
+    
     arplainlightsample_l_add_l(
           art_gv,
           l0,
@@ -149,6 +170,8 @@ void arplainlightsample_lld_sloppy_add_l(
               ArPlainLightSample      * lr
         )
 {
+    (void) d0;
+    
     arplainlightsample_ll_add_l(
           art_gv,
           l0,
@@ -165,6 +188,8 @@ void arplainlightsample_dld_mul_sloppy_add_l(
               ArPlainLightSample    * lr
         )
 {
+    (void) d1;
+    
     arplainlightsample_dl_mul_add_l(
           art_gv,
           d0,
@@ -203,6 +228,10 @@ unsigned int arplainlightsample_ll_collinear(
         const ArPlainLightSample      * l1
         )
 {
+    (void) art_gv;
+    (void) l0;
+    (void) l1;
+    
     return 1;
 }
 

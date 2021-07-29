@@ -39,13 +39,13 @@ ART_MODULE_INTERFACE(ARM_SkyModel)
 
 @interface ArnPreethamSkyModel ( ARM_Interface )
 
-- elevation
+- (id) elevation
                  : (double) newElevation
         azimuth  : (double) newAzimuth
         turbidity: (double) newTurbidity
         ;
 
-- elevation
+- (id) elevation
                  : (double) newElevation
         azimuth  : (double) newAzimuth
         turbidity: (double) newTurbidity
@@ -56,14 +56,14 @@ ART_MODULE_INTERFACE(ARM_SkyModel)
 
 @interface ArnHosekSkyModel ( ARM_Interface )
 
-- elevation
+- (id) elevation
                     : (double) newElevation
         azimuth     : (double) newAzimuth
         turbidity   : (double) newTurbidity
         groundAlbedo: (ArNode <ArpSpectrum> *) newGroundAlbedo
         ;
 
-- elevation
+- (id) elevation
                     : (double) newElevation
         azimuth     : (double) newAzimuth
         solColour   : (double) newKelvin
@@ -76,7 +76,7 @@ ART_MODULE_INTERFACE(ARM_SkyModel)
 //   skylight around an axis. This can come in handy if an entire scene is
 //   already specified in a coordinate system where positive Z is not "up".
 
-- elevation
+- (id) elevation
                     : (double) newElevation
         azimuth     : (double) newAzimuth
         turbidity   : (double) newTurbidity
@@ -88,7 +88,7 @@ ART_MODULE_INTERFACE(ARM_SkyModel)
 
 @interface ArnPragueSkyModel ( ARM_Interface )
 
-- elevation
+- (id) elevation
                     : (double) newElevation
         azimuth     : (double) newAzimuth
         turbidity   : (double) newTurbidity

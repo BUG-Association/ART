@@ -47,12 +47,12 @@ ART_MODULE_INTERFACE(ArnReconstructionKernel)
     double  parameterC;
 }
 
-- parameterB
+- (id) parameterB
                    : (double) newParameterB
         parameterC : (double) newParameterC
         ;
 
-- init
+- (id) init
         : (double) newParameterB
         : (double) newParameterC
         ;
@@ -85,11 +85,11 @@ ART_MODULE_INTERFACE(ArnReconstructionKernel)
     unsigned int  supportSize;
 }
 
-- supportSize
+- (id) supportSize
         : (unsigned int) newSupportSize
         ;
 
-- init
+- (id) init
         : (unsigned int) newSupportSize
         ;
 

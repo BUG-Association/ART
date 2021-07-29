@@ -35,6 +35,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnAssignmentTable registerWithRuntime ];
 )
 
@@ -50,6 +51,8 @@ ArAssignmentTable arassignmenttable_v(
         va_list    argPtr
         )
 {
+    (void) art_gv;
+    
     ArList  assignmentList = ARLIST_EMPTY;
 
     ArAssignment  assignment;
@@ -153,7 +156,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnAssignmentTable)
         ALLOC_ARRAY( ArAssignment, assignmentTable.size );
 }
 
-- init
+- (id) init
         : (ArAssignmentTable) newAssignmentTable
 {
     self = [ super init ];
@@ -166,7 +169,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnAssignmentTable)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnAssignmentTable  * copiedInstance = [ super copy ];
 
@@ -176,7 +179,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnAssignmentTable)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnAssignmentTable  * copiedInstance =

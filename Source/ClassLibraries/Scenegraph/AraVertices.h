@@ -39,7 +39,7 @@ ART_MODULE_INTERFACE(AraVertices)
 {
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNode
         : (ArNodeRef) newSurface
         ;

@@ -67,7 +67,7 @@ ART_MODULE_INTERFACE(ArnPDFSampling)
     double exponent;
 }
 
-- init
+- (id) init
         : (double) newExponent
         ;
 
@@ -86,7 +86,7 @@ ART_MODULE_INTERFACE(ArnPDFSampling)
     double d_omega_i;
 }
 
-- init
+- (id) init
         : (double) newTau
         : (double) newSigma0
         : (double) newLambdaAvg

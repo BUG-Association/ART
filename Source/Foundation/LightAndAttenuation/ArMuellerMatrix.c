@@ -27,7 +27,7 @@
 #define ART_MODULE_NAME     ArMuellerMatrix
 
 #include "ArMuellerMatrix.h"
-#include "ArMuellerMatrix_GSLSettings.h"
+#include <ArMuellerMatrix_GSLSettings.h>
 #include "ArStokesVector.h"
 #include "ArString.h"
 
@@ -1714,7 +1714,7 @@ unsigned int armuellermatrix_m_nonpol_att_valid(
     const unsigned int channels_count = spc_channels( art_gv );
     const ArSpectrum * colour = ARMUELLER_M_II( *mm0, 0, 0 );
 
-    for ( int channel = 0; channel < channels_count; channel++ )
+    for ( unsigned int channel = 0; channel < channels_count; channel++ )
     {
         double spc_value = spc_si( art_gv, colour, channel );
 
@@ -1803,10 +1803,8 @@ unsigned int armuellermatrix_m_sanity_check(
     spc_ds_mul_s(art_gv, 4, sanity_threshold, sanity_threshold);
     spc_ss_sub_s(art_gv, sanity_sum, sanity_threshold, sanity_diff); // threshold - sum
 
-    for (int channel = 0; channel < channels_count; channel++)
+    for (unsigned int channel = 0; channel < channels_count; channel++)
     {
-        double threshold = spc_si( art_gv, sanity_threshold, channel );
-        double sum       = spc_si( art_gv, sanity_sum, channel );
         double diff      = spc_si( art_gv, sanity_diff, channel );
         if (diff < diff_threshold)
         {
@@ -1906,8 +1904,8 @@ unsigned int armuellermatrix_m_realisable(
 
     unsigned int result = YES;
 
-    unsigned int channels_count = spc_channels( art_gv );
-    for ( int channel = 0; channel < channels_count; channel++ )
+    const unsigned int channels_count = spc_channels( art_gv );
+    for ( unsigned int channel = 0; channel < channels_count; channel++ )
     {
         // Prepare nicely accessible components of the Mueller matrix.
         // Names of the variables are indexed from 1 instead of from 0 so that
@@ -2195,7 +2193,7 @@ void armuellermatrix_d_randomly_damage_m(
     #define DAMAGE_MM_COMPONENT(__component) \
     {\
         colour = ARMUELLER_M_I( *mm, __component ); \
-        for (int channel = 0; channel < channels_count; channel++) \
+        for (unsigned int channel = 0; channel < channels_count; channel++) \
         { \
             const double random_val = ( 2.0 * rand() / (double)RAND_MAX ) - 1.0; \
             double value = spc_si( art_gv, colour, channel ); \
@@ -2419,7 +2417,7 @@ void armuellermatrix_test_damaged_MMs_validity(
 {
     ArMuellerMatrix * mm = armuellermatrix_alloc(art_gv);
 
-    const double damage = 0.0001;
+    //const double damage = 0.0001;
 
     // Damaged plain attenuator (non-polarizing MM)
     //for (double attenuation = -0.5; attenuation <= 1.5; attenuation += 0.1)

@@ -88,7 +88,7 @@ ART_MODULE_INTERFACE(ArNode_ARM_SpecificAttributes)
  *
  * @param material  SurfaceMaterial     Material to apply to the node.
  */
-- surfaceMaterial
+- (id) surfaceMaterial
         : (ArNode *) newSurfaceMaterial
         ;
 
@@ -99,7 +99,7 @@ ART_MODULE_INTERFACE(ArNode_ARM_SpecificAttributes)
  *
  * @param material  EnvironmentMaterial     Material to apply to the node.
  */
-- environmentMaterial
+- (id) environmentMaterial
         : (ArNode *) newEnvironmentMaterial
         ;
 
@@ -110,7 +110,7 @@ ART_MODULE_INTERFACE(ArNode_ARM_SpecificAttributes)
  *
  * @param material  VolumeMaterial     Material to apply to the node.
  */
-- volumeMaterial
+- (id) volumeMaterial
         : (ArNode *) newVolumeMaterial
         ;
 
@@ -144,7 +144,7 @@ ART_MODULE_INTERFACE(ArNode_ARM_SpecificAttributes)
  *
  * @param vert  VertexSet     Vertices to apply to the node.
  */
-- vertices
+- (id) vertices
         : (ArNode *) newSetOfVertices
         ;
 
@@ -164,29 +164,29 @@ ART_MODULE_INTERFACE(ArNode_ARM_SpecificAttributes)
  *
  * @param transform     Trafo   Transformation(s) to apply to the node.
  */
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         ;
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         ;
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
         ;
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
         : (ArNode *) newTrafo3
         ;
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -194,7 +194,7 @@ ART_MODULE_INTERFACE(ArNode_ARM_SpecificAttributes)
         : (ArNode *) newTrafo4
         ;
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -203,7 +203,7 @@ ART_MODULE_INTERFACE(ArNode_ARM_SpecificAttributes)
         : (ArNode *) newTrafo5
         ;
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -213,7 +213,7 @@ ART_MODULE_INTERFACE(ArNode_ARM_SpecificAttributes)
         : (ArNode *) newTrafo6
         ;
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2

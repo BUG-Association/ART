@@ -57,7 +57,7 @@ ART_MODULE_INTERFACE(ArnColourSpace)
     ArColourSpaceRef  colourSpaceRef;
 }
 
-- init
+- (id) init
         : (ArColourSpaceRef) newColourSpaceRef
         ;
 

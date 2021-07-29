@@ -79,7 +79,7 @@ ArPathTracerMode;
     unsigned int    nonzeroContributions[CONTRIBUTIONS_ARRAY_LENGTH];
 }
 
-- init
+- (id) init
         : (ArNode <ArpRayCaster> *) newRayCaster
         : (unsigned int) newMaximalRecursion
         : (ArPathTracerMode) newMode

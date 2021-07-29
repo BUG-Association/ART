@@ -36,11 +36,11 @@ ART_MODULE_INTERFACE(ArRSSpectrum)
 
 typedef struct ArRSSpectrum
 {
-    unsigned long  size;
-    double         start;
-    double         step;
-    double         scale;
-    double       * array;
+    unsigned int  size;
+    double        start;
+    double        step;
+    double        scale;
+    double      * array;
 }
 ArRSSpectrum;
 
@@ -54,7 +54,7 @@ ArRSSpectrum;
 #define ARRSSPECTRUM_ARRAY_I(__s,__i)    ARRSSPECTRUM_ARRAY(__s)[(__i)]
 
 #define ARRSSPECTRUM_SAMPLE(__s,__i) \
-  (((__i) >= 0 && (__i) < ARRSSPECTRUM_SIZE(__s) ) ?  \
+  (((int)(__i) >= 0 && (int)(__i) < (int) ARRSSPECTRUM_SIZE(__s) ) ?  \
   ARRSSPECTRUM_ARRAY_I( (__s),(__i) ) : 0.0 )
 
 //   Shorthand versions

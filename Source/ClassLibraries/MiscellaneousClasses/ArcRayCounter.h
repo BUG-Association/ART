@@ -68,7 +68,7 @@ RayCount;
 
 }
 
-- init
+- (id) init
         : (ArcObject <ArpReporter> *) newReporter
         : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
         : (ArcObject <ArpImageSamplerMessenger> *) newImageSampler

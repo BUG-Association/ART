@@ -60,7 +60,7 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 }
 
 
-- wavelength
+- (id) wavelength
         : (double) newWavelength
         ;
 
@@ -77,11 +77,11 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 {
 }
 
-- removeSource
+- (id) removeSource
         : (BOOL) newRemoveOption
         ;
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         ;
 
@@ -98,18 +98,18 @@ ART_MODULE_INTERFACE(ImageConversionActions)
     unsigned int  destinationBitsPerChannel;
 }
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newRemoveOption
         bitsPerChannel  : (unsigned int) newNumberOfBits
         ;
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newRemoveOption
         colourSpace     : (ArNode <ArpColourSpace> *) newColourSpace
         bitsPerChannel  : (unsigned int) newNumberOfBits
         ;
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         : (ArNode <ArpColourSpace> *) newColourSpace
         : (ArnColourTransform *) newColourTransform
@@ -130,13 +130,13 @@ ART_MODULE_INTERFACE(ImageConversionActions)
     double  wavelength;
 }
 
-- removeSource
+- (id) removeSource
                   : (BOOL) newRemoveOption
         normalise : (BOOL) newNormalise
         wavelength: (double) newWavelength
         ;
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         : (BOOL) newNormalise
         : (double) newWavelength
@@ -157,12 +157,12 @@ ART_MODULE_INTERFACE(ImageConversionActions)
     unsigned int  stokesComponentID[4];
 }
 
-- removeSource
+- (id) removeSource
                                 : (BOOL) newRemoveOption
         stokesComponentsToOutput: (int) newStokesComponentsToOutput
         ;
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         : (int) newStokesComponentsToOutput
         ;
@@ -189,7 +189,7 @@ ART_MODULE_INTERFACE(ImageConversionActions)
     unsigned int  scaleTickmarks;
 }
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newDeleteSourceImageAfterUse
         bitsPerChannel  : (unsigned int) newDestinationBitsPerChannel
         falsecolour     : (BOOL) newFalsecolourOption
@@ -199,7 +199,7 @@ ART_MODULE_INTERFACE(ImageConversionActions)
         scaleTickmarks  : (unsigned int) newScaleTickmarks
         ;
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
         : (unsigned int) newDestinationBitsPerChannel
         : (BOOL) newFalsecolourOption
@@ -221,11 +221,11 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 {
 }
 
-- removeSource
+- (id) removeSource
         : (BOOL) newRemoveOption
         ;
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         ;
 
@@ -259,16 +259,16 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 {
 }
 
-- removeSource
-                        : (BOOL) newRemoveOption
+- (id) removeSource
+        : (BOOL) newRemoveOption
         ;
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newRemoveOption
         colourSpace     : (ArNode <ArpColourSpace> *) newColourSpace
         ;
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         : (ArNode <ArpColourSpace> *) newColourSpace
         : (ArnColourTransform *) newColourTransform
@@ -286,11 +286,11 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 {
 }
 
-- removeSource
-                        : (BOOL) newRemoveOption
+- (id) removeSource
+        : (BOOL) newRemoveOption
         ;
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         ;
 
@@ -306,11 +306,11 @@ ART_MODULE_INTERFACE(ImageConversionActions)
 {
 }
 
-- removeSource
-                        : (BOOL) newRemoveOption
+- (id) removeSource
+        : (BOOL) newRemoveOption
         ;
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         ;
 

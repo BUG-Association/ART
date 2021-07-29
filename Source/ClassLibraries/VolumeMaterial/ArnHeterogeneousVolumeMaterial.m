@@ -37,6 +37,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnHeterogeneousVolumeMaterial registerWithRuntime ];
 )
 
@@ -60,7 +61,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHeterogeneousVolumeMaterial)
         ];
 }
 
-- copy
+- (id) copy
 {
     ArnHeterogeneousVolumeMaterial  * copiedInstance = [ super copy ];
 
@@ -69,7 +70,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHeterogeneousVolumeMaterial)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnHeterogeneousVolumeMaterial  * copiedInstance =
@@ -82,7 +83,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHeterogeneousVolumeMaterial)
     return copiedInstance;
 }
 
-- init
+- (id) init
         : (ArNode <ArpSpectrum>      *) newIOR
         : (ArNode <ArpSpectrum>      *) newAbsorption
         : (ArNode <ArpPhaseFunction> *) newPhaseFunction
@@ -120,7 +121,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHeterogeneousVolumeMaterial)
     return self;
 }
 
-- init
+- (id) init
         : (ArNode <ArpSpectrum>      *) newIOR
         : (ArNode <ArpSpectrum>      *) newAbsorption
         : (ArNode <ArpPhaseFunction> *) newPhaseFunction

@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSyntheticFluorescentSpectrum registerWithRuntime ];
 )
 
@@ -116,7 +117,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
 //    arcrosstalk_x_mathematicaprintf( art_gv, crosstalk );
 }
 
-- init
+- (id) init
         : (ArNodeRef) newMainDiagonal
         : (double) newCrosstalkMaximum
         : (Pnt2D) newCrosstalkCenter
@@ -158,6 +159,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (ArcPointContext *) locationInfo
         : (ArSpectrum *) outSpectrum
 {
+    (void) locationInfo;
+    
     spc_s_init_s(
           art_gv,
           mainDiagonalColour,
@@ -168,6 +171,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (ArcPointContext *) locationInfo
         : (ArSpectrum500 *) outSpectrum
 {
+    (void) locationInfo;
+    
     s500_s_init_s(
           art_gv,
           hiresMainDiagonal,
@@ -180,6 +185,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const ArWavelength *) wavelength
         : (      ArSpectralSample *) outSpectrum
 {
+    (void) locationInfo;
+    (void) wavelength;
+    (void) outSpectrum;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -187,6 +196,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (ArcPointContext *) locationInfo
         : (ArLightIntensity *) outLightIntensity
 {
+    (void) locationInfo;
+    
     arlightintensity_s_init_i(
           art_gv,
           mainDiagonalColour,
@@ -198,6 +209,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (ArcPointContext *) locationInfo
         : (ArLight *) outLight
 {
+    (void) locationInfo;
+    
     arlight_s_init_unpolarised_l(
           art_gv,
           mainDiagonalColour,
@@ -209,6 +222,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (ArcPointContext *) locationInfo
         : (ArAttenuation *) attenuation_r
 {
+    (void) locationInfo;
+    
     arattenuation_sx_init_a(
           art_gv,
           mainDiagonalColour,
@@ -222,6 +237,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const ArWavelength *) wavelength
         : (      ArAttenuationSample *) outAttenuation
 {
+    (void) locationInfo;
+    (void) wavelength;
+    (void) outAttenuation;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -231,6 +250,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (ArReferenceFrame *) refframeExit
         : (ArAttenuation *) attenuation_r
 {
+    (void) locationInfo;
+    
     arattenuation_sxrr_init_depolarising_a(
           art_gv,
           mainDiagonalColour,
@@ -248,6 +269,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const ArWavelength *) wavelength
         : (      ArAttenuationSample *) outAttenuation
 {
+    (void) locationInfo;
+    (void) refframeEntry;
+    (void) refframeExit;
+    (void) wavelength;
+    (void) outAttenuation;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -257,6 +284,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (ArReferenceFrame *) refframeExit
         : (ArAttenuation *) attenuation_r
 {
+    (void) locationInfo;
+    
     arattenuation_sxrr_init_nonpolarising_a(
           art_gv,
           mainDiagonalColour,
@@ -274,6 +303,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const ArWavelength *) wavelength
         : (      ArAttenuationSample *) outAttenuation
 {
+    (void) locationInfo;
+    (void) refframeEntry;
+    (void) refframeExit;
+    (void) wavelength;
+    (void) outAttenuation;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -281,6 +316,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
+    (void) locationInfo;
+    (void) outPSSpectrum;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -288,6 +326,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    (void) wavelength;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0.0;
@@ -298,6 +339,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const unsigned int) numberOfValues
         : (ArSpectrum *) outSpectrum
 {
+    (void) evalEnv;
+    
     unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES);
 
     for ( unsigned int i = 0; i < actualNumberOfValues; i++)
@@ -314,6 +357,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const ArcObject <ArpEvaluationEnvironment> *) evalEnv
         : (ArSpectrum *) outSpectrum
 {
+    (void) evalEnv;
+    
     spc_s_init_s(
           art_gv,
           mainDiagonalColour,
@@ -327,6 +372,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const ArcObject <ArpEvaluationEnvironment> *) evalEnv
         : (ArSpectrum500 *) outSpectrum
 {
+    (void) evalEnv;
+    
     s500_s_init_s(
           art_gv,
           hiresMainDiagonal,
@@ -341,6 +388,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const unsigned int) numberOfValues
         : (      ArAttenuation *) outAttenuations
 {
+    (void) evalEnv;
+    
     unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES);
 
     for ( unsigned int i = 0; i < actualNumberOfValues; i++)
@@ -358,6 +407,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const ArcObject <ArpEvaluationEnvironment> *) evalEnv
         : (      ArAttenuation *) outAttenuation
 {
+    (void) evalEnv;
+    
     arattenuation_sx_init_a(
           art_gv,
           mainDiagonalColour,
@@ -375,6 +426,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const unsigned int) numberOfValues
         : (      ArAttenuation *) outAttenuations
 {
+    (void) evalEnv;
+    
     unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES);
 
     for ( unsigned int i = 0; i < actualNumberOfValues; i++)
@@ -396,6 +449,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const ArReferenceFrame *) refframeExit
         : (      ArAttenuation *) outAttenuation
 {
+    (void) evalEnv;
+    
     arattenuation_sxrr_init_depolarising_a(
           art_gv,
           mainDiagonalColour,
@@ -415,6 +470,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const unsigned int) numberOfValues
         : (      ArAttenuation *) outAttenuations
 {
+    (void) evalEnv;
+    
     unsigned int actualNumberOfValues = M_MIN(numberOfValues, ARPVALUES_MAX_VALUES);
 
     for ( unsigned int i = 0; i < actualNumberOfValues; i++)
@@ -436,6 +493,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSyntheticFluorescentSpectrum)
         : (const ArReferenceFrame *) refframeExit
         : (      ArAttenuation *) outAttenuation
 {
+    (void) evalEnv;
+    
     arattenuation_sxrr_init_nonpolarising_a(
           art_gv,
           mainDiagonalColour,

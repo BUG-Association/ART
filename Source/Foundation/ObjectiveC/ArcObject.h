@@ -276,7 +276,7 @@ ART_MODULE_INTERFACE(ArcObject)
 
 #ifndef RELEASE_RETAIN_DEBUG_OUTPUT
 
-#define RELEASE_OBJECT(_object) \
+#define RELEASE_OBJECT_RETURN_ID(_object) \
     ((id) ( \
     ( \
         (_object) == 0 \
@@ -296,6 +296,8 @@ ART_MODULE_INTERFACE(ArcObject)
     ), \
     NULL \
     ) )
+
+#define RELEASE_OBJECT(_object) ((void)RELEASE_OBJECT_RETURN_ID(_object))
 
 #endif
 
@@ -409,7 +411,7 @@ ART_MODULE_INTERFACE(ArcObject)
 #define ARLIST_IMPLEMENTATION_FOR_OBJECT_TYPE(_Type,_type) \
     _ARLIST_IMPLEMENTATION_FOR_TYPE( \
         _Type, _type, _Type *, \
-        RETAIN_OBJECT, , RELEASE_OBJECT )
+        RETAIN_OBJECT, , RELEASE_OBJECT_RETURN_ID )
 
 
 //   Interface definition of ArList functionality for ArcObjects.

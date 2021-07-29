@@ -334,21 +334,21 @@ void trafo3d_v_local2world_from_worldspace_normal_t(
     vec3d_vv_cross_v(
           in_vec,
         & vector,
-        & TRAFO3D_X_VEC(*out_local2world)
+          G3D_TR_X_VEC_P(*out_local2world)
         );
 
     vec3d_norm_v(
-        & TRAFO3D_X_VEC(*out_local2world)
+          G3D_TR_X_VEC_P(*out_local2world)
         );
 
     vec3d_vv_cross_v(
           in_vec,
-        & TRAFO3D_X_VEC(*out_local2world),
-        & TRAFO3D_Y_VEC(*out_local2world)
+          G3D_TR_X_VEC_P(*out_local2world),
+          G3D_TR_Y_VEC_P(*out_local2world)
         );
 
     vec3d_norm_v(
-        & TRAFO3D_Y_VEC(*out_local2world)
+          G3D_TR_Y_VEC_P(*out_local2world)
         );
 
     TRAFO3D_Z_VEC(*out_local2world) = *in_vec;
@@ -383,14 +383,14 @@ void trafo3d_v_world2local_from_worldspace_normal_t(
     vec3d_vv_cross_v(
           in_vec,
         & vector,
-        & TRAFO3D_X_VEC(*out_world2local) );
+          G3D_TR_X_VEC_P(*out_world2local) );
 
-    vec3d_norm_v( & TRAFO3D_X_VEC(*out_world2local) );
+    vec3d_norm_v( G3D_TR_X_VEC_P(*out_world2local) );
 
     vec3d_vv_cross_v(
           in_vec,
-        & TRAFO3D_X_VEC(*out_world2local),
-        & TRAFO3D_Y_VEC(*out_world2local));
+          G3D_TR_X_VEC_P(*out_world2local),
+          G3D_TR_Y_VEC_P(*out_world2local));
 
     vec3d_norm_v( & TRAFO3D_Y_VEC(*out_world2local) );
 

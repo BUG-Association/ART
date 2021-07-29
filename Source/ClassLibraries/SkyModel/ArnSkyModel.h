@@ -77,7 +77,7 @@ ART_MODULE_INTERFACE(ArnSkyModel)
 
 }
 
-- init
+- (id) init
         : (double) newSolarRadius
         : (double) newSolarElevation
         : (double) newSolarAzimuth

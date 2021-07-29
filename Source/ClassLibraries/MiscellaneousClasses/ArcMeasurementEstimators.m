@@ -35,7 +35,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcLineMeasurementEstimator
 
-- init
+- (id) init
         : (double) newLength
 {
     self = [ super init ];
@@ -101,7 +101,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcTriangleMeasurementEstimator
 
-- init
+- (id) init
         : (double) newArea
 {
     self = [ super init ];
@@ -210,7 +210,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 {
     area = 0.0;
 
-    for ( unsigned int i = 0; i < numberOfParts; i++ )
+    for ( int i = 0; i < numberOfParts; i++ )
         area += [ estimator[i] area ];
 }
 

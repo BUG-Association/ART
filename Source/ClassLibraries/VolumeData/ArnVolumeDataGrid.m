@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+     (void) art_gv;
      [ ArnVolumeDataGrid registerWithRuntime ];
 )
 
@@ -40,7 +41,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataGrid)
 
-- copy
+- (id) copy
 {
     ArnVolumeDataGrid  * copiedInstance = [ super copy ];
 
@@ -73,7 +74,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataGrid)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnVolumeDataGrid  * copiedInstance =
@@ -279,7 +280,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataGrid)
 
 
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo
 {
     if ( [ newTrafo conformsToArProtocol: ARPROTOCOL(ArpTrafo3D) ] )
@@ -297,7 +298,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataGrid)
     return self;
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
 {
@@ -311,7 +312,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataGrid)
              ];
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -330,7 +331,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataGrid)
              ];
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -354,7 +355,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataGrid)
      ];
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -383,7 +384,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataGrid)
      ];
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -418,7 +419,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataGrid)
 		  ];
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2
@@ -458,7 +459,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVolumeDataGrid)
      ];
 }
 
-- trafo
+- (id) trafo
         : (ArNode *) newTrafo0
         : (ArNode *) newTrafo1
         : (ArNode *) newTrafo2

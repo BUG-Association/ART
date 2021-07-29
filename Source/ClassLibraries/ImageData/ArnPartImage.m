@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnPartImage registerWithRuntime ];
 )
 
@@ -43,7 +44,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPartImage)
 
-- init
+- (id) init
         : (ArNodeRef) newBaseImage
         : (ArNodeRef) newDataImage
         : (IPnt2D) newOrigin
@@ -58,7 +59,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPartImage)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnPartImage  * copiedInstance = [ super copy ];
 
@@ -67,7 +68,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPartImage)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnPartImage  * copiedInstance =

@@ -62,11 +62,11 @@ ArNode <ArpRayCaster> * standard_raycaster(
 
 @interface ArnRayCaster ( ARM_Interface )
 
-- hitEpsilon
+- (id) hitEpsilon
         : (double) newHitEps
         ;
 
-- hitEpsilon
+- (id) hitEpsilon
         : (double) newHitEps
         options: (unsigned int) newOptions;
         ;

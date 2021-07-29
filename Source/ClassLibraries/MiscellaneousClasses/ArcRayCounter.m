@@ -36,7 +36,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcRayCounter
 
-- init
+- (id) init
         : (ArcObject <ArpReporter> *) newReporter
         : (ArNode <ArpPathspaceIntegratorCore> *) pathspaceIntegrator
         : (ArcObject <ArpImageSamplerMessenger> *) newImageSampler

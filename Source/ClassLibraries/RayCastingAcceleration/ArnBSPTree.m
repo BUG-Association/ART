@@ -38,6 +38,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnBSPTree registerWithRuntime ];
 )
 
@@ -163,24 +164,6 @@ static int order_split(
             }
         }
     }
-}
-
-static int order_split_old(
-        const void  * a,
-        const void  * b
-        )
-{
-    double firstCoordinate = ((const plausibleSplit*) a)->splitCoordinate;
-    int firstAxist = ((const plausibleSplit*) a)->axis;
-    double secondCoordinate = ((const plausibleSplit*) b)->splitCoordinate;
-    int secondAxis = ((const plausibleSplit*) b)->axis;
-
-    return
-    (firstCoordinate < secondCoordinate ? arorder_lessthan
-        : (firstCoordinate > secondCoordinate ? arorder_greaterthan
-            : (firstAxist < secondAxis ? arorder_lessthan
-                : (firstAxist > secondAxis ? arorder_greaterthan
-                    : arorder_equal))));
 }
 
 #define CURRENT_BSP_NODE  bspTree[indexOfCurrentBSPNode]
@@ -708,14 +691,14 @@ void bspTree_debugprintf(
         bboxForSubTree[0] = *bboxForCurrentScenegraphLeaves;
         bboxForSubTree[1] = *bboxForCurrentScenegraphLeaves;
 
-        //   Dynarrays for the two subtrees - initally empty.
+        //   Dynarrays for the two subtrees - (id) initally empty.
 
         ArSGLptrDynArray  leavesInSubTree[2];
 
         leavesInSubTree[0] = arsglptrdynarray_init(0);
         leavesInSubTree[1] = arsglptrdynarray_init(0);
 
-                //      Dynarrays for the two subtree plausible splits - initally empty.
+                //      Dynarrays for the two subtree plausible splits - (id) initally empty.
 
                 ArplausibleSplitptrDynArray splitsInSubTree[2];
 
@@ -1091,7 +1074,7 @@ void bspTree_debugprintf(
 
     bspTree = ALLOC_ARRAY( BSPNode, numberOfAllocatedBSPNodes );
 
-    for ( unsigned int i = 0; i < numberOfAllocatedBSPNodes; i++ )
+    for ( int i = 0; i < numberOfAllocatedBSPNodes; i++ )
         BSP_NODE_INNER(bspTree[i]) = BSP_NODE_INNER_EMPTY;
 
     //   This is also a rough initial guess, and probably too low as well.
@@ -1414,7 +1397,7 @@ void bspTree_debugprintf(
         ];
 }
 
-- init
+- (id) init
         : (ArNodeRef) originalScenegraphRef
         : (ArnLeafNodeBBoxCollection *) leafNodeBBoxes
         : (ArnOperationTree*) operationTree
@@ -1496,7 +1479,7 @@ void bspTree_debugprintf(
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnBSPTree  * copiedInstance = [ super copy ];
 
@@ -1505,7 +1488,7 @@ void bspTree_debugprintf(
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnBSPTree  * copiedInstance =
@@ -1619,6 +1602,7 @@ void getLeafArrayIntersectionList_UseOpTree(
         Ray3D         * worldViewingRay3D
         )
 {
+    (void) worldViewingRay3D;
     // mark the leaf nodes for the operation tree.
 
     for( int i = 0; i < SGLPARRAY_N(*leafArray); i++ )
@@ -2121,7 +2105,11 @@ void intersectRayWithBSPTree_UseOpTree(
 }
 
 void opTreeDebugprintSimple(ArOpNode* tree, int size)
-{/*
+{
+    (void) tree;
+    (void) size;
+ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+/*
         void (*function) (int, struct ArOpNode*, ArnRayCaster*, ArIntersectionList*);
         for( int i = 0; i < size; ++i )
         {
@@ -2154,7 +2142,7 @@ void opTreeDebugprintSimple(ArOpNode* tree, int size)
 void opTreeDebugprint(int offset, ArOpNode* tree, int index)
 {
         debugprintf("\n");
-        for( int i = 0; i < offset; ++i ) debugprintf("  ");
+        for( int i = 0; i < offset; ++i ) { debugprintf("  "); }
         void (*function) (int, struct ArOpNode*, ArnRayCaster*, ArIntersectionList*);
         function = tree[index].intersectFunction;
 

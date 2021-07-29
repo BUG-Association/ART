@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     RUNTIME_REGISTER_PROTOCOL(ArpAttributeConcatenation);
 )
 

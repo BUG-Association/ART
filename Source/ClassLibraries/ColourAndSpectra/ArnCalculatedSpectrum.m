@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnCalculatedSpectrum registerWithRuntime ];
     [ ArnExtinctionFromAbsorbance registerWithRuntime ];
     [ ArnAbsorbanceFromReflectivity registerWithRuntime ];
@@ -73,7 +74,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
 ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
 
-- init
+- (id) init
         : (ArNode *) newColour
         : (double) newExponent
 {
@@ -96,6 +97,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
+    (void) locationInfo;
+    (void) outPSSpectrum;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -103,6 +107,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    (void) wavelength;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0.0;
@@ -149,7 +156,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExtinctionFromAbsorbance)
         :   spectrum
         ];
 
-    for ( int i = 0; i < spc_channels( art_gv ) ; i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ) ; i++ )
     {
         double lambda =  spc_channel_center( art_gv, i );
         double absorbance = spc_si( art_gv, spectrum, i );
@@ -196,7 +203,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExtinctionFromAbsorbance)
 
 ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
 
-- init
+- (id) init
         : (ArNode *) newColour
         : (double) newLength
 {
@@ -219,6 +226,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
+    (void) locationInfo;
+    (void) outPSSpectrum;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -226,6 +236,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    (void) wavelength;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0.0;
@@ -268,9 +281,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExtinctionFromAbsorbance)
         :   spectrum
         ];
 
-    for ( int i = 0; i < spc_channels( art_gv ) ; i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ) ; i++ )
     {
-        double lambda =  spc_channel_center( art_gv, i );
         double reflectivity = spc_si( art_gv, spectrum, i );
 
         spc_set_sid(
@@ -315,7 +327,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExtinctionFromAbsorbance)
 
 ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
 
-- init
+- (id) init
         : (ArNode *) newColour
 {
     self =
@@ -335,6 +347,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
+    (void) locationInfo;
+    (void) outPSSpectrum;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -342,6 +357,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    (void) wavelength;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0.0;

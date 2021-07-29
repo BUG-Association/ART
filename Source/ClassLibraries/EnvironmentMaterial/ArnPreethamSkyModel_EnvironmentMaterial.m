@@ -48,6 +48,12 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (ArSamplingRegion *) resultSamplingRegion
         : (ArLightSample *) resultLightSample
 {
+    (void) queryLocation_worldspace;
+    (void) queryDirection_worldspace;
+    (void) wavelength;
+    (void) resultSamplingRegion;
+    (void) resultLightSample;
+     
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -57,6 +63,11 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (ArSamplingRegion *) resultSamplingRegion
         : (ArSpectralIntensity *) resultIntensity
 {
+    (void) queryLocation_worldspace;
+    (void) queryDirection_worldspace;
+    (void) resultSamplingRegion;
+    (void) resultIntensity;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -66,6 +77,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (ArSamplingRegion *) resultSamplingRegion
         : (ArLight *) resultLight
 {
+    (void) queryLocation_worldspace;
+    
     ArSpectrum  * outSpectrum = spc_alloc(art_gv);
     Vec3D         hitNormal = *queryDirection_worldspace;
 

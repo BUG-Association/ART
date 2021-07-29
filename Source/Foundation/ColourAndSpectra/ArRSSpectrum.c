@@ -114,6 +114,8 @@ void rss_free_contents(
               ArRSSpectrum  * rss
         )
 {
+    (void) art_gv;
+    
     FREE_ARRAY( ARRSS_ARRAY(*rss) );
 }
 
@@ -130,8 +132,12 @@ double rss_integrate(
         const double          xmax
         )
 {
+    (void) art_gv;
+    
     double fraction = (xmin - rss->start) / rss->step;
-    unsigned int index = (int)floor(fraction);
+    ASSERT_NONNEGATIVE_DOUBLE(fraction);
+
+    unsigned int index = (unsigned int)floor(fraction);
     double x = rss->start + rss->step * (double)index;
     double sum;
 
@@ -164,6 +170,8 @@ double rss_sd_value_at_wavelength(
         const double          d0
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_RSS(s0)
     
     //   Early exit - is the requested wavelength within the spectral bounds?
@@ -180,7 +188,7 @@ double rss_sd_value_at_wavelength(
     
     ASSERT_NONNEGATIVE_FINITE_DOUBLE( ARRSS_SAMPLE(*s0,index) );
     
-    return ARRSS_SAMPLE(*s0,index);
+    return ARRSS_SAMPLE(*s0, (unsigned int)index);
 }
 
 unsigned int rss_s_valid(
@@ -188,6 +196,8 @@ unsigned int rss_s_valid(
         const ArRSSpectrum  * rss
         )
 {
+    (void) art_gv;
+    
     //   Null pointer? Direct return in that case.
     
     if ( ! rss )
@@ -202,7 +212,7 @@ unsigned int rss_s_valid(
     if ( ARRSS_SIZE(*rss) <= 0 )
     {
         ART_ERRORHANDLING_WARNING(
-            "invalid RSS size (%ld entries)"
+            "invalid RSS size (%d entries)"
             ,   ARRSS_SIZE(*rss)
             );
 
@@ -251,7 +261,7 @@ unsigned int rss_s_valid(
         result = 0;
     }
     
-    for ( int i = 0; i < ARRSS_SIZE(*rss); i++ )
+    for ( unsigned int i = 0; i < ARRSS_SIZE(*rss); i++ )
     {
         if (   ARRSS_SAMPLE( *rss, i ) < 0.0
             || m_d_isInf( ARRSS_SAMPLE( *rss, i ) )
@@ -275,10 +285,12 @@ void rss_s_debugprintf(
         const ArRSSpectrum  * rss
         )
 {
-    printf("rsspectrum( %ld, %f nm, %f nm, %f",
+    (void) art_gv;
+    
+    printf("rsspectrum( %d, %f nm, %f nm, %f",
     ARRSS_SIZE(*rss),NANO_FROM_UNIT(ARRSS_START(*rss)),
     NANO_FROM_UNIT(ARRSS_STEP(*rss)),ARRSS_SCALE(*rss));
-    for ( int i = 0; i < ARRSS_SIZE(*rss); i++ )
+    for ( unsigned long i = 0; i < ARRSS_SIZE(*rss); i++ )
        printf(", %f",ARRSS_SAMPLE(*rss,i));
     printf(")\n");
     fflush(stdout);
@@ -289,6 +301,8 @@ void rss_s_mathematicaprintf(
         const ArRSSpectrum  * rss
         )
 {
+    (void) art_gv;
+    
     printf("rsspectrum{ ");
 
     if ( ARRSS_SIZE(*rss) > 0 )
@@ -296,7 +310,7 @@ void rss_s_mathematicaprintf(
            NANO_FROM_UNIT(ARRSS_START(*rss)),
            ARRSS_SAMPLE(*rss,0));
 
-    for ( int i = 1; i < ARRSS_SIZE(*rss); i++ )
+    for ( unsigned long i = 1; i < ARRSS_SIZE(*rss); i++ )
        printf(", {%4.1f,%f}",
            NANO_FROM_UNIT(ARRSS_START(*rss)+i*ARRSS_STEP(*rss)),
            ARRSS_SAMPLE(*rss,i));

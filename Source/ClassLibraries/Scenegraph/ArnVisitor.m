@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnVisitor registerWithRuntime ];
 )
 
@@ -40,7 +41,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVisitor)
 
-- copy
+- (id) copy
 {
     ArnVisitor  * copiedInstance = [ super copy ];
 
@@ -55,7 +56,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVisitor)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnVisitor  * copiedInstance =

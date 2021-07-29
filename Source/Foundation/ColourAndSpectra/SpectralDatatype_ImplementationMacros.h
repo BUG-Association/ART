@@ -512,6 +512,8 @@ _Type * _typeShort##_alloc( \
         const ART_GV  * art_gv \
         ) \
 { \
+    (void) art_gv; \
+\
     _Type  * newC = ALLOC(_Type); \
 \
     INITIALISE_ISR_ASSERTION_DATA(newC) \
@@ -688,6 +690,8 @@ void _typeShort##_free( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
     FREE(cr); \
@@ -699,6 +703,8 @@ void _typeShort##_d_init_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
     for ( unsigned int i = 0; i < _ISR_CHANNELS; i++ ) \
@@ -713,6 +719,8 @@ void _typeShort##_##_vtype##_init_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -730,6 +738,8 @@ double _typeShort##_##_vtype##i( \
         const unsigned int    i \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
 \
     return _ISR_CI( *c0, i ); \
@@ -742,6 +752,8 @@ void _typeShort##_set_##_vtype##id( \
         const double          d0 \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  c0 ) \
     ASSERT_NONNEGATIVE_INTEGER( i0 ) \
     ASSERT_VALID_DOUBLE( d0 ) \
@@ -756,6 +768,8 @@ double _typeShort##_##_vtype##_max( \
         const _Type   * c0 \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
 \
     double  max = -MATH_HUGE_DOUBLE; \
@@ -772,6 +786,8 @@ double _typeShort##_##_vtype##_min( \
         const _Type   * c0 \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
 \
     double  min = MATH_HUGE_DOUBLE; \
@@ -788,6 +804,8 @@ double _typeShort##_##_vtype##_sum( \
         const _Type   * c0 \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
 \
     double  sum = 0.0; \
@@ -803,6 +821,8 @@ double _typeShort##_##_vtype##_avg( \
         const _Type   * c0 \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
 \
     double  sum = 0.0; \
@@ -818,6 +838,8 @@ double _typeShort##_##_vtype##_l1_norm( \
         const _Type   * c0 \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
 \
     double  sum = 0.0; \
@@ -833,6 +855,8 @@ double _typeShort##_##_vtype##_l2_norm( \
         const _Type   * c0 \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
 \
     double  sum = 0.0; \
@@ -848,6 +872,8 @@ double _typeShort##_##_vtype##_linf_norm( \
         const _Type   * c0 \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
 \
     double  max = -MATH_HUGE_DOUBLE; \
@@ -864,6 +890,8 @@ void _typeShort##_inv_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
     _ctype##_inv_c( \
@@ -878,6 +906,8 @@ void _typeShort##_##_vtype##_inv_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -894,6 +924,8 @@ void _typeShort##_##_vtype##_fast_inv_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -909,6 +941,8 @@ void _typeShort##_abs_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
     _ctype##_abs_c( \
@@ -923,6 +957,8 @@ void _typeShort##_##_vtype##_abs_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -939,6 +975,8 @@ unsigned int _typeShort##_##_vtype##_vtype##_equal( \
         const _Type   * c1 \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
 \
@@ -955,6 +993,8 @@ unsigned int _typeShort##_##_vtype##_vtype##d_equal( \
         const double    max_relative_error \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
 \
@@ -973,6 +1013,8 @@ void _typeShort##_##_vtype##_vtype##_max_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
 \
@@ -991,6 +1033,8 @@ void _typeShort##_##_vtype##_vtype##_min_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
 \
@@ -1009,6 +1053,8 @@ void _typeShort##_##_vtype##_vtype##_mean_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
 \
@@ -1027,6 +1073,8 @@ double _typeShort##_##_vtype##_vtype##_maxdiff( \
         const _Type   * c1 \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
 \
@@ -1042,6 +1090,8 @@ void _typeShort##_d_add_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
     _ctype##_d_add_c( \
@@ -1057,6 +1107,8 @@ void _typeShort##_d_atomic_add_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
     _ctype##_d_atomic_add_c( \
@@ -1072,6 +1124,8 @@ void _typeShort##_d_sub_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
     _ctype##_d_sub_c( \
@@ -1087,6 +1141,8 @@ void _typeShort##_d_mul_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
     _ctype##_d_mul_c( \
@@ -1102,6 +1158,8 @@ void _typeShort##_d_div_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_NONZERO_DOUBLE( d0 ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
@@ -1119,6 +1177,8 @@ void _typeShort##_##_vtype##_add_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
@@ -1136,6 +1196,8 @@ void _typeShort##_##_vtype##_atomic_add_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
@@ -1153,6 +1215,8 @@ void _typeShort##_##_vtype##_sub_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
@@ -1169,6 +1233,8 @@ void _typeShort##_##_vtype##_mul_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
@@ -1186,6 +1252,8 @@ void _typeShort##_##_vtype##_div_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
@@ -1202,6 +1270,8 @@ void _typeShort##_exp_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
     _ctype##_exp_c( \
@@ -1216,6 +1286,8 @@ void _typeShort##_##_vtype##_exp_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
@@ -1231,6 +1303,8 @@ void _typeShort##_negexp_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
     _ctype##_negexp_c( \
@@ -1245,6 +1319,8 @@ void _typeShort##_##_vtype##_negexp_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
@@ -1262,6 +1338,8 @@ void _typeShort##_##_vtype##d_pow_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -1280,6 +1358,8 @@ void _typeShort##_##_vtype##d_negpow_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -1298,6 +1378,8 @@ void _typeShort##_d##_vtype##_pow_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -1314,6 +1396,8 @@ void _typeShort##_sqrt_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
     _ctype##_sqrt_c( \
@@ -1328,6 +1412,8 @@ void _typeShort##_##_vtype##_sqrt_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
@@ -1345,6 +1431,8 @@ void _typeShort##_##_vtype##d_add_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -1363,6 +1451,8 @@ void _typeShort##_##_vtype##d_sub_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -1381,6 +1471,8 @@ void _typeShort##_##_vtype##d_mul_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -1399,6 +1491,8 @@ void _typeShort##_##_vtype##d_div_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_NONZERO_COLOURTYPE( _typeShort, _Type, c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
@@ -1418,6 +1512,8 @@ void _typeShort##_d##_vtype##_add_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -1436,6 +1532,8 @@ void _typeShort##_d##_vtype##_sub_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -1454,6 +1552,8 @@ void _typeShort##_d##_vtype##_mul_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
 \
@@ -1472,6 +1572,8 @@ void _typeShort##_d##_vtype##_div_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_NONZERO_DOUBLE( d0 ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
@@ -1491,6 +1593,8 @@ void _typeShort##_##_vtype##_vtype##_mul_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
@@ -1510,6 +1614,8 @@ void _typeShort##_##_vtype##_vtype##_add_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
@@ -1529,6 +1635,8 @@ void _typeShort##_##_vtype##_vtype##_sub_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
@@ -1548,6 +1656,8 @@ void _typeShort##_##_vtype##_vtype##_div_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
@@ -1567,6 +1677,8 @@ void _typeShort##_dd_clamp_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_NONNEGATIVE_DOUBLE( d0 ) \
     ASSERT_NONNEGATIVE_DOUBLE( d1 ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
@@ -1587,6 +1699,8 @@ void _typeShort##_dd##_vtype##_clamp_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_NONNEGATIVE_DOUBLE( d0 ) \
     ASSERT_NONNEGATIVE_DOUBLE( d1 ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
@@ -1608,6 +1722,8 @@ void _typeShort##_d##_vtype##_mul_add_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  cr, _vtype ) \
 \
@@ -1627,6 +1743,8 @@ void _typeShort##_d##_vtype##_vtype##_interpol_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_NONNEGATIVE_DOUBLE( d0 ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
@@ -1650,6 +1768,8 @@ void _typeShort##_d##_vtype##_mul_d##_vtype##_mul_add_##_vtype( \
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
     ASSERT_ALLOCATED_SPECTRUMTYPE( _typeShort, _Type,  cr ) \
@@ -1675,6 +1795,8 @@ void _typeShort##_d##_vtype##_mul_d##_vtype##_mul_d##_vtype##_mul_add3_##_vtype(
               _Type   * cr \
         ) \
 { \
+    (void) art_gv; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c1, _vtype ) \
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c2, _vtype ) \
@@ -1697,6 +1819,8 @@ unsigned int _typeShort##_##_vtype##_valid( \
         const _Type   * c0 \
         ) \
 { \
+    (void) art_gv; \
+\
     if ( !c0 ) \
     { \
         ART_ERRORHANDLING_WARNING( #_Type " parameter is not allocated" ); \
@@ -1731,6 +1855,8 @@ unsigned int _typeShort##_##_vtype##_all_components_nonzero( \
         const _Type   * c0 \
         ) \
 { \
+    (void) art_gv; \
+\
     unsigned int  result = 1; \
 \
     for ( unsigned int i = 0; i < _ISR_CHANNELS; i++ ) \
@@ -1831,6 +1957,8 @@ void _typeShort##_##_vtype##_debugprintf( \
         const _Type   * c_0 \
         ) \
 { \
+    (void) art_gv; \
+\
     printf( #_Type "[%p]( ", c_0); \
 \
     printf( "% 5.3f", _ISR_CI(*c_0,0)); \
@@ -1930,6 +2058,8 @@ void _typeShort##_##_vtype##dd_sample_at_wavelength_##_vtype( \
               _Type   * cr  \
         ) \
 { \
+    (void) d1; \
+\
     ASSERT_VALID_SPECTRUMTYPE( _typeShort, _Type,  c0, _vtype ) \
     ASSERT_NONNEGATIVE_DOUBLE( d0 ) \
     ASSERT_POSITIVE_DOUBLE( d1 ) \
@@ -2024,6 +2154,8 @@ double _typeShort##_##_vtype##d_value_at_wavelength( \
         const double    d0 \
         ) \
 { \
+    (void) art_gv; \
+\
     ART_ERRORHANDLING_FATAL_ERROR( \
         "function not implemented" \
         ); \
@@ -2035,6 +2167,8 @@ void _typeShort##_##_vtype##dd_sample_at_wavelength_c( \
         const double    d0 \
         ) \
 { \
+    (void) art_gv; \
+\
     ART_ERRORHANDLING_FATAL_ERROR( \
         "function not implemented" \
         ); \

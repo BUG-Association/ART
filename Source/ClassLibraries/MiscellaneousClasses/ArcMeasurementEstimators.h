@@ -41,7 +41,7 @@ ART_MODULE_INTERFACE(ArcMeasurementEstimators)
     double  subLength[2];
 }
 
-- init
+- (id) init
         : (double) newLength
         ;
 
@@ -55,7 +55,7 @@ ART_MODULE_INTERFACE(ArcMeasurementEstimators)
     double  subArea[4];
 }
 
-- init
+- (id) init
         : (double) newArea
         ;
 

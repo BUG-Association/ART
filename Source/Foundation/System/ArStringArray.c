@@ -97,12 +97,6 @@ void arstringarray_debugprintf(
             i++;
         }
 
-        debugprintf(
-            "string #%d is '%s'\n"
-            ,   i
-            ,   stringarray[i]
-            );
-
         debugprintf("string array %p end\n",stringarray);
     }
 }

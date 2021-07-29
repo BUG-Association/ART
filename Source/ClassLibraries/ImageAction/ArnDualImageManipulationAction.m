@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnDualImageManipulationAction registerWithRuntime ];
 )
 
@@ -44,7 +45,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDualImageManipulationAction)
 
-- init
+- (id) init
 {
     return
         [ self init
@@ -55,7 +56,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDualImageManipulationAction)
             ];
 }
 
-- init
+- (id) init
         : (const char *) newOutputName
         : (const char *) newOutputTag
 {
@@ -68,7 +69,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDualImageManipulationAction)
             ];
 }
 
-- init
+- (id) init
         : (const char *) newOutputName
         : (const char *) newOutputTag
         : (ArNode *) newSubnode0

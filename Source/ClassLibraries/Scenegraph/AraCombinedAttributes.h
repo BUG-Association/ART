@@ -49,7 +49,7 @@ ART_MODULE_INTERFACE(AraCombinedAttributes)
 {
 }
 
-- init
+- (id) init
         : (ArNode *) newGeometry
         : (ArNode *) newVolumeMaterial
         : (ArNode *) newSurfaceMaterial
@@ -85,7 +85,7 @@ ART_MODULE_INTERFACE(AraCombinedAttributes)
     ArSymbol referencedName;
 }
 
-- init
+- (id) init
         : (ArNode *) newVolumeMaterial
         : (ArNode *) newSurfaceMaterial
         : (ArNode *) newEnvironmentMaterial

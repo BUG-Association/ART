@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnImageConverter_RAW_To_ARTCSP                registerWithRuntime ];
     [ ArnImageConverter_RAW_To_Monochrome_ARTCSP     registerWithRuntime ];
     [ ArnImageConverter_TIFF_To_ARTCSP               registerWithRuntime ];
@@ -112,7 +113,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_AR
 
     ArSpectrum  * temp_col = spc_alloc( art_gv );
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -186,7 +187,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_AR
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_RAW_To_Monochrome_ARTCSP)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Monochrome_ARTCSP)
 
-- wavelength
+- (id) wavelength
         : (double) newWavelength
 {
     [ super init ];
@@ -255,10 +256,6 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Mo
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    double  visibleRangeLength =
-          XC(ARPSSPECTRUM_ARRAY_I(*VISIBLE_RANGE,1))
-        - XC(ARPSSPECTRUM_ARRAY_I(*VISIBLE_RANGE,0));
-
     ArSpectrum      * temp_col = spc_alloc( art_gv );
     ArStokesVector  * temp_sc  = arstokesvector_alloc( art_gv );
     
@@ -274,7 +271,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Mo
             & ARCIEXY_SYSTEM_WHITE_POINT
             );
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -392,7 +389,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Mo
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_TIFF_To_ARTCSP)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_ARTCSP)
 
-- removeSource
+- (id) removeSource
         : (BOOL) newRemoveOption
 {
     return
@@ -401,7 +398,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
 {
     self =
@@ -476,7 +473,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_TIFF_To_A
             & ARCIEXY_SYSTEM_WHITE_POINT
             );
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         ArDataType  sourceDataType =
             [ sourceImage[i]->imageInfo fileDataType ];
@@ -612,7 +609,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
         ];
 }
 
-- removeSource : (BOOL) newRemoveOption
+- (id) removeSource : (BOOL) newRemoveOption
 {
     return
         [ self init
@@ -623,7 +620,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             ];
 }
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newRemoveOption
         bitsPerChannel  : (unsigned int) newNumberOfBits
 {
@@ -636,7 +633,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             ];
 }
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newRemoveOption
         colourSpace     : (ArNode <ArpColourSpace> *) newColourSpace
         bitsPerChannel  : (unsigned int) newNumberOfBits
@@ -650,7 +647,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
         : (ArNode <ArpColourSpace> *) newColourSpace
         : (ArnColourTransform *) newColourTransform
@@ -763,7 +760,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -898,7 +895,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
     }
 }
 
-- removeSource
+- (id) removeSource
                                 : (BOOL) newRemoveOption
         stokesComponentsToOutput: (int) newStokesComponentsToOutput
 {
@@ -909,7 +906,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         : (int) newStokesComponentsToOutput
 {
@@ -1041,7 +1038,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
     
     if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
     {
-        for ( int i = 0; i < numberOfDestinationImages; i++ )
+        for ( unsigned int i = 0; i < numberOfDestinationImages; i++ )
         {
             //   Stokes components 2, 3, 4 have a max value, component 1 does not
             
@@ -1069,7 +1066,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
     ArSpectrum      * temp_col = spc_alloc( art_gv );
     ArStokesVector  * temp_sc  = arstokesvector_alloc( art_gv );
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -1077,9 +1074,9 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
             {
                 [ self loadSourceScanlineBuffer: i : y ];
 
-                for ( int j = 0; j < numberOfISRChannels; j++ )
+                for ( unsigned int j = 0; j < numberOfISRChannels; j++ )
                 {
-                    for ( int k = 0; k < componentsPerInputImage; k++ )
+                    for ( unsigned int k = 0; k < componentsPerInputImage; k++ )
                     {
                         for ( int x = 0; x < XC(destinationImageSize); x++ )
                         {
@@ -1140,7 +1137,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
             {
                 [ self loadSourceScanlineBuffer: i : y ];
 
-                for ( int j = 0; j < numberOfISRChannels; j++ )
+                for ( unsigned int j = 0; j < numberOfISRChannels; j++ )
                 {
                     for ( int x = 0; x < XC(destinationImageSize); x++ )
                     {
@@ -1241,7 +1238,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_RAW_To_Singlechannel_ARTGSC)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Singlechannel_ARTGSC)
 
-- removeSource
+- (id) removeSource
                   : (BOOL) newRemoveOption
         normalise : (BOOL) newNormalise
         wavelength: (double) newWavelength
@@ -1254,7 +1251,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         : (BOOL) newNormalise
         : (double) newWavelength
@@ -1329,8 +1326,6 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
 
     destinationImageDataType = ardt_grey;
     destinationFileDataType  = ardt_grey;
-    
-    unsigned int  numberOfISRChannels = spc_channels(art_gv);
     
     numberOfDestinationsPerSource = 1;
 
@@ -1416,7 +1411,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
     dopMin =  MATH_HUGE_DOUBLE;
     dopMax = -MATH_HUGE_DOUBLE;
     
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -1584,7 +1579,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
 
     if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
     {
-        for ( int i = 0; i < numberOfSourceImages; i++ )
+        for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
         {
             for ( int k = 1; k < 4; k++ )
             {
@@ -1602,7 +1597,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -1755,7 +1750,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Si
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTGSC_To_TIFF)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To_TIFF)
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newDeleteSourceImageAfterUse
         bitsPerChannel  : (unsigned int) newDestinationBitsPerChannel
         falsecolour     : (BOOL) newFalsecolourOption
@@ -1776,7 +1771,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
         : (unsigned int) newDestinationBitsPerChannel
         : (BOOL) newFalsecolourOption
@@ -1883,7 +1878,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
                 :   "determining maximum value in greyscale image"
                 ];
     
-        for ( int i = 0; i < numberOfSourceImages; i++ )
+        for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
         {
             //   This cast looks hack-y. But in this context, it is safe.
             //   We know the source images are ArfARTGSCs.
@@ -1922,7 +1917,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
 
         if ( numberOfSourceImages > 1 )
         {
-            for ( int i = 0; i < numberOfSourceImages; i++ )
+            for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
             {
                 if ( storedMaxValue[i] )
                     [ REPORTER printf
@@ -1965,11 +1960,11 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
             ,   maxValue
             ];
         
-        for ( int i = 0; i < numberOfSourceImages; i++ )
+        for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
             imageMaxValue[i] = maxValue;
     }
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         if ( imageMaxValue[i] == 0.0 )
             imageMaxValue[i] = 1.0;
@@ -2034,9 +2029,9 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
 
     //   Loop over the entire image height
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
-        for ( unsigned int y = 0; y < YC(sourceImageSize); y++ )
+        for ( int y = 0; y < YC(sourceImageSize); y++ )
         {
             //   Load the source scanline into the buffer
 
@@ -2051,7 +2046,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
             //   the other, while dividing them by the max value, and
             //   clamping them to the unit interval.
 
-            for ( unsigned int x = 0; x < XC(sourceImageSize); x++ )
+            for ( int x = 0; x < XC(sourceImageSize); x++ )
             {
     #ifdef IMAGECONVERSION_DEBUGPRINTF
                 g_s_debugprintf( art_gv,& GREY_SOURCE_BUFFER(x) );
@@ -2078,7 +2073,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
                   (double) scaleY
                 / ( YC(sourceImageSize) - 1 );
 
-            for ( unsigned int x = XC(sourceImageSize); x < XC(destinationImageSize); x++ )
+            for ( int x = XC(sourceImageSize); x < XC(destinationImageSize); x++ )
             {
                 GREYALPHA_DESTINATION_BUFFER_A(x) = 1.0;
                 
@@ -2209,7 +2204,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
 
 @implementation ArnImageConverter_ARTGSC_To_GreyCSV
 
-- removeSource
+- (id) removeSource
         : (BOOL) newRemoveOption
 {
     return
@@ -2218,7 +2213,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
 {
     self =
@@ -2283,7 +2278,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         
         for ( int y = 0; y < YC(destinationImageSize); y++ )
@@ -2379,7 +2374,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_RAW_To_Sp
             :   "converting raw image to spectral EXR"
             ];
         
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -2435,7 +2430,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
         ];
 }
 
-- removeSource : (BOOL) newRemoveOption
+- (id) removeSource : (BOOL) newRemoveOption
 {
     return
         [ self init
@@ -2445,7 +2440,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             ];
 }
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newRemoveOption
         colourSpace     : (ArNode <ArpColourSpace> *) newColourSpace
 {
@@ -2457,7 +2452,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
         : (ArNode <ArpColourSpace> *) newColourSpace
         : (ArnColourTransform *) newColourTransform
@@ -2538,7 +2533,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( int y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -2611,10 +2606,15 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
     'ArnImageConverter_EXR_To_ARTCSP'
 =========================================================================== */
 
-// #define DESTINATION_COLOURSPACE \
-// ((ArnColourSpace *) ARNODEREF_POINTER(subnodeRefArray[0]))
-// #define COLOUR_TRANSFORM \
-// ((ArnColourTransform *) ARNODEREF_POINTER(subnodeRefArray[1]))
+/*
+#define DESTINATION_COLOURSPACE \
+((ArnColourSpace *) ARNODEREF_POINTER(subnodeRefArray[0]))
+*/
+
+/*
+#define COLOUR_TRANSFORM \
+((ArnColourTransform *) ARNODEREF_POINTER(subnodeRefArray[1]))
+*/
 
 // #define DESTINATION_COLOURSPACE_REF     [ DESTINATION_COLOURSPACE colourSpaceRef ]
 // #define COLOUR_TRANSFORM_REF            [ COLOUR_TRANSFORM transformRef ]
@@ -2624,7 +2624,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTCSP_To
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_EXR_To_ARTCSP)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_ARTCSP)
 
-- removeSource
+- (id) removeSource
         : (BOOL) newRemoveOption
 {
     return
@@ -2634,7 +2634,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
 }
 
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
 {
     self =
@@ -2691,7 +2691,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         ArDataType  sourceDataType =
             [ sourceImage[i]->imageInfo fileDataType ];
@@ -2802,10 +2802,15 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
     'ArnImageConverter_ARTGSC_To_EXR'
 =========================================================================== */
 
-// #define DESTINATION_COLOURSPACE \
-// ((ArnColourSpace *) ARNODEREF_POINTER(subnodeRefArray[0]))
-// #define COLOUR_TRANSFORM \
-// ((ArnColourTransform *) ARNODEREF_POINTER(subnodeRefArray[1]))
+/*
+#define DESTINATION_COLOURSPACE \
+((ArnColourSpace *) ARNODEREF_POINTER(subnodeRefArray[0]))
+*/
+
+/*
+#define COLOUR_TRANSFORM \
+((ArnColourTransform *) ARNODEREF_POINTER(subnodeRefArray[1]))
+*/
 
 // #define DESTINATION_COLOURSPACE_REF     [ DESTINATION_COLOURSPACE colourSpaceRef ]
 // #define COLOUR_TRANSFORM_REF            [ COLOUR_TRANSFORM transformRef ]
@@ -2815,7 +2820,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_EXR_To_AR
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageConverter_ARTGSC_To_EXR)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To_EXR)
 
-- removeSource : (BOOL) newRemoveOption
+- (id) removeSource : (BOOL) newRemoveOption
 {
     return
         [ self init
@@ -2823,7 +2828,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newDeleteSourceImageAfterUse
 {
     self =
@@ -2888,7 +2893,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
     BOOL  * imageHasOnlyPositiveValues =
         ALLOC_ARRAY( BOOL, numberOfSourceImages );
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         //   This cast looks hack-y. But in this context, it is safe.
         //   We know the source images are ArfARTGSCs.
@@ -2903,7 +2908,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnImageConverter_ARTGSC_To
         }
     }
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         
         for ( int y = 0; y < YC(destinationImageSize); y++ )

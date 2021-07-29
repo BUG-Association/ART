@@ -85,7 +85,7 @@ struct ArTraversalState;
 //   is a completely separate copy of the original graph, including all
 //   subnodes.
 
-- copy
+- (id) copy
         ;
 
 //   This creates an explicit copy of the node and all its subnodes
@@ -95,7 +95,7 @@ struct ArTraversalState;
 //   where all conditional expressions are evaluated (i.e. cyclic graphs
 //   are removed).
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
         ;
 

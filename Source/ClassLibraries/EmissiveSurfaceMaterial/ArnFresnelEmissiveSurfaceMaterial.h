@@ -44,7 +44,7 @@ ART_MODULE_INTERFACE(ArnFresnelEmissiveSurfaceMaterial)
     ArSpectrum500  * blackbodyEmissionSpectrum;
 }
 
-- init
+- (id) init
     : (double)  newTemperature
     ;
 

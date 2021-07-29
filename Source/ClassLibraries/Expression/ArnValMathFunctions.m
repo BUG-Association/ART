@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ArnVal_d_abs_d     registerWithRuntime];
     [ArnVal_i_abs_i     registerWithRuntime];
 

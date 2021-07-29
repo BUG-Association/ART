@@ -35,7 +35,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcLightsource
 
-- init
+- (id) init
         : (ArLightsourceType) newLightsourceType
 {
     return
@@ -45,7 +45,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- init
+- (id) init
         : (ArNode <ArpShape> *) newShape
         : (ArLightsourceType) newLightsourceType
 {
@@ -129,7 +129,13 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return YES;
 }
 
-- copy
+- (double)selectionProbabilityOfRegion:(ArSamplingRegion *)lightsourceSamplingRegion :(const Pnt3D *)queryLocationWorldspace {
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    return 0.;
+}
+
+
+- (id) copy
 {
     ArcLightsource  * clone = [ super copy ];
 

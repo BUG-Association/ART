@@ -36,6 +36,7 @@ ArPSSpectrum  _pss_visible_range;
 
 ART_MODULE_INITIALISATION_FUNCTION_EXEC_ONLY_ONCE
 (
+    (void) art_gv;
     ARPSS_SIZE(_pss_visible_range)       = 2;
     ARPSS_SCALE(_pss_visible_range)      = 1.0;
     ARPSS_ARRAY(_pss_visible_range)      = ALLOC_ARRAY(Pnt2D,2);
@@ -132,11 +133,13 @@ void pss_s_copy_new_s(
               ArPSSpectrum  * sr
         )
 {
+    (void) art_gv;
+    
     ARPSS_SIZE(*sr)  = ARPSS_SIZE(*s0);
     ARPSS_SCALE(*sr) = ARPSS_SCALE(*s0);
     ARPSS_ARRAY(*sr) = ALLOC_ARRAY( Pnt2D, ARPSS_SIZE(*sr) );
 
-    for ( int i = 0; i < ARPSS_SIZE(*sr); i++ )
+    for ( unsigned long i = 0; i < ARPSS_SIZE(*sr); i++ )
         ARPSS_ARRAY_I(*sr,i) = ARPSS_ARRAY_I(*s0,i);
 }
 
@@ -145,6 +148,8 @@ void pss_freearray_s(
               ArPSSpectrum  * sr
         )
 {
+    (void) art_gv;
+    
     if ( ARPSS_ARRAY(*sr) )
         FREE_ARRAY( ARPSS_ARRAY(*sr) );
 }
@@ -155,7 +160,9 @@ void pss_d_mul_s(
               ArPSSpectrum  * sr
         )
 {
-    for ( int i = 0; i < ARPSS_SIZE(*sr); i++ )
+    (void) art_gv;
+    
+    for ( unsigned long i = 0; i < ARPSS_SIZE(*sr); i++ )
         YC( ARPSS_ARRAY_I(*sr,i) ) *= d0;
 }
 
@@ -166,7 +173,12 @@ void pss_ss_add_new_s(
               ArPSSpectrum  * sr
         )
 {
-    ART_ERRORHANDLING_FATAL_ERROR("pss_ss_add_new_s not implemented");
+    (void) art_gv;
+    (void) s0;
+    (void) s1;
+    (void) sr;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 void pss_s_add_s(
@@ -175,7 +187,11 @@ void pss_s_add_s(
               ArPSSpectrum  * sr
         )
 {
-    ART_ERRORHANDLING_FATAL_ERROR("pss_s_add_s not implemented");
+    (void) art_gv;
+    (void) s0;
+    (void) sr;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 void rss2d_to_pss_new(
@@ -184,7 +200,11 @@ void rss2d_to_pss_new(
               ArPSSpectrum    * sr
         )
 {
-    ART_ERRORHANDLING_FATAL_ERROR("rss2d_to_pss_new not implemented");
+    (void) art_gv;
+    (void) s0;
+    (void) sr;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 static __inline__ double integral_evaluate(
@@ -209,6 +229,8 @@ double pss_inner_product(
         const ArPSSpectrum  * s1
         )
 {
+    (void) art_gv;
+
     Pnt2D * min_0 = s0->array;
     Pnt2D * min_1 = s1->array;
     Pnt2D * max_0 = min_0 + 1;
@@ -311,6 +333,7 @@ double pss_sd_value_at_wavelength(
         const double          d0
         )
 {
+    (void) art_gv;
 
     if ( d0 >= XC(ARPSS_ARRAY_I( *s0, 0 )) && d0 <= XC(ARPSS_ARRAY_I( *s0, ARPSSPECTRUM_SIZE( *s0 ) - 2 ) ) )
     {
@@ -338,9 +361,11 @@ void pss_s_debugprintf(
         const ArPSSpectrum  * pss
         )
 {
-    printf("psspectrum( %ld, %f", ARPSS_SIZE(*pss), ARPSS_SCALE(*pss) );
+    (void) art_gv;
 
-    for ( int i = 0; i < ARPSS_SIZE(*pss); i++ )
+    printf("psspectrum( %d, %f", ARPSS_SIZE(*pss), ARPSS_SCALE(*pss) );
+
+    for ( unsigned long i = 0; i < ARPSS_SIZE(*pss); i++ )
        printf( ", PNT2D( %4.1f nm, % 5.3f)",
        NANO_FROM_UNIT(XC(ARPSS_ARRAY_I(*pss,i))),YC(ARPSS_ARRAY_I(*pss,i)));
 
@@ -354,13 +379,15 @@ void pss_s_mathematicaprintf(
         const ArPSSpectrum  * pss
         )
 {
+    (void) art_gv;
+
     printf("psspectrum{ ");
 
     if ( ARPSS_SIZE(*pss) > 0 )
         printf( "{%4.1f, %f}",
            NANO_FROM_UNIT(XC(ARPSS_ARRAY_I(*pss,0))),YC(ARPSS_ARRAY_I(*pss,0)));
 
-    for ( int i = 1; i < ARPSS_SIZE(*pss); i++ )
+    for ( unsigned long i = 1; i < ARPSS_SIZE(*pss); i++ )
         printf( ", {%4.1f, %f}",
            NANO_FROM_UNIT(XC(ARPSS_ARRAY_I(*pss,i))),YC(ARPSS_ARRAY_I(*pss,i)));
 

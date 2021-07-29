@@ -48,6 +48,8 @@ void arrefframe_v_pd_init_rf(
               ArReferenceFrame  * rr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_VEC3D( *v0 );
     ASSERT_ALLOCATED_REFERENCE_FRAME( rr );
 
@@ -139,6 +141,8 @@ void arreframe_vv_pd_init_rf_rf(
               ArReferenceFrame  * refframe_exit
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_VEC3D(*incoming_vector)
     ASSERT_VALID_VEC3D(*outgoing_vector)
     ASSERT_ALLOCATED_REFERENCE_FRAME( refframe_entry );
@@ -207,6 +211,8 @@ void arreframe_vvv_pd_init_rf_rf(
               ArReferenceFrame  * refframe_exit
         )
 {
+    (void) art_gv;
+    
     // FIXME: This function expects Fresnel-like incoming-outcoming vector pair!
     //                                                                     (ip)
 
@@ -291,6 +297,8 @@ unsigned int arrefframe_rf_valid(
         const ArReferenceFrame  * r0
         )
 {
+    (void) art_gv;
+    
     //   We have two things to check here:
 
     //   a) whether the two refframe vectors are of length 1.0:
@@ -336,6 +344,8 @@ unsigned int arrefframe_rf_rf_d_coaxial(
         const double              d0
         )
 {
+    (void) art_gv;
+    
     //   We compute the propagation directions for the two refframes.
 
     Vec3D  dir0, dir1;
@@ -425,6 +435,8 @@ unsigned int arrefframe_rf_vd_coaxial(
         const double              d0
         )
 {
+    (void) art_gv;
+    
     //   We compute the propagation directions for the two refframes.
 
     Vec3D  dir0;
@@ -505,6 +517,8 @@ unsigned int arrefframe_rf_rf_equal(
         const ArReferenceFrame  * r1
         )
 {
+    (void) art_gv;
+    
     unsigned int  result = 1;
 
     if ( ! vec3d_vv_equal(
@@ -531,6 +545,8 @@ unsigned int arrefframe_rf_rf_d_equal(
         const double              max_relative_error
         )
 {
+    (void) art_gv;
+    
     unsigned int  result = 1;
 
     if ( ! vec3d_vvd_equal(

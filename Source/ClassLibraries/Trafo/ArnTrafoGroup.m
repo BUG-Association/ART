@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnTrafoGroup registerWithRuntime ];
 )
 
@@ -69,7 +70,7 @@ ArnTrafoGroup * arntrafogroup(
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTrafoGroup)
 
-- init
+- (id) init
         : (ArNodeRefDynArray *) newSubnodeArray
 {
     self =

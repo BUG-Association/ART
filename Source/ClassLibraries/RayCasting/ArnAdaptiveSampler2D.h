@@ -40,7 +40,7 @@ ART_MODULE_INTERFACE(ArnAdaptiveSampler2D)
     unsigned int  areaMaxRecursionDepth;
 }
 
-- init
+- (id) init
         : (double) newLengthMaxError
         : (unsigned int) newLengthMaxRecursionDepth
         : (double) newAreaMaxError

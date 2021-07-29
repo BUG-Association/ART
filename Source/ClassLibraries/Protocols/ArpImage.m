@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     RUNTIME_REGISTER_PROTOCOL(ArpBasicImageInfo);
     RUNTIME_REGISTER_PROTOCOL(ArpSetBasicImageInfo);
     RUNTIME_REGISTER_PROTOCOL(ArpAdditionalImageInfo);

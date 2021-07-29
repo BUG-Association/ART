@@ -49,7 +49,7 @@ ART_MODULE_INTERFACE(ArnNoClosedFormVolumeMaterial)
     int phaseFunctionNodeIndex;
 }
 
-- init
+- (id) init
         : (ArNodeRefDynArray         *) newArray
         : (ArNode <ArpPhaseFunction> *) newPhaseFunction
         ;

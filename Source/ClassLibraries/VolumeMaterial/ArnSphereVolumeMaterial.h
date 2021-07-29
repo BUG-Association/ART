@@ -46,7 +46,7 @@ ART_MODULE_INTERFACE(ArnSphereVolumeMaterial)
     double sphereSize;
 }
 
-- init
+- (id) init
         : (Pnt3D) newSphereCenter
         : (double) newSphereSize
         : (ArNode <ArpSpectrum> *) outerAbsorbCrossSection

@@ -40,7 +40,7 @@ ART_MODULE_INTERFACE(ArfOpenEXRSpectral)
 @interface ArfOpenEXRSpectral
            : ArfRAWRasterImage
 {
-    BOOL                _writtingMode;
+    BOOL                _writingMode;
     ArnImageInfo       * _imageInfo;
     IVec2D               _size;
     int                  _nSpectralChannels;

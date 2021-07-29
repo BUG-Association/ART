@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ AraWorld registerWithRuntime ];
 )
 
@@ -46,7 +47,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(AraWorld)
 
-- init
+- (id) init
         : (ArNodeRef) newSceneGeometry
         : (ArNodeRef) newWorldVolumeMaterial
         : (ArNodeRef) newDefaultVolumeMaterial

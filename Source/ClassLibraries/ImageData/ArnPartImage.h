@@ -38,7 +38,7 @@ ART_MODULE_INTERFACE(ArnPartImage)
     IPnt2D      origin;
 }
 
-- init
+- (id) init
         : (ArNodeRef) newBaseImage
         : (ArNodeRef) newDataImage
         : (IPnt2D) newOrigin

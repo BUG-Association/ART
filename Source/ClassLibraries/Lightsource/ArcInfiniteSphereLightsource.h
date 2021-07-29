@@ -43,7 +43,7 @@ ART_MODULE_INTERFACE(ArcInfiniteSphereLightsource)
     double           infSphereSampleProbability;
 }
 
-- init
+- (id) init
         : (ArNode <ArpShape> *) newShape
         : (ArTraversalState *) traversalState
         : (ArnLightsourceCollector *) lightsourceCollector

@@ -39,6 +39,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSingleImageManipulationAction registerWithRuntime ];
 )
 
@@ -49,7 +50,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
 
-- removeSource
+- (id) removeSource
         : (BOOL) newRemoveSource
 {
     return
@@ -58,7 +59,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
             ];
 }
 
-- init
+- (id) init
 {
     return
         [ self init
@@ -68,7 +69,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newRemoveSource
 {
     return
@@ -79,7 +80,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
             ];
 }
 
-- init
+- (id) init
         : (BOOL) newRemoveSource
         : (ArNode *) newSubnode0
         : (ArNode *) newSubnode1
@@ -172,7 +173,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
     sourceImage =
         ALLOC_ARRAY( ArnFileImage <ArpImage> *, numberOfSourceImages );
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         ArNodeRef  imageRef = ARNODEREF_NONE;
         
@@ -186,7 +187,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
     otherImage =
         ALLOC_ARRAY( ArnFileImage <ArpImage> *, numberOfOtherImages );
 
-    for ( int i = 0; i < numberOfOtherImages; i++ )
+    for ( unsigned int i = 0; i < numberOfOtherImages; i++ )
     {
         ArNodeRef  imageRef = ARNODEREF_NONE;
         
@@ -216,7 +217,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
 
     destinationFilename = ALLOC_ARRAY( char *, numberOfDestinationImages );
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         char  * clippedSourceFilename = 0;
         
@@ -504,7 +505,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
 
     sourceImageBuffer = ALLOC_ARRAY( ArNode *, numberOfSourceImages );
     
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         sourceImageBuffer[i] =
             (ArNode *)
@@ -646,7 +647,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
     
     for ( unsigned int i = 0; i < numberOfSourceScanlineBuffers; i++ )
     {
-        unsigned int  thisScanline = scanline + i;
+        const int  thisScanline = scanline + i;
         
         if ( thisScanline < YC(sourceImageSize) )
         {
@@ -680,7 +681,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
     {
         //   Delete the source image file
 
-        for ( int i = 0; i < numberOfSourceImages; i++ )
+        for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
         {
             #ifdef PATHNAME_DEBUGPRINTF
             debugprintf(
@@ -698,7 +699,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
 
         if ( tagWasAddedToDestinationFilename )
         {
-            for ( int i = 0; i < numberOfSourceImages; i++ )
+            for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
             {
                 #ifdef PATHNAME_DEBUGPRINTF
                 debugprintf(
@@ -791,7 +792,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
 
     RELEASE_OBJECT(destinationImageInfo);
 
-    for ( int i = 0; i < numberOfSourceScanlineBuffers; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceScanlineBuffers; i++ )
     {
         RELEASE_OBJECT(sourceScanlineBuffer[i]);
     }
@@ -813,7 +814,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
         FREE_ARRAY(destinationFilenameTag);
     }
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         RELEASE_OBJECT(sourceImage[i]);
         RELEASE_OBJECT(sourceImageBuffer[i]);
@@ -823,7 +824,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSingleImageManipulationAction)
     FREE_ARRAY(sourceImageBuffer);
     FREE_ARRAY(otherImage);
 
-    for ( int i = 0; i < numberOfDestinationImages; i++ )
+    for ( unsigned int i = 0; i < numberOfDestinationImages; i++ )
         RELEASE_OBJECT(destinationImage[i]);
     
     FREE_ARRAY(destinationImage);

@@ -809,6 +809,10 @@ void arcolourspace_debugprintf(
         ArColourSpaceRef    csr
         )
 {
+    (void) art_gv;
+    (void) csr;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 /*
         ArCIEXYZ  xyz = ARCIEXYZ(whitepoint.X,whitepoint.Y,whitepoint.Z);
         ArCIExyY  xyy;

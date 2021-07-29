@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnAdaptiveSampler2D registerWithRuntime ];
 )
 
@@ -61,7 +62,7 @@ ArnAdaptiveSampler2D  * arnadaptivesampler2d(
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnAdaptiveSampler2D)
 
-- init
+- (id) init
         : (double) newLengthMaxError
         : (unsigned int) newLengthMaxRecursionDepth
         : (double) newAreaMaxError
@@ -88,7 +89,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnAdaptiveSampler2D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnAdaptiveSampler2D  * copiedInstance = [ super copy ];
 
@@ -97,7 +98,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnAdaptiveSampler2D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnAdaptiveSampler2D  * copiedInstance =

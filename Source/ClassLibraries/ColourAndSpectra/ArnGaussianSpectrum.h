@@ -46,13 +46,13 @@ ART_MODULE_INTERFACE(ArnGaussianSpectrum)
 }
 
 
-- dominantWavelength
+- (id) dominantWavelength
                     : (double) newCenter
         sigma       : (double) newSigma
         maximumValue: (double) newMaximum
         ;
 
-- init
+- (id) init
         : (double) newCenter
         : (double) newSigma
         : (double) newMaximum

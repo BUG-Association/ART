@@ -77,7 +77,7 @@ ArDistanceTrackingMode;
     
 }
 
-- init
+- (id) init
         : (ArNode <ArpRayCaster> *) newRayCaster
         : (double) newMinimalContribution
         : (unsigned int) newMaximalRecursion

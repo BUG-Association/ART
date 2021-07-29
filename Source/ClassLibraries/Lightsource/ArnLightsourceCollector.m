@@ -45,6 +45,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnLightsourceCollector registerWithRuntime ];
 )
 
@@ -242,7 +243,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLightsourceCollector)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnLightsourceCollector)
 
-- copy
+- (id) copy
 {
     ArnLightsourceCollector  * copiedInstance = [ super copy ];
 
@@ -251,7 +252,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnLightsourceCollector)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnLightsourceCollector  * copiedInstance =
@@ -264,7 +265,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnLightsourceCollector)
     return copiedInstance;
 }
 
-- sampler2D
+- (id) sampler2D
                    : (ArNode <ArpSampling2D> *) newSampler2D
         resolution : (double) newResolution
         type       : (ArLightsourceType) newLightsourceType
@@ -279,7 +280,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnLightsourceCollector)
             ];
 }
 
-- sampler2D
+- (id) sampler2D
                         : (ArNode <ArpSampling2D> *) newSampler2D
         ambientLight    : (ArNode <ArpSpectrum> *) newAmbientLight
         ambientIntensity: (double) newAmbientIntensity
@@ -296,7 +297,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnLightsourceCollector)
             ];
 }
 
-- init
+- (id) init
         : (ArNode <ArpSampling2D> *) newSampler2D
         : (ArNode <ArpSpectrum> *) newAmbientLight
         : (double) newAmbientIntensity

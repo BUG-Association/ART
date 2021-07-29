@@ -38,7 +38,7 @@ ART_MODULE_INTERFACE(ArnLayeredSurfaceMaterial)
 {
 }
 
-- init
+- (id) init
         : (ArNode <ArpSurfaceMaterial> *) newUpperSurfaceMaterial
         : (ArNode <ArpVolumeMaterial>  *) newVolumeMaterial
         : (ArNode <ArpDoubleValues>    *) newLayerThickness

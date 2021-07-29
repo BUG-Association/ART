@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnBlinnMicrofacetDistribution registerWithRuntime ];
 )
 
@@ -50,7 +51,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBlinnMicrofacetDistribution)
 
-- init
+- (id) init
         : (ArNode *) expressionForBeta
 {
     ART_ERRORHANDLING_MANDATORY_ARPROTOCOL_CHECK(

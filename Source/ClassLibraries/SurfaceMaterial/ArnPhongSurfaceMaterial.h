@@ -41,7 +41,7 @@ ART_MODULE_INTERFACE(ArnPhongSurfaceMaterial)
     ArSurfaceType   additionalSurfaceProperties;
 }
 
-- init
+- (id) init
         : (ArNode <ArpNode>*) newColour
         : (ArNode <ArpNode>*) newShininess
         ;

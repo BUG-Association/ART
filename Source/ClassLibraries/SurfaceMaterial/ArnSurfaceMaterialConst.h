@@ -53,7 +53,7 @@ ART_MODULE_INTERFACE(ArnSurfaceMaterialConst)
 {
 }
 
-- init
+- (id) init
         : (ArNode *) newColour
         ;
 
@@ -70,7 +70,7 @@ ART_MODULE_INTERFACE(ArnSurfaceMaterialConst)
     double  parameter;
 }
 
-- init
+- (id) init
         : (ArNode *) newColour
         : (double) newParameter
         ;

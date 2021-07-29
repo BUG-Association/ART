@@ -68,7 +68,7 @@ ARDYNARRAY_INTERFACE_FOR_TYPE_PTR(plausibleSplit,plausibleSplit,plausibleSplit,p
     ArTraversalState  stateForVisShapes;
 }
 
-- init
+- (id) init
         : (ArNodeRef) originalScenegraphRef
         : (ArnLeafNodeBBoxCollection *) leafNodeBBoxes
         : (ArnOperationTree*) newOperationTree

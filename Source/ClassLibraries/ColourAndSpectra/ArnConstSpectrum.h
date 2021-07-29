@@ -53,7 +53,7 @@ ART_SPECTRUM_MODULE_INTERFACE(ArnConstSpectrum)
     Ar##_Type           nativeValue; \
 } \
  \
-- init \
+- (id) init \
         : (Ar##_Type) newNativeValue \
         ; \
  \
@@ -72,7 +72,7 @@ ARNVAL_CONST_COLOUR_INTERFACE( RSSpectrum,  rss );
 
 @interface ArnVal_const_xyz (initFrom_xyY)
 
-- initFrom_CIExyY
+- (id) initFrom_CIExyY
         : (ArCIExyY) newCIExyY
         ;
 
@@ -101,7 +101,7 @@ ARNVAL_CONST_COLOUR_INTERFACE( RSSpectrum,  rss );
 
 @interface ArnVal_const_archive_rss (archiveData)
 
-- init
+- (id) init
         : (ArRSSpectrum) newNativeValue
         : (ArSymbol) newDescription
         : (ArSymbol) newAdditionalDescription

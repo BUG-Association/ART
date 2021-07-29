@@ -36,6 +36,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnRAWLinearPolarisingFilter    registerWithRuntime ];
     [ ArnRAWPolarisationVisualisation registerWithRuntime ];
 )
@@ -58,7 +59,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWLinearPolarisingFilte
 {
 }
 
-- _init
+- (id) _init
         : (double) newAngle
         : (double) newStrength
         : (BOOL) newCloneOption
@@ -80,7 +81,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWLinearPolarisingFilte
     return self;
 }
 
-- _init
+- (id) _init
         : (double) newAngle
         : (double) newStrength
 {
@@ -94,7 +95,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWLinearPolarisingFilte
     return self;
 }
 
-- angle
+- (id) angle
                    : (double) newAngle
         strength   : (double) newStrength
         cloneSource: (BOOL) newCloneOption
@@ -107,7 +108,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWLinearPolarisingFilte
             ];
 }
 
-- angle
+- (id) angle
                 : (double) newAngle
         strength: (double) newStrength
 {
@@ -185,7 +186,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWLinearPolarisingFilte
              Process all pixels in the image.
         ---------------------------------------------------------------aw- */
 
-        for ( int i = 0; i < numberOfSourceImages; i++ )
+        for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
         {
             for ( long y = 0; y < YC(destinationImageSize); y++ )
             {
@@ -384,6 +385,8 @@ void binary_polvis_colour_to_rgb(
         ArRGB        * rgb
         )
 {
+    (void)art_gv;
+    
     switch( *pvc )
     {
         case arpolviscolour_RG:
@@ -411,6 +414,8 @@ void polvis_colour_to_rgb(
         ArRGB        * rgb
         )
 {
+    (void)art_gv;
+    
     switch( *pvc )
     {
         case arpolviscolour_R:
@@ -449,7 +454,7 @@ void polvis_colour_to_rgb(
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRAWPolarisationVisualisation)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWPolarisationVisualisation)
 
-- sv1
+- (id) sv1
            : (ArPolVisColour) newSC1Colour
         sv2: (ArPolVisColour) newSC2Colour
         sv3: (ArPolVisColour) newSC3Colour
@@ -478,7 +483,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWPolarisationVisualisa
             ];
 }
 
-- init
+- (id) init
         : (ArPolVisColour) newSC1Colour
         : (ArPolVisColour) newSC2Colour
         : (ArPolVisColour) newSC3Colour
@@ -526,6 +531,8 @@ void  lch_to_lab(
         ArCIELab  * lab
         )
 {
+    (void)art_gv;
+    
     ARCIELab_L(*lab) = ARCIELCH_L(*lch);
     ARCIELab_a(*lab) = cos( ARCIELCH_H(*lch) ) * ARCIELCH_C(*lch);
     ARCIELab_b(*lab) = sin( ARCIELCH_H(*lch) ) * ARCIELCH_C(*lch);
@@ -625,7 +632,7 @@ void  lch_to_lab(
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {

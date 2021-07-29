@@ -44,7 +44,7 @@ ART_MODULE_INTERFACE(ArnGeneralSurfaceMaterial)
     double                  specularWeight;
 }
 
-- init
+- (id) init
         : (ArNodeRefDynArray *) newSurfaceComponents
         ;
 
@@ -84,7 +84,7 @@ ArnGeneralSurfaceMaterial * arngeneralsurfacematerial(
     double  weight;
 }
 
-- init
+- (id) init
         : (ArNode <ArpSurfaceMaterial>*) newSurface
         : (double) newWeight
         ;

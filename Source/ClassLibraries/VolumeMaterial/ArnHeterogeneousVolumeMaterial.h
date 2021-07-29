@@ -45,14 +45,14 @@ ART_MODULE_INTERFACE(ArnHeterogeneousVolumeMaterial)
     double scale;
 }
 
-- init
+- (id) init
         : (ArNode <ArpSpectrum>      *) newIOR
         : (ArNode <ArpSpectrum>      *) newAbsorption
         : (ArNode <ArpPhaseFunction> *) newPhaseFunction
         : (ArNode <ArpVolume>        *) newDensityVolume
         ;
 
-- init
+- (id) init
         : (ArNode <ArpSpectrum>      *) newIOR
         : (ArNode <ArpSpectrum>      *) newAbsorption
         : (ArNode <ArpPhaseFunction> *) newPhaseFunction

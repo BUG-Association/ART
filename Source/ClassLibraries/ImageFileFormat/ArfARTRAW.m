@@ -264,6 +264,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,artraw)
         : (ArNode **) objectPtr
         : (ArList *) externals
 {
+    (void) externals;
+    
     *objectPtr =
         [ ALLOC_INIT_OBJECT(ArnFileImage)
             :   [ file name ]
@@ -868,7 +870,7 @@ while (0);
 
     scanline = ALLOC_ARRAY( ArLightAlpha *, XC(size) );
 
-    for ( unsigned int i = 0; i < XC(size); i ++ )
+    for ( int i = 0; i < XC(size); i ++ )
         scanline[i] =
             arlightalpha_d_alloc_init_unpolarised(
                 art_gv,
@@ -882,7 +884,7 @@ while (0);
     bufferA = ALLOC_ARRAY( double, XC(size) );
     colBufS0 = ALLOC_ARRAY( ArSpectrum *, XC(size) );
 
-    for ( unsigned int i = 0; i < XC(size); i ++ )
+    for ( int i = 0; i < XC(size); i ++ )
         colBufS0[i] =
             spc_d_alloc_init(
                 art_gv,
@@ -902,7 +904,7 @@ while (0);
             colBufS2 = ALLOC_ARRAY( ArSpectrum *, XC(size) );
             colBufS3 = ALLOC_ARRAY( ArSpectrum *, XC(size) );
 
-            for ( unsigned int i = 0; i < XC(size); i ++ )
+            for ( int i = 0; i < XC(size); i ++ )
             {
                 colBufS1[i] = spc_d_alloc_init( art_gv, 0.0 );
                 colBufS2[i] = spc_d_alloc_init( art_gv, 0.0 );
@@ -920,6 +922,8 @@ while (0);
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
+    (void) start;
+    
     for ( long y = 0; y < YC(image->size); y++ )
     {
         if ( fileContainsPolarisationData )
@@ -1122,7 +1126,7 @@ while (0);
 
     scanline = ALLOC_ARRAY( ArLightAlpha *, XC(size) );
 
-    for ( unsigned int i = 0; i < XC(size); i ++ )
+    for ( int i = 0; i < XC(size); i ++ )
         scanline[i] =
             arlightalpha_d_alloc_init_unpolarised(
                 art_gv,
@@ -1293,6 +1297,8 @@ while (0);
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
+    (void) start;
+    
     for ( long y = 0; y < YC(image->size); y++ )
     {
 
@@ -1365,7 +1371,7 @@ while (0);
                             sv
                             );
 
-                        for ( int j = 0; j < maxComponents; j++ )
+                        for ( unsigned int j = 0; j < maxComponents; j++ )
                             [ self _writePixel
                                 :   ARSV_I( *sv, j )
                                 ];

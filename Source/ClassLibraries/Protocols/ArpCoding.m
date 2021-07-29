@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     RUNTIME_REGISTER_PROTOCOL(ArpCoding);
 )
 
@@ -43,7 +44,7 @@ void arpcoder_ar##_type##array( \
 { \
     if ( [ coder isReading ] ) \
     { \
-        unsigned long  arraySize; \
+        unsigned int  arraySize; \
         \
         [ coder codeTableBegin \
             :   "ar" #_type "array" \
@@ -55,7 +56,7 @@ void arpcoder_ar##_type##array( \
     } \
     else \
     { \
-        unsigned long  arraySize = ARARRAY_SIZE(*array); \
+        unsigned int  arraySize = ARARRAY_SIZE(*array); \
         \
         [ coder codeTableBegin \
             :   "ar" #_type "array" \
@@ -118,7 +119,7 @@ void arpcoder_##__type ( \
         __Type         * c \
         ) \
 { \
-    ArSymbol  colourspaceName;  \
+    (void) art_gv;\
 \
     [ coder codeDouble: & C3_CI(c->c,0) ]; \
     [ coder codeDouble: & C3_CI(c->c,1) ]; \
@@ -139,7 +140,7 @@ void arpcoder_arspectrum##__NC ( \
         ArSpectrum##__NC  * s \
         ) \
 { \
-    unsigned long  size = __NC ; \
+    unsigned int  size = __NC ; \
 \
     [ coder codeTableBegin: "ArSpectrum" : & size ]; \
 \
@@ -179,6 +180,8 @@ void arpcoder_arpsspectrum(
         ArPSSpectrum   * pss
         )
 {
+    (void) art_gv;
+    
     [ coder codeTableBegin: "psspectrum" : & ARPSS_SIZE(*pss) ];
     [ coder codeDouble: & ARPSS_SCALE(*pss) ];
 
@@ -199,6 +202,8 @@ void arpcoder_arrsspectrum(
         ArRSSpectrum   * rss
         )
 {
+    (void) art_gv;
+    
     [ coder codeTableBegin: "rsspectrum" : & ARRSS_SIZE(*rss) ];
     [ coder codeDouble: & ARRSS_START(*rss) ];
     [ coder codeDouble: & ARRSS_STEP(*rss) ];
@@ -219,8 +224,10 @@ void arpcoder_arrsspectrum2d(
         ArRSSpectrum2D  * rss2d
         )
 {
+    (void) art_gv;
+    
     [ coder codeTableBegin: "rsspectrum2d" : & rss2d->size ];
-    [ coder codeULong:  & rss2d->stride ];
+    [ coder codeInt:  & rss2d->stride ];
     [ coder codeDouble: & rss2d->excitation_start ];
     [ coder codeDouble: & rss2d->excitation_step ];
     [ coder codeDouble: & rss2d->emission_start ];
@@ -243,7 +250,7 @@ void arpcoder_arnoderefdynarray(
         ArNodeRefDynArray  * nodeRefArray
         )
 {
-    unsigned long  numberOfNodes;
+    unsigned int  numberOfNodes;
 
     if ( ! [ coder isReading ] )
         numberOfNodes = arnoderefdynarray_size( nodeRefArray );

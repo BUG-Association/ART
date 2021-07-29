@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnScale2D       registerWithRuntime ];
     [ ArnScale3D       registerWithRuntime ];
     [ ArnTranslation2D registerWithRuntime ];
@@ -61,7 +62,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScale3D)
     invScale = SCALE3D_INV_SC(scale);
 }
 
-- init
+- (id) init
 {
     self = [ super init ];
 
@@ -74,7 +75,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScale3D)
     return self;
 }
 
-- init
+- (id) init
         : (Scale3D) newScale
 {
     self = [ super init ];
@@ -89,7 +90,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScale3D)
     return self;
 }
 
-- initFrom
+- (id) initFrom
         : (const Scale3D *) newScale
 {
     self = [ super init ];
@@ -104,7 +105,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScale3D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnScale3D  * copiedInstance = [ super copy ];
 
@@ -114,7 +115,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScale3D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnScale3D  * copiedInstance =
@@ -289,7 +290,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScale3D)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTranslation3D)
 
-- init
+- (id) init
 {
     self = [ super init ];
 
@@ -301,7 +302,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTranslation3D)
     return self;
 }
 
-- init
+- (id) init
         : (Translation3D) newTranslation
 {
     self = [ super init ];
@@ -314,7 +315,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTranslation3D)
     return self;
 }
 
-- initFrom
+- (id) initFrom
         : (const Translation3D *) newTranslation
 {
     translation = *newTranslation;
@@ -322,7 +323,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTranslation3D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnTranslation3D  * copiedInstance = [ super copy ];
 
@@ -331,7 +332,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTranslation3D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnTranslation3D  * copiedInstance =
@@ -479,7 +480,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScale2D)
     invScale = SCALE2D_INV_SC(scale);
 }
 
-- init
+- (id) init
 {
     self  = [ super init ];
 
@@ -492,7 +493,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScale2D)
     return self;
 }
 
-- init
+- (id) init
         : (Scale2D) newScale
 {
     self = [ super init ];
@@ -507,7 +508,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScale2D)
     return self;
 }
 
-- initFrom
+- (id) initFrom
         : (const Scale2D *) newScale
 {
     self = [ super init ];
@@ -522,7 +523,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScale2D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnScale2D  * copiedInstance = [ super copy ];
 
@@ -532,7 +533,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScale2D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnScale2D  * copiedInstance =
@@ -672,7 +673,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScale2D)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTranslation2D)
 
-- init
+- (id) init
 {
     self = [ super init ];
     
@@ -684,7 +685,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTranslation2D)
     return self;
 }
 
-- init
+- (id) init
         : (Translation2D) newTranslation
 {
     self = [ super init ];
@@ -697,7 +698,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTranslation2D)
     return self;
 }
 
-- initFrom
+- (id) initFrom
         : (const Translation2D *) newTranslation
 {
     translation = *newTranslation;
@@ -705,7 +706,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTranslation2D)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnTranslation2D  * copiedInstance = [ super copy ];
 
@@ -714,7 +715,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTranslation2D)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnTranslation2D  * copiedInstance =
@@ -830,7 +831,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVarScale3D)
 {
 }
 
-- init
+- (id) init
         : (ArNode <ArpDoubleValues> *) xScale
         : (ArNode <ArpDoubleValues> *) yScale
         : (ArNode <ArpDoubleValues> *) zScale
@@ -889,7 +890,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVarTranslation3D)
 {
 }
 
-- init
+- (id) init
         : (ArNode <ArpDoubleValues> *) xTranslation
         : (ArNode <ArpDoubleValues> *) yTranslation
         : (ArNode <ArpDoubleValues> *) zTranslation

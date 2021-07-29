@@ -48,6 +48,8 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
         : (ArSamplingRegion *) resultSamplingRegion
         : (ArLightSample *) resultLightSample
 {
+    (void) queryLocation_worldspace;
+    
     Vec3D  hitNormal = *queryDirection_worldspace;
 
     vec3d_norm_v(&hitNormal);
@@ -137,6 +139,8 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
         : (ArSamplingRegion *) resultSamplingRegion
         : (ArSpectralIntensity *) resultIntensity
 {
+    (void) queryLocation_worldspace;
+    
     Vec3D  hitNormal = *queryDirection_worldspace;
 
     vec3d_norm_v(&hitNormal);
@@ -200,9 +204,6 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
         if ( resultSamplingRegion ) *resultSamplingRegion =
             ARNSKYLIGHT_SAMPLINGREGION_SKYDOME;
 
-        ArSpectrum  * temp_colour = spc_alloc(art_gv);
-
-
         for ( int i = 0; i < 500 ; i++ )
         {
             ArWavelength  lambda;
@@ -251,6 +252,8 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
         : (ArSamplingRegion *) resultSamplingRegion
         : (ArLight *) resultLight
 {
+    (void) queryLocation_worldspace;
+    
     Vec3D  hitNormal = *queryDirection_worldspace;
 
     vec3d_norm_v(&hitNormal);

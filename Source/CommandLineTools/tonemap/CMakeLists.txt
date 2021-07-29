@@ -8,6 +8,8 @@ target_link_libraries(
 	${art_generic_link_libraries}
 	)
 
+target_compile_options(tonemap PRIVATE -Wall -Wextra)
+
 install (
 	TARGETS
 		tonemap

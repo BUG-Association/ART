@@ -44,17 +44,17 @@ ART_MODULE_INTERFACE(ArcFreelist)
     ArList  freelist;
 }
 
-- init
+- (id) init
         : (Class) newClass
         ;
 
-- init
+- (id) init
         : (Class) newClass
         : (SEL) activationMethod
         : (SEL) deactivationMethod
         ;
 
-- obtainInstance
+- (id) obtainInstance
         ;
 
 - (void) releaseInstance

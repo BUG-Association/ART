@@ -158,6 +158,7 @@ void testing_context_prepare_for_use(
         ArBlendedSurfacesTestingContext   * testingContext
         )
 {
+    (void) surface2;
     testingContext->currentThetaIn = thetaIn;
     testingContext->currentSigmaIn = sigmaIn;
 
@@ -230,6 +231,8 @@ void testing_context_release(
         ArBlendedSurfacesTestingContext   * testingContext
         )
 {
+    (void) art_gv;
+    
     RELEASE_OBJECT(testingContext->intersection);
 
     arbsdfsamplefreelists_free_contents(
@@ -298,6 +301,14 @@ void tests_for_incoming_direction(
         const char *                        sampleSourceStr
         )
 {
+#ifndef NEVERMORE
+    (void) art_gv;
+    (void) testingContext;
+    (void) firstSurface;
+    (void) secondSurface;
+    (void) sampleSourceStr;
+#endif
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 #ifdef NEVERMORE
     ArBSDFSampleList bsdfsampleList = ARFULLIGHTBSDFSAMPLELIST_EMPTY;
@@ -415,16 +426,8 @@ void arnsurface_test_blended_BSDF_MMs(
         ArNode <ArpVolumeMaterial>              * lowerMaterial
         )
 {
-    // Get surfaces' characteristics
-    ArSurfaceType firstSurfaceType = [ firstSurface globalSurfaceType ];
-    BOOL isFirstSurfacePerfectlySpecular =
-        ARSURFACETYPE_IS_SPECULAR_REFLECTOR(firstSurfaceType) ||
-        ARSURFACETYPE_IS_SPECULAR_REFRACTOR(firstSurfaceType);
-    ArSurfaceType secondSurfaceType = [ secondSurface globalSurfaceType ];
-    BOOL isSecondSurfacePerfectlySpecular =
-        ARSURFACETYPE_IS_SPECULAR_REFLECTOR(secondSurfaceType) ||
-        ARSURFACETYPE_IS_SPECULAR_REFRACTOR(secondSurfaceType);
-
+    (void) randomGenerator;
+    
     // Generate eye direction from the "upper" hemi-sphere only. We don't sample
     // the whole sphere because in the current implementation the BSDFs act
     // identically from both sides of the surface (due to inversion of normal
@@ -544,7 +547,7 @@ id generate_random_albedo(
     id randomColour = nil;
 
     unsigned int channels_count = spc_channels( art_gv );
-    unsigned int channel_width2 = spc_channel_width(art_gv, 0);
+
     switch (channels_count)
     {
         case 8:

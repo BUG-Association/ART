@@ -75,7 +75,7 @@ ART_MODULE_INTERFACE(ArnMappedSurfaceMaterial)
 //    int cellIndexType;
 }
 
-- init
+- (id) init
         : (ArNode <ArpNode>*) newExpression
         : (ArNode <ArpNode>*) newCellIndices
         : (ArNode <ArpNode>*) newSurfaceMap
@@ -93,7 +93,7 @@ ART_MODULE_INTERFACE(ArnMappedSurfaceMaterial)
     ArSurfaceType               globalSurfaceType;
 }
 
-- init
+- (id) init
         : (ArNodeRefDynArray *) newSurfacePhases
         ;
 
@@ -116,7 +116,7 @@ ArnSurfaceMap * arnsurfacemap(
     double  phase;
 }
 
-- init
+- (id) init
         : (ArNode <ArpSurfaceMaterial>*) newSurface
         : (double) newPhase
         ;

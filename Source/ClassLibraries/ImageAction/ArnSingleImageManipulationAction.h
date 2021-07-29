@@ -115,15 +115,15 @@ ART_MODULE_INTERFACE(ArnSingleImageManipulationAction)
     BOOL              returnSourceImagesToStack;
 }
 
-- removeSource
+- (id) removeSource
         : (BOOL) newRemoveSource
         ;
 
-- init
+- (id) init
         : (BOOL) newRemoveSource
         ;
 
-- init
+- (id) init
         : (BOOL) newRemoveSource
         : (ArNode *) newSubnode0
         : (ArNode *) newSubnode1

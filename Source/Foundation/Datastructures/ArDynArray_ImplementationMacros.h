@@ -122,14 +122,14 @@ _Type ar##_type##dynarray_i( \
         const unsigned int          index  \
         ) \
 { \
-    if (   index >= 0 \
-        && index <= _ARDYNARRAY_STP(*dynArray) ) \
+    if ( (int) index <= _ARDYNARRAY_STP(*dynArray) ) \
     { \
         return _ARDYNARRAY_I( *dynArray, index );\
     }\
     else \
     { \
-        printf("\n ## Warning: stack array read above stack pointer ## \n"); \
+        printf("\n ## Warning: stack array read above stack pointer for "\
+        "element access: %u vs. %d ## \n",index,_ARDYNARRAY_STP(*dynArray)); \
         fflush(stdout); \
         return _ARDYNARRAY_UNUSED_SLOT_VALUE( *dynArray ); \
     } \
@@ -140,14 +140,14 @@ _Type * ar##_type##dynarray_ptr_to_i( \
         const unsigned int          index  \
         ) \
 { \
-    if (   index >= 0 \
-        && index <= _ARDYNARRAY_STP(*dynArray) ) \
+    if ( (int) index <= _ARDYNARRAY_STP(*dynArray) ) \
     { \
         return & _ARDYNARRAY_I( *dynArray, index );\
     }\
     else \
     { \
-        printf("\n ## Warning: stack array read above stack pointer ## \n"); \
+        printf("\n ## Warning: stack array read above stack pointer for "\
+        "ptr access: %u vs. %d ## \n",index,_ARDYNARRAY_STP(*dynArray)); \
         fflush(stdout); \
         return 0; \
     } \
@@ -259,7 +259,7 @@ void ar##_type##dynarray_push( \
         ) \
 { \
     if (    _ARDYNARRAY_STP(*dynArray) + 1 \
-         == _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(*dynArray) ) \
+         == (int) _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(*dynArray) ) \
     { \
         if ( _ARDYNARRAY_DYNARRAY(*dynArray) ) \
         { \
@@ -313,8 +313,7 @@ void ar##_type##dynarray_set_i( \
         const unsigned int          index  \
         ) \
 { \
-    if (   index >= 0 \
-        && index <= _ARDYNARRAY_STP(*dynArray) ) \
+    if ( (int) index <= _ARDYNARRAY_STP(*dynArray) ) \
     { \
         _ARDYNARRAY_I( *dynArray, index ) = newValue; \
     }\
@@ -354,7 +353,7 @@ void ar##_type##dynarray_free_contents( \
             if ( _ARDYNARRAY_STP(*dynArray) > -1 ) \
             { \
                 for ( unsigned int i = 0; \
-                      i <= _ARDYNARRAY_STP(*dynArray); \
+                      (int) i <= _ARDYNARRAY_STP(*dynArray); \
                       i++ ) \
                 { \
                     _ARDYNARRAY_I( *dynArray, i ) = \
@@ -392,7 +391,7 @@ Ar##_ShortType##DynArray ar##_type##dynarray_copy( \
 \
     for ( unsigned int i = 0; i < _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(clone); i++ ) \
     { \
-        if ( i <= _ARDYNARRAY_STP(*original) ) \
+        if ( (int) i <= _ARDYNARRAY_STP(*original) ) \
             _ARDYNARRAY_I( clone, i ) = \
                 _pushFunction( _ARDYNARRAY_I( clone, i ) );\
         else \
@@ -409,7 +408,7 @@ void ar##_type##dynarray_push( \
         ) \
 { \
     if (       _ARDYNARRAY_STP(*dynArray) + 1 \
-            == _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(*dynArray) \
+            == (int) _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(*dynArray) \
          ||    _ARDYNARRAY_NUMBER_OF_ALLOCATED_STACK_SLOTS(*dynArray) \
             == 0 \
        ) \
@@ -474,8 +473,7 @@ void ar##_type##dynarray_set_i( \
         const unsigned int          index  \
         ) \
 { \
-    if (   index >= 0 \
-        && index <= _ARDYNARRAY_STP(*dynArray) ) \
+    if ( (int) index <= _ARDYNARRAY_STP(*dynArray) ) \
     { \
         _pushFunction( newValue ); \
         _payloadFreeFunction( ar##_type##dynarray_i( dynArray, index ) ); \

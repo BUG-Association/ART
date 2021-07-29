@@ -38,6 +38,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnImageSamplerBase registerWithRuntime ];
 )
 
@@ -65,6 +66,8 @@ void image_sampler_sigusr1_handler(
         int  sig
         )
 {
+    (void) sig;
+    
     received_signal = 1;
     pthread_mutex_lock( signal_handler_mutex );
     pthread_cond_signal( signal_handler_cond );
@@ -75,6 +78,8 @@ void image_sampler_sigusr2_handler(
         int  sig
         )
 {
+    (void) sig;
+    
     received_signal = 2;
     pthread_mutex_lock( signal_handler_mutex );
     pthread_cond_signal( signal_handler_cond );
@@ -85,6 +90,8 @@ void image_sampler_sigint_handler(
         int  sig
         )
 {
+    (void) sig;
+    
     received_signal = 3;
     pthread_mutex_lock( signal_handler_mutex );
     pthread_cond_signal( signal_handler_cond );
@@ -121,7 +128,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
     }
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (int) newNumberOfSamples
@@ -146,7 +153,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnImageSamplerBase  * copiedInstance = [ super copy ];
 
@@ -155,7 +162,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnImageSamplerBase  * copiedInstance =
@@ -299,6 +306,9 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
         : (ArNode <ArpImageWriter> **) image
         : (int) numberOfResultImages
 {
+    (void) newWorld;
+    (void) newCamera;
+    
     sampleCounter =
         [ ALLOC_INIT_OBJECT(ArcSampleCounter)
             :  ART_GLOBAL_REPORTER
@@ -370,7 +380,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
     x_start = ALLOC_ARRAY(int, YC(imageSize));
     x_end   = ALLOC_ARRAY(int, YC(imageSize));
 
-    for ( unsigned int y = 0; y < YC(imageSize); y++ )
+    for ( int y = 0; y < YC(imageSize); y++ )
     {
         x_start[y] = 0;
         x_end[y]   = XC(imageSize);
@@ -378,7 +388,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
         BOOL  pixelRunHasStarted = NO;
         BOOL  pixelRunHasEnded   = NO;
     
-        for ( unsigned int x = 0; x < XC(imageSize); x++ )
+        for ( int x = 0; x < XC(imageSize); x++ )
         {
             ArReferenceFrame  referenceFrame;
             Ray3D             ray;
@@ -476,15 +486,25 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
         : (ArNode <ArpImageWriter> **) image
         : (int) numberOfResultImages
 {
+    (void) newWorld;
+    (void) newCamera;
+    (void) image;
+    (void) numberOfResultImages;
+    
     ART__VIRTUAL_METHOD__EXIT_WITH_ERROR
 }
 
 - (void) cleanupAfterImageSampling
-        : (ArNode <ArpWorld> *) world
-        : (ArNode <ArpCamera > *) camera
-        : (ArNode <ArpImageWriter> **) image
+        : (ArNode <ArpWorld> *) pWorld
+        : (ArNode <ArpCamera > *) pCamera
+        : (ArNode <ArpImageWriter> **) ppImage
         : (int) numberOfResultImages
 {
+    (void) pWorld;
+    (void) pCamera;
+    (void) ppImage;
+    (void) numberOfResultImages;
+    
     RELEASE_OBJECT( sampleCounter );
 
     for ( unsigned int i = 0; i < numberOfRenderThreads; i++ )
@@ -499,19 +519,23 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
 }
 
 - (void) termIOProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
+    (void) threadIndex;
+    
     ART__VIRTUAL_METHOD__EXIT_WITH_ERROR
 }
 
 - (void) renderProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
+    (void) threadIndex;
+    
     ART__VIRTUAL_METHOD__EXIT_WITH_ERROR
 }
 
 - (void) renderProcHasFinished
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     threadStatus[ THREAD_INDEX ] = FINISHED;
 
@@ -554,7 +578,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerBase)
 {
     [ super code: coder ];
 
-    [ coder codeInt:  & overallNumberOfSamplesPerPixel ];
+    [ coder codeUInt: & overallNumberOfSamplesPerPixel ];
     
     if ( [ coder isReading ] )
     {

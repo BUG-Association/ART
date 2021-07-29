@@ -141,8 +141,8 @@ void sps_s500w_init_s(
     
     unsigned int last_channel_idx = s500_channels( art_gv ) - 1;
     double range_start = s500_channel_lower_bound( art_gv, 0 );
-    double range_end = s500_channel_lower_bound( art_gv, last_channel_idx );
-                        + s500_channel_width( art_gv, last_channel_idx );
+    double range_end =   s500_channel_lower_bound( art_gv, last_channel_idx )
+                       + s500_channel_width( art_gv, last_channel_idx );
     double channel_width = s500_channel_width( art_gv, 0 );
 
     for ( int i = 0; i < 4; i++ )
@@ -188,6 +188,8 @@ ArSpectralSample * sps_alloc(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ArSpectralSample  * sr = ALLOC(ArSpectralSample);
 
     return sr;
@@ -210,6 +212,8 @@ ArSpectralSample * sps_s_alloc_init(
         const ArSpectralSample  * s0
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_SPECTRUMTYPE( sps, ArSpectralSample,  s0, s )
 
     ArSpectralSample  * hr = ALLOC( ArSpectralSample );
@@ -264,7 +268,6 @@ void sps_splatting_data_from_current_ISR_s(
     }
 
     int current_spc_channel = 0;
-    int current_other_spc_channel = 0;
 
     for ( int i = 0; i < 500; i++ )
     {

@@ -35,7 +35,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcAmbientLightsource
 
-- init
+- (id) init
         : (ArSpectralIntensity *)  newSpectralPower
 {
     self =

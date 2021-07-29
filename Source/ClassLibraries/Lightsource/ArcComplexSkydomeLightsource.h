@@ -77,7 +77,7 @@ ArComplexSkydomeLightsourcePatch;
     double                              radiantPowerAlt[PSM_ARRAYSIZE]; //  W
 }
 
-- init
+- (id) init
         : (ArNode <ArpShape> *) shapeRef
         : (ArTraversalState *) traversalState
         : (ArnLightsourceCollector *) lightsourceCollector

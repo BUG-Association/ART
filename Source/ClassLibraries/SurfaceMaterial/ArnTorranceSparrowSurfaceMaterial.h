@@ -48,7 +48,7 @@ ART_MODULE_INTERFACE(ArnTorranceSparrowSurfaceMaterial)
 {
 }
 
-- init
+- (id) init
         : (ArNode *) newMicrofacetDistribution
         ;
 

@@ -31,14 +31,14 @@
 
 typedef struct ArRSSpectrum2D
 {
-    unsigned long  size;
-    unsigned long  stride;
-    double         excitation_start;
-    double         excitation_step;
-    double         emission_start;
-    double         emission_step;
-    double         scale;
-    double       * array;
+    unsigned int  size;
+    int           stride;
+    double        excitation_start;
+    double        excitation_step;
+    double        emission_start;
+    double        emission_step;
+    double        scale;
+    double      * array;
 }
 ArRSSpectrum2D;
 //   Access macros
@@ -55,12 +55,12 @@ ArRSSpectrum2D;
 
 #define ARRSSPECTRUM2D_SAMPLE(__s,__i,__j) \
 ( \
-       (    ((__j)*(__s)->stride+(__i)) >= 0 \
-         && ((__j)*(__s)->stride+(__i)) < (__s)->size ) \
-    && (__i) >= 0 \
-    && (__j) >= 0 \
-    && (__i) < (__s)->stride \
-    && (__j) < (__s)->size / (__s)->stride \
+       (    (int)((__j)*(__s)->stride+(__i)) >= 0 \
+         && (int)((__j)*(__s)->stride+(__i)) < (int)(__s)->size ) \
+    && (int)(__i) >= 0 \
+    && (int)(__j) >= 0 \
+    && (int)(__i) < (__s)->stride \
+    && (int)(__j) < (int)(__s)->size / (__s)->stride \
 ? \
     M_MAX((__s)->array[(__j)*(__s)->stride+(__i)],0.0) \
 : \

@@ -42,13 +42,13 @@ ART_MODULE_INTERFACE(ArnLightsourceCollector)
     ArNode <ArpLightsourceCollection>  * lightsourceCollection;
 }
 
-- sampler2D
+- (id) sampler2D
                    : (ArNode <ArpSampling2D> *) newSampler2D
         resolution : (double) newResolution
         type       : (ArLightsourceType) newLightsourceType
         ;
 
-- sampler2D
+- (id) sampler2D
                         : (ArNode <ArpSampling2D> *) newSampler2D
         ambientLight    : (ArNode <ArpSpectrum> *) newAmbientLight
         ambientIntensity: (double) newAmbientIntensity
@@ -56,7 +56,7 @@ ART_MODULE_INTERFACE(ArnLightsourceCollector)
         type            : (ArLightsourceType) newLightsourceType
         ;
 
-- init
+- (id) init
         : (ArNode <ArpSampling2D> *) newSampler2D
         : (ArNode <ArpSpectrum> *) newAmbientLight
         : (double) newAmbientIntensity

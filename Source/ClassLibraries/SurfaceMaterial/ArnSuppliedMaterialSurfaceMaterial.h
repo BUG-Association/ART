@@ -38,7 +38,7 @@ ART_MODULE_INTERFACE(ArnSuppliedMaterialSurfaceMaterial)
 {
 }
 
-- init
+- (id) init
     : (ArNode *) newSurfaceMaterial
     : (ArNode *) newMaterial
     ;

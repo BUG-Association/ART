@@ -85,7 +85,7 @@ ART_MODULE_SHUTDOWN_FUNCTION
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnLightsourceCollection)
 
-- init
+- (id) init
         : (ArcObject <ArpSampling2D> *) newSampler2D
         : (double) newResolution
 {
@@ -454,7 +454,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     }
 }
 
-- copy
+- (id) copy
 {
     ArnLightsourceCollection  * copiedInstance = [ super copy ];
 
@@ -491,7 +491,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnLightsourceCollection  * copiedInstance =

@@ -138,7 +138,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     reporter = newReporter;
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
 {
     self = [ super init ];
@@ -181,7 +181,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     [ super setReporter: newReporter ];
 }
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -189,7 +189,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
 {
     self = [ super init ];
@@ -275,7 +275,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     [ super setReporter: newReporter ];
 }
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -283,7 +283,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
 {
     self = [ super init ];
@@ -369,7 +369,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     [ super setReporter: newReporter ];
 }
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -377,7 +377,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
 {
     self = [ super init ];
@@ -451,7 +451,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 
 @implementation ArcHaltonRandomGenerator
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -460,8 +460,8 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             ];
 }
 
-- init
-        : (int) newMaxNumberOfSamples
+- (id) init
+        : (unsigned int) newMaxNumberOfSamples
 {
     return
         [ self initWithReporter
@@ -470,9 +470,9 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
-        : (int) newMaxNumberOfSamples
+        : (unsigned int) newMaxNumberOfSamples
 {
     self =
         [ super initWithReporter
@@ -505,7 +505,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             //   This is why there is no reference to the global
             //   randseed in here.
 
-            for ( unsigned int i = 0; i < maxPrime; i++ )
+            for ( unsigned int i = 0; (int) i < maxPrime; i++ )
             {
                 int  prime;
 
@@ -560,7 +560,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 {
     double  quasiRnd = 0.0;
 
-    if ( sequenceToUse >= maxPrime )
+    if ( (int) sequenceToUse >= maxPrime )
         return [ super valueFromNewSequence ];
 
     quasiRnd = quasi_halton( inverseBase[ sequenceToUse ] ,
@@ -620,7 +620,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 
 @implementation ArcGaussianRandomGenerator
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -628,7 +628,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
 {
     self = [ super init ];
@@ -761,7 +761,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 
 @implementation ArcEfficientRandomGenerator
 
-- init
+- (id) init
 {
     return
         [ self initWithReporter
@@ -769,8 +769,8 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             :   ARCEFFICIENTRANDOMGENERATOR_DEFAULTNETSIZE ];
 }
 
-- init
-        : (int) newTmsNetSize
+- (id) init
+        : (unsigned int) newTmsNetSize
 {
     return
         [ self initWithReporter
@@ -778,9 +778,9 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
             :   newTmsNetSize ];
 }
 
-- initWithReporter
+- (id) initWithReporter
         : (ArcObject <ArpReporter> *) newReporter
-        : (int) newTmsNetSize
+        : (unsigned int) newTmsNetSize
 {
     self  = [ super init ];
     
@@ -805,8 +805,8 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
         //if (reporter)
 #ifdef RANDOM_GENERATOR_DEBUG_PRINTFS
         [ reporter printf
-            :   "ArcEfficientrandomGenerator: TMS net size requested: %d, "
-                "created: %d\n"
+            :   "ArcEfficientrandomGenerator: TMS net size requested: %ud, "
+                "created: %ud\n"
             ,   newTmsNetSize
             ,   tmsNetSize ];
 #endif
@@ -851,12 +851,12 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
 
 // in case all sequences are used up, create some new ones.
 //  (called internally)
-- _createMoreSequencesSingle: (BOOL) moreSingle
+- (id) _createMoreSequencesSingle: (BOOL) moreSingle
                       Double: (BOOL) moreDouble
 {
     if (moreSingle){
     state1=REALLOC_ARRAY(state1, ArEffRNGseq1State, 2*size1);
-    for (int i=size1; i<2*size1; i++) {
+    for (UInt32 i=size1; i<2*size1; i++) {
       state1[i].i=0;
       state1[i].r=nrand48(rseed48);
       state1[i].max=0;
@@ -867,7 +867,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     }
     if (moreDouble){
     state2=REALLOC_ARRAY(state2, ArEffRNGseq2State, 2*size2);
-    for (int i=size2; i<2*size2; i++) {
+    for (UInt32 i=size2; i<2*size2; i++) {
       state2[i].i=0;
       state2[i].r=nrand48(rseed48);
       state2[i].s=nrand48(rseed48);
@@ -1004,7 +1004,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
         : (ArSequenceID) sequenceToUse
 {
   if (sequenceToUse>size1)
-    err(1, "Bad sequence index %llu! We only have %d", sequenceToUse, size1);
+    err(1, "Bad sequence index %lu! We only have %d", (unsigned long) sequenceToUse, size1);
     // should never happen...
 
   if (state1[sequenceToUse].i >= tmsNetSize) {
@@ -1066,7 +1066,7 @@ ArcRandomGenerator <ArpRandomGenerator> * newARTRandomGenerator(
     Before, we reset indices. This ensures that we can make sub-images
     with the same noise pattern!
 </p> */
-- _shuffleIndices
+- (id) _shuffleIndices
 {
   for (UInt32 i=0; i<size1; ++i) {
     for (UInt32 j=0; j<tmsNetSize; ++j) state1[i].shuffledIndices[j]=j;

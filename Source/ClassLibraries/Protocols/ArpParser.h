@@ -65,6 +65,8 @@ ART_MODULE_INTERFACE(ArpParser)
         : (ArList *)  externals \
         : (ArNode *)  auxiliaryNode \
 { \
+    (void) auxiliaryNode; \
+\
     [ self parseFileGetExternals \
         :   objectPtr \
         :   externals \

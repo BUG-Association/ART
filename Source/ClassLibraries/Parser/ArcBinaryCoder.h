@@ -52,7 +52,7 @@ ART_MODULE_INTERFACE(ArcBinaryCoder)
     unsigned int            topDict;
 }
 
-- init
+- (id) init
         : (ArcObject <ArpOutputStream> *)newStream
         ;
 
@@ -76,7 +76,7 @@ ART_MODULE_INTERFACE(ArcBinaryCoder)
         : (ArcObject <ArpStream> *) stream
         ;
 
-- init
+- (id) init
         : (ArcObject <ArpInputStream> *) newStream
         ;
 

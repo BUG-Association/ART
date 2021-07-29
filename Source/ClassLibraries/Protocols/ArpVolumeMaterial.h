@@ -349,6 +349,10 @@ ART_MODULE_INTERFACE(ArpVolumeMaterial)
         : (      double *) near \
         : (      double *) far \
 { \
+    (void) rayWorldspace; \
+    (void) near; \
+    (void) far; \
+\
     return YES; \
 }
 
@@ -361,6 +365,13 @@ ART_MODULE_INTERFACE(ArpVolumeMaterial)
         : (      ArWavelength                  *) sampledWavelength \
         : (      ArPDFValue                    *) shiftProbability \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) sampledWavelength; \
+    (void) shiftProbability; \
+\
     return NO; \
 } \
 \
@@ -372,6 +383,13 @@ ART_MODULE_INTERFACE(ArpVolumeMaterial)
         : (const ArWavelength                  *) outgoingWavelength \
         : (      ArPDFValue                    *) shiftProbability \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) outgoingWavelength; \
+    (void) shiftProbability; \
+\
     return NO; \
 } \
 \
@@ -386,6 +404,16 @@ ART_MODULE_INTERFACE(ArpVolumeMaterial)
         : (      ArPDFValue                    *) reverseSampleProbability \
         : (      ArAttenuationSample           *) attenuationSample \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) sampledWavelength; \
+    (void) sampledDirection; \
+    (void) sampleProbability; \
+    (void) reverseSampleProbability; \
+    (void) attenuationSample; \
+\
     return NO; \
 } \
 \
@@ -400,6 +428,16 @@ ART_MODULE_INTERFACE(ArpVolumeMaterial)
         : (      ArPDFValue                    *) reverseSampleProbability \
         : (      ArAttenuationSample           *) attenuationSample \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) outgoingDirection; \
+    (void) pathDirection; \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) outgoingWavelength; \
+    (void) sampleProbability; \
+    (void) reverseSampleProbability; \
+    (void) attenuationSample; \
+\
     return NO; \
 }
 
@@ -412,6 +450,10 @@ ARPVOLUME_MATERIAL_DEFAULT_PHASE_FUNCTION_IMPLEMENTATION \
         : (      ArPathDirection   ) pathDirection \
         : (      ArSpectralSample *) scatteringCoefficient \
 { \
+    (void) pointWorldspace; \
+    (void) wavelength; \
+    (void) pathDirection; \
+\
     *scatteringCoefficient = SPS4(0.0); \
 } \
 \
@@ -421,6 +463,10 @@ ARPVOLUME_MATERIAL_DEFAULT_PHASE_FUNCTION_IMPLEMENTATION \
         : (      ArPathDirection   ) pathDirection \
         : (      ArSpectralSample *) maxScatteringCoefficient \
 { \
+    (void) rayWorldspace; \
+    (void) wavelength; \
+    (void) pathDirection; \
+\
     *maxScatteringCoefficient = SPS4(0.0); \
 }
 
@@ -436,6 +482,10 @@ ARPVOLUME_MATERIAL_DEFAULT_PHASE_FUNCTION_IMPLEMENTATION \
         : (      ArPathDirection   ) pathDirection \
         : (      ArSpectralSample *) crossSection \
 { \
+    (void) pointWorldspace; \
+    (void) wavelength; \
+    (void) pathDirection; \
+\
     *crossSection = SPS4(0); \
 } \
 \
@@ -445,6 +495,10 @@ ARPVOLUME_MATERIAL_DEFAULT_PHASE_FUNCTION_IMPLEMENTATION \
         : (      ArPathDirection   ) pathDirection \
         : (      ArSpectralSample *) scatteringCoefficient \
 { \
+    (void) pointWorldspace; \
+    (void) wavelength; \
+    (void) pathDirection; \
+\
     *scatteringCoefficient = SPS4(0); \
 } \
 \
@@ -453,6 +507,10 @@ ARPVOLUME_MATERIAL_DEFAULT_PHASE_FUNCTION_IMPLEMENTATION \
         : (const ArWavelength     *) wavelength \
         : (      ArSpectralSample *) absorptionCoefficient \
 { \
+    (void) pointWorldspace; \
+    (void) wavelength; \
+    (void) absorptionCoefficient; \
+\
     *absorptionCoefficient = SPS4(0); \
 } \
 ARPVOLUME_MATERIAL_HOMOGENEOUS_IMPLEMENTATION \
@@ -468,6 +526,10 @@ ARPVOLUME_MATERIAL_DEFAULT_PHASE_FUNCTION_IMPLEMENTATION
         : (      ArWavelength                  *) sampledWavelength \
         : (      ArPDFValue                    *) shiftProbability \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+\
     *sampledWavelength = *incomingWavelength; \
     *shiftProbability = ARPDFVALUE_UNIT_DIRAC; \
     \
@@ -482,6 +544,10 @@ ARPVOLUME_MATERIAL_DEFAULT_PHASE_FUNCTION_IMPLEMENTATION
         : (const ArWavelength                  *) outgoingWavelength \
         : (      ArPDFValue                    *) shiftProbability \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+\
     if(ARWL_WI(*incomingWavelength, 0) == ARWL_WI(*outgoingWavelength, 0)) \
     { \
         *shiftProbability = ARPDFVALUE_UNIT_DIRAC; \

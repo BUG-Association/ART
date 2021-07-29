@@ -39,6 +39,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnTriangleMesh registerWithRuntime ];
 )
 
@@ -369,15 +370,15 @@ ArNode  * arntrianglemesh_heightfield_from_image(
     switch ( imageInfo.fileDataType )
     {
         case ardt_grey8:
-            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey8 image found.\n")
+            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey8 image found.\n");
             break;
     
         case ardt_grey16:
-            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey16 image found.\n")
+            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Type grey16 image found.\n");
             break;
 
         default:
-            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Please provide an image of type arcolour_grey8 or arcolour_grey16.\n")
+            debugprintf("\nArnTriangleMesh::arntrianglemesh_heightfield_from_image: Please provide an image of type arcolour_grey8 or arcolour_grey16.\n");
             ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
             break;
     }
@@ -416,7 +417,7 @@ ArNode  * arntrianglemesh_heightfield_from_image(
                     break;
                 
                 default:
-                    debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Please provide an arcolour_grey8 or arcolour_grey16 type image.\n")
+                    debugprintf("ArnTriangleMesh::arntrianglemesh_heightfield_from_image: Please provide an arcolour_grey8 or arcolour_grey16 type image.\n");
                     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
                     break;
             }
@@ -539,7 +540,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         shapeGeometry & arshape_singular,
         1)
 
-- init
+- (id) init
         : (ArShapeGeometry) newGeometry
         : (ArLongArray) faces_
         : (Pnt3D) minPoint_
@@ -568,7 +569,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnTriangleMesh  * copiedInstance = [ super copy ];
 
@@ -583,7 +584,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnTriangleMesh  * copiedInstance =
@@ -606,6 +607,9 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         : (const ArTraversalState *) traversalState
         : (Pnt3D *) outCentroid
 {
+    (void) traversalState;
+    (void) outCentroid;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -635,12 +639,17 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(
         : (const ArTraversalState *) traversalState
         : (Pnt3DE *) point
 {
+    (void) traversalState;
+    (void) point;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 - (ArNode <ArpMapping> *) createMappingFor
         : (ArMappingCriteria) criteria
 {
+    (void) criteria;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return nil;

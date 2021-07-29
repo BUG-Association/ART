@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ArnDiracPDF registerWithRuntime];
     [ArnUniformPDF registerWithRuntime];
     [ArnBlinnPDF registerWithRuntime];
@@ -54,6 +55,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDiracPDF)
         : (const double)  u1
         : (const double)  u2
 {
+    (void) pdfValue;
+    (void) u1;
+    (void) u2;
+    
     // For a Dirac impulse, there is only one possible direction, the
     // mirror direction
 
@@ -70,6 +75,11 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDiracPDF)
         : (const double)  u1
         : (const double)  u2
 {
+    (void) pdfValue;
+    (void) localI;
+    (void) u1;
+    (void) u2;
+    
     // For a Dirac impulse, there is only one possible direction, the
     // mirror direction
 
@@ -80,6 +90,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDiracPDF)
         : (const Vec3D *) localI
         : (const Vec3D *) localO
 {
+    (void) localI;
+    (void) localO;
+    
     // The PDF is always zero since it is staistically impossible
     // to sample a singe direction
 
@@ -92,6 +105,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDiracPDF)
         : (const Vec3D *) localO
         : (const Vec3D *) localH
 {
+    (void) localI;
+    (void) localO;
+    (void) localH;
+    
     // The PDF is always zero since it is staistically impossible
     // to sample a singe direction
 
@@ -272,7 +289,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnUniformPDF)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBlinnPDF)
 
-- init
+- (id) init
         : (double) newExponent
 {
     self = [super init];
@@ -285,7 +302,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBlinnPDF)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnBlinnPDF  * copiedInstance = [ super copy ];
 
@@ -294,7 +311,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBlinnPDF)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnBlinnPDF  * copiedInstance =
@@ -434,7 +451,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBlinnPDF)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHTSGAdaptedPDF)
 
-- copy
+- (id) copy
 {
     ArnHTSGAdaptedPDF  * copiedInstance = [ super copy ];
 
@@ -443,7 +460,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHTSGAdaptedPDF)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnHTSGAdaptedPDF  * copiedInstance =
@@ -468,7 +485,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHTSGAdaptedPDF)
 double C1, expC1, C2, C3, k_norm;
 
 
-- init
+- (id) init
         : (double) newTau
         : (double) newSigma0
         : (double) newLambdaAvg
@@ -529,7 +546,6 @@ double f_z(
 double f_dev_z(
     double cti,
     double cti2,
-    double u1,
     double z
     )
 {
@@ -556,13 +572,13 @@ double compute_cos_theta(
     int ind;
 
     z = 0.99;
-    new_z = z - f_z(cti,cti2,u1,z) / f_dev_z(cti,cti2,u1,z);
+    new_z = z - f_z(cti,cti2,u1,z) / f_dev_z(cti,cti2,z);
     ind = 0;
 
     while (fabs(new_z - z) > 0.00001  &&  ind < 70)
     {
         z = new_z;
-        new_z = z - f_z(cti,cti2,u1,z) / f_dev_z(cti,cti2,u1,z);
+        new_z = z - f_z(cti,cti2,u1,z) / f_dev_z(cti,cti2,z);
         ind++;
     }
 

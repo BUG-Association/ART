@@ -61,6 +61,8 @@ void arwavelength_d_init_w(
               ArWavelength              * wavelength_r
         )
 {
+    (void) art_gv;
+    
     ARWL_WI( *wavelength_r, 0 ) = wavelength_0;
     ARWL_WI( *wavelength_r, 1 ) = wavelength_0;
     ARWL_WI( *wavelength_r, 2 ) = wavelength_0;
@@ -73,6 +75,8 @@ void arwavelength_c_init_w(
               ArWavelength              * wavelength_r
         )
 {
+    (void) art_gv;
+    
     ARWL_C(*wavelength_r) = *wavelengths;
 }
 
@@ -83,6 +87,8 @@ void arwavelength_sd_init_w(
               ArWavelength              * wavelength_r
         )
 {
+    (void) art_gv;
+    
     ASSERT_ALLOCATED_WAVELENGTH( wavelength_r )
 
     ARWL_WI( *wavelength_r, 0 ) =
@@ -169,6 +175,8 @@ int arwavelength_ww_equal(
         const ArWavelength  * w1
         )
 {
+    (void) art_gv;
+    
     //  Potential problem: we only check the hero WL
     //  OTOH, given how HWSS is intended to work like, this should be ok
     
@@ -180,6 +188,8 @@ void arwavelength_w_debugprintf(
         const ArWavelength  * w0
         )
 {
+    (void) art_gv;
+    
     debugprintf(
         "\nArWavelength( %3.0f,  %3.0f,  %3.0f,  %3.0f) [nm]\n",
         NANO_FROM_UNIT( ARWL_WI( *w0, 0 ) ),

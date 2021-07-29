@@ -131,7 +131,7 @@ void  sps_sigmoid_sample(
               ArSpectralSample  * sps
         )
 {
-    for ( int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+    for ( unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
     {
         double  iwl =  NANO_FROM_UNIT(ARWL_WI(*wl, i)) - 380. - 180.;
         
@@ -218,8 +218,6 @@ void ucc_alloc_and_read_from_file(
 
     double  stepsize = 1. / ( UCC_DIMENSION(cc) - 1.);
 
-    int  untreated_points = 0;
-    
     for ( int i = 0; i < UCC_OVERALL_SIZE(cc); i++ )
     {
         //   Lattice point RGB values are computed

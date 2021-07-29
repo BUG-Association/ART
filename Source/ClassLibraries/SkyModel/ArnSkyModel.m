@@ -34,6 +34,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSkyModel registerWithRuntime ];
 )
 
@@ -59,7 +60,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSkyModel)
         groundAlbedo = NULL;
 }
     
-- init
+- (id) init
         : (double) newSolarRadius
         : (double) newSolarElevation
         : (double) newSolarAzimuth
@@ -135,7 +136,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSkyModel)
     [ self _setup ];
 }
 
-- copy
+- (id) copy
 {
     return
         [ self deepSemanticCopy
@@ -143,7 +144,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSkyModel)
             ];
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnSkyModel  * copiedInstance =

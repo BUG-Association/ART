@@ -76,10 +76,10 @@ ART_MODULE_INTERFACE(ArnThinLensCamera)
     HTrafo3D    camera2world;
 }
 
-- filmSize                  : (Vec2D) newFilmSize
+- (id) filmSize                  : (Vec2D) newFilmSize
         ;
 
-- filmResolution
+- (id) filmResolution
                             : (IVec2D) newFilmResolution
         lensFocalLength     : (double) newFocalLength
         aperture            : (double) newAperture
@@ -88,7 +88,7 @@ ART_MODULE_INTERFACE(ArnThinLensCamera)
         cameraRotation      : (double) newCameraRotation
         ;
 
-- filmResolution
+- (id) filmResolution
                             : (IVec2D) newFilmResolution
         lensFocalLength     : (double) newFocalLength
         aperture            : (double) newAperture
@@ -96,7 +96,7 @@ ART_MODULE_INTERFACE(ArnThinLensCamera)
         cameraFocusPoint    : (Pnt3D)  newFocusPoint
         ;
 
-- filmResolution
+- (id) filmResolution
                             : (IVec2D) newFilmResolution
         lensFocalLength     : (double) newFocalLength
         aperture            : (double) newAperture
@@ -106,7 +106,7 @@ ART_MODULE_INTERFACE(ArnThinLensCamera)
         cameraRotation      : (double) newCameraRotation
         ;
 
-- filmResolution
+- (id) filmResolution
                             : (IVec2D) newFilmResolution
         lensFocalLength     : (double) newFocalLength
         aperture            : (double) newAperture
@@ -115,7 +115,7 @@ ART_MODULE_INTERFACE(ArnThinLensCamera)
         cameraFocalDistance : (double) newFocalDistance
         ;
 
-- init
+- (id) init
         : (Vec2D)  newFilmSize
         : (IVec2D) newFilmResolution
         : (double) newFocalLength

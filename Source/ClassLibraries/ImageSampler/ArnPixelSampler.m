@@ -35,6 +35,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnPixelSampler registerWithRuntime ];
     [ ArnNonLockingIndependentPixelSampler registerWithRuntime ];
 )
@@ -60,7 +61,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnPixelSampler)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnPixelSampler)
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
 {
@@ -73,7 +74,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnPixelSampler)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnPixelSampler  * copiedInstance = [ super copy ];
 
@@ -82,7 +83,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnPixelSampler)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnPixelSampler  * copiedInstance =
@@ -264,7 +265,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnPixelSampler)
 
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnNonLockingIndependentPixelSampler)
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
 {
@@ -277,7 +278,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnNonLockingIndependentPixelSampler)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnNonLockingIndependentPixelSampler  * copiedInstance = [ super copy ];
 
@@ -286,7 +287,7 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnNonLockingIndependentPixelSampler)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnNonLockingIndependentPixelSampler  * copiedInstance =
@@ -461,7 +462,7 @@ static int positionTM[2];
 
 
 - (void) writeImage
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     //   Autorelease pool for this thread to keep Cocoa happy
 
@@ -502,7 +503,7 @@ static int positionTM[2];
         the scanline_mutex is unlocked and scanline_value == 0.
     ---------------------------------------------------------------aw- */
 
-    for ( unsigned int i = 0; i < YC(imageSize); i++ )
+    for ( int i = 0; i < YC(imageSize); i++ )
     {
         BOOL scanlineReady = NO;
 
@@ -528,14 +529,14 @@ static int positionTM[2];
 
         for ( int im = 0; im < numberOfImagesToWrite; im++ )
         {
-            for ( unsigned int j = 0; j < XC(imageSize); j++ )
+            for ( int j = 0; j < XC(imageSize); j++ )
                 arlightalpha_l_init_l(
                       art_gv,
                       ARLIGHTALPHA_NONE_A0,
                       compositeScanline->data[j]
                     );
 
-            for ( unsigned int j = 0; j < numberOfRenderThreads; j++ )
+            for ( int j = 0; j < numberOfRenderThreads; j++ )
             {
                 if ( THREAD_SCANLINE(i, j, im) )
                 {
@@ -585,12 +586,12 @@ static int positionTM[2];
         : (ArNode <ArpImageWriter> **) newOutImage
         : (int) numberOfResultImages
 {
-    ArcInteger * index =
-        [ ALLOC_INIT_OBJECT(ArcInteger)
+    ArcUnsignedInteger * index =
+        [ ALLOC_INIT_OBJECT(ArcUnsignedInteger)
             :   NUMBER_OF_RENDERTHREADS
             ];
 
-    int  kernelOffset = ( [ RECONSTRUCTION_KERNEL supportSize ] - 1) / 2;
+    const unsigned int  kernelOffset = ( [ RECONSTRUCTION_KERNEL supportSize ] - 1) / 2;
 
     numberOfRenderThreads = NUMBER_OF_RENDERTHREADS;
 
@@ -642,7 +643,7 @@ static int positionTM[2];
         secondaryScanlineCache =
             ALLOC_ARRAY( ArnGreyImage *, YC(imageSize) );
 
-        for ( unsigned int i = 0; i < YC(imageSize); i++ )
+        for ( int i = 0; i < YC(imageSize); i++ )
             secondaryScanlineCache[i] =
                 [ ALLOC_OBJECT(ArnGreyImage)
                     initWithSize
@@ -661,7 +662,7 @@ static int positionTM[2];
     for ( unsigned int i = 0; i < YC(imageSize) * NUMBER_OF_RENDERTHREADS * numberOfResultImages; i++ )
         scanlineCache[i] = 0;
 
-    for ( unsigned int i = 0; i < YC(imageSize); i++ )
+    for ( int i = 0; i < YC(imageSize); i++ )
     {
         pthread_mutex_init( & scanlineMutex[i], NULL );
         pthread_mutex_init( & scanlineCounterMutex[i], NULL );
@@ -700,7 +701,7 @@ static int positionTM[2];
 
     for ( unsigned int i = 0; i < NUMBER_OF_RENDERTHREADS; i++ )
     {
-        ArcInteger  * index = [ ALLOC_INIT_OBJECT(ArcInteger) : i ];
+        ArcUnsignedInteger  * index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
 
         [ pathCounter[i] start ];
 

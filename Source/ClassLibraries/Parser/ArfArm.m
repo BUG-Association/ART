@@ -644,7 +644,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
 
 // take file, compile with art, initialize ArfNativeObjectiveC child
 
-- initWithFile
+- (id) initWithFile
         : (ArcFile *) newFile
 {
     self = [ super init ];

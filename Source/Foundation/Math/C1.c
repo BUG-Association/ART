@@ -38,6 +38,7 @@ ART_MODULE_INITIALISATION_FUNCTION_EXEC_ONLY_ONCE
 (
     C1_C_ZERO = CRD1( 0.0 );
 ,
+    (void) art_gv;
     // module has no code that gets executed on every startup
 )
 

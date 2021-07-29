@@ -30,6 +30,8 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
+ 
     [ ArnVertexSet registerWithRuntime ];
 )
 
@@ -242,6 +244,12 @@ ArnVertexSet * arnvertexset_from_files(
         coord_array = read_fpnt2d_file(coord_file_name);
     if (normal_file_name)
         normal_array = read_fvec3d_file(normal_file_name);
+    if (pnt4D_file_name){
+        ART_ERRORHANDLING_FATAL_ERROR("unsupported feature");
+    }
+    if (value_file_name){
+        ART_ERRORHANDLING_FATAL_ERROR("unsupported feature");
+    }
 
 
     return
@@ -397,7 +405,7 @@ ArnVertexSet * arncontrolvertexweightedset(
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVertexSet)
 
-- init
+- (id) init
         : (ArPnt3DArray) newPointTable
         : (ArPnt4DArray) newPnt4DTable
         : (ArFloatArray) newValueTable
@@ -418,7 +426,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnVertexSet)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnVertexSet  * copiedInstance = [ super copy ];
 

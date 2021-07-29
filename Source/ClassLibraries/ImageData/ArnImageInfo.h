@@ -43,11 +43,11 @@ ART_MODULE_INTERFACE(ArnImageInfo)
     ArDataType        dataType;
 }
 
-- init
+- (id) init
         : (IVec2D) newSize
         ;
 
-- init
+- (id) init
         : (IVec2D) newSize
         : (unsigned int) newDataType
         ;
@@ -78,19 +78,19 @@ ART_MODULE_INTERFACE(ArnImageInfo)
     const ArColourSpace  * destinationCSR;
 }
 
-- init
+- (id) init
         : (IVec2D) newSize
         : (unsigned int) newDataType
         ;
 
-- init
+- (id) init
         : (IVec2D) newSize
         : (ArDataType) newDataType
         : (ArDataType) newFileDataType
         : (FVec2D) newResolution
         ;
 
-- init
+- (id) init
         : (IVec2D) newSize
         : (ArDataType) newDataType
         : (ArDataType) newFileDataType

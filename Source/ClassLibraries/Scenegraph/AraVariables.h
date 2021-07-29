@@ -39,7 +39,7 @@ ART_MODULE_INTERFACE(AraVariables)
 {
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRef) newVariableRef
         ;

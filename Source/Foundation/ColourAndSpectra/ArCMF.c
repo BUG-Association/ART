@@ -663,6 +663,7 @@ void arcmf_free(
         ArCMF   * cmf_r
         )
 {
+    FREE(cmf_r);
 }
 
 ArSpectrum500 const * arcmf_vlambda500(

@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnBlackbodyRadiation registerWithRuntime ];
 )
 
@@ -116,7 +117,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnBlackbodyRadiation)
 
 ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
 
-- init
+- (id) init
         : (double) newTemperature
 {
     self = [ super init ];
@@ -135,6 +136,9 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
+    (void) locationInfo;
+    (void) outPSSpectrum;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "getNewPSSpectrum::: not implemented yet"
         );
@@ -144,6 +148,8 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    
     return art_blackbody_dd_value( temperature, wavelength );
 }
 

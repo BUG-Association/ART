@@ -40,10 +40,12 @@ ARPFILE_DEFAULT_IMPLEMENTATION( ArfRasterImage, 0 )
 + (ArFiletypeMatch) matchWithStream
         : (ArcObject <ArpStream> *) stream
 {
+    (void) stream;
+    
     return arfiletypematch_exact;
 }
 
-- initWithFile: (ArcFile *) newFile
+- (id) initWithFile: (ArcFile *) newFile
 
 {
     file = newFile;

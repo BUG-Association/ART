@@ -37,6 +37,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnExternal registerWithRuntime ];
 )
 
@@ -180,9 +181,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
             );
     }
 
-    ArSymbol   externalFileName =
-        arsymbol( art_gv, complete_path_to_external );
-
     ArNode   * auxiliaryNode    = [ self auxiliaryNode ];
 
     ArNode <ArpFiletype, ArpParser> * nativeFile =
@@ -240,7 +238,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
         ];
 }
 
-- init
+- (id) init
         : (ArSymbol) newExternalFileName
         : (Protocol *) newArProtocol
 {
@@ -253,7 +251,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
             ];
 }
 
-- init
+- (id) init
         : (ArSymbol) newExternalFileName
         : (ArSymbol) newObjectName
         : (Protocol *) newArProtocol
@@ -267,7 +265,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
             ];
 }
 
-- init
+- (id) init
         : (ArSymbol) newExternalFileName
         : (ArSymbol) newObjectName
         : (Protocol *) newArProtocol0
@@ -290,7 +288,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
     return self;
 }
 
-- initWithAuxiliaryNode
+- (id) initWithAuxiliaryNode
         : (ArSymbol) newExternalFileName
         : (ArNodeRef) newAuxiliary
         : (Protocol *) newArProtocol
@@ -311,7 +309,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnExternal  * copiedInstance = [ super copy ];
 
@@ -323,7 +321,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExternal)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnExternal  * copiedInstance =

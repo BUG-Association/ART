@@ -35,6 +35,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnImageMap registerWithRuntime ];
 )
 
@@ -159,7 +160,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
         ucc = ucc_srgb( art_gv );
         imageRGBData = ALLOC_ARRAY( ArRGB, sourceImageDataSize );
 
-        double  max;
+        double  max = 0;
         
         for ( int i = 0; i < sourceImageDataSize; i++)
         {
@@ -226,7 +227,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
     RELEASE_OBJECT(sourceImageBuffer);
 }
 
-- init
+- (id) init
         : (ArNode *) newImage
         : (double)   newScaleFactor
 {
@@ -277,6 +278,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
         : (ArcPointContext *) locationInfo
         : (ArSpectrum *) outSpectrum
 {
+    (void) locationInfo;
+    
     // if (isSpectral) {
     //     //   Casting this is safe insofar as something is very, very wrong
     //     //   if this gets called in a situation where anything except an
@@ -302,7 +305,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
 - (void) getHiresSpectrum
         : (ArcPointContext *) locationInfo
         : (ArSpectrum500 *) outSpectrum
-{    
+{
+    (void) locationInfo;
+    
     // if (isSpectral) {
     //     //   Casting this is safe insofar as something is very, very wrong
     //     //   if this gets called in a situation where anything except an
@@ -341,7 +346,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageMap)
     
 
     if (isSpectral) {
-        for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++) {
+        for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++) {
             SPS_CI(*outSpectralSample, i) =    
                 spc_sd_value_at_wavelength(
                     art_gv,
@@ -514,15 +519,19 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "getNewPSSpectrum::: not implemented yet"
-        );
+    (void) locationInfo;
+    (void) outPSSpectrum;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 - (double) valueAtWavelength
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    (void) wavelength;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return 0.;
 }

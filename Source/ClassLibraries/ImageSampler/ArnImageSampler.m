@@ -40,6 +40,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnImageSampler registerWithRuntime ];
 )
 
@@ -56,7 +57,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 
-- copy
+- (id) copy
 {
     ArnImageSampler  * copiedInstance = [ super copy ];
 
@@ -65,7 +66,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnImageSampler  * copiedInstance =
@@ -203,13 +204,13 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
           threadIdx < numberOfRenderThreads;
           threadIdx++ )
     {
-        for ( unsigned int imgIdx = 0;
+        for ( int imgIdx = 0;
               imgIdx < numberOfResultImages;
               imgIdx++ )
         {
-            for ( unsigned int y = 0; y < YC(imageSize); y++ )
+            for ( int y = 0; y < YC(imageSize); y++ )
             {
-                for ( unsigned int x = 0; x < XC(imageSize); x++ )
+                for ( int x = 0; x < XC(imageSize); x++ )
                 {
                     arlightalpha_l_init_l(
                           art_gv,
@@ -241,7 +242,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 
     for ( unsigned int i = 0; i < numberOfRenderThreads; i++ )
     {
-        ArcInteger  * index = [ ALLOC_INIT_OBJECT(ArcInteger) : i ];
+        ArcUnsignedInteger  * index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
 
         if ( ! art_thread_detach(@selector(renderProc:), self,  index))
             ART_ERRORHANDLING_FATAL_ERROR(
@@ -349,11 +350,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
             unsigned long int  overallSampleCount = 0;
             unsigned long int  nonzeroPixels = 0;
             
-            for ( unsigned int y = 0; y < YC(imageSize); y++ )
+            for ( int y = 0; y < YC(imageSize); y++ )
             {
                 for ( int x = 0; x < XC(imageSize); x++ )
                 {
-                    int  pixelSampleCount = 0;
+                    unsigned int  pixelSampleCount = 0;
                     
                     for ( unsigned int threadIdx = 0;
                           threadIdx < numberOfRenderThreads;
@@ -450,7 +451,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
             
             FREE( rendertimeString );
 
-            for ( unsigned int y = 0; y < YC(imageSize); y++ )
+            for ( int y = 0; y < YC(imageSize); y++ )
             {
                 for ( int x = 0; x < XC(imageSize); x++ )
                 {
@@ -534,8 +535,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
             //   "renderthreads plus one". It doesn't use the index anyway, but
             //   still needs one.
 
-            ArcInteger  * index =
-                [ ALLOC_INIT_OBJECT(ArcInteger)
+            ArcUnsignedInteger  * index =
+                [ ALLOC_INIT_OBJECT(ArcUnsignedInteger)
                     :   numberOfRenderThreads
                     ];
 
@@ -586,8 +587,10 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 
 
 - (void) tonemapAndOpenProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
+    (void) threadIndex;
+    
     //   autorelease pool for this thread to keep Cocoa happy
 
     NSAutoreleasePool  * threadPool;
@@ -659,7 +662,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 }
 
 - (void) renderProcHasFinished
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     threadStatus[ THREAD_INDEX ] = FINISHED;
 
@@ -688,8 +691,10 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSampler)
 }
 
 - (void) termIOProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
+    (void) threadIndex;
+    
     if ( art_interactive_mode_permitted( art_gv ) )
     {
         setvbuf(stdout,NULL,_IONBF,0);

@@ -52,31 +52,31 @@ ART_MODULE_INTERFACE(ArnUniformFisheyeCamera)
     HTrafo3D *  near2world;
 }
 
-- imageSize
+- (id) imageSize
                 : (IVec2D) newImageSize
         ray     : (Ray3D) newRay
         zoom    : (double) newZoom
         ;
 
-- init
+- (id) init
         : (Ray3D) newRay
         : (IVec2D) newImageSize
         : (double) newZoom
         ;
 
-- withTwist
+- (id) withTwist
         : (double) newTwist
         ;
 
-- withNear
+- (id) withNear
         : (double) newNear
         ;
 
-- withRatio
+- (id) withRatio
         : (double) newRatio
         ;
 
-- init
+- (id) init
         : (Ray3D) newRayPtr
         : (IVec2D) newImageSize
         : (double) newZoom

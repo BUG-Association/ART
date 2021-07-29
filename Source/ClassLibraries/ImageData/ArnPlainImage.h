@@ -44,13 +44,13 @@ ART_MODULE_INTERFACE(ArnPlainImage)
     BOOL    changed;
 }
 
-+ new
++ (id) new
         : (ART_GV *) art_gv
         : (IVec2D) newSize
         : (ArDataType) newDataType
         ;
 
-- init
+- (id) init
         : (ArNode <ArpBasicImage> *) baseImage
         : (IPnt2D) newOffset
         : (IVec2D) newSize
@@ -92,7 +92,7 @@ void arnsimpleimage_calculate_copy_region(
         This constructor initializes the plain image with its own image
         plane of the given size.
 --------------------------------------------------------------------------- */
-- initWithSize
+- (id) initWithSize
         : (IVec2D) newSize
         ;
 
@@ -100,7 +100,7 @@ void arnsimpleimage_calculate_copy_region(
     'initAsCopyOf'
         Initializes the image as a copy of the base image.
 --------------------------------------------------------------------------- */
-- initAsCopyOf
+- (id) initAsCopyOf
         : (ArNode <ArpBasicImage> *) baseImage
         ;
 
@@ -119,7 +119,7 @@ void arnsimpleimage_calculate_copy_region(
     'initAsPartOf'
         Initializes the image as a part of the base image.
 --------------------------------------------------------------------------- */
-- initAsPartOf
+- (id) initAsPartOf
         : (ArNode <ArpBasicImage> *) baseImage
         ;
 
@@ -131,7 +131,7 @@ void arnsimpleimage_calculate_copy_region(
         point into the image data of its base image.  Otherwise it allocates
         its own memory, and initializes the data from the base image.
 --------------------------------------------------------------------------- */
-- initAsPartOf
+- (id) initAsPartOf
         : (ArNode <ArpBasicImage> *) baseImage
         : (IPnt2D) newOffset
         : (IVec2D) newSize
@@ -141,7 +141,7 @@ void arnsimpleimage_calculate_copy_region(
     'initAsCopyOf'
         Initializes the image as a copy of the base image.
 --------------------------------------------------------------------------- */
-- initAsCopyOf
+- (id) initAsCopyOf
         : (ArNode <ArpBasicImage> *) baseImage
         : (IPnt2D) newOffset
         : (IVec2D) newSize

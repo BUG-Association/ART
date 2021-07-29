@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSuppliedMaterialSurfaceMaterial registerWithRuntime ];
 )
 
@@ -44,14 +45,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSuppliedMaterialSurfaceMaterial)
 
-- copy
+- (id) copy
 {
         ArnSuppliedMaterialSurfaceMaterial * copiedInstance = [ super copy ];
     
         return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
         ArnSuppliedMaterialSurfaceMaterial * copiedInstance = [ super deepSemanticCopy: traversal ];
@@ -65,7 +66,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSuppliedMaterialSurfaceMaterial)
 #define SURFACE_SUBNODE         ((ArNode <ArpSurfaceMaterial> *)ARNBINARY_SUBNODE_0)
 #define SUPPLIED_MATERIAL_INTO  ((ArNode <ArpVolumeMaterial>  *)ARNBINARY_SUBNODE_1)
 
-- init
+- (id) init
         : (ArNode *) newSurfaceMaterial
         : (ArNode *) newMaterial
 {
@@ -365,6 +366,19 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSuppliedMaterialSurfaceMaterial)
     RESTORE_PHASE_INTERFACE;
     
     return result;
+}
+
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) location
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    return
+        [ SURFACE_SUBNODE calculateAlbedoSampleAtWavelength
+            :   location
+            :   wavelength
+            :   albedo
+            ];
 }
 
 @end

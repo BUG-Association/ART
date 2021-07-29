@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnThinLensCamera registerWithRuntime ];
 )
 
@@ -192,7 +193,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
     RELEASE_OBJECT(trafo);
 }
 
-- copy
+- (id) copy
 {
     ArnThinLensCamera  * copiedInstance = [ super copy ];
 
@@ -215,7 +216,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnThinLensCamera  * copiedInstance =
@@ -242,7 +243,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
     return copiedInstance;
 }
 
-- filmSize                  : (Vec2D) newFilmSize
+- (id) filmSize                  : (Vec2D) newFilmSize
 {
     [ super init ];
 
@@ -263,7 +264,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
     return self;
 }
 
-- filmResolution
+- (id) filmResolution
                             : (IVec2D) newFilmResolution
         lensFocalLength     : (double) newFocalLength
         aperture            : (double) newAperture
@@ -279,7 +280,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
         cameraRotation  : 0.0 ];
 }
 
-- filmResolution
+- (id) filmResolution
                             : (IVec2D) newFilmResolution
         lensFocalLength     : (double) newFocalLength
         aperture            : (double) newAperture
@@ -303,7 +304,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
     return self;
 }
 
-- filmResolution
+- (id) filmResolution
                             : (IVec2D) newFilmResolution
         lensFocalLength     : (double) newFocalLength
         aperture            : (double) newAperture
@@ -321,7 +322,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
         cameraRotation     : 0.0 ];
 }
 
-- filmResolution
+- (id) filmResolution
                             : (IVec2D) newFilmResolution
         lensFocalLength     : (double) newFocalLength
         aperture            : (double) newAperture
@@ -343,7 +344,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
     return self;
 }
 
-- init
+- (id) init
         : (Vec2D)  newFilmSize
         : (IVec2D) newFilmResolution
         : (double) newFocalLength
@@ -414,6 +415,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
         : (ArNode <ArpBBox> *) inObject
         : (ArcObject <ArpReporter> *) reporter
 {
+    (void) inObject;
+    (void) reporter;
     //   Unlike some other cameras, we do not need to do anything object-specific in
     //   this setup routine, so nothing happens here. (aw)
 }
@@ -440,6 +443,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
         : (      ArReferenceFrame *) outReferenceFrame
         : (      Ray3D *) worldSpaceViewingRay
 {
+    (void) outReferenceFrame;
+    
     double  x0, x1;
 
     do
@@ -519,6 +524,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
         : (const Ray3D *) inputRay
         : (      Vec2D *) pixelCoordinates
 {
+    (void) inputRay;
+    (void) pixelCoordinates;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return NO;
 }

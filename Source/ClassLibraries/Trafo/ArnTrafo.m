@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnTrafo        registerWithRuntime ];
     [ ArnUnaryTrafo   registerWithRuntime ];
     [ ArnBinaryTrafo  registerWithRuntime ];

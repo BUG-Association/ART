@@ -61,6 +61,8 @@ void _type##_to_##_type( \
               Ar##_Type  * cr  \
         ) \
 { \
+    (void) art_gv; \
+\
     CC_START_DEBUGPRINTF( _type##_to_##_type ) \
     CC_OPERAND_DEBUGPRINTF( _type, c0 ) \
     CC_OPERAND_DEBUGPRINTF( _type, cr ) \
@@ -76,6 +78,8 @@ void _type0##_to_##_type1( \
               Ar##_Type1  * cr  \
         ) \
 { \
+   (void) art_gv; \
+\
     CC_START_DEBUGPRINTF( _type0##_to_##_type1 ) \
     CC_OPERAND_DEBUGPRINTF( _type0, c0 ) \
     (*cr) = AR##_TYPE1##_OF_AR##_TYPE0(*c0); \
@@ -249,7 +253,7 @@ const _stype  ** _st ## _ ## _ptype ## _primary( \
         { \
             spectrum[i] = ALLOC( _stype ); \
             pss_to_ ## _st ( art_gv, _primfunc(i), spectrum[i]); \
-            for ( int j = 0; j < _st ## _channels(art_gv); j++ ) \
+            for ( unsigned int j = 0; j < _st ## _channels(art_gv); j++ ) \
                 _st ## _set_sid( \
                     art_gv, \
                     spectrum[i], \
@@ -330,7 +334,7 @@ void s##_n##_to_rss_new( \
     sr->start = s##_n##_channel_lower_bound(art_gv,0); \
     sr->step  = s##_n##_channel_lower_bound(art_gv,1) - s##_n##_channel_lower_bound(art_gv,0); \
     sr->array = ALLOC_ARRAY(double, sr->size); \
-    for (int i = 0; i < s##_n##_channels(art_gv); i++) \
+    for (unsigned int i = 0; i < s##_n##_channels(art_gv); i++) \
     { \
         sr->array[i] = s##_n##_si(art_gv,s0,i); \
     } \
@@ -348,7 +352,7 @@ void s##_n##_to_pss_new( \
     sr->size = 2 * s##_n##_channels(art_gv); \
     sr->scale = 1.0; \
     sr->array = ALLOC_ARRAY(Pnt2D, sr->size); \
-    for (int i = 0; i < s##_n##_channels(art_gv); i++) \
+    for (unsigned int i = 0; i < s##_n##_channels(art_gv); i++) \
     { \
         sr->array[2 * i] = \
             PNT2D( \
@@ -440,7 +444,7 @@ void pss_to_s##_n ( \
 { \
     CC_START_DEBUGPRINTF( pss_to_s##_n ) \
     CC_OPERAND_DEBUGPRINTF( pss, spectrum ) \
-    for ( int i = 0; i < s##_n##_channels(art_gv); i++ ) \
+    for ( unsigned int i = 0; i < s##_n##_channels(art_gv); i++ ) \
     { \
         double  value = \
             pss_inner_product( \

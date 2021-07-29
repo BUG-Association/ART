@@ -38,9 +38,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnPragueSkyModel(EnvironmentMaterial)
 
-ARPSURFACEMATERIAL_DEFAULT_BLACKBODY_EMITTER_IMPLEMENTATION
-ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
-
 - (void) lightSampleEmittedTowardsPointFromDirection
         : (ArcPointContext *) queryLocation
         : (Vec3D *) queryDirection_worldspace
@@ -85,7 +82,7 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
 
         ArSpectralSample  sun_sample;
         
-        for(int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
             SPS_CI( sun_sample, i) =
                 arpragueskymodel_solar_radiance(
                       skymodel_state,
@@ -113,7 +110,7 @@ ARPSURFACEMATERIAL_DEFAULT_EMITTER_SURFACETYPE_IMPLEMENTATION
 
         ArSpectralSample  sky_sample;
 
-        for(int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
             SPS_CI( sky_sample, i) =
                 arpragueskymodel_radiance(
                       skymodel_state,

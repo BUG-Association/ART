@@ -39,15 +39,17 @@ ART_MODULE_INTERFACE(ARM_SurfaceMaterial)
 
 // Perfectly diffuse emitter
 
-//#define LAMBERT_EMITTER( \
-//        _colour, \
-//        _brightness \
-//        ) \
-//    \
-//    [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnLambertEmitter) \
-//        : (_colour) \
-//        : (_brightness) \
-//        ]
+/*
+#define LAMBERT_EMITTER( \
+       _colour, \
+       _brightness \
+       ) \
+   \
+   [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnLambertEmitter) \
+       : (_colour) \
+       : (_brightness) \
+       ]
+*/
 
 #define LAMBERT_EMITTER_CONST( \
         _colour, \
@@ -63,13 +65,15 @@ ART_MODULE_INTERFACE(ARM_SurfaceMaterial)
 
 // Perfecty diffuse reflector
 
-//#define LAMBERT_REFLECTOR( \
-//        _colour \
-//        ) \
-//    \
-//    [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnLambertSurfaceMaterial) \
-//        : (_colour) \
-//        ]
+/*
+#define LAMBERT_REFLECTOR( \
+       _colour \
+       ) \
+   \
+   [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnLambertSurfaceMaterial) \
+       : (_colour) \
+       ]
+*/
 
 /**
  * @brief Lambertian surface material

@@ -50,7 +50,7 @@ ART_MODULE_INTERFACE(ArnPathspaceIntegratorRGBA)
     ArRayTree                           rayTree;
 }
 
-- init
+- (id) init
         : (ArNode <ArpRayCaster> *) newRayCaster
         ;
 

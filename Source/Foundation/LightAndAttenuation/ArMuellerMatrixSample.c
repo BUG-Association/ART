@@ -64,6 +64,8 @@ ArMuellerMatrixSample * armuellermatrixsample_alloc(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ArMuellerMatrixSample  * newMM = ALLOC( ArMuellerMatrixSample );
 
     return newMM;
@@ -74,6 +76,8 @@ void armuellermatrixsample_free(
               ArMuellerMatrixSample  * mmr
         )
 {
+    (void) art_gv;
+    
     FREE( mmr );
 }
 
@@ -1681,7 +1685,7 @@ unsigned int armuellermatrixsample_m_nonpol_att_valid(
     const unsigned int channels_count = 1;
     const ArSpectralSample * colour = ARMUELLER_S_M_II( *mm0, 0, 0 );
 
-    for ( int channel = 0; channel < channels_count; channel++ )
+    for ( unsigned int channel = 0; channel < channels_count; channel++ )
     {
         double hs_value = sps_si( art_gv, colour, channel );
 
@@ -1771,10 +1775,8 @@ unsigned int armuellermatrixsample_m_sanity_check(
     sps_ds_mul_s(art_gv, 4, & sanity_threshold, & sanity_threshold);
     sps_ss_sub_s(art_gv, & sanity_sum, & sanity_threshold, & sanity_diff); // threshold - sum
 
-    for (int channel = 0; channel < channels_count; channel++)
+    for (unsigned int channel = 0; channel < channels_count; channel++)
     {
-        double threshold = sps_si( art_gv, & sanity_threshold, channel );
-        double sum       = sps_si( art_gv, & sanity_sum, channel );
         double diff      = sps_si( art_gv, & sanity_diff, channel );
         if (diff < diff_threshold)
         {
@@ -1869,8 +1871,9 @@ unsigned int armuellermatrixsample_m_realisable(
 
     unsigned int result = YES;
 
-    unsigned int channels_count = 1;
-    for ( int channel = 0; channel < channels_count; channel++ )
+    unsigned int channels_count = spc_channels( art_gv );
+
+    for ( unsigned int channel = 0; channel < channels_count; channel++ )
     {
         // Prepare nicely accessible components of the Mueller matrix.
         // Names of the variables are indexed from 1 instead of from 0 so that
@@ -2158,7 +2161,7 @@ void armuellermatrixsample_d_randomly_damage_m(
     #define DAMAGE_MM_COMPONENT(__component) \
     {\
         colour = ARMUELLER_S_M_I( *mm, __component ); \
-        for (int channel = 0; channel < channels_count; channel++) \
+        for (unsigned int channel = 0; channel < channels_count; channel++) \
         { \
             const double random_val = ( 2.0 * rand() / (double)RAND_MAX ) - 1.0; \
             double value = sps_si( art_gv, colour, channel ); \
@@ -2252,7 +2255,6 @@ void armuellermatrixsample_test_synthetic_MMs_validity(
         )
 {
     ArMuellerMatrixSample mm;
-    ArSpectralSample  colour;
 
     // Tests of correct synthetical MMs:
 
@@ -2382,7 +2384,6 @@ void armuellermatrixsample_test_damaged_MMs_validity(
 {
     ArMuellerMatrixSample * mm = armuellermatrixsample_alloc(art_gv);
 
-    const double damage = 0.0001;
 
     // Damaged plain attenuator (non-polarizing MM)
     //for (double attenuation = -0.5; attenuation <= 1.5; attenuation += 0.1)

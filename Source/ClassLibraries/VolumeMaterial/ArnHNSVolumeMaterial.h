@@ -55,7 +55,7 @@ ArSpectrum const * art_absorptionCoefficient(
     BOOL  clear;
 }
 
-- init
+- (id) init
         : (ArNode <ArpSpectrum> *) newIOR
         : (ArNode <ArpSpectrum> *) newExtinction
         ;

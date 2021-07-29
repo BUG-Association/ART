@@ -1,7 +1,7 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2014 The ART Development Team
-    -------------------------------------------
+    Copyright (c) 1996-2021 The ART Development Team
+    ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
     description of their respective contributions, see the file
@@ -24,4 +24,36 @@
 
 =========================================================================== */
 
-#define GSL_FOUND   0
+#define ART_MODULE_NAME     ArcUnsignedInteger
+
+#import "ArcUnsignedInteger.h"
+
+ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
+
+ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
+
+
+@implementation ArcUnsignedInteger
+
+- (id) init
+        : (unsigned int) newValue
+{
+    self = [ super init  ];
+
+    if ( self )
+    {
+        value = newValue;
+    }
+    
+    return self;
+}
+
+- (void) setValue
+        : (unsigned int) newValue
+{
+    value = newValue;
+}
+
+@end
+
+// ===========================================================================

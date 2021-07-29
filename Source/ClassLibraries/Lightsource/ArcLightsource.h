@@ -43,11 +43,11 @@ ART_MODULE_INTERFACE(ArcLightsource)
     double                percentOfOverallRadiantPower;  // [0..1]
 }
 
-- init
+- (id) init
         : (ArLightsourceType) lightsourceType
         ;
 
-- init
+- (id) init
         : (ArNode <ArpShape> *) shape
         : (ArLightsourceType) lightsourceType
         ;

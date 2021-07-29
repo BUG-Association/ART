@@ -44,12 +44,12 @@ ART_MODULE_INTERFACE(ImageComparisonActions)
 {
 }
     
-- outputName
+- (id) outputName
         : (const char *) newOutputName
         ;
 
 
-- init
+- (id) init
         : (const char *) newOutputName
         ;
 @end
@@ -64,7 +64,7 @@ ART_MODULE_INTERFACE(ImageComparisonActions)
 {
 }
 
-- outputTag
+- (id) outputTag
         : (const char *) newOutputTag
         ;
 
@@ -80,7 +80,7 @@ ART_MODULE_INTERFACE(ImageComparisonActions)
 {
 }
 
-- outputTag
+- (id) outputTag
         : (const char *) newOutputName
         ;
 
@@ -128,11 +128,11 @@ ArDifferenceImageFeatures;
     ArDifferenceImageFeatures  features;
 }
 
-- outputName    : (const char *) newOutputName
-        features: (ArDifferenceImageFeatures) newFeatures
+- (id) outputName    : (const char *) newOutputName
+             features: (ArDifferenceImageFeatures) newFeatures
         ;
 
-- init
+- (id) init
         : (const char *) newOutputName
         : (ArDifferenceImageFeatures) newFeatures
         ;
@@ -150,11 +150,11 @@ ArDifferenceImageFeatures;
     double  wavelength;
 }
 
-- outputName      : (const char *) newOutputName
-        wavelength: (double) newWavelength
+- (id) outputName      : (const char *) newOutputName
+             wavelength: (double) newWavelength
         ;
 
-- init
+- (id) init
         : (const char *) newOutputName
         : (double) newWavelength
         ;
@@ -172,10 +172,11 @@ ArDifferenceImageFeatures;
     ArSymbol  resultFilename;
 }
 
-- outputName: (const char *) newFilename
+- (id) outputName
+        : (const char *) newFilename
         ;
 
-- init
+- (id) init
         : (const char *) newFilename
         ;
 
@@ -192,10 +193,11 @@ ArDifferenceImageFeatures;
     ArSymbol  resultFilename;
 }
 
-- outputName: (const char *) newFilename
+- (id) outputName
+        : (const char *) newFilename
         ;
 
-- init
+- (id) init
         : (const char *) newFilename
         ;
 

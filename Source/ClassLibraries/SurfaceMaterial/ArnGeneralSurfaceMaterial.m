@@ -32,6 +32,8 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
+ 
     RUNTIME_REGISTER_PROTOCOL(ArpGeneralSurfaceComponent);
 
     [ ArnGeneralSurfaceMaterial             registerWithRuntime ];
@@ -142,7 +144,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     }
 }
 
-- init
+- (id) init
         : (ArNodeRefDynArray *) newSurfaceComponents
 {
     self = [ super init
@@ -154,7 +156,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnGeneralSurfaceMaterial  * copiedInstance = [ super copy ];
 
@@ -163,7 +165,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnGeneralSurfaceMaterial  * copiedInstance =
@@ -193,7 +195,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     ArSurfaceType localSurfaceType = arsurface_undefined;
 
     ArNode <ArpGeneralSurfaceComponent> * surfaceComp;
+    
     unsigned int surfaceCounter;
+    
     ARNARY_FOR_EACH_SUBNODE(
         surfaceCounter,
         surfaceComp,
@@ -220,7 +224,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArcSurfacePoint *) location
 {
     ArNode <ArpGeneralSurfaceComponent> * surfaceComp;
+    
     unsigned int surfaceCounter;
+
     ARNARY_FOR_EACH_SUBNODE(
         surfaceCounter,
         surfaceComp,
@@ -244,7 +250,14 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArSamplingRegion *) outSamplingRegion
         : (ArLightIntensity *) outLightIntensity
 {
+#ifndef NEVERMORE
+    (void) emissionLocation;
+    (void) outSamplingRegion;
+    (void) outLightIntensity;
+#endif
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
 #ifdef NEVERMORE
     ArGeneralSurface * surface;
 
@@ -292,7 +305,15 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArSamplingRegion *) outSamplingRegion
         : (ArLight *) outLight
 {
+#ifndef NEVERMORE
+    (void) emissionLocation;
+    (void) outgoingDirection;
+    (void) outSamplingRegion;
+    (void) outLight;
+#endif
+
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
 #ifdef NEVERMORE
     ArGeneralSurface * surface;
 
@@ -340,7 +361,14 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArSamplingRegion *) outSamplingRegion
         : (ArLight *) outLight
 {
+#ifndef NEVERMORE
+    (void) emissionLocationAndIncidentDirection;
+    (void) outSamplingRegion;
+    (void) outLight;
+#endif
+
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
 #ifdef NEVERMORE
     ArGeneralSurface * surface;
 
@@ -388,7 +416,15 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArDirectionCosine *) emissionDirection
         : (ArPDFValue *) sampleProbability
 {
+#ifndef NEVERMORE
+    (void) emissionLocation;
+    (void) context;
+    (void) emissionDirection;
+    (void) sampleProbability;
+#endif
+
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
 #ifdef NEVERMORE
     ArGeneralSurface * surface;
 
@@ -422,7 +458,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (      ArPDFValue *) shiftProbability
 {
     ArNode <ArpGeneralSurfaceComponent> * surfaceComp;
-    int surfaceCounter;
 
     //  We first select which surface component we will generate the main sample
     //  from.                                                               -mm-
@@ -431,6 +466,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     double currentPercentile = 0;
     int selectedSurfaceCounter = -1;
     
+    unsigned int surfaceCounter;
+
     ARNARY_FOR_EACH_SUBNODE(
         surfaceCounter,
         surfaceComp,
@@ -494,7 +531,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     {
         // Skip over the surface we sampled the shift from, as its probability
         // was the first one calculated.                                        -mm-
-        if (surfaceCounter != selectedSurfaceCounter && surfaceComp != NULL)
+        if ((int)surfaceCounter != selectedSurfaceCounter && surfaceComp != NULL)
         {
             ArNode <ArpSurfaceMaterial> * surface = [ surfaceComp getSurface ];
             double surfaceWeight = [ surfaceComp getWeight ];
@@ -812,7 +849,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     ASSERT_ALLOCATED_ATTENUATION_SAMPLE(attenuationSample);
 
     ArNode <ArpGeneralSurfaceComponent> * surfaceComp;
-    int surfaceCounter;
 
     //  We first select which surface component we will generate the main sample
     //  from.                                                               -mm-
@@ -821,6 +857,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     double currentPercentile = 0;
     int selectedSurfaceCounter = -1;
     
+    unsigned int surfaceCounter;
+
     ARNARY_FOR_EACH_SUBNODE(
         surfaceCounter,
         surfaceComp,
@@ -922,7 +960,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
     {
         // Skip over the surface we sampled the direction from, as its contribution
         // was the first one calculated.                                        -mm-
-        if (surfaceCounter != selectedSurfaceCounter && surfaceComp != NULL)
+        if ((int)surfaceCounter != selectedSurfaceCounter && surfaceComp != NULL)
         {
             ArNode <ArpSurfaceMaterial> * surface = [ surfaceComp getSurface ];
             double surfaceWeight = [ surfaceComp getWeight ];
@@ -1007,6 +1045,19 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArPDFValue *) alternateReverseSampleProbability
         : (ArAttenuationSample *) attenuationSample
 {
+    (void) incomingDirectionAndLocation;
+    (void) pathDirection;
+    (void) context;
+    (void) incomingWavelength;
+    (void) constraint;
+    (void) sampledWavelength;
+    (void) sampledDirection;
+    (void) sampleProbability;
+    (void) reverseSampleProbability;
+    (void) alternateSampleProbability;
+    (void) alternateReverseSampleProbability;
+    (void) attenuationSample;
+
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     return NO;
 }
@@ -1017,9 +1068,27 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceMaterial)
         : (ArSamplingRegion *) samplingRegion
         : (ArSpectralIntensity *) spectralIntensity
 {
+    (void) emissionLocation;
+    (void) samplingRegion;
+    (void) spectralIntensity;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
+
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) location
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    (void) location;
+    (void) wavelength;
+    (void) albedo;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+
+    return FALSE;
+}
 
 - (void) code
         : (ArcObject <ArpCoder> *) coder
@@ -1159,7 +1228,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGeneralSurfaceComponent)
     // ...
 }
 
-- init
+- (id) init
         : (ArNode <ArpSurfaceMaterial>*) newSurface
         : (double) newWeight
 {

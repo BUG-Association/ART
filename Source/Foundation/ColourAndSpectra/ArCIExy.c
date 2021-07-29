@@ -121,6 +121,8 @@ void xy_c_debugprintf(
         const ArCIExy  * c0
         )
 {
+    (void) art_gv;
+    
     printf(
         "CIE xy ( % 5.3f, % 5.3f )\n",
         ARCIExy_x(*c0),

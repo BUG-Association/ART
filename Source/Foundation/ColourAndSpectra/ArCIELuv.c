@@ -51,6 +51,8 @@ void luv_c_debugprintf(
         const ArCIELuv  * c_0
         )
 {
+    (void) art_gv;
+    
     printf( "CIE L* u* v* ( % 5.3f, % 5.3f, % 5.3f )\n",
         ARCIELuv_L(*c_0),
         ARCIELuv_u(*c_0),

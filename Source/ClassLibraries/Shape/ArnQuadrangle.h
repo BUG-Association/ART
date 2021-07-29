@@ -39,7 +39,7 @@ ART_MODULE_INTERFACE(ArnQuadrangle)
       QuadrangleData  * quadrangleData;
 }
 
-- init
+- (id) init
         : (long) idx0
         : (long) idx1
         : (long) idx2

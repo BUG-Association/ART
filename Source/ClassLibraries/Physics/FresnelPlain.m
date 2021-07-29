@@ -109,6 +109,8 @@ void fresnel_plain_refractive_attenuation_single_sample(
               ArAttenuationSample  * attenuation_r
     )
 {
+    (void) pathDirection;
+    (void) refractedDirection;
     double  n =
         ARCPHASEINTERFACE_IOR_AT_WAVELENGTH(
             *ARCINTERSECTION_PHASEINTERFACE(incomingDirectionAndLocation),
@@ -145,6 +147,9 @@ void fresnel_plain_refractive_attenuation_sample(
               ArAttenuationSample  * attenuation_r
     )
 {
+    (void) pathDirection;
+    (void) refractedDirection;
+
     ArSpectralSample  attenuationSpectralSample;
     
     for ( int i = 0; i < 4; i++ )
@@ -189,7 +194,7 @@ void fresnel_plain_reflective_attenuation_realvalued_IOR(
 
     double n, attenuation_perpendicular, attenuation_parallel;
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
         n =
             spc_si(
@@ -234,7 +239,7 @@ void fresnel_plain_reflective_attenuation_complex_IOR(
 
     double  n, k, attenuation_perpendicular, attenuation_parallel;
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
 
         n =
@@ -289,7 +294,7 @@ void fresnel_plain_absorbance_realvalued_IOR(
 
     double n, attenuation_perpendicular, attenuation_parallel;
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
         n =
             spc_si(
@@ -334,7 +339,7 @@ void fresnel_plain_absorbance_complex_IOR(
 
     double n, k, attenuation_perpendicular, attenuation_parallel;
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
         n =
             spc_si(
@@ -473,6 +478,17 @@ void fresnel_plain_reflective_attenuation_birefringent(
               double              ne_var
         )
 {
+#ifndef NEVERMORE
+    (void) art_gv;
+    (void) incomingDirectionAndLocation;
+    (void) attenuation_r_reflect;
+    (void) attenuation_r_refract_o;
+    (void) attenuation_r_refract_e;
+    (void) localCa;
+    (void) cos_e;
+    (void) ne_var;
+#endif
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 
 #ifdef NEVERMORE
@@ -523,12 +539,13 @@ void fresnel_plain_refractive_attenuation(
               ArAttenuation     * attenuation_r
         )
 {
+    (void) cosTheta_T;
 
     ArSpectrum  *attenuationColour = spc_alloc( art_gv );
 
     double n, attenuation_perpendicular, attenuation_parallel;
 
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
+    for ( unsigned int i = 0; i < spc_channels( art_gv ); i++ )
     {
         n =
             spc_si(

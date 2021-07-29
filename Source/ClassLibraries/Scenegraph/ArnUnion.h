@@ -48,7 +48,7 @@ ArUnionOptions;
     unsigned int  options;
 }
 
-- init
+- (id) init
         : (ArNodeRefDynArray *) newSubnodeArray
         : (unsigned int) newOptions
         ;

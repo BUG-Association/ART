@@ -207,7 +207,7 @@ ART_MODULE_INTERFACE(ArpCoding)
         ;
 - (void) codeTableBegin
         : (const char *) tableName
-        : (unsigned long *) codeSize
+        : (unsigned int *) codeSize
         ;
 - (void) codeTableEnd
         ;

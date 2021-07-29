@@ -31,6 +31,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnGaussianSpectrum registerWithRuntime ];
 )
 
@@ -71,7 +72,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGaussianSpectrum)
     rss_spectrum.size  = 530;
     rss_spectrum.array = ALLOC_ARRAY( double, rss_spectrum.size );
 
-    for ( int i = 0; i < rss_spectrum.size; i++ )
+    for ( unsigned long i = 0; i < rss_spectrum.size; i++ )
     {
         double lambda =   rss_spectrum.start
                         + i * rss_spectrum.step
@@ -101,7 +102,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnGaussianSpectrum)
 
 ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
 
-- dominantWavelength
+- (id) dominantWavelength
                     : (double) newCenter
         sigma       : (double) newSigma
         maximumValue: (double) newMaximum
@@ -113,7 +114,7 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
             :   newMaximum ];
 }
 
-- init
+- (id) init
         : (double) newCenter
         : (double) newSigma
         : (double) newMaximum
@@ -136,15 +137,18 @@ ARNSPECTRUM_STANDARD_METHOD_IMPLEMENTATIONS
         : (ArcPointContext *) locationInfo
         : (ArPSSpectrum *) outPSSpectrum
 {
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "getNewPSSpectrum::: not implemented yet"
-        );
+    (void) locationInfo;
+    (void) outPSSpectrum;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
 - (double) valueAtWavelength
         : (ArcPointContext *) locationInfo
         : (const double) wavelength
 {
+    (void) locationInfo;
+    
     return
           scaleFactor
         * gaussiancolour_dd_value(

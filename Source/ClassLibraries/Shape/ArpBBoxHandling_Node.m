@@ -534,7 +534,7 @@ ARPBBOXES_DEFAULT_ENLARGE_IMPLEMENTATION
     if (! leftNode) return 0;
 
     rightNode = [ SUBNODE_1 clipToBox :inBox];
-    if (! rightNode) { leftNode = RELEASE_OBJECT(leftNode); return 0; }
+    if (! rightNode) { leftNode = RELEASE_OBJECT_RETURN_ID(leftNode); return 0; }
 
     instanceID = leftNode->instanceID + rightNode->instanceID;
 
@@ -865,6 +865,10 @@ ARPBBOXES_DEFAULT_ENLARGE_IMPLEMENTATION
 :       (ArnLeafNodeBBoxCollection *) bboxCollection
 :       (ArnOperationTree*) opTree
 {
+    (void) traversal;
+    (void) bboxCollection;
+    (void) opTree;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -1033,6 +1037,10 @@ ARPBBOXES_DEFAULT_OPTIMISE_IMPLEMENTATION
 :       (ArnLeafNodeBBoxCollection *) bboxCollection
 :       (ArnOperationTree*) opTree
 {
+    (void) traversal;
+    (void) bboxCollection;
+    (void) opTree;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 
@@ -1943,6 +1951,10 @@ ARPBBOXES_DEFAULT_OPTIMISE_IMPLEMENTATION
 :       (ArnLeafNodeBBoxCollection *) bboxCollection
 :       (ArnOperationTree*) opTree
 {
+    (void) traversal;
+    (void) bboxCollection;
+    (void) opTree;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 

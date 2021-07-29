@@ -35,7 +35,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcFreelist
 
-- init
+- (id) init
         : (Class) newClass
 {
     self = [ super init ];
@@ -51,7 +51,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
-- init
+- (id) init
         : (Class) newClass
         : (SEL) activationMethod
         : (SEL) deactivationMethod
@@ -70,7 +70,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return self;
 }
 
-- obtainInstance
+- (id) obtainInstance
 {
     id  objectFromFreelist;
 

@@ -35,6 +35,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnPathTracer registerWithRuntime ];
 )
 
@@ -176,7 +177,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     [ self _setupPathTracer ];
 }
 
-- init
+- (id) init
         : (ArNode <ArpRayCaster> *) newRayCaster
         : (unsigned int) newMaximalRecursion
         : (ArPathTracerMode) newMode
@@ -200,7 +201,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnPathTracer  * copiedInstance = [ super copy ];
     
@@ -211,7 +212,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnPathTracer  * copiedInstance =
@@ -934,7 +935,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPathTracer)
     int lastNonzeroIndex = -1;
     nonzeroContributions[0] = 0;
     
-    for(int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
+    for(unsigned int pathLength = 0; pathLength < maximalRecursionLevel; ++pathLength)
     {
         // set up the indices into buffer arrays
         int mediaContributionIndex = pathLength; // not to be touched by media attenuation, can be initialized from previous iteration

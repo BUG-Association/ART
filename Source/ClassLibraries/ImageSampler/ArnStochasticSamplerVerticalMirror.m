@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnStochasticSamplerVerticalMirror registerWithRuntime ];
 )
 
@@ -87,7 +88,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSamplerVerticalMirror)
     //   samplePacketSize - size of each of the n sample packets. This is
     //   obviously always DEFAULT_PACKET_SIZE, except for the last one.
 
-    packetSize = ALLOC_ARRAY( int, numberOfSamplePackets );
+    packetSize = ALLOC_ARRAY( unsigned int, numberOfSamplePackets );
 
     for ( unsigned int i = 0; i < ( numberOfSamplePackets - 1 ); i++ )
         packetSize[i] = DEFAULT_PACKET_SIZE;
@@ -141,7 +142,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSamplerVerticalMirror)
     startingSequenceID = [ randomGenerator[0] currentSequenceID ];
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples
@@ -162,7 +163,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSamplerVerticalMirror)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnStochasticSamplerVerticalMirror  * copiedInstance = [ super copy ];
 
@@ -171,7 +172,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSamplerVerticalMirror)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnStochasticSamplerVerticalMirror  * copiedInstance =
@@ -208,21 +209,13 @@ ArStochasticSample;
 
 
 - (void) renderProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     //   Autorelease pool for this thread to keep Cocoa happy
 
     NSAutoreleasePool  * threadPool;
 
     threadPool = [ [ NSAutoreleasePool alloc ] init ];
-
-    //   If the splatting kernel is of size > 1, we maintain a temp array the
-    //   size of the splatting kernel, into which all samples are written during
-    //   the inner loop. Only after the loop is finished are the contents of the
-    //   temp array scaled ( 1 / numberOfValidSamples), and added to the actual
-    //   target image.
-
-    ArLightAlpha  ** splattingTempArray = NULL;
 
     //   The value for individual samples
 
@@ -264,7 +257,7 @@ ArStochasticSample;
                         :   IVEC2D(XC(imageSize), 1)
                         ];
 
-                for ( unsigned int v = 0; v < XC(imageSize); v++ )
+                for ( int v = 0; v < XC(imageSize); v++ )
                     arlightalpha_l_init_l(
                           art_gv,
                           ARLIGHTALPHA_NONE_A0,

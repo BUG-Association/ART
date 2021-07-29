@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnStochasticSampler registerWithRuntime ];
 )
 
@@ -94,7 +95,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSampler)
     //   samplePacketSize - size of each of the n sample packets. This is
     //   obviously always DEFAULT_PACKET_SIZE, except for the last one.
 
-    packetSize = ALLOC_ARRAY( int, numberOfSamplePackets );
+    packetSize = ALLOC_ARRAY( unsigned int, numberOfSamplePackets );
 
     for ( unsigned int i = 0; i < ( numberOfSamplePackets - 1 ); i++ )
         packetSize[i] = DEFAULT_PACKET_SIZE;
@@ -163,7 +164,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSampler)
             {
                 double  dY = 1.0 * u - splattingKernelOffset;
 
-                for ( int v = 0; v < splattingKernelWidth; v++ )
+                for ( unsigned int v = 0; v < splattingKernelWidth; v++ )
                 {
                     double  dX = 1.0 * v - splattingKernelOffset;
 
@@ -185,7 +186,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSampler)
             ALLOC_ARRAY( IPnt2D, splattingKernelArea );
 
         for ( unsigned int u = 0; u < splattingKernelWidth; u++ )
-            for ( int v = 0; v < splattingKernelWidth; v++ )
+            for ( unsigned int v = 0; v < splattingKernelWidth; v++ )
             {
                 XC( sampleSplattingOffset[ u * splattingKernelWidth + v ] )
                     = u - splattingKernelOffset;
@@ -195,7 +196,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSampler)
     }
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples
@@ -216,7 +217,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSampler)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnStochasticSampler  * copiedInstance = [ super copy ];
 
@@ -225,7 +226,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticSampler)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnStochasticSampler  * copiedInstance =
@@ -262,7 +263,7 @@ ArStochasticSample;
 
 
 - (void) renderProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     //   Autorelease pool for this thread to keep Cocoa happy
 
@@ -333,7 +334,7 @@ ArStochasticSample;
                                 :   IVEC2D(XC(imageSize), 1)
                                 ];
 
-                        for ( unsigned int v = 0; v < XC(imageSize); v++ )
+                        for ( int v = 0; v < XC(imageSize); v++ )
                             arlightalpha_l_init_l(
                                   art_gv,
                                   ARLIGHTALPHA_NONE_A0,

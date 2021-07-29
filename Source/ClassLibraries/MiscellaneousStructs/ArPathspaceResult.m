@@ -86,6 +86,8 @@ void arpathspaceresult_push(
         ArPathspaceResult  * new_result
         )
 {
+    (void) art_gv;
+    
     ARPATHSPACERESULT_NEXT(*new_result) =
         ARPATHSPACERESULT_NEXT(*result);
     ARPATHSPACERESULT_NEXT(*result) =

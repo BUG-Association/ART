@@ -207,6 +207,11 @@ void xyz_ss_convolve_d(
               double    * dr
         )
 {
+    (void) art_gv;
+    (void) c0;
+    (void) c1;
+    (void) dr;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "convolution operation not defined in colour space - "
         "switch ART to a spectral ISR to avoid this error"
@@ -263,6 +268,7 @@ void xyz_sdd_sample_at_wavelength_s(
               ArCIEXYZ  * c_r
         )
 {
+    (void) d_1;
     //   Note: this is probably not what should be done: a gradual shift
     //         between channels would likely be much better.
     
@@ -306,6 +312,10 @@ double xyz_ss_convolve(
         const ArCIEXYZ  * c1
         )
 {
+    (void) art_gv;
+    (void) c0;
+    (void) c1;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "ArSpectrum value convolution not defined in colour space - "
         "switch ART to a spectral ISR to avoid this error"
@@ -319,6 +329,8 @@ void xyz_s_debugprintf(
         const ArCIEXYZ  * c_0
         )
 {
+    (void) art_gv;
+    
     printf( "ArCIEXYZ( % 5.3f, % 5.3f, % 5.3f )\n",
         ARRGB_R(*c_0),
         ARRGB_G(*c_0),
@@ -333,6 +345,8 @@ void xyz_s_mathematicaprintf(
         const ArCIEXYZ  * c_0
         )
 {
+    (void) art_gv;
+    
     printf( "ArCIEXYZ{ % 5.3f, % 5.3f, % 5.3f }\n",
         ARRGB_R(*c_0),
         ARRGB_G(*c_0),

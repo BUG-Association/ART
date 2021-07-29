@@ -34,6 +34,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnStochasticImageSampler registerWithRuntime ];
 )
 
@@ -56,7 +57,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSampler)
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> * ) newPathspaceIntegrator
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples
@@ -153,7 +154,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSampler)
             {
                 double  dY = 1.0 * u - splattingKernelOffset;
 
-                for ( int v = 0; v < splattingKernelWidth; v++ )
+                for ( unsigned int v = 0; v < splattingKernelWidth; v++ )
                 {
                     double  dX = 1.0 * v - splattingKernelOffset;
 
@@ -175,7 +176,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSampler)
             ALLOC_ARRAY( IPnt2D, splattingKernelArea );
 
         for ( unsigned int u = 0; u < splattingKernelWidth; u++ )
-            for ( int v = 0; v < splattingKernelWidth; v++ )
+            for ( unsigned int v = 0; v < splattingKernelWidth; v++ )
             {
                 XC( sampleSplattingOffset[ u * splattingKernelWidth + v ] )
                     = u - splattingKernelOffset;
@@ -185,7 +186,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSampler)
     }
 }
 
-- copy
+- (id) copy
 {
     ArnStochasticImageSampler  * copiedInstance = [ super copy ];
 
@@ -194,7 +195,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSampler)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnStochasticImageSampler  * copiedInstance =
@@ -223,7 +224,7 @@ ArPixelID;
 
 
 - (void) renderProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     //   Autorelease pool for this thread to keep Cocoa happy
 
@@ -355,7 +356,7 @@ ArPixelID;
                         {
                             if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
                             {
-                                for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                                for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                                     arlightsample_realign_to_coaxial_refframe_l(
                                           art_gv,
                                         & referenceFrame,
@@ -368,7 +369,7 @@ ArPixelID;
                     }
                     else
                     {
-                        for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                        for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                         {
                             sampleValue[im] =
                                 (ArPathspaceResult*) arfreelist_pop(
@@ -391,7 +392,7 @@ ArPixelID;
                     {
                         if ( splattingKernelWidth == 1 )
                         {
-                            for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                            for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                             {
                                 PIXEL_SAMPLE_COUNT( x, y, THREAD_INDEX, im ) += 1.0;
                                 
@@ -417,11 +418,11 @@ ArPixelID;
                                     && cY >= 0
                                     && cY < YC(imageSize) )
                                 {
-                                    for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                                    for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                                     {
                                         PIXEL_SAMPLE_COUNT( cX, cY, THREAD_INDEX, im ) += SAMPLE_SPLATTING_FACTOR( subpixelIdx, l );
 
-                                        for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                                        for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                                         {
                                             arlightalpha_dwsd_mul_sloppy_add_l(
                                                   art_gv,
@@ -439,7 +440,7 @@ ArPixelID;
                         }
                     }
 
-                    for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                    for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                     {
                         arpathspaceresult_free_to_freelist(
                               art_gv,
@@ -487,13 +488,16 @@ ArPixelID;
     [ super code: coder ];
     [ coder codeBOOL: & deterministicWavelengths ];
     
-    if ([coder isReading])
+    if ( [ coder isReading ] )
     {
-#warning  this whole thing is fragile and should not be in a release version of ART (aw)
-        if ( ! deterministicWavelengths )
-            wavelengthSteps = 1;
+        if ( deterministicWavelengths )
+        {
+            [ self useDeterministicWavelengths ];
+        }
         else
-            wavelengthSteps = spc_channels(art_gv) / 4;
+        {
+            wavelengthSteps = 1;
+        }
     }
 }
 

@@ -152,6 +152,8 @@ double s500_dc_value_at_wavelength(
         const ArSpectrum500  * s0
         )
 {
+    (void) art_gv;
+    
     //  The beauty of s500 is that we just take the nearest wavelength,
     //  and be done with it. No interpolation, nothing. For graphics
     //  purposes (!), this is enough.

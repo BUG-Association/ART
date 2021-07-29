@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnCSGorBBox registerWithRuntime];
     [ ArnCSGcombineBBox registerWithRuntime];
 )
@@ -41,7 +42,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCSGorBBox)
 
-- init
+- (id) init
         : (ArNodeRef) nodeRef0
         : (ArNodeRef) nodeRef1
         : (BoxFlags3D) newBoxFlags
@@ -60,7 +61,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCSGorBBox)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnCSGorBBox  * copiedInstance = [ super copy ];
 
@@ -71,7 +72,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCSGorBBox)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     return
@@ -97,7 +98,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCSGorBBox)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCSGcombineBBox)
 
-- init
+- (id) init
         : (ArNodeRef) nodeRef0
         : (ArNodeRef) nodeRef1
         : (BoxFlags3D) newBoxFlags
@@ -116,7 +117,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCSGcombineBBox)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnCSGcombineBBox  * copiedInstance = [ super copy ];
 
@@ -127,7 +128,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCSGcombineBBox)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnCSGcombineBBox  * copiedInstance =

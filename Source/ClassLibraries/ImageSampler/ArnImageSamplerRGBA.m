@@ -38,6 +38,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnImageSamplerRGBA registerWithRuntime ];
 )
 
@@ -54,7 +55,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegratorRGBA> * ) newPathspaceIntegrator
 {
     self =
@@ -68,7 +69,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
     return  self;
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegratorRGBA> * ) newPathspaceIntegrator
         : (unsigned int) newNumberOfSamplesPerPixel
 {
@@ -90,7 +91,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
     return  self;
 }
 
-- copy
+- (id) copy
 {
     ArnImageSamplerRGBA  * copiedInstance = [ super copy ];
 
@@ -99,7 +100,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnImageSamplerRGBA  * copiedInstance =
@@ -166,9 +167,9 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
 
     //   Zero out the buffer.
     
-    for ( unsigned int y = 0; y < YC(imageSize); y++ )
+    for ( int y = 0; y < YC(imageSize); y++ )
     {
-        for ( unsigned int x = 0; x < XC(imageSize); x++ )
+        for ( int x = 0; x < XC(imageSize); x++ )
         {
             RGB_PIXEL_SAMPLE_VALUE( x, y ) = ARRGBA(0, 0, 0, 0);
         }
@@ -192,7 +193,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
 
     for ( unsigned int i = 0; i < numberOfRenderThreads; i++ )
     {
-        ArcInteger  * index = [ ALLOC_INIT_OBJECT(ArcInteger) : i ];
+        ArcUnsignedInteger  * index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
 
         if ( ! art_thread_detach(@selector(renderProc:), self,  index))
             ART_ERRORHANDLING_FATAL_ERROR(
@@ -252,7 +253,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageSamplerRGBA)
 }
 
 - (void) renderProcHasFinished
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
 {
     threadStatus[ THREAD_INDEX ] = FINISHED;
 

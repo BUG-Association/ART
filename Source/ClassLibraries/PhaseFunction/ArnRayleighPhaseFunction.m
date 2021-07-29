@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+     (void) art_gv;
      [ ArnRayleighPhaseFunction registerWithRuntime ];
 )
 
@@ -39,7 +40,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRayleighPhaseFunction)
 
-- copy
+- (id) copy
 {
     ArnRayleighPhaseFunction  * copiedInstance = [ super copy ];
     
@@ -50,7 +51,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRayleighPhaseFunction)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnRayleighPhaseFunction  * copiedInstance =
@@ -65,7 +66,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRayleighPhaseFunction)
     return copiedInstance;
 }
 
-- init
+- (id) init
         : (double                ) newParticlesPerM3
         : (double                ) newVolumePolarisability
         : (double                ) newDepolarisationFactor

@@ -42,7 +42,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcFileStream
 
-- init
+- (id) init
         : (FILE *) newFile
 {
     self = [ super init ];
@@ -65,6 +65,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 - (int) getPath
         : (char *) outPath
 {
+    (void) outPath;
     return 0;
 }
 
@@ -75,17 +76,17 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 - (BOOL) read
         : (void *) data
-        : (unsigned long) itemSize
-        : (unsigned long) itemsToRead
+        : (unsigned int) itemSize
+        : (unsigned int) itemsToRead
 {
     unsigned long itemsRead = fread(data, itemSize, itemsToRead, file);
 
     return ( itemsRead == itemsToRead );
 }
 
-- (unsigned long) readline
+- (unsigned int) readline
         : (void *) data
-        : (unsigned long) size
+        : (unsigned int) size
 {
     Byte * bytes = data;
     while (size--)
@@ -154,16 +155,16 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return fgetc(file);
 }
 
-- (unsigned long) write
+- (unsigned int) write
         : (const void *) data
-        : (unsigned long) itemSize
-        : (unsigned long) itemsToWrite
+        : (unsigned int) itemSize
+        : (unsigned int) itemsToWrite
 {
-    unsigned long itemsWritten = fwrite(data, itemSize, itemsToWrite, file);
+    unsigned int itemsWritten = fwrite(data, itemSize, itemsToWrite, file);
 
     if ( itemsWritten != itemsToWrite )
         ART_ERRORHANDLING_FATAL_ERROR(
-            "block count mismatch during binary file write (%lu vs. %lu)"
+            "block count mismatch during binary file write (%u vs. %u)"
             ,   itemsWritten
             ,   itemsToWrite
             );
@@ -215,7 +216,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcFile
 
-+ new
++ (id) new
         : (ART_GV *) new_art_gv
         : (const char *) newName
 {
@@ -246,7 +247,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     return YES;
 }
 
-- init
+- (id) init
         : (const char *) newName
 {
     self = [ super init ];

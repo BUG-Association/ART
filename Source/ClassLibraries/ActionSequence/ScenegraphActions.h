@@ -52,7 +52,7 @@ ART_MODULE_INTERFACE(ScenegraphActions)
     double bboxEpsilon;
 }
 
-- init
+- (id) init
         : (double) newBBoxEpsilon
         ;
 
@@ -64,7 +64,7 @@ ART_MODULE_INTERFACE(ScenegraphActions)
     ArSymbol  fileName;
 }
 
-- init
+- (id) init
         : (const char *) newFileName
         ;
 
@@ -76,7 +76,7 @@ ART_MODULE_INTERFACE(ScenegraphActions)
     ArDataType  isr;
 }
 
-- init
+- (id) init
         : (ArDataType) isr
         ;
 
@@ -92,7 +92,7 @@ ART_MODULE_INTERFACE(ScenegraphActions)
 {
 }
 
-- init
+- (id) init
         ;
 
 @end

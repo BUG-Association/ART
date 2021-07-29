@@ -41,7 +41,7 @@ ART_MODULE_INTERFACE(AraVolumeMaterial)
 {
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRef) newMaterialRef
         ;

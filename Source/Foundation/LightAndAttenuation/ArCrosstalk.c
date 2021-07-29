@@ -104,6 +104,8 @@ void arcrosstalk_free(
               ArCrosstalk  * xr
         )
 {
+    (void) art_gv;
+    
     FREE(xr->c);
     FREE(xr);
 }
@@ -112,6 +114,8 @@ ArCrosstalk const * arcrosstalk_none(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0;
@@ -207,7 +211,9 @@ double arcrosstalk_x_norm(
         const ArCrosstalk  * x0
         )
 {
-    ASSERT_VALID_CROSSTALK( x0 )
+    (void) art_gv;
+    (void) x0;
+//    ASSERT_VALID_CROSSTALK( x0 )
 
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
@@ -598,11 +604,6 @@ double arcrosstalk_wl_wl_value(
 
     double  result = 0.0;
     
-    if ( cidx_i >= 0 && cidx_o >= 0 && cidx_i < cidx_o )
-    {
-        int  idx = ( ( cidx_i * ( cidx_i - 1 ) ) / 2 ) + cidx_o;
-    }
-    
     return result;
 }
 
@@ -648,14 +649,19 @@ double cx500_integrate_to_spc_channels(
     y0 -= ARCROSSTALK500_LOWER_BOUND;
     y1 -= ARCROSSTALK500_LOWER_BOUND;
 
+    ASSERT_NONNEGATIVE_INTEGER(x0);
+    ASSERT_NONNEGATIVE_INTEGER(x1);
+    ASSERT_NONNEGATIVE_INTEGER(y0);
+    ASSERT_NONNEGATIVE_INTEGER(y1);
+
     double  result = 0.0;
     double  integrationHeight = x1 -x0;
 
-    for ( unsigned int x = x0; x < x1; x++ )
+    for ( int x = x0; x < x1; x++ )
     {
         double  lineResult = 0.0;
 
-        for ( unsigned int y = y0; y < x; y++ )
+        for ( int y = y0; y < x; y++ )
         {
             lineResult += ARCROSSTALK500_XY( *cx, x, y );
         }
@@ -727,7 +733,7 @@ void arcrosstalk_x_mathematicaprintf(
         const ArCrosstalk  * x0
         )
 {
-    int  channels = spc_channels( art_gv );
+    const unsigned int  channels = spc_channels( art_gv );
 
     printf( "ArCrosstalk %dx%d { \n",channels,channels);
 

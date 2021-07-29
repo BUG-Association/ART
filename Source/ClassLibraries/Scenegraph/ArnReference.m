@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnReference registerWithRuntime ];
 )
 
@@ -45,7 +46,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnReference)
 
-- init
+- (id) init
         : (ArSymbol) newReferencedName
 {
     self = [ super init ];
@@ -58,7 +59,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnReference)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnReference  * copiedInstance = [ super copy ];
 
@@ -67,7 +68,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnReference)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnReference  * copiedInstance =

@@ -35,6 +35,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnScene registerWithRuntime ];
 )
 
@@ -52,7 +53,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScene)
     return (ArNode <ArpCamera> *) ARNARY_SUBNODE_I(0);
 }
 
-- setCamera
+- (id) setCamera
         : (ArNode <ArpCamera> *) newCamera
 {
     ASSIGN_AS_HARD_NODE_REFERENCE_TO_NARY_SUBNODE( 0, newCamera );
@@ -64,7 +65,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScene)
     return (ArNode <ArpWorld> *) ARNARY_SUBNODE_I(1);
 }
 
-- setWorld
+- (id) setWorld
         : (ArNode <ArpWorld> *) newWorld
 {
     ASSIGN_AS_HARD_NODE_REFERENCE_TO_NARY_SUBNODE( 1, newWorld );
@@ -77,7 +78,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnScene)
         (ArNode <ArpActionSequence> *) ARNARY_SUBNODE_I(2);
 }
 
-- setActionSequence
+- (id) setActionSequence
         : (ArNode <ArpActionSequence> *) newActionSequence
 {
     ASSIGN_AS_HARD_NODE_REFERENCE_TO_NARY_SUBNODE(

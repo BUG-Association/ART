@@ -204,6 +204,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 - (ArNode *) pushAttributesToLeafNodes
         : (ArnGraphTraversal *) traversal
 {
+    (void) traversal;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
 /* THIS HAS TO BE RE-ACTIVATED!

@@ -39,7 +39,7 @@ ART_MODULE_INTERFACE(AraEnvironmentMaterial)
 {
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNode
         : (ArNodeRef) newSurface
         ;

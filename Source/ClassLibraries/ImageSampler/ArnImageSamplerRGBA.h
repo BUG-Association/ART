@@ -48,11 +48,11 @@ ART_MODULE_INTERFACE(ArnImageSamplerRGBA)
     //   Internal variables that are used during rendering
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegratorRGBA> * ) newPathspaceIntegrator
         ;
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegratorRGBA> * ) newPathspaceIntegrator
         : (unsigned int) newNumberOfSamplesPerPixel
         ;

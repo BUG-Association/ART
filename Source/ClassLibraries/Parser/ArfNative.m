@@ -104,7 +104,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
     return 0;
 }
 
-- initWithFile: (ArcFile *) newFile
+- (id) initWithFile: (ArcFile *) newFile
 {
     file = newFile;
 
@@ -215,9 +215,9 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
 
     //   We count the externals and then treat all of them in a loop
 
-    unsigned int  numberOfExternals = arlist_length( & externalList );
+    const unsigned int  numberOfExternals = arlist_length( & externalList );
 
-    for ( int i = 0; i < numberOfExternals; i++ )
+    for ( unsigned int i = 0; i < numberOfExternals; i++ )
     {
         //   Popping the external from the list also destroys the list entry,
         //   so there is no list left to free once we're through with them

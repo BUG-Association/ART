@@ -50,7 +50,7 @@ ART_MODULE_INTERFACE(ArnRayleighVolumeMaterial)
 {
 }
 
-- init
+- (id) init
         : (ArNode <ArpSpectrum> *) newIOR
         : (ArNode <ArpSpectrum> *) newExtinction
         : (double                ) newParticlesPerM3

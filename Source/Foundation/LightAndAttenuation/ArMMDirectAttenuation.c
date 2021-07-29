@@ -56,6 +56,7 @@ ART_MODULE_SHUTDOWN_FUNCTION
 
 ART_LIGHT_AND_ATTENUATION_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
 )
 
 ART_LIGHT_AND_ATTENUATION_MODULE_NO_SHUTDOWN_FUNCTION_NECESSARY
@@ -79,6 +80,8 @@ const char * armmdirectattenuation_act_string(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     return "Mueller matrix attenuation";
 }
 
@@ -113,6 +116,9 @@ ArMMDirectAttenuation * armmdirectattenuation_d_alloc_init(
         const double    d0
         )
 {
+    (void) art_gv;
+    (void) d0;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "non-polarisation aware attenuation functionality used on "
         "a polarising attenuation struct"
@@ -187,6 +193,8 @@ ArMMDirectAttenuation const * armmdirectattenuation_total(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "non-polarisation aware attenuation functionality used on "
         "a polarising attenuation struct"
@@ -201,6 +209,10 @@ ArMMDirectAttenuation * armmdirectattenuation_rr_alloc_init_total(
         const ArReferenceFrame    * r1
         )
 {
+    (void) art_gv;
+    (void) r0;
+    (void) r1;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0;
@@ -210,6 +222,8 @@ ArMMDirectAttenuation const * armmdirectattenuation_none(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "non-polarisation aware attenuation functionality used on "
         "a polarising attenuation struct"
@@ -224,6 +238,10 @@ ArMMDirectAttenuation * armmdirectattenuation_rr_alloc_init_none(
         const ArReferenceFrame    * r1
         )
 {
+    (void) art_gv;
+    (void) r0;
+    (void) r1;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0;
@@ -235,6 +253,10 @@ void armmdirectattenuation_d_init_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) ar;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "non-polarisation aware attenuation functionality used on "
         "a polarising attenuation struct"
@@ -287,6 +309,10 @@ void armmdirectattenuation_s_init_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) c0;
+    (void) ar;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "non-polarisation aware attenuation functionality used on "
         "a polarising attenuation struct"
@@ -319,6 +345,10 @@ void armmdirectattenuation_s_init_nonpolarising_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) c0;
+    (void) ar;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
         "non-polarisation aware attenuation functionality used on "
         "a polarising attenuation struct"
@@ -393,6 +423,10 @@ void armmdirectattenuation_a_init_s(
               ArSpectrum               * cr
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) cr;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -420,6 +454,8 @@ unsigned int armmdirectattenuation_a_polarising(
         const ArMMDirectAttenuation  * a0
         )
 {
+    (void) art_gv;
+    
     return
         ARMMDIRECTATTENUATION_IS_GENERAL_MATRIX( *a0 );
 }
@@ -429,6 +465,8 @@ ArReferenceFrame const * armmdirectattenuation_a_entry_rf(
         const ArMMDirectAttenuation  * a0
         )
 {
+    (void) art_gv;
+    
     return
         & ARMMDA_REFFRAME_ENTRY( *a0 );
 }
@@ -438,6 +476,8 @@ ArReferenceFrame const * armmdirectattenuation_a_exit_rf(
         const ArMMDirectAttenuation  * a0
         )
 {
+    (void) art_gv;
+    
     return
         & ARMMDA_REFFRAME_EXIT( *a0 );
 }
@@ -1507,6 +1547,10 @@ void armmdirectattenuation_realign_to_coaxial_exit_rf_a(
               ArMMDirectAttenuation   * ar
         )
 {
+    (void) art_gv;
+    (void) r0;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -1578,6 +1622,10 @@ void armmdirectattenuation_a_inv_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -1586,6 +1634,9 @@ void armmdirectattenuation_inv_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -1596,6 +1647,11 @@ void armmdirectattenuation_aa_max_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) a1;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -1606,6 +1662,11 @@ void armmdirectattenuation_aa_min_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) a1;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -1615,6 +1676,10 @@ double armmdirectattenuation_aa_maxdiff(
         const ArMMDirectAttenuation  * a1
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) a1;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
     return 0.0;
 }
@@ -2299,6 +2364,10 @@ void armmdirectattenuation_d_div_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2309,6 +2378,11 @@ void armmdirectattenuation_da_div_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) a0;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2319,6 +2393,11 @@ void armmdirectattenuation_da_pow_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) a0;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2329,6 +2408,11 @@ void armmdirectattenuation_da_negpow_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) a0;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2340,6 +2424,12 @@ void armmdirectattenuation_dda_clamp_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) d1;
+    (void) a0;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2351,6 +2441,12 @@ void armmdirectattenuation_daa_interpol_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) a0;
+    (void) a1;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2360,6 +2456,10 @@ void armmdirectattenuation_a_complement_from_one_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2370,6 +2470,11 @@ void armmdirectattenuation_ia_singleband_complement_from_one_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) i0;
+    (void) a0;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2381,6 +2486,12 @@ void armmdirectattenuation_dia_singleband_mul_copy_a(
               ArMMDirectAttenuation  * ar
         )
 {
+    (void) art_gv;
+    (void) d0;
+    (void) i0;
+    (void) a0;
+    (void) ar;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2911,6 +3022,12 @@ void armmdirectattenuation_axl_mul_l(
               ArSVLight              * lr
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) x0;
+    (void) l0;
+    (void) lr;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2920,6 +3037,10 @@ void armmdirectattenuation_a_mul_i(
               ArLightIntensity       * lr
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) lr;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2930,6 +3051,11 @@ void armmdirectattenuation_ai_mul_i(
               ArLightIntensity       * lr
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) l0;
+    (void) lr;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2940,6 +3066,11 @@ void armmdirectattenuation_ax_mul_i(
               ArLightIntensity       * lr
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) x0;
+    (void) lr;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 
@@ -2951,6 +3082,12 @@ void armmdirectattenuation_axi_mul_i(
               ArLightIntensity       * lr
         )
 {
+    (void) art_gv;
+    (void) a0;
+    (void) x0;
+    (void) l0;
+    (void) lr;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR;
 }
 

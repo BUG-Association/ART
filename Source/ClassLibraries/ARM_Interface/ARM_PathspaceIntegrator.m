@@ -35,7 +35,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnFirstHitNormalShadingTracer ( ARM_Interface )
 
-- rayCaster
+- (id) rayCaster
                         : (ArNode <ArpRayCaster> *) newRayCaster
 {
     return
@@ -48,7 +48,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnPathTracer ( ARM_Interface )
 
-- rayCaster
+- (id) rayCaster
                         : (ArNode <ArpRayCaster> *) newRayCaster
         maximalRecursion: (unsigned int) newMaximalRecursion
 {
@@ -61,7 +61,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- rayCaster
+- (id) rayCaster
                         : (ArNode <ArpRayCaster> *) newRayCaster
         maximalRecursion: (unsigned int) newMaximalRecursion
         mode            : (ArPathTracerMode) newMode
@@ -75,7 +75,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             ];
 }
 
-- rayCaster
+- (id) rayCaster
                         : (ArNode <ArpRayCaster> *) newRayCaster
         maximalRecursion: (unsigned int) newMaximalRecursion
         mode            : (ArPathTracerMode) newMode
@@ -94,7 +94,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArnSimplePathTracer
 
-- rayCaster             : (ArNode <ArpRayCaster> *) newRayCaster
+- (id) rayCaster             : (ArNode <ArpRayCaster> *) newRayCaster
         maximalRecursion: (unsigned int) newMaximalRecursion
 {
     return

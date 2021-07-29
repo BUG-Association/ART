@@ -352,12 +352,16 @@ int m_ddi_equal(
         || ( !signbit(d0) &&  signbit(d1) ) )
      return d0 == d1;
 
-    Int64 d0_long = *(Int64*)&d0;
+    union { double d; Int64 i; }  value;
+    
+    value.d = d0;
+    Int64 d0_long = value.i;
 
     if (d0_long < 0)
         d0_long = 0x8000000000000000LL - d0_long;
 
-    Int64 d1_long = *(Int64*)&d1;
+    value.d = d1;
+    Int64 d1_long = value.i;
 
     if (d1_long < 0)
         d1_long = 0x8000000000000000LL - d1_long;
@@ -696,7 +700,7 @@ double m_i_factorial_ln(
 }
 
 
-double m_i0_dbinomial(double x) { return 1.0; }
+double m_i0_dbinomial(double x) { (void) x; return 1.0; }
 double m_i1_dbinomial(double x) { return x; }
 double m_i2_dbinomial(double x) { return x*(x-1)/2; }
 double m_i3_dbinomial(double x) { return x*(x-1)*(x-2)/6; }
@@ -795,6 +799,8 @@ int m_iii_atomic_compare_and_swap(
     //   Note: the cast we are doing here is potentially dodgy. It _should_ be harmless, but YMMV.
 
     atomic_compare_exchange_strong((volatile atomic_int *) location_to_swap_with, old_value, new_value );
+    
+    return new_value;
 #else
     int  result;
 
@@ -840,6 +846,8 @@ Int32 m_iii32_atomic_compare_and_swap(
     //   Note: the cast we are doing here is potentially dodgy. It _should_ be harmless, but YMMV.
 
     atomic_compare_exchange_strong((volatile atomic_int *) location_to_swap_with, old_value, new_value );
+
+    return new_value;
 #else
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
@@ -872,6 +880,8 @@ Int64 m_iii64_atomic_compare_and_swap(
     //   Note: the cast we are doing here is potentially dodgy. It _should_ be harmless, but YMMV.
 
     atomic_compare_exchange_strong((volatile atomic_long *) location_to_swap_with, old_value, new_value );
+
+    return new_value;
 #else
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 

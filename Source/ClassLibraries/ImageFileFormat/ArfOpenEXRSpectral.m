@@ -144,6 +144,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
         : (ArNode **) objectPtr
         : (ArList *) externals
 {
+    (void) externals;
+    
     *objectPtr =
         [ ALLOC_INIT_OBJECT(ArnFileImage)
             :   [ file name ]
@@ -171,7 +173,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
 
 - (ArnImageInfo *) open
 {
-    _writtingMode = NO;
+    _writingMode = NO;
     
     float** spectral_buffers[4] = { 
         &_bufferS0, 
@@ -363,7 +365,9 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
 - (void) getPlainImage
         : (IPnt2D) start
         : (ArnPlainImage *) image
-{     
+{
+    (void) start;
+    
     ArSpectrum *colBufS0 = spc_d_alloc_init( art_gv, 0.0 );
     ArSpectrum *colBufS1 = spc_d_alloc_init( art_gv, 0.0 );
     ArSpectrum *colBufS2 = spc_d_alloc_init( art_gv, 0.0 );
@@ -456,7 +460,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
 - (void) open
         : (ArnImageInfo *) imageInfo
 {
-    _writtingMode = YES;
+    _writingMode = YES;
     
     // ART only write emissive images
     _isEmissive = YES;
@@ -648,11 +652,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
 
 - (void) close
 {
-    if (_writtingMode) {
+    if (_writingMode) {
         // Gather metadata
-        const IVec2D size = [ _imageInfo size ];
-        const int width = XC(size);
-        const int height = YC(size);
             
         char * createdByString = NULL;
         char * creationDateStr = NULL;

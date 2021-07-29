@@ -255,7 +255,7 @@ void artable_add_phase_interface_with_key2(
 
 @implementation ArcPhaseInterfaceCache
 
-- init
+- (id) init
 {
     self = [ super init ];
 
@@ -301,13 +301,14 @@ void artable_add_phase_interface_with_key2(
     {
         //   And if nothing was found, create a new cache entry
 
-        ArSpectrum  *temp = spc_alloc( art_gv );
         
 //   #define the following to see debug printfs for all phase interfaces
 //   which get created. As each rendering thread has its own cache, run
 //   artist -j1 to see meaningful output
 
 #ifdef PHASEINTERFACE_DEBUG_OUTPUT
+        ArSpectrum  *temp = spc_alloc( art_gv );
+
         double  fromIOR, intoIOR;
         
         [ (( ArNode <ArpSpectrum> *) [fromMaterial subnodeWithIndex : 0])

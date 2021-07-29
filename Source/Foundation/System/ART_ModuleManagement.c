@@ -34,6 +34,8 @@ pthread_mutex_t  art_module_management_mutex;
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
+    
     pthread_mutex_init(
         & art_module_management_mutex,
           NULL
@@ -42,6 +44,8 @@ ART_MODULE_INITIALISATION_FUNCTION
 
 ART_MODULE_SHUTDOWN_FUNCTION
 (
+    (void) art_gv;
+ 
     pthread_mutex_destroy(
         & art_module_management_mutex
         );

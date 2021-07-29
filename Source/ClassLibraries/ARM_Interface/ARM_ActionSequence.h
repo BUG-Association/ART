@@ -47,13 +47,13 @@ ART_MODULE_INTERFACE(ARM_ActionSequence)
 
 //   old interface, deprecated, will be removed
 
-- object
+- (id) object
         :               (ArNode *) sceneGeometry
         camera:         (ArNode <ArpCamera> *) newCamera
         actionSequence: (ArNode <ArpActionSequence> *) newActionSequence
         ;
 
-- object
+- (id) object
         :               (ArNode *) sceneGeometry
         skylight:       (ArNode <ArpSkyModel> *) newSkyModel
         camera:         (ArNode <ArpCamera> *) newCamera
@@ -68,7 +68,7 @@ ART_MODULE_INTERFACE(ARM_ActionSequence)
  * @param camera            Camera          Camera in use for rendering the scene.
  * @param actionSequence    ActionSequence  The action sequence that need to be executed for rendering the scene.
  */
-- sceneGeometry
+- (id) sceneGeometry
         :               (ArNode *) sceneGeometry
         camera:         (ArNode <ArpCamera> *) newCamera
         actionSequence: (ArNode <ArpActionSequence> *) newActionSequence
@@ -81,7 +81,7 @@ ART_MODULE_INTERFACE(ARM_ActionSequence)
  * @param camera            Camera          Camera in use for rendering the scene.
  * @param actionSequence    ActionSequence  The action sequence that need to be executed for rendering the scene.
  */
-- sceneGeometry
+- (id) sceneGeometry
         :               (ArNode *) sceneGeometry
         skyModel:       (ArNode <ArpSkyModel> *) newSkyModel
         camera:         (ArNode <ArpCamera> *) newCamera
@@ -96,7 +96,7 @@ ART_MODULE_INTERFACE(ARM_ActionSequence)
  * @param camera                Camera              Camera in use for rendering the scene.
  * @param actionSequence        ActionSequence      The action sequence that need to be executed for rendering the scene.
  */
-- sceneGeometry
+- (id) sceneGeometry
         :                    (ArNode *) sceneGeometry
         environmentMaterial: (ArNode <ArpEnvironmentMaterial> *) e
         camera:              (ArNode <ArpCamera> *) c
@@ -114,7 +114,7 @@ ART_MODULE_INTERFACE(ARM_ActionSequence)
  * @param camera                Camera              Camera in use for rendering the scene.
  * @param actionSequence        ActionSequence      The action sequence that need to be executed for rendering the scene.
  */
-- sceneGeometry
+- (id) sceneGeometry
         :                    (ArNode *) sceneGeometry
         environmentMaterial: (ArNode <ArpEnvironmentMaterial> *) e
         worldVolumeMaterial: (ArNode <ArpVolumeMaterial> *) v

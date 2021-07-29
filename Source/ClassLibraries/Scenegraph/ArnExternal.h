@@ -114,25 +114,25 @@ ART_MODULE_INTERFACE(ArnExternal)
         ART scene file.
 ------------------------------------------------------------------------aw- */
 
-- init
+- (id) init
         : (ArSymbol) newExternalFileName
         : (Protocol *) newArProtocol
         ;
 
-- init
+- (id) init
         : (ArSymbol) newExternalFileName
         : (ArSymbol) newObjectName
         : (Protocol *) newArProtocol
         ;
 
-- init
+- (id) init
         : (ArSymbol) newExternalFileName
         : (ArSymbol) newObjectName
         : (Protocol *) newArProtocol0
         : (Protocol *) newArProtocol1
         ;
 
-- initWithAuxiliaryNode
+- (id) initWithAuxiliaryNode
         : (ArSymbol) newExternalFileName
         : (ArNodeRef) newAuxiliary
         : (Protocol *) newArProtocol

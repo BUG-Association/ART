@@ -155,7 +155,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(CIEXYZA,artcsp)
     unsigned char  buffer[4];
     double         d;
 
-    for ( int c = 0; c < channels; c++ )
+    for ( unsigned int c = 0; c < channels; c++ )
     {
         [ file read : buffer : 1 : 4 ];
         ieee32buffer_to_double(buffer, &d);
@@ -170,7 +170,7 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(CIEXYZA,artcsp)
         : (ArCIEXYZA *) pixel
 {
     unsigned char buffer[4];
-    for ( int c = 0; c < channels; c++ )
+    for ( unsigned int c = 0; c < channels; c++ )
     {
         double_to_ieee32buffer(& ARCIEXYZA_CI(*pixel, c), buffer);
         [ file write: buffer : 1 : 4 ];
@@ -333,6 +333,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(CIEXYZA,artcsp)
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
+    (void) start;
+    
     for ( long y = 0; y < YC(image->size); y++ )
     {
         for ( long x = 0; x < XC(image->size); x++ )
@@ -432,6 +434,8 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(CIEXYZA,artcsp)
         : (IPnt2D) start
         : (ArnPlainImage *) image
 {
+    (void) start;
+    
     for ( long y = 0; y < YC(image->size); y++ )
     {
         [ (ArNode <ArpGetCIEXYZARegion> *)image getCIEXYZARegion

@@ -61,7 +61,7 @@ ART_MODULE_INTERFACE(ArnCalculatedSpectrum)
     double  exponent;
 }
 
-- init
+- (id) init
         : (ArNode *) newColour
         : (double) newExponent
         ;
@@ -84,7 +84,7 @@ ART_MODULE_INTERFACE(ArnCalculatedSpectrum)
     double  length;
 }
 
-- init
+- (id) init
         : (ArNode *) newColour
         : (double) newLength
         ;
@@ -106,7 +106,7 @@ ART_MODULE_INTERFACE(ArnCalculatedSpectrum)
 {
 }
 
-- init
+- (id) init
         : (ArNode *) newColour
         ;
 

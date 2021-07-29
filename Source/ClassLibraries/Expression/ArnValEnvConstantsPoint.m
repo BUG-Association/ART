@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnValWorldSpaceCoords    registerWithRuntime ];
     [ ArnValObjectSpaceCoords   registerWithRuntime ];
     [ ArnValWorldSpaceNormal    registerWithRuntime ];
@@ -129,6 +130,9 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_point)
         : (const unsigned int) numberOfValues
         : (Pnt3D *) outValues
 {
+    (void) numberOfValues;
+    (void) outValues;
+    
     // Coordinates do not provide globally constant values
     return 0;
 }
@@ -136,6 +140,8 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_point)
 - (unsigned int) getConstPnt3DValue
         : (Pnt3D *) outValue
 {
+    (void) outValue;
+    
     // Coordinates do not provide globally constant values
     return 0;
 }
@@ -292,6 +298,9 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_point)
         : (const unsigned int) numberOfValues
         : (Pnt3D *) outValues
 {
+    (void) numberOfValues;
+    (void) outValues;
+    
     // Coordinates do not provide globally constant values
     return 0;
 }
@@ -299,6 +308,8 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_point)
 - (unsigned int) getConstPnt3DValue
         : (Pnt3D *) outValue
 {
+    (void) outValue;
+    
     // Coordinates do not provide globally constant values
     return 0;
 }
@@ -356,6 +367,9 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_point)
         : (const unsigned int) numberOfValues
         : (Pnt2D *) outValues
 {
+    (void) numberOfValues;
+    (void) outValues;
+    
     // Coordinates do not provide globally constant values
     return 0;
 }
@@ -363,6 +377,8 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_point)
 - (unsigned int) getConstPnt2DValue
         : (Pnt2D *) outValue
 {
+    (void) outValue;
+    
     // Coordinates do not provide globally constant values
     return 0;
 }
@@ -415,6 +431,9 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_surfacepoint)
         : (const unsigned int) numberOfValues
         : (Vec3D *) outValues
 {
+    (void) numberOfValues;
+    (void) outValues;
+    
     // Normals do not provide globally constant values
     return 0;
 }
@@ -422,6 +441,8 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_surfacepoint)
 - (unsigned int) getConstVec3DValue
         : (Vec3D *) outValue
 {
+    (void) outValue;
+    
     // Normals do not provide globally constant values
     return 0;
 }
@@ -474,6 +495,9 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_surfacepoint)
         : (const unsigned int) numberOfValues
         : (Vec3D *) outValues
 {
+    (void) numberOfValues;
+    (void) outValues;
+    
     // Normals do not provide globally constant values
     return 0;
 }
@@ -481,6 +505,8 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_surfacepoint)
 - (unsigned int) getConstVec3DValue
         : (Vec3D *) outValue
 {
+    (void) outValue;
+    
     // Normals do not provide globally constant values
     return 0;
 }

@@ -319,6 +319,8 @@ ArBSDFSamplingConstraint;
         : (ArSamplingRegion *) samplingRegion \
         : (ArLightIntensity *) lightIntensity \
 { \
+    (void) emissionLocation; \
+\
     if ( samplingRegion ) *samplingRegion = 0; \
 \
     arlightintensity_i_init_i( \
@@ -333,6 +335,8 @@ ArBSDFSamplingConstraint;
         : (ArSamplingRegion *) samplingRegion \
         : (ArSpectralIntensity *) spectralIntensity \
 { \
+    (void) emissionLocation; \
+\
     if ( samplingRegion ) *samplingRegion = 0; \
 \
     arspectralintensity_i_init_i( \
@@ -348,6 +352,9 @@ ArBSDFSamplingConstraint;
         : (ArSamplingRegion *) samplingRegion \
         : (ArLight *) light \
 { \
+    (void) emissionLocation; \
+    (void) outgoingDirection; \
+\
     if ( samplingRegion ) *samplingRegion = 0; \
 \
     arlight_d_init_unpolarised_l( \
@@ -362,6 +369,8 @@ ArBSDFSamplingConstraint;
         : (ArSamplingRegion *) samplingRegion \
         : (ArLight *) light \
 { \
+    (void) emissionLocationAndIncidentDirection; \
+\
     if ( samplingRegion ) *samplingRegion = 0; \
 \
     arlight_d_init_unpolarised_l( \
@@ -378,6 +387,10 @@ ArBSDFSamplingConstraint;
         : (      ArSamplingRegion *) samplingRegion \
         : (      ArLightSample *) lightSample \
 { \
+    (void) emissionLocation; \
+    (void) outgoingDirection; \
+    (void) wavelength; \
+\
     if ( samplingRegion ) *samplingRegion = 0; \
 \
     arlightsample_d_init_unpolarised_l( \
@@ -393,6 +406,10 @@ ArBSDFSamplingConstraint;
         : (ArDirectionCosine *) emissionDirection \
         : (ArPDFValue *) sampleProbability \
 { \
+    (void) emissionLocation; \
+    (void) context; \
+    (void) emissionDirection; \
+    (void) sampleProbability; \
 }
 
 #define ARPSURFACEMATERIAL_DEFAULT_NONDIFFUSE_NONEMISSIVE_IMPLEMENTATION \
@@ -403,6 +420,9 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (const ArWavelength *) wavelength \
         : (      ArSpectralSample *) albedo \
 { \
+    (void) emissionLocation; \
+    (void) wavelength; \
+\
     *albedo = SPS4(0.0); \
     return NO; \
 }
@@ -416,6 +436,13 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (      ArWavelength *) sampledWavelength \
         : (      ArPDFValue *) shiftProbability \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) sampledWavelength; \
+    (void) shiftProbability; \
+    \
     return NO; \
 } \
  \
@@ -427,6 +454,13 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (const ArWavelength *) outgoingWavelength \
         : (      ArPDFValue *) shiftProbability \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) outgoingWavelength; \
+    (void) shiftProbability; \
+    \
     return NO; \
 } \
  \
@@ -441,6 +475,10 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (ArPDFValue *) reverseSampleProbability \
         : (ArAttenuationSample *) attenuation \
 { \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) outgoingWavelength; \
+    \
     if(sampleProbability) *sampleProbability = ARPDFVALUE_ZERO; \
     if(reverseSampleProbability) *reverseSampleProbability = ARPDFVALUE_ZERO; \
 \
@@ -466,6 +504,16 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (      ArPDFValue *) reverseSampleProbability \
         : (      ArAttenuationSample *) attenuationSample \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) sampledWavelength; \
+    (void) sampledDirection; \
+    (void) sampleProbability; \
+    (void) reverseSampleProbability; \
+    (void) attenuationSample; \
+    \
     return NO; \
 } \
 \
@@ -483,6 +531,19 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (      ArPDFValue *) alternateReverseSampleProbability \
         : (      ArAttenuationSample *) attenuationSample \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    (void) incomingWavelength; \
+    (void) constraint; \
+    (void) sampledWavelength; \
+    (void) sampledDirection; \
+    (void) sampleProbability; \
+    (void) reverseSampleProbability; \
+    (void) alternateSampleProbability; \
+    (void) alternateReverseSampleProbability; \
+    (void) attenuationSample; \
+    \
     return NO; \
 } \
 \
@@ -491,6 +552,9 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (const ArWavelength *) wavelength \
         : (      ArSpectralSample *) albedo \
 { \
+    (void) emissionLocation; \
+    (void) wavelength; \
+\
     *albedo = SPS4(0.0); \
     return NO; \
 }
@@ -546,6 +610,10 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (      ArWavelength *) sampledWavelength \
         : (      ArPDFValue *) shiftProbability \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+    \
     *sampledWavelength = *incomingWavelength; \
     *shiftProbability = ARPDFVALUE_UNIT_DIRAC; \
     \
@@ -560,10 +628,14 @@ ARPSURFACEMATERIAL_DEFAULT_NONEMISSIVE_IMPLEMENTATION \
         : (const ArWavelength *) outgoingWavelength \
         : (      ArPDFValue *) shiftProbability \
 { \
+    (void) incomingDirectionAndLocation; \
+    (void) pathDirection; \
+    (void) context; \
+\
     if(ARWL_WI(*incomingWavelength,0) == ARWL_WI(*outgoingWavelength,0)) \
     { \
         *shiftProbability = ARPDFVALUE_UNIT_DIRAC; \
-        for( int i = 1; i < HERO_SAMPLES_TO_SPLAT; ++i) \
+        for( unsigned int i = 1; i < HERO_SAMPLES_TO_SPLAT; ++i) \
         { \
             if(ARWL_WI(*incomingWavelength,i) != ARWL_WI(*outgoingWavelength,i)) \
                 ARPDFVAL_PI(*shiftProbability, i) = 0.0; \
@@ -595,12 +667,16 @@ ARPSURFACEMATERIAL_DEFAULT_WAVELENGTH_PRESERVING_OPAQUE_IMPLEMENTATION
         : (ArcSurfacePoint *) location \
         : (UInt32 *) hash \
 { \
+    (void) location; \
+    (void) hash; \
+\
     return ( (__t) | additionalSurfaceProperties ); \
 } \
 \
 - (void) finishSurface \
         : (ArcSurfacePoint *) location \
 { \
+    (void) location; \
 }
 
 
@@ -641,12 +717,16 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION_OPAQUE_##__opaque
         : (ArcSurfacePoint *) location \
         : (UInt32 *) hash \
 { \
+    (void) location; \
+    (void) hash; \
+\
     return arsurface_emitter; \
 } \
 \
 - (void) finishSurface \
         : (ArcSurfacePoint *) location \
 { \
+    (void) location; \
 }
 
 

@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnQuadrangle registerWithRuntime ];
 )
 
@@ -65,7 +66,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(1,1,1)
     quadrangleData = 0;
 }
 
-- init
+- (id) init
         : (long) idx0
         : (long) idx1
         : (long) idx2
@@ -88,7 +89,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(1,1,1)
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArnQuadrangle  * copiedInstance = [ super copy ];
 
@@ -97,7 +98,7 @@ ARPSHAPE_DEFAULT_IMPLEMENTATION(1,1,1)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnQuadrangle  * copiedInstance =

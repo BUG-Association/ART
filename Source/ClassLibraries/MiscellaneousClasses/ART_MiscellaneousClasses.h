@@ -32,7 +32,7 @@ ART_LIBRARY_INTERFACE(ART_MiscellaneousClasses)
 #import "LengthAndAreaComputations.h"
 #import "ArcBBoxCache.h"
 #import "ArcOption.h"
-#import "ArcInteger.h"
+#import "ArcUnsignedInteger.h"
 #import "ArcEvaluationEnvironment.h"
 #import "ArcParameterisation.h"
 #import "ArcParameterRange.h"

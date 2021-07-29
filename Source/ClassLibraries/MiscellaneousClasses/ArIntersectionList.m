@@ -149,7 +149,7 @@ void arintersectionlist_check_connectivity(
         ArIntersectionList  * list
         )
 {
-    ART__CODE_IS_WORK_IN_PROGRESS__GENERATE_WARNING(
+    ART_ERRORHANDLING_WARNING(
         "currently, this function only performs a partial connectivity check"
         );
     
@@ -456,6 +456,7 @@ void arintersectionlist_or(
         double                eps
         )
 {
+    (void) eps;
 #ifdef WITH_RSA_STATISTICS
     combined_list->intersectionTests =
         left_list->intersectionTests + right_list->intersectionTests;
@@ -655,6 +656,7 @@ void arintersectionlist_and(
         double                eps
         )
 {
+    (void) eps;
 #ifdef WITH_RSA_STATISTICS
     combined_list->intersectionTests =
         left_list->intersectionTests + right_list->intersectionTests;
@@ -814,6 +816,7 @@ void arintersectionlist_sub(
         double                eps
         )
 {
+    (void) eps;
 #ifdef WITH_RSA_STATISTICS
     combined_list->intersectionTests =
         left_list->intersectionTests + right_list->intersectionTests;
@@ -967,6 +970,7 @@ void arintersectionlist_combine(
         double                eps
         )
 {
+    (void) eps;
 #ifdef WITH_RSA_STATISTICS
     combined_list->intersectionTests =
         left_list->intersectionTests + right_list->intersectionTests;
@@ -1436,6 +1440,11 @@ void arintersectionlist_init_4_singular(
               ArnRayCaster        * raycaster
         )
 {
+    (void) list;
+    (void) values_of_t;
+    (void) face_indices;
+    (void) shape;
+    (void) raycaster;
     ART_ERRORHANDLING_FATAL_ERROR(
         "arintersectionlist_init_4_singular not implemented"
         );

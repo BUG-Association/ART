@@ -55,7 +55,7 @@ ART_MODULE_INTERFACE(ArAttribute)
     ArNodeRef  attributeRef;
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRef) newAttributeRef
         ;
@@ -72,7 +72,7 @@ ART_MODULE_INTERFACE(ArAttribute)
     ArNodeRef  attributeRefArray[2];
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRef) newAttributeRef0
         : (ArNodeRef) newAttributeRef1
@@ -90,7 +90,7 @@ ART_MODULE_INTERFACE(ArAttribute)
     ArNodeRef  attributeRefArray[3];
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRef) newAttributeRef0
         : (ArNodeRef) newAttributeRef1
@@ -109,7 +109,7 @@ ART_MODULE_INTERFACE(ArAttribute)
     ArNodeRef  attributeRefArray[4];
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRef) newAttributeRef0
         : (ArNodeRef) newAttributeRef1
@@ -129,7 +129,7 @@ ART_MODULE_INTERFACE(ArAttribute)
     ArNodeRefDynArray  attributeRefArray;
 }
 
-- init
+- (id) init
         : (ArNodeRef) newNodeRef
         : (ArNodeRefDynArray *) newAttributeRefArray
         ;

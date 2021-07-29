@@ -32,7 +32,7 @@ ART_MODULE_INTERFACE(ArnPreethamSkyModel_VolumeMaterial)
 #import "ART_SkyModel.h"
 
 
-@interface ArnPreethamSkyModel(Material) < ArpVolumeMaterial > @end
+@interface ArnPreethamSkyModel(VolumeMaterial) < ArpVolumeMaterial > @end
 
 
 // ===========================================================================

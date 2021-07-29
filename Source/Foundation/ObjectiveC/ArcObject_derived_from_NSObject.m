@@ -74,7 +74,7 @@
 
 #endif // ALLOC_DEALLOC_DEBUG_OUTPUT
 
-- init_ART_GV
+- (id) init_ART_GV
         : (ART_GV *) new_art_gv
 {
 #ifdef USE_PROPRIETARY_ARCOBJECT_RETAIN_RELEASE

@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     RUNTIME_REGISTER_PROTOCOL(ArpSurfaceMap);
     RUNTIME_REGISTER_PROTOCOL(ArpSurfacePhase);
 
@@ -75,7 +76,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
 //      cellIndexType = 0;
 }
 
-- init
+- (id) init
         : (ArNode <ArpNode>*) newExpression
         : (ArNode <ArpNode>*) newCellIndices
         : (ArNode <ArpNode>*) newSurfaceMap
@@ -102,80 +103,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
 
     if ( [ coder isReading ] )
         [self _setupMappedSurface];
-}
-
-- (BOOL) calculateAlbedoSampleAtWavelength
-        : (      ArcSurfacePoint *) location
-        : (const ArWavelength *) wavelength
-        : (      ArSpectralSample *) albedo
-{
-    ArSurfacePhaseCache  cache;
-
-    [ self _getCurrentSurfaceIndex
-        :   location
-        : & cache
-        ];
-
-    double  x = m_d_frac(cache.xf);
-
-    ArSpectralSample  albedo1;
-    ArSpectralSample  albedo2;
-
-    sps_d_init_s(art_gv, 0, &albedo1);
-    sps_d_init_s(art_gv, 0, &albedo2);
-
-    BOOL    resultBOOL1 = NO, resultBOOL2 = NO;
-
-    if ( 1.0 - x > 0.0 )
-    {
-        double  thisAlbedo;
-
-        resultBOOL1 =
-            [ cache.surface1 calculateAlbedoSampleAtWavelength
-                :   location
-                :   wavelength
-                : & albedo1
-                ];
-
-        sps_d_mul_s( art_gv, 1.0 - x, & albedo1 );
-    }
-
-    if ( x > 0.0)
-    {
-        double  thisAlbedo;
-
-        resultBOOL2 =
-            [ cache.surface2 calculateAlbedoSampleAtWavelength
-                :   location
-                :   wavelength
-                : & albedo2
-                ];
-
-        sps_d_mul_s( art_gv, x, & albedo2 );
-    }
-
-    sps_ss_add_s( art_gv, & albedo1, & albedo2, albedo );
-
-    return resultBOOL1 || resultBOOL2;
-}
-
-- (BOOL) calculateSingleConstrainedBSDFSample
-        : (      ArcIntersection *) incomingDirectionAndLocation
-        : (      ArPathDirection) pathDirection
-        : (      ArBSDFSampleGenerationContext *) context
-        : (const ArWavelength *) incomingWavelength
-        : (      ArBSDFSamplingConstraint) constraint
-        : (      ArWavelength *) sampledWavelength
-        : (      ArDirectionCosine *) sampledDirection
-        : (      ArPDFValue *) sampleProbability
-        : (      ArPDFValue *) reverseSampleProbability
-        : (      ArPDFValue *) alternateSampleProbability
-        : (      ArPDFValue *) alternateReverseSampleProbability
-        : (      ArAttenuationSample *) attenuationSample
-{
-    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
-    
-    return YES;
 }
 
 - (void) _getCurrentSurfaceIndex
@@ -216,6 +143,89 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
     //       (unsigned int)(void*)(cache->surface1),
     //       (unsigned int)(void*)(cache->surface2)
     //       );
+}
+
+- (BOOL) calculateAlbedoSampleAtWavelength
+        : (      ArcSurfacePoint *) location
+        : (const ArWavelength *) wavelength
+        : (      ArSpectralSample *) albedo
+{
+    ArSurfacePhaseCache  cache;
+
+    [ self _getCurrentSurfaceIndex
+        :   location
+        : & cache
+        ];
+
+    double  x = m_d_frac(cache.xf);
+
+    ArSpectralSample  albedo1;
+    ArSpectralSample  albedo2;
+
+    sps_d_init_s(art_gv, 0, &albedo1);
+    sps_d_init_s(art_gv, 0, &albedo2);
+
+    BOOL    resultBOOL1 = NO, resultBOOL2 = NO;
+
+    if ( 1.0 - x > 0.0 )
+    {
+        resultBOOL1 =
+            [ cache.surface1 calculateAlbedoSampleAtWavelength
+                :   location
+                :   wavelength
+                : & albedo1
+                ];
+
+        sps_d_mul_s( art_gv, 1.0 - x, & albedo1 );
+    }
+
+    if ( x > 0.0)
+    {
+        resultBOOL2 =
+            [ cache.surface2 calculateAlbedoSampleAtWavelength
+                :   location
+                :   wavelength
+                : & albedo2
+                ];
+
+        sps_d_mul_s( art_gv, x, & albedo2 );
+    }
+
+    sps_ss_add_s( art_gv, & albedo1, & albedo2, albedo );
+
+    return resultBOOL1 || resultBOOL2;
+}
+
+- (BOOL) calculateSingleConstrainedBSDFSample
+        : (      ArcIntersection *) incomingDirectionAndLocation
+        : (      ArPathDirection) pathDirection
+        : (      ArBSDFSampleGenerationContext *) context
+        : (const ArWavelength *) incomingWavelength
+        : (      ArBSDFSamplingConstraint) constraint
+        : (      ArWavelength *) sampledWavelength
+        : (      ArDirectionCosine *) sampledDirection
+        : (      ArPDFValue *) sampleProbability
+        : (      ArPDFValue *) reverseSampleProbability
+        : (      ArPDFValue *) alternateSampleProbability
+        : (      ArPDFValue *) alternateReverseSampleProbability
+        : (      ArAttenuationSample *) attenuationSample
+{
+    (void) incomingDirectionAndLocation;
+    (void) pathDirection;
+    (void) context;
+    (void) incomingWavelength;
+    (void) constraint;
+    (void) sampledWavelength;
+    (void) sampledDirection;
+    (void) sampleProbability;
+    (void) reverseSampleProbability;
+    (void) alternateSampleProbability;
+    (void) alternateReverseSampleProbability;
+    (void) attenuationSample;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
+    return YES;
 }
 
 - (BOOL) noTransmission
@@ -326,6 +336,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
 - (void) finishSurface
         : (ArcSurfacePoint *) location
 {
+    (void) location;
     // TODO: ...
 
 //    ArSurfacePhaseCache cache;
@@ -503,7 +514,11 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMappedSurfaceMaterial)
         : (ArSamplingRegion *) samplingRegion
         : (ArLightSample *) lightSample
 {
-ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    (void) emissionLocation;
+    (void) outgoingDirection;
+    (void) wavelength;
+    
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
     //  This is a temporary workaround for non-emmisive surfaces
 
     //  TODO: Add support for emmiters
@@ -928,7 +943,7 @@ ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSurfaceMap)
 
-- copy
+- (id) copy
 {
     ArnSurfaceMap  * copiedInstance = [ super copy ];
 
@@ -937,7 +952,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSurfaceMap)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnSurfaceMap  * copiedInstance =
@@ -981,7 +996,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSurfaceMap)
     }
 }
 
-- init
+- (id) init
         : (ArNodeRefDynArray *) newSurfacePhases
 {
     self =
@@ -1158,7 +1173,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSurfacePhase)
     // ...
 }
 
-- init
+- (id) init
         : (ArNode <ArpSurfaceMaterial>*) newSurface
         : (double) newPhase
 {

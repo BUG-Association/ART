@@ -48,7 +48,7 @@ ART_MODULE_INTERFACE(ArcObjCCoder)
     const char            * prefix;
 }
 
-- init
+- (id) init
         : (ArcObject <ArpOutputStream> *)newStream
         ;
 
@@ -69,7 +69,7 @@ ART_MODULE_INTERFACE(ArcObjCCoder)
         : (ArcObject <ArpStream> *) stream
         ;
 
-- init
+- (id) init
         : (ArcObject <ArpInputStream> *) newStream
         ;
 

@@ -49,7 +49,7 @@ ART_MODULE_INTERFACE(ArnImageMap)
     const UCC  * ucc;
 }
 
-- init
+- (id) init
         : (ArNode *) newImage
         : (double)   newScaleFactor
         ;

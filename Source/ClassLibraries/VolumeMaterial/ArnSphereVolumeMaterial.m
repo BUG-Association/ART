@@ -38,6 +38,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSphereVolumeMaterial registerWithRuntime ];
 )
 
@@ -49,7 +50,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSphereVolumeMaterial)
 ARPVOLUME_MATERIAL_ABSORPTION_ONLY
 
-- copy
+- (id) copy
 {
     ArnSphereVolumeMaterial  * copiedInstance = [ super copy ];
 
@@ -58,7 +59,7 @@ ARPVOLUME_MATERIAL_ABSORPTION_ONLY
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnSphereVolumeMaterial  * copiedInstance =
@@ -75,7 +76,7 @@ ARPVOLUME_MATERIAL_ABSORPTION_ONLY
 {
 }
 
-- init
+- (id) init
         : (Pnt3D                 ) newSphereCenter
         : (double                ) newSphereSize
         : (ArNode <ArpSpectrum> *) outerAbsorbCrossSection
@@ -140,6 +141,8 @@ ARPVOLUME_MATERIAL_ABSORPTION_ONLY
         : (      ArPathDirection   ) pathDirection
         : (      ArSpectralSample *) crossSection
 {
+    (void) pathDirection;
+    
     [ self absorptionCoefficient
         :   pointWorldspace
         :   wavelength
@@ -153,6 +156,8 @@ ARPVOLUME_MATERIAL_ABSORPTION_ONLY
         : (      ArPathDirection   ) pathDirection
         : (      ArSpectralSample *) maxCrossSection
 {
+    (void) pathDirection;
+    
     [ self maxAbsorptionCoefficientForRay
         :   rayWorldspace
         :   wavelength
@@ -173,7 +178,6 @@ ARPVOLUME_MATERIAL_ABSORPTION_ONLY
         & distanceToCenter
         );
     
-    ArSpectralSample absorptionSample;
     ArNode <ArpSpectrum> * node =
         (vec3d_v_sqrlen(& distanceToCenter) <= M_SQR(sphereSize) ?
                 SPHERE_ABSORPTION_COLOURNODE :
@@ -191,6 +195,8 @@ ARPVOLUME_MATERIAL_ABSORPTION_ONLY
         : (const ArWavelength     *) wavelength
         : (      ArSpectralSample *) maxAbsorptionCoefficient
 {
+    (void) rayWorldspace;
+    
     // TODO : more clever stuff with the ray
     ArSpectralSample outerSample, sphereSample;
     
@@ -219,7 +225,12 @@ ARPVOLUME_MATERIAL_ABSORPTION_ONLY
         : (      double *) near
         : (      double *) far
 {
+    (void) ray_worldspace;
+    (void) near;
+    (void) far;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+    
     return NO;
 }
 
@@ -238,9 +249,15 @@ ARPVOLUME_MATERIAL_ABSORPTION_ONLY
         : (      ArAttenuationSample *) attenuation_r
         : (      ArLightSample       *) light_r
 {
+    (void) ray_worldspace;
+    (void) distance;
+    (void) pathDirection;
+    (void) wavelength;
+    (void) attenuation_r;
+    (void) light_r;
+    
     ART_ERRORHANDLING_FATAL_ERROR(
-        "This volume does not provide a closed form for emission / extinction",
-        NULL
+        "This volume does not provide a closed form for emission / extinction"
         );
 }
 

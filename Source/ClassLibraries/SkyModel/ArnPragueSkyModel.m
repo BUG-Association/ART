@@ -56,13 +56,23 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPragueSkyModel)
         arpragueskymodelstate_free( skymodel_state );
     }
 
-    double  ground_albedo[11];
+    ArSpectrum  * groundAlbedoSpectrum = spc_alloc(art_gv);
 
-#warning placeholder for actual albedo
+    [ SKYMODEL_GROUND_ALBEDO_SUBNODE getSpectrum
+        :   0
+        :   groundAlbedoSpectrum
+        ];
+        
+    ArSpectrum11  groundAlbedoSpectrum11;
+    
+    spc_to_s11(art_gv,groundAlbedoSpectrum,&groundAlbedoSpectrum11);
+    spc_free(art_gv, groundAlbedoSpectrum);
+
+    double  ground_albedo[11];
     
     for ( unsigned int i = 0; i < 11; i++ )
     {
-        ground_albedo[i] = 0.5;
+        ground_albedo[i] = s11_si(art_gv,&groundAlbedoSpectrum11,i);
     }
     
     ArConstStringArray  resourcePaths = ART_RESOURCE_PATHS;
@@ -125,7 +135,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPragueSkyModel)
     return self;
 }
 
-- init
+- (id) init
         : (double) newElevation
         : (double) newAzimuth
         : (double) newTurbidity
@@ -133,17 +143,18 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPragueSkyModel)
         : (ArNode <ArpSpectrum> *) newGroundAlbedo
         : (ArNode <ArpTrafo3D> *) newTrafo
 {
-    [ super init
-        :   PSM_SUN_RADIUS
-        :   newElevation
-        :   newAzimuth
-        :   0.0
-        :   1.0
-        :   newTurbidity
-        :   newPolarisedOutput
-        :   newGroundAlbedo
-        :   newTrafo
-        ];
+    self = 
+        [ super init
+            :   PSM_SUN_RADIUS
+            :   newElevation
+            :   newAzimuth
+            :   0.0
+            :   1.0
+            :   newTurbidity
+            :   newPolarisedOutput
+            :   newGroundAlbedo
+            :   newTrafo
+            ];
 
     [ self _setup ];
 

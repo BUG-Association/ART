@@ -32,6 +32,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSphericalCamera registerWithRuntime ];
 )
 
@@ -47,11 +48,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSphericalCamera)
     near2world = NULL;
 }
 
-- init
+- (id) init
         : (Ray3D) newRay
         : (IVec2D) newImageSize
         : (double) newZoom
 {
+    (void) newZoom;
+    
     self = [super init];
     
     if ( self )
@@ -68,7 +71,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSphericalCamera)
     return self;
 }
 
-- init
+- (id) init
         : (Ray3D) newRay
         : (IVec2D) newImageSize
         : (double) newZoom
@@ -76,6 +79,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSphericalCamera)
         : (double) newNear
         : (double) newRatio
 {
+    (void) newZoom;
+    (void) newNear;
+    (void) newRatio;
+    
     self = [super init];
     
     if ( self )
@@ -213,6 +220,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSphericalCamera)
 #endif
         : (Ray3D *) outRay
 {
+    (void) randomGenerator;
+    
     Vec3D       getRayVector;
     double scaledx = (x - xscale)/(2*xscale) * MATH_2_MUL_PI;
     double scaledy = MATH_PI_DIV_2*(y-yscale)/yscale;
@@ -226,16 +235,18 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSphericalCamera)
     return YES;
 }
 
-- withNear
+- (id) withNear
         : (double) newNear
 {
+    (void) newNear;
     near = 0.0; // ignore  newNear;
     return self;
 }
 
-- withRatio
+- (id) withRatio
         : (double) newRatio
 {
+    (void) newRatio;
     ratio = 1.0; // ignore
     return self;
 }

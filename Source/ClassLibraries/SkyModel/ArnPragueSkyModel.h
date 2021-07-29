@@ -60,7 +60,7 @@ ART_MODULE_INTERFACE(ArnPragueSkyModel)
     ArPragueSkyModelState  * skymodel_state;
 }
 
-- init
+- (id) init
         : (double) newElevation
         : (double) newAzimuth
         : (double) newTurbidity

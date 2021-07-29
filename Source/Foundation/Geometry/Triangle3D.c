@@ -83,6 +83,7 @@ void triangledata_point_coord(
         Pnt2D * out_crd
         )
 {
+    (void) triangle_data;
     int d1 = (d0 + 1) % 3;
     double u, v;
     double u0 = PNT3D_I(*ray_point,d0) - PNT3D_I(*p0,d0);
@@ -182,6 +183,7 @@ int triangledata_contains_point_x(
         Pnt2D * out_crd
         )
 {
+    (void) triangle_data;
     double u, v;
     double u0 = XC(*ray_point) - XC(*p0);
     double v0 = YC(*ray_point) - YC(*p0);
@@ -216,6 +218,7 @@ int triangledata_contains_point_y(
         Pnt2D * out_crd
         )
 {
+    (void) triangle_data;
     double u, v;
     double u0 = YC(*ray_point) - YC(*p0);
     double v0 = ZC(*ray_point) - ZC(*p0);
@@ -250,6 +253,7 @@ int triangledata_contains_point_z(
         Pnt2D * out_crd
         )
 {
+    (void) triangle_data;
     double u, v;
     double u0 = ZC(*ray_point) - ZC(*p0);
     double v0 = XC(*ray_point) - XC(*p0);
@@ -308,6 +312,7 @@ int triangledata_contains_point_index(
         Pnt2D * out_crd
         )
 {
+    (void) triangle_data;
     int d1 = (d0 + 1) % 3;
     double u, v;
     double u0 = PNT3D_I(*ray_point,d0) - PNT3D_I(*p0,d0);

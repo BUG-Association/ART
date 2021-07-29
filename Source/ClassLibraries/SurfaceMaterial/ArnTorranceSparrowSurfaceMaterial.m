@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnTorranceSparrowSurfaceMaterial  registerWithRuntime ];
 )
 
@@ -95,7 +96,7 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
     ARSURFACETYPE_GENERIC_REFLECTIONS | ARSURFACETYPE_GENERIC_REFRACTIONS,
     NO
                                                       )
-- init
+- (id) init
         : (ArNode *) newMicrofacetDistribution
 {
     self =
@@ -197,7 +198,7 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
             ];               
 }
 
-- copy
+- (id) copy
 {
     ArnTorranceSparrowSurfaceMaterial  * copiedInstance = [ super copy ];
     
@@ -206,7 +207,7 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
 : (ArnGraphTraversal *) traversal
 {
     ArnTorranceSparrowSurfaceMaterial  * copiedInstance =
@@ -499,7 +500,7 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
         SPS_CI(incomingDirectionMicrofacetCosineSample, 0) = incomingDirectionMicrofacetCosine;
         SPS_CI(negativeOutgoingDirectionMicrofacetCosineSample, 0) = -outgoingDirectionMicrofacetCosine;
         
-        for(int i = 1; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for(unsigned int i = 1; i < HERO_SAMPLES_TO_SPLAT; ++i)
         {
             // compute the refraction normals for the other wavelengths
             ArDirectionCosine otherMicrofacetNormalDirection;
@@ -890,7 +891,7 @@ ARPSURFACEMATERIAL_DEFAULT_SURFACETYPE_IMPLEMENTATION(
                                                  & inverseIOR
                                                  );
                 
-                for(int i = 1; i < HERO_SAMPLES_TO_SPLAT; ++i)
+                for(unsigned int i = 1; i < HERO_SAMPLES_TO_SPLAT; ++i)
                 {
                     // compute the refraction normals for the other wavelengths
                     

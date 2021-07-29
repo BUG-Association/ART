@@ -43,7 +43,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @implementation ArcInfiniteSphereLightsource
 
-- init
+- (id) init
         : (ArNode <ArpShape> *) shapeRef
         : (ArTraversalState *) traversalState
         : (ArnLightsourceCollector *) lightsourceCollector
@@ -117,7 +117,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     [ super dealloc ];
 }
 
-- copy
+- (id) copy
 {
     ArcInfiniteSphereLightsource  * clone = [ super copy ];
 
@@ -127,6 +127,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 - (double) selectionProbabilityOfRegion
         : ( ArSamplingRegion *)  lightsourceSamplingRegion
 {
+    (void) lightsourceSamplingRegion;
+    
     return 1.0;
 }
 
@@ -134,6 +136,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : ( ArSamplingRegion *)  samplingRegion
         : ( double * ) probability
 {
+    (void) samplingRegion;
+    
     *probability = infSphereSampleProbability;
     return YES;
     // return NO;

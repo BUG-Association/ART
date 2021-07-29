@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
      [ ART_MODULE_NAME registerWithRuntime ];
 )
 
@@ -39,14 +40,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExponentialTrackingVolumeIntegrator)
 
-- copy
+- (id) copy
 {
     ArnExponentialTrackingVolumeIntegrator  * copiedInstance = [ super copy ];
 
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnExponentialTrackingVolumeIntegrator  * copiedInstance =

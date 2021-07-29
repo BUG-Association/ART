@@ -34,6 +34,7 @@ ART_MODULE_INITIALISATION_FUNCTION_EXEC_ONLY_ONCE
 (
     C4_ZERO_POINT = CRD4(0.0,0.0,0.0,1.0);
 ,
+    (void) art_gv;
     // module has no code that gets executed on every startup
 )
 

@@ -161,7 +161,7 @@ ARPFILE_DEFAULT_IMPLEMENTATION( ArfHeightfield, arfiletypecapabilites_read )
     }
 }
 
-- initWithFile: (ArcFile *) newFile
+- (id) initWithFile: (ArcFile *) newFile
 {
     file = newFile;
     return self;
@@ -198,6 +198,10 @@ ARPFILE_DEFAULT_IMPLEMENTATION( ArfHeightfield, arfiletypecapabilites_read )
         : (ArList *) externals
         : (ArNode *) auxiliaryNode
 {
+    (void) objectPtr;
+    (void) externals;
+    (void) auxiliaryNode;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 /*
     if ( ( [ file open :arfile_read ] & arstream_invalid ) == 0 )
@@ -230,6 +234,9 @@ ARPFILE_DEFAULT_IMPLEMENTATION( ArfHeightfield, arfiletypecapabilites_read )
         : (ArNode **) objectPtr
         : (ArcObject <ArpStream> *) stream
 {
+    (void) objectPtr;
+    (void) stream;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 /*
     [self parseStreamGetExternals :objectPtr :stream :0 :0];
@@ -288,7 +295,7 @@ do{ \
     : (unsigned long) arraySize
 {
     float ftmp;
-    int i;
+    unsigned long i;
 
     for(i = 0; i < arraySize; i++)
     {

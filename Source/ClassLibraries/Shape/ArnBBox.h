@@ -49,7 +49,7 @@ ART_MODULE_INTERFACE(ArnBBox)
     unsigned int  unionOptions;
 }
 
-- init
+- (id) init
         : (ArNodeRef) nodeRef0
         : (ArNodeRef) nodeRef1
         : (BoxFlags3D) newBoxFlags
@@ -76,7 +76,7 @@ ART_MODULE_INTERFACE(ArnBBox)
     unsigned int  unionOptions;
 }
 
-- init
+- (id) init
         : (ArNodeRef) nodeRef0
         : (ArNodeRef) nodeRef1
         : (BoxFlags3D) newBoxFlags

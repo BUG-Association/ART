@@ -43,6 +43,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnImageFractionDitherer registerWithRuntime ];
     [ ArnARTCSPLuminanceClipping registerWithRuntime ];
 )
@@ -58,7 +59,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnImageFractionDitherer)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageFractionDitherer)
 
-- init
+- (id) init
         : (const char *) newDitherFileName
 {
     self = [ super init ];
@@ -126,7 +127,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnImageFractionDitherer)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnARTCSPLuminanceClipping)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTCSPLuminanceClipping)
 
-- removeSource
+- (id) removeSource
                         : (BOOL) newRemoveOption
         whiteLuminance  : (double) newWhiteLuminance
 {
@@ -137,7 +138,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTCSPLuminanceClipping)
     return self;
 }
 
-- init
+- (id) init
         : (BOOL) newRemoveOption
         : (double) newWhiteLuminance
 {
@@ -199,7 +200,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnARTCSPLuminanceClipping)
          Process all pixels in all the source images.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -407,7 +408,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnOpenImageInExternalViewer)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSetColourSubsystemWhitepoint)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetColourSubsystemWhitepoint)
 
-- init
+- (id) init
         : (char *) newWP_Desc
         : (ArNode <ArpSpectrum> *) newIlluminantSpectrum
 {
@@ -424,7 +425,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetColourSubsystemWhitepoint)
     return self;
 }
 
-- init
+- (id) init
 {
     return
         [ self init
@@ -438,6 +439,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetColourSubsystemWhitepoint)
 - (void) performOn
         : (ArNode <ArpNodeStack> *) nodeStack
 {
+    (void) nodeStack;
+    
     if ( art_system_white_point_has_been_manually_set(art_gv) )
     {
         [ ART_GLOBAL_REPORTER beginAction
@@ -525,7 +528,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnSetColourSubsystemWhitepoint)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnChangeISR_to_Match_RAW_Contents)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnChangeISR_to_Match_RAW_Contents)
 
-- init
+- (id) init
         : (double) newWavelengthToCheckAgainstISRBounds
         : (BOOL) newRequirePolarisedRAW
 {
@@ -540,7 +543,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnChangeISR_to_Match_RAW_Contents)
     return self;
 }
 
-- init
+- (id) init
 {
     return
         [ self init
@@ -708,6 +711,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnOutputCurrentISR)
 - (void) performOn
         : (ArNode <ArpNodeStack> *) nodeStack
 {
+    (void) nodeStack;
+    
     [ ART_GLOBAL_REPORTER beginAction
         :   "performing computations using %s%s as ISR"
         ,   ardatatype_polarisable_string( art_isr( art_gv ) )
@@ -728,7 +733,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnOutputCurrentISR)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRAW_Double_Mul_RAW)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAW_Double_Mul_RAW)
 
-- _init
+- (id) _init
         : (double) newFactor
         : (BOOL) newCloneOption
 {
@@ -746,7 +751,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAW_Double_Mul_RAW)
     return self;
 }
 
-- _init
+- (id) _init
         : (double) newFactor
 {
     self =
@@ -758,7 +763,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAW_Double_Mul_RAW)
     return self;
 }
 
-- multiplyBy
+- (id) multiplyBy
                    : (double) newFactor
         cloneSource: (BOOL) newCloneOption
 {
@@ -769,7 +774,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAW_Double_Mul_RAW)
             ];
 }
 
-- multiplyBy
+- (id) multiplyBy
                    : (double) newFactor
 {
     return
@@ -833,7 +838,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAW_Double_Mul_RAW)
 
     ArStokesVector  * sv0 = arstokesvector_alloc(art_gv);
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -891,7 +896,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAW_Double_Mul_RAW)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFilterTinyRAWValues)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyRAWValues)
 
-- _init
+- (id) _init
         : (double) newThresholdValue
         : (BOOL) newCloneOption
 {
@@ -909,7 +914,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyRAWValues)
     return self;
 }
 
-- _init
+- (id) _init
         : (double) newThresholdValue
 {
     self =
@@ -921,7 +926,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyRAWValues)
     return self;
 }
 
-- thresholdValue
+- (id) thresholdValue
                    : (double) newThresholdValue
         cloneSource: (BOOL) newCloneOption
 {
@@ -932,7 +937,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyRAWValues)
             ];
 }
 
-- thresholdValue
+- (id) thresholdValue
                    : (double) newThresholdValue
 {
     return
@@ -997,7 +1002,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyRAWValues)
 
     ArStokesVector  * sv0 = arstokesvector_alloc(art_gv);
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -1074,7 +1079,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterTinyRAWValues)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnDownscaleRAW)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleRAW)
 
-- downscaleFactor
+- (id) downscaleFactor
                    : (unsigned int) newDownscaleFactor
 {
     [ super init
@@ -1141,9 +1146,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleRAW)
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    unsigned int  averagingArea = M_SQR(downscaleFactor);
-    
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -1238,7 +1241,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnDownscaleRAW)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFilterHighDopRAWValues)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopRAWValues)
 
-- _init
+- (id) _init
         : (double) newThresholdValue
         : (BOOL) newCloneOption
         : (BOOL) newRemoveOption
@@ -1257,7 +1260,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopRAWValues)
     return self;
 }
 
-- _init
+- (id) _init
         : (double) newThresholdValue
 {
     self =
@@ -1270,7 +1273,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopRAWValues)
     return self;
 }
 
-- thresholdValue
+- (id) thresholdValue
                    : (double) newThresholdValue
         cloneSource: (BOOL) newCloneOption
 {
@@ -1282,7 +1285,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopRAWValues)
             ];
 }
 
-- thresholdValue
+- (id) thresholdValue
                     : (double) newThresholdValue
         removeSource: (BOOL) newRemoveOption
 {
@@ -1294,7 +1297,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopRAWValues)
             ];
 }
 
-- thresholdValue
+- (id) thresholdValue
                    : (double) newThresholdValue
 {
     return
@@ -1360,7 +1363,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnFilterHighDopRAWValues)
     
     double  num_channels = spc_channels(art_gv);
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {

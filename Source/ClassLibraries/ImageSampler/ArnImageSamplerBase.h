@@ -41,7 +41,7 @@ ART_MODULE_INTERFACE(ArnImageSamplerBase)
 {
     //   Basic configuration parameters
 
-    int                                   overallNumberOfSamplesPerPixel;
+    unsigned int                          overallNumberOfSamplesPerPixel;
     int                                   randomValueGeneration;
 
     //   These are taken from the stack or other input, and stored locally
@@ -59,10 +59,10 @@ ART_MODULE_INTERFACE(ArnImageSamplerBase)
     
     //   Internal variables that are used during rendering
     
-    int                                   numberOfRenderThreads;
-    int                                   numberOfImagesToWrite;
+    unsigned int                          numberOfRenderThreads;
+    unsigned int                          numberOfImagesToWrite;
     double                                inverseNumberOfOverallSamples;
-    int                                   numberOfSamplesPerThread;
+    unsigned int                          numberOfSamplesPerThread;
     IVec2D                                imageSize;
     IPnt2D                                imageOrigin;
     int                                 * threadStatus;
@@ -74,7 +74,7 @@ ART_MODULE_INTERFACE(ArnImageSamplerBase)
     int                                 * x_end;
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (int) newNumberOfSamples
@@ -82,15 +82,15 @@ ART_MODULE_INTERFACE(ArnImageSamplerBase)
         ;
     
 - (void) termIOProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
         ;
 
 - (void) renderProc
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
         ;
 
 - (void) renderProcHasFinished
-        : (ArcInteger *) threadIndex
+        : (ArcUnsignedInteger *) threadIndex
         ;
 
 - (const char *) preSamplingMessage

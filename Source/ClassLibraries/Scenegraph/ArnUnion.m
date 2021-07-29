@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnUnion registerWithRuntime ];
 )
 
@@ -40,7 +41,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnUnion)
 
-- init
+- (id) init
         : (ArNodeRefDynArray *) newSubnodeArray
         : (unsigned int) newOptions
 {
@@ -57,7 +58,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnUnion)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnUnion  * copiedInstance = [ super copy ];
 
@@ -66,7 +67,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnUnion)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnUnion  * copiedInstance =

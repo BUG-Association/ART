@@ -185,7 +185,7 @@ ARNVAL_CONST_COLOUR_IMPL(RSSpectrum, rss,  archive_rss);
 
 @implementation ArnVal_const_archive_rss (archiveData)
 
-- init
+- (id) init
         : (ArRSSpectrum) newNativeValue
         : (ArSymbol) newDescription
         : (ArSymbol) newAdditionalDescription

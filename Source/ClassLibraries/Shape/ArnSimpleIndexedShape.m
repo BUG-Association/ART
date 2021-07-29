@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnSimpleIndexedShape registerWithRuntime ];
 )
 
@@ -44,7 +45,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPNODE_DEFAULT_IMPLEMENTATION(ArnSimpleIndexedShape)
 ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
 
-- init
+- (id) init
         : (ArLongArray) newIndexTable
 {
     self = [ super init ];
@@ -57,7 +58,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnSimpleIndexedShape  * copiedInstance = [ super copy ];
 
@@ -66,7 +67,7 @@ ARPBBOX_DEFAULT_WORLDSPACE_BBOX_GET_IMPLEMENTATION
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnSimpleIndexedShape  * copiedInstance =

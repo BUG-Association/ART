@@ -235,7 +235,6 @@ int isSpectralEXR(const char* filename)
         const Imf::ChannelList& exrChannels = file.header().channels();
 
         // Check if there is a spectral channel in the image
-        SpectrumType spectrumType = UNDEFINED;
 
         for (Imf::ChannelList::ConstIterator channel = exrChannels.begin(); channel != exrChannels.end(); channel++) {
             // Check if the channel is spectral or one of the RGBA channel
@@ -264,9 +263,6 @@ int isRGBEXR(const char* filename)
     try {
         Imf::InputFile file(filename);
         const Imf::ChannelList& exrChannels = file.header().channels();
-
-        // Check if there is a spectral channel in the image
-        SpectrumType spectrumType = UNDEFINED;
 
         bool hasR = false;
         bool hasG = false;

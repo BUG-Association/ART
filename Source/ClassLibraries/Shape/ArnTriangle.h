@@ -39,7 +39,7 @@ ART_MODULE_INTERFACE(ArnTriangle)
     UInt8           dim;
 }
 
-- init
+- (id) init
         : (long) idx0
         : (long) idx1
         : (long) idx2

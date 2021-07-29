@@ -44,7 +44,7 @@ ArNode  * create_arntrafopair(
 {
 }
 
-- init
+- (id) init
         : (ArNodeRef) nodeRef0
         : (ArNodeRef) nodeRef1
         ;
@@ -64,7 +64,7 @@ ArnTrafo2DPair * create_arntrafo2dpair(
 {
 }
 
-- init
+- (id) init
         : (ArNodeRef) nodeRef0
         : (ArNodeRef) nodeRef1
         ;

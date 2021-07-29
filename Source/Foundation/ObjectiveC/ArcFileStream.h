@@ -43,7 +43,7 @@ ART_MODULE_INTERFACE(ArcFileStream)
     ArStreamState    state;
 }
 
-- init
+- (id) init
         : (FILE *) newFile
         ;
 
@@ -64,7 +64,7 @@ ART_MODULE_INTERFACE(ArcFileStream)
     ArFileMode    fileModeUsedDuringCreation;
 }
 
-+ new
++ (id) new
         : (ART_GV *) art_gv
         : (const char *) newName
         ;
@@ -74,7 +74,7 @@ ART_MODULE_INTERFACE(ArcFileStream)
         : (const char *) newName
         ;
 
-- init
+- (id) init
         : (const char *) newName
         ;
 

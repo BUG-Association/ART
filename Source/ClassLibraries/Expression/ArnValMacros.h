@@ -42,9 +42,11 @@
         : (const unsigned int) numberOfValues \
         : (_otype *) outValues \
     { \
+        (void) evalEnv; \
+        \
         unsigned int actualNumberOfValues = \
             M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
-        for (int i = 0; i < actualNumberOfValues; i++) \
+        for (unsigned int i = 0; i < actualNumberOfValues; i++) \
             outValues[i] = _value; \
         return actualNumberOfValues; \
     } \
@@ -53,6 +55,8 @@
         : (const ArcObject <ArpEvaluationEnvironment> *) evalEnv \
         : (_otype *) outValue \
     { \
+        (void) evalEnv; \
+        \
         if (outValue == NULL) \
             return 0; \
         *outValue = _value; \
@@ -65,7 +69,7 @@
     { \
         unsigned int actualNumberOfValues = \
             M_MIN(numberOfValues, ARPVALUES_MAX_VALUES); \
-        for (int i = 0; i < actualNumberOfValues; i++) \
+        for (unsigned int i = 0; i < actualNumberOfValues; i++) \
             outValues[i] = _value; \
         return actualNumberOfValues; \
     } \
@@ -98,7 +102,7 @@
                     :   numberOfValues \
                     :   iv \
                     ]; \
-        for (int i = 0; i < actualNumberOfValues; i++) \
+        for (unsigned int i = 0; i < actualNumberOfValues; i++) \
             _fmulti; \
         return actualNumberOfValues; \
     } \
@@ -130,7 +134,7 @@
                     :   numberOfValues \
                     :   iv \
                     ]; \
-        for (int i = 0; i < actualNumberOfValues; i++) \
+        for (unsigned int i = 0; i < actualNumberOfValues; i++) \
             _fmulti; \
         return actualNumberOfValues; \
     } \
@@ -639,7 +643,7 @@
  --------------------------------------------------------------------------- */
 
 #define ARNVAL_CONST_EXPR_INIT_IMPL(_Type, _value_var) \
-    - init \
+    - (id) init \
         : (_Type) newValue \
     { \
         self = [ super init ]; \
@@ -659,7 +663,7 @@
                 ARNUNARY_SUBNODE, Arp##_itype##Values); \
     } \
     \
-    - init \
+    - (id) init \
             : (ArNode *) newParam \
     { \
         self = \
@@ -684,7 +688,7 @@
                 ARNBINARY_SUBNODE_1, Arp##_itype1##Values); \
     } \
     \
-    - init \
+    - (id) init \
             : (ArNode *) newParam0 \
             : (ArNode *) newParam1 \
     { \
@@ -713,7 +717,7 @@
                 ARNTERNARY_SUBNODE_2, Arp##_itype2##Values); \
     } \
     \
-    - init \
+    - (id) init \
             : (ArNode *) newParam0 \
             : (ArNode *) newParam1 \
             : (ArNode *) newParam2 \
@@ -746,7 +750,7 @@
                 ARNQUATERNARY_SUBNODE_3, Arp##_itype3##Values); \
     } \
     \
-    - init \
+    - (id) init \
             : (ArNode *) newParam0 \
             : (ArNode *) newParam1 \
             : (ArNode *) newParam2 \
@@ -788,7 +792,7 @@
         {  \
             _Type value;  \
         }  \
-        - init  \
+        - (id) init  \
             : (_Type) newValue \
         ; \
     @end \
@@ -798,7 +802,7 @@
             : ArnUnary < \
                     ArpConcreteClass, \
                     Arp##_otype##Values > \
-    - init \
+    - (id) init \
             : (ArNode *) newParam \
             ; \
     @end
@@ -808,7 +812,7 @@
             : ArnUnary < \
                     ArpConcreteClass, \
                     Arp##_otype0##Values, Arp##_otype1##Values > \
-    - init \
+    - (id) init \
             : (ArNode *) newParam \
             ; \
     @end
@@ -818,7 +822,7 @@
             : ArnBinary < \
                     ArpConcreteClass, \
                     Arp##_otype##Values > \
-    - init \
+    - (id) init \
             : (ArNode *) newParam0 \
             : (ArNode *) newParam1 \
             ; \
@@ -829,7 +833,7 @@
             : ArnBinary < \
                     ArpConcreteClass, \
                     Arp##_otype0##Values, Arp##_otype1##Values > \
-    - init \
+    - (id) init \
             : (ArNode *) newParam0 \
             : (ArNode *) newParam1 \
             ; \
@@ -840,7 +844,7 @@
             : ArnTernary < \
                     ArpConcreteClass, \
                     Arp##_otype##Values > \
-    - init \
+    - (id) init \
             : (ArNode *) newParam0 \
             : (ArNode *) newParam1 \
             : (ArNode *) newParam2 \
@@ -852,7 +856,7 @@
             : ArnTernary < \
                     ArpConcreteClass, \
                     Arp##_otype0##Values, Arp##_otype1##Values > \
-    - init \
+    - (id) init \
             : (ArNode *) newParam0 \
             : (ArNode *) newParam1 \
             : (ArNode *) newParam2 \
@@ -864,7 +868,7 @@
             : ArnQuaternary < \
                     ArpConcreteClass, \
                     Arp##_otype##Values > \
-    - init \
+    - (id) init \
             : (ArNode *) newParam0 \
             : (ArNode *) newParam1 \
             : (ArNode *) newParam2 \
@@ -877,7 +881,7 @@
             : ArnQuaternary < \
                     ArpConcreteClass, \
                     Arp##_otype0##Values, Arp##_otype1##Values > \
-    - init \
+    - (id) init \
             : (ArNode *) newParam0 \
             : (ArNode *) newParam1 \
             : (ArNode *) newParam2 \

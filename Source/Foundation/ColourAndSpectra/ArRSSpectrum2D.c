@@ -58,7 +58,7 @@ ArRSSpectrum2D rss2d_v(
 
     double  sample = RSS2D_LINE_END;
 
-    unsigned long stride = 0;
+    int stride = 0;
     ARRSS2D_STRIDE(s) = -1; // mark as undefined
     while ( sample != RSS2D_END )
     {
@@ -70,7 +70,7 @@ ArRSSpectrum2D rss2d_v(
                 ARRSS2D_STRIDE(s) = stride;
             else if( ARRSS2D_STRIDE(s) != stride && ( stride != 0 || sample == RSS2D_LINE_END ) )
                 ART_ERRORHANDLING_FATAL_ERROR(
-                    "ArRSSpectrum2D: incompatible stride -- %lu at first, %lu then",
+                    "ArRSSpectrum2D: incompatible stride -- %u at first, %u then",
                     ARRSSPECTRUM2D_STRIDE(s),
                     stride
                 );
@@ -133,13 +133,15 @@ ArIntegrationCell2D;
 //   Determines the integer array coordinate for a given double
 //   coordinate in wavelength space, e.g. 430nm -> array index 5
 
-int rss_coord(
+unsigned long rss_coord(
         double  wavelength,
         double  rss_start,
         double  rss_step
         )
 {
-    double  d_from_start = wavelength - rss_start;
+    const double  d_from_start = wavelength - rss_start;
+
+    ASSERT_NONNEGATIVE_FINITE_DOUBLE(d_from_start);
 
     return  (int) ( d_from_start / rss_step );
 }
@@ -154,7 +156,7 @@ double getHeight(
     double excitationFactor = 0.0;
     double emissionFactor = 0.0;
     double factor = 0.0;
-    int i,j;
+    unsigned int i,j;
     double a, b;
     double height = 0.0;
     double eps = UNIT_FROM_NANO(0.001);
@@ -192,8 +194,7 @@ double getHeight(
                        excitationFactor);
         if (fabs(excitationFactor) <= eps) factor = emissionFactor;
         else factor = emissionFactor/excitationFactor;
-        height = M_INTERPOL(a,                                                                          b,
-                       factor);
+        height = M_INTERPOL(a, b,  factor);
     }
     //Lower left triangle
     else
@@ -206,8 +207,7 @@ double getHeight(
                        excitationFactor);
         if (fabs(excitationFactor) <= eps) factor = emissionFactor;
         else factor = (1.0 - emissionFactor)/excitationFactor;
-        height = M_INTERPOL(a,                                                                          b,
-                       factor);
+        height = M_INTERPOL(a, b, factor);
     }
 
     height = M_MAX(height,0.0);
@@ -242,6 +242,8 @@ double rss2d_integrate(
         const double            ymax
         )
 {
+    (void) art_gv;
+    
     ASSERT_NONNEGATIVE_FINITE_DOUBLE( xmin )
     ASSERT_NONNEGATIVE_FINITE_DOUBLE( xmax )
     ASSERT_NONNEGATIVE_FINITE_DOUBLE( ymin )
@@ -367,7 +369,7 @@ ArRSSpectrum2D  * rss2d_s_alloc_init_denoised_version_free_original(
     //   Step 1 - the original array will be discarded anyway, so we clip
     //   the sample values there (to a maximum value, and zero).
 
-    for ( int i = 0; i < ARRSS2D_SIZE(*rss2d); i++ )
+    for ( unsigned long i = 0; i < ARRSS2D_SIZE(*rss2d); i++ )
     {
         int  x = i % ARRSS2D_STRIDE(*rss2d);
         int  y = i / ARRSS2D_STRIDE(*rss2d);
@@ -388,7 +390,7 @@ ArRSSpectrum2D  * rss2d_s_alloc_init_denoised_version_free_original(
     //   Step 2 - outliers, judged by percent difference to the average of
     //   their surroundings, are clipped to that average as well.
 
-    for ( int i = 0; i < ARRSS2D_SIZE(*rss2d); i++ )
+    for ( unsigned long i = 0; i < ARRSS2D_SIZE(*rss2d); i++ )
     {
         int  x = i % ARRSS2D_STRIDE(*rss2d);
         int  y = i / ARRSS2D_STRIDE(*rss2d);
@@ -430,7 +432,7 @@ void rss2d_to_rss(
               ArRSSpectrum    * rss
         )
 {
-    int  i, offset;
+    int  offset;
 
     rss->start = rss2d->emission_start;
     rss->step  = rss2d->emission_step;
@@ -440,7 +442,7 @@ void rss2d_to_rss(
 
     offset = rss2d->stride - rss->size;
 
-    for ( i = 0; i < rss->size; i++ )
+    for ( unsigned int i = 0; i < rss->size; i++ )
     {
         rss->array[i] = ARRSSPECTRUM2D_SAMPLE(rss2d,i+offset,i);
     }
@@ -468,7 +470,7 @@ unsigned int rss2d_s_valid(
 
     //   stride larger than size
 
-    if ( s0->stride > s0->size )
+    if ( s0->stride > (int) s0->size )
         return 0;
 
     //   zero or negative double parameters
@@ -486,7 +488,7 @@ unsigned int rss2d_s_valid(
 
     //   finally, a check for degenerate spectrum entries
 
-    for ( int i = 0; i < s0->size; i++ )
+    for ( unsigned long i = 0; i < s0->size; i++ )
         if (   s0->array[i] < 0.0
             || m_d_isInf( s0->array[i] )
             || m_d_isNaN( s0->array[i] ) )

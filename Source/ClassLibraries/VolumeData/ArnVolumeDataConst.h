@@ -39,12 +39,12 @@ ART_MODULE_INTERFACE(ArnVolumeDataConst)
     BOOL _isBounded;
 }
 
-- init
+- (id) init
 // TODO    : (ArNode <ArpSpectrum> *) value
         : (double) value
         ;
 
-- init
+- (id) init
 // TODO    : (ArNode <ArpSpectrum> *) value
         : (double) value
         : (Pnt3D) min

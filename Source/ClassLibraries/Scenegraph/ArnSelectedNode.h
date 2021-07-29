@@ -37,7 +37,7 @@ ART_MODULE_INTERFACE(ArnSelectedNode)
 {
 }
 
-- init
+- (id) init
         : (ArNodeRef) newExpression
         : (ArNodeRef) newNodeTable
         ;

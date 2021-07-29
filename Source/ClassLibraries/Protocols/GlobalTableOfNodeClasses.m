@@ -33,6 +33,7 @@ ArClassDynArray     globalTableOfNodeClasses;
 
 ART_MODULE_INITIALISATION_FUNCTION_EXEC_ONLY_ONCE
 (
+    (void) art_gv;
     pthread_mutex_init( & globalTableOfNodeClasses_mutex, NULL );
 
     globalTableOfNodeClasses = arclassdynarray_init(256);
@@ -42,6 +43,7 @@ ART_MODULE_INITIALISATION_FUNCTION_EXEC_ONLY_ONCE
 
 ART_MODULE_SHUTDOWN_FUNCTION_EXEC_ONLY_ONCE
 (
+    (void) art_gv;
     pthread_mutex_destroy( & globalTableOfNodeClasses_mutex );
 
     arclassdynarray_free_contents(

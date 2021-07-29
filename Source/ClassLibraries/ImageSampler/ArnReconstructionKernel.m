@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnBoxReconstructionKernel  registerWithRuntime ];
     [ ArnTentReconstructionKernel registerWithRuntime ];
     [ ArnCookReconstructionKernel registerWithRuntime ];
@@ -129,6 +130,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCookReconstructionKernel)
 - (double) edgeCorrectionFactor
         : (IPnt2D *) distanceFromEdge
 {
+    (void) distanceFromEdge;
+    
     return 1.0;
 }
 
@@ -144,14 +147,14 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCookReconstructionKernel)
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMitchellNetravaliReconstructionKernel)
 
-- parameterB
+- (id) parameterB
                    : (double) newParameterB
         parameterC : (double) newParameterC
 {
     return [ self init: newParameterB : newParameterC ];
 }
 
-- init
+- (id) init
         : (double) newParameterB
         : (double) newParameterC
 {
@@ -169,6 +172,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMitchellNetravaliReconstructionKernel
 - (double) edgeCorrectionFactor
         : (IPnt2D *) distanceFromEdge
 {
+    (void) distanceFromEdge;
+    
     return 1.0;
 }
 
@@ -221,13 +226,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMitchellNetravaliReconstructionKernel
 
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSincReconstructionKernel)
 
-- supportSize
+- (id) supportSize
         : (unsigned int) newSupportSize
 {
     return [ self init: newSupportSize ];
 }
 
-- init
+- (id) init
         : (unsigned int) newSupportSize
 {
     self = [ super init ];
@@ -263,6 +268,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSincReconstructionKernel)
 - (double) edgeCorrectionFactor
         : (IPnt2D *) distanceFromEdge
 {
+    (void) distanceFromEdge;
+    
     return 1.0;
 }
 

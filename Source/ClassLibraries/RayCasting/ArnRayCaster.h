@@ -39,7 +39,7 @@ ART_MODULE_INTERFACE(ArnRayCaster)
 //   Architectures".
 
 #define ARNRAYCASTER_HASH_TABLE_SIZE    128
-#define ARNRAYCASTER_HASH_TABLE_MASK    ARNRAYCASTER_HASH_TABLE_SIZE-1
+#define ARNRAYCASTER_HASH_TABLE_MASK    (ARNRAYCASTER_HASH_TABLE_SIZE-1)
 
 typedef struct ArHashedMailboxEntry
 {
@@ -84,11 +84,11 @@ ArHashedMailboxEntry;
     BOOL                   * activeNodes;
 }
 
-- init
+- (id) init
         : (double) newHitEps
         ;
 
-- init
+- (id) init
         : (double) newHitEps
         : (unsigned int) newOptions
         ;

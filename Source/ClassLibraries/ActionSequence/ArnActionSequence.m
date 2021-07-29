@@ -30,6 +30,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnActionSequence registerWithRuntime ];
 )
 
@@ -43,7 +44,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnActionSequence)
 ARPACTION_DEFAULT_IMPLEMENTATION(ArnActionSequence)
 
-- init
+- (id) init
         : ( ArNodeRefDynArray *) newActions
         : (const ArSymbol) newMessage
 {
@@ -60,7 +61,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnActionSequence)
     return self;
 }
 
-- copy
+- (id) copy
 {
     ArnActionSequence  * copiedInstance = [ super copy ];
 
@@ -69,7 +70,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnActionSequence)
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnActionSequence  * copiedInstance =

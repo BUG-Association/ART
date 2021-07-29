@@ -58,13 +58,13 @@ ART_MODULE_INTERFACE(ArnStochasticSampler)
     //   sampling is to be broken down) is hardcoded as a #define in
     //   the .m file.
 
-    int             numberOfSamplePackets;
+    unsigned int     numberOfSamplePackets;
 
     //   Array with 'numberOfSamplePackets' entries, contains the size
     //   of each packet. All but the last one are 'DEFAULT_PACKET_SIZE',
     //   but the last one is accurately sized.
 
-    int           * packetSize;
+    unsigned int   * packetSize;
 
     //   Size of the working temp array used while processing a packet. If
     //   only one packet is run (the default case for "normal" scenes,
@@ -72,7 +72,7 @@ ART_MODULE_INTERFACE(ArnStochasticSampler)
     //   array is only as large as needed, and not 'DEFAULT_PACKET_SIZE'
     //   in length.
 
-    int             packetArraySize;
+    unsigned int     packetArraySize;
 
     //   The 2D subpixel starting points for each sample. These are
     //   precomputed, and re-used for each pixel.
@@ -125,7 +125,7 @@ ART_MODULE_INTERFACE(ArnStochasticSampler)
     IPnt2D        * sampleSplattingOffset;
 }
 
-- init
+- (id) init
         : (ArNode <ArpPathspaceIntegrator> * ) newRaySampler
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples

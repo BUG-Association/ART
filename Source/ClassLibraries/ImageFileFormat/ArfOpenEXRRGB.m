@@ -82,7 +82,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
             ART_ERRORHANDLING_FATAL_ERROR(
                 "No suitable image data format"
                 );
-            return [Nil class];
+        return NULL;
     }
 }
 
@@ -160,6 +160,8 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
         : (ArNode **) objectPtr
         : (ArList *) externals
 {
+    (void) externals;
+    
     *objectPtr =
         [ ALLOC_INIT_OBJECT(ArnFileImage)
             :   [ file name ]
@@ -187,7 +189,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
 
 - (ArnImageInfo *) open
 {
-    _writtingMode = NO;
+    _writingMode = NO;
 
     // Get current native chromaticities
     float *chromaticities = NULL;
@@ -266,7 +268,9 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
 - (void) getPlainImage
         : (IPnt2D) start
         : (ArnPlainImage *) image
-{    
+{
+    (void) start;
+    
     switch (_fileDataType) {
         case ardt_rgb: {
             ArRGB * outScanline = ALLOC_ARRAY(ArRGB, XC(image->size));
@@ -371,7 +375,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
 - (void) open
         : (ArnImageInfo *) imageInfo
 {
-    _writtingMode = YES;
+    _writingMode = YES;
     
     _imageInfo = [imageInfo retain];
 
@@ -525,11 +529,7 @@ ARFRASTERIMAGE_DEFAULT_STRING_IMPLEMENTATION(exrrgb)
 
 - (void) close
 {
-    if (_writtingMode) {
-        // Gather metadata
-        const IVec2D size = [ _imageInfo size ];
-        const int width = XC(size);
-        const int height = YC(size);
+    if (_writingMode) {
             
         char * createdByString = NULL;
         char * creationDateStr = NULL;

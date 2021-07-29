@@ -52,7 +52,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 {
     double  percentileThreshold = [ RANDOM_GENERATOR valueFromNewSequence ];
 
-    int  i = -1;
+    unsigned int i;
+    // int  i = -1;
     int  a = 0;
 
     if ( complexSkydomePresent )
@@ -61,29 +62,29 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     }
     else
     {
-    ArSpectralSample percentile;
-    do
-    {
-        ++i;
-        // if we go over all lights and pick none, we terminate
-        // (it can happen when there is no available light source
-        //  for the specified hero wavelength)
-        if(i >= numberOfLights)
+        ArSpectralSample percentile;
+
+        for (i = 0; i < numberOfLights; i++) {
+            // the same method as is used later in pdf multiplication
+            // (as spc_sd_value_at_wavelength behaves differently)
+            sps_s500w_init_s(
+                art_gv,
+                LSC_LIGHT(a,i).overallSpectralPowerPercentile,
+                wavelength,
+                & percentile
+                );
+
+            // decide based on the hero wavelength only
+            if (SPS_CI(percentile, 0) >= percentileThreshold) {
+                break;
+            }
+        }
+
+        if (i == numberOfLights) {
             return NO;
-        
-        // the same method as is used later in pdf multiplication
-        // (as spc_sd_value_at_wavelength behaves differently)
-        sps_s500w_init_s(
-              art_gv,
-              LSC_LIGHT(a,i).overallSpectralPowerPercentile,
-              wavelength,
-            & percentile
-            );
+        }
     }
-    while ( SPS_CI(percentile, 0)  // decide based on the hero wavelength only
-            < percentileThreshold);
-    }    
-    
+        
     BOOL result =
         [ LIGHTSOURCE(a,i) sampleLightsource
             : illuminatedPoint
@@ -137,7 +138,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (      ArPDFValue *)                   illuminationProbability /* optional */
         : (      ArPDFValue *)                   emissionProbability /* optional */
 {
-    int  i = 0;
+    unsigned int  i = 0;
     int  a = 0;
 
     while ( i < numberOfLights
@@ -211,10 +212,12 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         : (const ArcPointContext *)              illuminatedPoint
         : (      ArPDFValue *)                   selectionProbability
 {
-    int  i = 0;
+    ASSERT_POSITIVE_INTEGER(numberOfLights);
+
+    unsigned int  i = 0;
     int  a = 0;
 
-    while ( i < ( numberOfLights - 1 )
+    while ( ( i + 1 < numberOfLights )
            && (id)[ LSC_LIGHT(a,i).source shape ] != (id)emissiveObject )
         i++;
 

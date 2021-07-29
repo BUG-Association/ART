@@ -103,7 +103,7 @@ int compute_pp_coefs_from_float(const int nbreaks, const double * breaks, const 
 }
 
 void printErrorAndExit(const char * message) {
-	fprintf(stderr, message);
+    fprintf(stderr, "%s", message);
 	fprintf(stderr, "\n");
 	fflush(stderr);
 	exit(-1);
@@ -711,7 +711,8 @@ double reconstruct(
 
 double map_parameter(const double param, const int value_count, const double * values)
 {
-	double mapped;
+	double mapped = 0.0;
+    
 	if (param < values[0])
 	{
 		mapped = 0.0;
@@ -737,6 +738,7 @@ double map_parameter(const double param, const int value_count, const double * v
 			}
 		}
 	}
+
 	return mapped;
 }
 
@@ -1019,6 +1021,8 @@ double arpragueskymodel_radiance(
         const double                   wavelength
         )
 {
+  (void) theta;
+    
   // Translate parameter values to indices
 
   const double turbidity_control = map_parameter(turbidity, state->turbidities, state->turbidity_vals);
@@ -1092,7 +1096,7 @@ void interpolate_elevation_hero(
   const double factor = elevation - (double)elevation_low;
 
   ArSpectralSample res_low;
-  for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+  for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
   {
     const double * control_params_low = control_params_single_config(
       state,
@@ -1122,7 +1126,7 @@ void interpolate_elevation_hero(
   }
 
   ArSpectralSample res_high;
-  for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+  for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
   {
     const double * control_params_high = control_params_single_config(
       state,
@@ -1376,7 +1380,6 @@ void interpolate_wavelength_hero(
 void arpragueskymodel_radiance_hero(
         const ART_GV                 * art_gv,
         const ArPragueSkyModelState  * state,
-        const double                   theta,
         const double                   gamma,
         const double                   shadow,
         const double                   zero,
@@ -1396,7 +1399,11 @@ void arpragueskymodel_radiance_hero(
   const double elevation_control = map_parameter(elevation * MATH_RAD_TO_DEG, state->elevations, state->elevation_vals);
 
   ArSpectralSample channel_control;
-  sps_s_init_s(art_gv, wavelength, &channel_control);
+  
+  for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+  {
+      SPS_CI(channel_control,i) = ARWL_WI(*wavelength, i);
+  }
   sps_d_mul_s(art_gv, 1.0E9, &channel_control);
   sps_d_add_s(art_gv, -state->channel_start, &channel_control);
   sps_d_mul_s(art_gv, 1.0 / state->channel_width, &channel_control);
@@ -1451,6 +1458,11 @@ double arpragueskymodel_solar_radiance(
         const double                   wavelength
         )
 {
+    (void) gamma;
+    (void) shadow;
+    (void) zero;
+    (void) elevation;
+    (void) albedo;
         double idx = (wavelength - SunRadStartWL) / SunRadIncrementWL;
         double sunRadiance = 0.0;
 
@@ -1541,7 +1553,6 @@ void arpragueskymodel_toAD(
 	// Ray circle intersection
 	double x_v = sin(theta);
 	double y_v = cos(theta);
-	double x_c = 0;
 	double y_c = PSM_PLANET_RADIUS + altitude;
 	double atmo_edge = PSM_PLANET_RADIUS + 90000;
 	double n;
@@ -1690,7 +1701,6 @@ double arpragueskymodel_calc_transmittance_svd(
 	const int altitude_inc,
 	const double altitude_factor)
 {
-	float t[4] = { 0.0, 0.0, 0.0, 0.0 };
 	int a_int = (int)floor(a * (double)state->trans_n_a);
 	int d_int = (int)floor(d * (double)state->trans_n_d);
 	int a_inc = 0;
@@ -1849,7 +1859,7 @@ void arpragueskymodel_tau_hero(
 	double d;
 	arpragueskymodel_toAD(theta, distance, altitude, &a, &d);
 
-        for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+        for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
         {
            const double wavelength_norm = (NANO_FROM_UNIT(ARWL_WI(*wavelength, i)) - 340.0) / 40.0;
 	   if (wavelength_norm > 10. || wavelength_norm < 0.)
@@ -2181,11 +2191,14 @@ void interpolate_elevation_pol_hero(
         ArSpectralSample      * result
 )
 {
+  (void) zero;
+  (void) zero_segment;
+    
   const int elevation_low = (int)elevation;
   const double factor = elevation - (double)elevation_low;
 
   ArSpectralSample res_low;
-  for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+  for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
   {
     const double * control_params_low = control_params_single_config(
       state,
@@ -2213,7 +2226,7 @@ void interpolate_elevation_pol_hero(
   }
 
   ArSpectralSample res_high;
-  for (int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
+  for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; ++i)
   {
     const double * control_params_high = control_params_single_config(
       state,
@@ -2463,7 +2476,10 @@ void arpragueskymodel_polarisation_hero(
   const double elevation_control = map_parameter(elevation * MATH_RAD_TO_DEG, state->elevations, state->elevation_vals);
 
   ArSpectralSample channel_control;
-  sps_s_init_s(art_gv, wavelength, &channel_control);
+  for (unsigned int i = 0; i < HERO_SAMPLES_TO_SPLAT; i++ )
+  {
+    SPS_CI(channel_control,i) = ARWL_WI(*wavelength, i);
+  }
   sps_d_mul_s(art_gv, 1.0E9, &channel_control);
   sps_d_add_s(art_gv, -state->channel_start, &channel_control);
   sps_d_mul_s(art_gv, 1.0 / state->channel_width, &channel_control);

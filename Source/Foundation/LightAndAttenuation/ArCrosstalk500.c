@@ -37,7 +37,7 @@ ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-ART_LIGHT_AND_ATTENUATION_MODULE_INITIALISATION_FUNCTION( )
+ART_LIGHT_AND_ATTENUATION_MODULE_INITIALISATION_FUNCTION( (void) art_gv; )
 
 ART_LIGHT_AND_ATTENUATION_MODULE_NO_SHUTDOWN_FUNCTION_NECESSARY
 
@@ -45,6 +45,8 @@ ArCrosstalk500  * cx500_alloc(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ArCrosstalk500  * x0 = ALLOC( ArCrosstalk500 );
 
     ASSERT_ALLOCATED_CROSSTALK500( x0 )
@@ -74,6 +76,8 @@ void cx500_free(
               ArCrosstalk500  * xr
         )
 {
+    (void) art_gv;
+    
     FREE(xr);
 }
 
@@ -81,6 +85,8 @@ ArCrosstalk500 const * cx500_none(
         const ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
     return 0;
@@ -92,6 +98,8 @@ void cx500_d_init_x(
               ArCrosstalk500  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_ALLOCATED_CROSSTALK500( xr )
     ASSERT_NONNEGATIVE_DOUBLE( d0 )
 
@@ -107,6 +115,8 @@ void cx500_x_init_x(
               ArCrosstalk500  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK500( x0 )
     ASSERT_ALLOCATED_CROSSTALK500( xr )
 
@@ -122,6 +132,8 @@ void cx500_horizontal_cx500(
               ArCrosstalk500  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK500( x0 );
     ASSERT_ALLOCATED_CROSSTALK500( xr );
 
@@ -147,6 +159,8 @@ void cx500_vertical_cx500(
               ArCrosstalk500  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_VALID_CROSSTALK500( x0 );
     ASSERT_ALLOCATED_CROSSTALK500( xr );
 
@@ -225,6 +239,8 @@ double cx500_dd_value(
               double            wo
         )
 {
+    (void) art_gv;
+    
     const int cidx_i = round(NANO_FROM_UNIT(wi) - ARCROSSTALK500_LOWER_BOUND);
     const int cidx_o = round(NANO_FROM_UNIT(wo) - ARCROSSTALK500_LOWER_BOUND);
     
@@ -265,6 +281,8 @@ unsigned int cx500_x_valid(
         const ArCrosstalk500  * x0
         )
 {
+    (void) art_gv;
+    
     if ( ! x0 )
     {
         ART_ERRORHANDLING_WARNING( "ArCrosstalk500 parameter is not allocated" );
@@ -290,11 +308,13 @@ void rss2d_strip_noncrosstalk_data(
               ArRSSpectrum2D  * rss2d
         )
 {
+    (void) art_gv;
+    
     int offset = rss2d->stride - rss2d->size / rss2d->stride;
 
     for ( unsigned int i = 0; i < rss2d->size; i++ )
     {
-        int lineadd = i / rss2d->stride;
+        unsigned int lineadd = i / rss2d->stride;
 
         if (    rss2d->array[i] < 0.0
              || (    i - lineadd * rss2d->stride
@@ -332,8 +352,8 @@ void rss2d_to_cx500(
 
     cx500_d_init_x(art_gv, 0.0, xr);
 
-    int  rss_s_x = RSS2D_SIZE_X(*rss2d);
-    int  rss_s_y = RSS2D_SIZE_Y(*rss2d);
+    unsigned int  rss_s_x = RSS2D_SIZE_X(*rss2d);
+    unsigned int  rss_s_y = RSS2D_SIZE_Y(*rss2d);
 
     double  sampleSize =
           NANO_FROM_UNIT(ARRSS2D_EX_STEP(*rss2d));
@@ -354,12 +374,17 @@ void rss2d_to_cx500(
             y0 -= RSS2D_TO_X_START;
             y1 -= RSS2D_TO_X_START;
 
+            ASSERT_NONNEGATIVE_INTEGER(x0);
+            ASSERT_NONNEGATIVE_INTEGER(x1);
+            ASSERT_NONNEGATIVE_INTEGER(y0);
+            ASSERT_NONNEGATIVE_INTEGER(y1);
+
             double sampleValue = ARRSSPECTRUM2D_SAMPLE(rss2d,x,y);
 
             sampleValue /= sampleSize;
 
-            for ( unsigned int xx = x0; xx < x1; xx++ )
-                for ( unsigned int yy = y0; yy < y1; yy++ )
+            for ( int xx = x0; xx < x1; xx++ )
+                for ( int yy = y0; yy < y1; yy++ )
                     ARCROSSTALK500_SET_XYD( *xr, xx, yy, sampleValue );
 
         }
@@ -373,6 +398,8 @@ void cx500_dpv_init_x(
               ArCrosstalk500  * xr
         )
 {
+    (void) art_gv;
+    
     ASSERT_ALLOCATED_CROSSTALK( xr )
 
     for ( unsigned int x = 0; x < RSS2D_TO_X_SIZE; x++ )
@@ -408,7 +435,9 @@ void cx500_x_mathematicaprintf(
         const ArCrosstalk500  * x0
         )
 {
-    int  channels = SPECTRAL_CHANNELS;
+    (void) art_gv;
+    
+    const unsigned int  channels = SPECTRAL_CHANNELS;
 
     printf( "ArCrosstalk500 %dx%d { \n",channels,channels);
 

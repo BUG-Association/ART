@@ -33,6 +33,7 @@
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
+    (void) art_gv;
     [ ArnExponentialToneMapper            registerWithRuntime ];
     [ ArnInteractiveCalibrationToneMapper registerWithRuntime ];
 )
@@ -47,7 +48,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnExponentialToneMapper)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
 
-- mappingValue
+- (id) mappingValue
         : (double) newMappingValue
 {
     return
@@ -56,7 +57,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
             ];
 }
 
-- init
+- (id) init
         : (double) newMappingValue
 {
     self =
@@ -72,7 +73,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
     return self;
 }
 
-- init
+- (id) init
 {
     return
         [ self init
@@ -141,7 +142,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -198,6 +199,14 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnExponentialToneMapper)
     RELEASE_OBJECT(imageMetrics);
 
     [ REPORTER endAction ];
+}
+
+- (void) code
+        : (ArcObject <ArpCoder> *) coder
+{
+    [ super code: coder ];
+
+    [ coder codeDouble: & mappingValue ];
 }
 
 @end
@@ -268,7 +277,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnScaleToUnityToneMapper)
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -326,6 +335,12 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnScaleToUnityToneMapper)
     [ REPORTER endAction ];
 }
 
+- (void) code
+        : (ArcObject <ArpCoder> *) coder
+{
+    [ super code: coder ];
+}
+
 @end
 
 
@@ -334,7 +349,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnScaleToUnityToneMapper)
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnInteractiveCalibrationToneMapper)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationToneMapper)
 
-- aperture
+- (id) aperture
                 : (double) newAperture
         contrast: (double) newContrast
 {
@@ -348,7 +363,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
             ];
 }
 
-- a
+- (id) a
          : (double) newA
         b: (double) newB
 {
@@ -362,7 +377,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
             ];
 }
 
-- init
+- (id) init
         : (double) newAperture
         : (double) newContrast
         : (BOOL) newPredefined_AB
@@ -387,7 +402,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
 }
 
 
-- init
+- (id) init
 {
     self =
         [ self init
@@ -452,7 +467,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
     
     if ( ! predefined_AB )
     {
-        for ( int i = 0; i < numberOfSourceImages; i++ )
+        for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
         {
             imageMetrics =
                 [ ALLOC_INIT_OBJECT(ArcImageMetrics)
@@ -541,7 +556,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
     }
     else
     {
-        for ( int i = 0; i < numberOfSourceImages; i++ )
+        for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
         {
             aa[i] = a;
             bb[i] = b;
@@ -572,7 +587,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {
@@ -665,7 +680,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnInteractiveCalibrationTo
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMonochromeInteractiveCalibrationToneMapper)
 ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnMonochromeInteractiveCalibrationToneMapper)
 
-- aperture
+- (id) aperture
                   : (double) newAperture
         wavelength: (double) newWavelength
 {
@@ -731,7 +746,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnMonochromeInteractiveCal
     aa = ALLOC_ARRAY( double, numberOfDestinationImages );
     bb = ALLOC_ARRAY( double, numberOfDestinationImages );
     
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         imageMetrics =
             [ ALLOC_INIT_OBJECT(ArcImageMetrics)
@@ -823,7 +838,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnMonochromeInteractiveCal
          Process all pixels in the image.
     ---------------------------------------------------------------aw- */
 
-    for ( int i = 0; i < numberOfSourceImages; i++ )
+    for ( unsigned int i = 0; i < numberOfSourceImages; i++ )
     {
         for ( long y = 0; y < YC(destinationImageSize); y++ )
         {

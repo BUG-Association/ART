@@ -93,7 +93,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
         return arfiletypematch_impossible;
 }
 
-- initWithFile: (ArcFile *) newFile
+- (id) initWithFile: (ArcFile *) newFile
 {
     file = newFile;
     return self;
@@ -134,6 +134,9 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
         : (ArNode **) objectPtr
         : (ArcObject <ArpStream> *) stream
 {
+    (void) objectPtr;
+    (void) stream;
+    
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 }
 

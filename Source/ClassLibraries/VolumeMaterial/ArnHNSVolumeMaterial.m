@@ -113,7 +113,7 @@ ArSpectrum const * art_absorptionCoefficient(
 ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnHNSVolumeMaterial)
 ARPVOLUME_MATERIAL_CLOSED_FORM_ONLY_IMPLEMENTATION
 
-- copy
+- (id) copy
 {
     ArnHNSVolumeMaterial  * copiedInstance = [ super copy ];
 
@@ -122,7 +122,7 @@ ARPVOLUME_MATERIAL_CLOSED_FORM_ONLY_IMPLEMENTATION
     return copiedInstance;
 }
 
-- deepSemanticCopy
+- (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
     ArnHNSVolumeMaterial  * copiedInstance =
@@ -184,7 +184,7 @@ ARPVOLUME_MATERIAL_CLOSED_FORM_ONLY_IMPLEMENTATION
     [ self _precomputeMaterial ];
 }
 
-- init
+- (id) init
         : (ArNode <ArpSpectrum> *) newIOR
         : (ArNode <ArpSpectrum> *) newExtinction
 {
@@ -235,207 +235,6 @@ ARPVOLUME_MATERIAL_CLOSED_FORM_ONLY_IMPLEMENTATION
 - (BOOL) isVolumetricMaterial
 {
     return NO;
-}
-
-- (void) calculateSamplepointsAlongRay
-    : (const Ray3D *) inRay
-    : (double) distance
-{
-    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
-}
-
-- (void) calculateEmissionAndExtinctionToInfinity
-        : (const Ray3D         *) ray_worldspace
-        : (const ArPathDirection) path_direction
-        : (ArAttenuation       *) attenuation_r
-        : (ArLight             *) outLight
-{
-    ArSpectrum  * attenuationSpectrum = spc_alloc( art_gv );
-
-    double distance = MATH_HUGE_DOUBLE;
-
-    ArSpectrum  * extinction = spc_alloc( art_gv );
-
-    [ EXTINCTION_COLOURNODE getSpectrum
-        :   0
-        :   extinction
-        ];
-
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
-    {
-        double power = spc_si( art_gv, extinction, i );
-
-        power *=
-              spc_si( art_gv, ABSORPTION_COEFFICIENT, i )
-            * distance;
-
-        spc_set_sid( art_gv, attenuationSpectrum, i, exp(-power) );
-    }
-
-
-    spc_free(art_gv, extinction);
-
-    if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
-    {
-        ArReferenceFrame  rf;
-
-        arrefframe_v_pd_init_rf(
-              art_gv,
-            & RAY3D_V(*ray_worldspace),
-              path_direction,
-            & rf
-            );
-
-        arattenuation_srr_init_nonpolarising_a(
-              art_gv,
-              attenuationSpectrum,
-            & rf,
-            & rf,
-              attenuation_r
-            );
-    }
-    else
-    {
-        arattenuation_s_init_a(
-            art_gv,
-            attenuationSpectrum,
-            attenuation_r
-            );
-    }
-
-    spc_free(art_gv, attenuationSpectrum);
-
-    ARLIGHT_INIT_AS_NONE(outLight);
-}
-
-- (void) calculateEmissionAndExtinctionForDistanceT
-        : (const Ray3D         *) ray_worldspace
-        : (const double         ) ray_t
-        : (const ArPathDirection) pathDirection
-        : (ArAttenuation       *) attenuation_r
-        : (ArLight             *) outLight
-{
-    ArSpectrum  * attenuationSpectrum = spc_alloc( art_gv );
-
-    double distance = ray_t * vec3d_v_len( & RAY3D_VECTOR(*ray_worldspace) );
-
-    ArSpectrum  * extinction = spc_alloc( art_gv );
-
-    [ EXTINCTION_COLOURNODE getSpectrum
-        :   0
-        :   extinction
-        ];
-
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
-    {
-        double power = spc_si( art_gv, extinction, i );
-
-        power *=
-              spc_si( art_gv, ABSORPTION_COEFFICIENT, i )
-            * distance;
-
-        spc_set_sid( art_gv, attenuationSpectrum, i, exp(-power) );
-    }
-
-
-    spc_free(art_gv, extinction);
-
-    if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
-    {
-        ArReferenceFrame  rf;
-
-        arrefframe_v_pd_init_rf(
-              art_gv,
-            & RAY3D_V(*ray_worldspace),
-              pathDirection,
-            & rf
-            );
-
-        arattenuation_srr_init_nonpolarising_a(
-              art_gv,
-              attenuationSpectrum,
-            & rf,
-            & rf,
-              attenuation_r
-            );
-    }
-    else
-    {
-        arattenuation_s_init_a(
-            art_gv,
-            attenuationSpectrum,
-            attenuation_r
-            );
-    }
-
-    spc_free(art_gv, attenuationSpectrum);
-
-    ARLIGHT_INIT_AS_NONE(outLight);
-}
-
-- (void) calculateEmissionAndExtinctionUntilPoint
-        : (const Ray3D         *) ray_worldspace
-        : (const Pnt3D         *) endpoint_worldspace
-        : (const ArPathDirection) pathDirection
-        : (ArAttenuation       *) attenuation_r
-        : (ArLight             *) outLight
-{
-    ArSpectrum  * attenuationSpectrum = spc_alloc( art_gv );
-    Vec3D  mv;
-    vec3d_pp_sub_v(endpoint_worldspace, & RAY3D_P(*ray_worldspace), &mv);
-    double distance = vec3d_v_len(&mv);
-
-    ArSpectrum  * extinction = spc_alloc( art_gv );
-
-    [ EXTINCTION_COLOURNODE getSpectrum
-        :   0
-        :   extinction
-        ];
-
-    for ( int i = 0; i < spc_channels( art_gv ); i++ )
-    {
-        double power = spc_si( art_gv, extinction, i );
-
-        power *=
-              spc_si( art_gv, ABSORPTION_COEFFICIENT, i )
-            * distance;
-
-        spc_set_sid( art_gv, attenuationSpectrum, i, exp(-power) );
-    }
-
-    spc_free(art_gv, extinction);
-
-    if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
-    {
-        ArReferenceFrame  rf;
-
-        arrefframe_v_pd_init_rf(
-              art_gv,
-            & RAY3D_V(*ray_worldspace),
-              pathDirection,
-            & rf
-            );
-
-        arattenuation_srr_init_nonpolarising_a(
-              art_gv,
-              attenuationSpectrum,
-            & rf,
-            & rf,
-              attenuation_r
-            );
-    }
-    else
-    {
-        arattenuation_s_init_a(
-            art_gv,
-            attenuationSpectrum,
-            attenuation_r
-            );
-    }
-
-    spc_free(art_gv, attenuationSpectrum);
-
-    ARLIGHT_INIT_AS_NONE(outLight);
 }
 
 - (void) closedFormEmissionAndExtinctionSample
