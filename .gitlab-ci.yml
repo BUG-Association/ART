@@ -42,7 +42,7 @@ render_linux:
     stage: test
     needs: ["build_linux"]
     script:
-        - export PATH=${PATH}:${PWD}/binaries
+        - export PATH=${PATH}:${PWD}/binaries/bin
         - export ART_LIBRARY_PATH=${PWD}/binaries/lib
         - export ART_RESOURCE_PATH=${ART_LIBRARY_PATH}/ART_Resources
         - export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ART_LIBRARY_PATH}
