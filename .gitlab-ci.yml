@@ -30,11 +30,11 @@ build_linux:
             libopenexr-dev
         - mkdir build
         - cd build
-        - cmake .. -GNinja
+        - cmake .. -GNinja -DCMAKE_INSTALL_PREFIX=../binaries
         - ninja install
     artifacts:
         paths:
-            - /usr/local
+            - binaries
     tags:
         - linux
 
@@ -42,10 +42,10 @@ render_linux:
     stage: test
     needs: ["build_linux"]
     script:
-        - export PATH=${PATH}:/usr/local/bin
-        - export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
-        - export ART_LIBRARY_PATH=/usr/local/lib
+        - export PATH=${PATH}:${PWD}/binaries
+        - export ART_LIBRARY_PATH=${PWD}/binaries/lib
         - export ART_RESOURCE_PATH=${ART_LIBRARY_PATH}/ART_Resources
+        - export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ART_LIBRARY_PATH}
         - git clone https://gitlab.com/art-development-team/art-functionality-test.git
         - cd art-functionality-test
         - git checkout v2.1
