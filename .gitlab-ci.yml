@@ -39,8 +39,8 @@ build_linux:
         - linux
 
 render_linux:
-    stage: build_linux
-    needs: ["linux"]
+    stage: test
+    needs: ["build_linux"]
     script:
         - export PATH=${PATH}:/usr/local/bin
         - export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
