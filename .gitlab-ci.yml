@@ -1,4 +1,5 @@
 stages:
+    - build
     - test
     
 before_script:
@@ -14,7 +15,7 @@ before_script:
         libopenexr-dev
         ninja-build
 
-linux:
+build_linux:
     stage: build
     script:
         - apt-get update
@@ -37,8 +38,8 @@ linux:
     tags:
         - linux
 
-render:
-    stage: test
+render_linux:
+    stage: build_linux
     needs: ["linux"]
     script:
         - export PATH=${PATH}:/usr/local/bin
