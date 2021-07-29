@@ -490,8 +490,18 @@ ArPixelID;
     
     if ([coder isReading])
     {
-        if ( deterministicWavelengths )
+        #warning AF please double check this: added the else clause to make it work
+        if ( deterministicWavelengths ) {
             [ self useDeterministicWavelengths ];
+        } else {
+            wavelengthSteps = 1;
+        }
+        // AF: old removed code
+        // #warning  this whole thing is fragile and should not be in a release version of ART (aw)
+        // if ( ! deterministicWavelengths )
+        //     wavelengthSteps = 1;
+        // else
+        //     wavelengthSteps = spc_channels(art_gv) / 4;
     }
 }
 
