@@ -233,7 +233,7 @@ void imageProbe(
                 luv_v_prime_from_xyz( art_gv, & xyz )
                 );
             
-            ArnCIEXYZAImage  * avgLine[11];
+            ArnCIEXYZAImage  * avgLine[11] = {NULL};
 
             //  3x3 average is only done if we are sufficiently far from the border
             

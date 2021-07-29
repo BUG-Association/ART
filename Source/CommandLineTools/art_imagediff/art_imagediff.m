@@ -186,7 +186,7 @@ int art_imagediff(
 
     double delta = 0;
     
-    for (size_t y = 0; y < YC(sizeReference); y++)
+    for (int y = 0; y < YC(sizeReference); y++)
     {
         [ imageReference getPlainImage
              :   IPNT2D( 0, y )
@@ -198,7 +198,7 @@ int art_imagediff(
              :   imageCompareScanline
              ];
 
-        for (size_t x = 0; x < XC(sizeReference); x++)
+        for (int x = 0; x < XC(sizeReference); x++)
         {
             ArCIEXYZ valueReference = (((ArnCIEXYZAImage*)imageReferenceScanline)->data[ x ]).xyz;
             ArCIEXYZ valueCompare   = (((ArnCIEXYZAImage*)imageCompareScanline)->data[ x ]).xyz;

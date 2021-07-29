@@ -267,6 +267,16 @@ int tonemap(
 
     char  * inputFileName = argv[1];
 
+    //   The point of this flag is to control whether the first
+    //   ARTCSP we encounter should be discarded after use.
+    //   Default is yes, as the thing is usually created by some
+    //   RAW->CSP conversion. The only exception is if the user
+    //   actually directly supplied a CSP image, in which case
+    //   they would presumably not be happy about us zapping it
+    //   after use.
+
+    BOOL  removeFirstCSP = YES;
+
     /* ------------------------------------------------------------------
          Read the input image.
     ---------------------------------------------------------------aw- */
@@ -540,16 +550,6 @@ int tonemap(
                     "single wavelength extraction only possible for RAW images"
                     );
         }
-
-        //   The point of this flag is to control whether the first
-        //   ARTCSP we encounter should be discarded after use.
-        //   Default is yes, as the thing is usually created by some
-        //   RAW->CSP conversion. The only exception is if the user
-        //   actually directly supplied a CSP image, in which case
-        //   they would presumably not be happy about us zapping it
-        //   after use.
-
-        BOOL  removeFirstCSP = YES;
 
         if ( [ inputImage imageFileIsKindOf: [ ArfRAWRasterImage class ] ] )
         {

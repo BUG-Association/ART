@@ -143,17 +143,18 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnPragueSkyModel)
         : (ArNode <ArpSpectrum> *) newGroundAlbedo
         : (ArNode <ArpTrafo3D> *) newTrafo
 {
-    [ super init
-        :   PSM_SUN_RADIUS
-        :   newElevation
-        :   newAzimuth
-        :   0.0
-        :   1.0
-        :   newTurbidity
-        :   newPolarisedOutput
-        :   newGroundAlbedo
-        :   newTrafo
-        ];
+    self = 
+        [ super init
+            :   PSM_SUN_RADIUS
+            :   newElevation
+            :   newAzimuth
+            :   0.0
+            :   1.0
+            :   newTurbidity
+            :   newPolarisedOutput
+            :   newGroundAlbedo
+            :   newTrafo
+            ];
 
     [ self _setup ];
 

@@ -1,12 +1,14 @@
 add_executable(
-impresario
-impresario.m
-)
+	impresario
+	impresario.m
+	)
 
 target_link_libraries(
-impresario
+	impresario
 	${art_generic_link_libraries}
-)
+	)
+
+target_compile_options(impresario PRIVATE -Wall -Wextra)
 
 install (
 	TARGETS
