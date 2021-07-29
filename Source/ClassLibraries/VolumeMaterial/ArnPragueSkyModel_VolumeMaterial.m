@@ -595,12 +595,12 @@ ARPVOLUME_MATERIAL_DEFAULT_PHASE_FUNCTION_IMPLEMENTATION
 }
 
 - (void) crossSection
-        : (const Pnt3D *) ÎpointWorldspace
+        : (const Pnt3D *) pointWorldspace
         : (const ArWavelength *) wavelength
         : (ArPathDirection) pathDirection
         : (ArSpectralSample *) crossSection
 {
-    (void) ÎpointWorldspace;
+    (void) pointWorldspace;
     (void) wavelength;
     (void) pathDirection;
     (void) crossSection;
