@@ -488,10 +488,16 @@ ArPixelID;
     [ super code: coder ];
     [ coder codeBOOL: & deterministicWavelengths ];
     
-    if ([coder isReading])
+    if ( [ coder isReading ] )
     {
         if ( deterministicWavelengths )
+        {
             [ self useDeterministicWavelengths ];
+        }
+        else
+        {
+            wavelengthSteps = 1;
+        }
     }
 }
 
