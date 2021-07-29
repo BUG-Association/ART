@@ -408,6 +408,7 @@ ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
 	ArPragueSkyModelState * state = ALLOC(ArPragueSkyModelState);
 
 	char filename[1024];
+    
 	sprintf(filename, "%s/SkyModel/SkyModelDataset.dat", library_path);
     
     if ( access(filename, F_OK | R_OK) != 0 )
