@@ -1,7 +1,8 @@
 /*
 This source is published under the following 3-clause BSD license.
 
-Copyright (c) 2016 <anonymous authors of SIGGRAPH paper submision 0155>
+Copyright (c) 2021 the authors of the SIGGRAPH paper
+"A Fitted Radiance and Attenuation Model for Realistic Atmospheres"
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,8 +32,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* ============================================================================
 
-1.0   January 15th, 2016
-      Initial release.
+1.1   May 24th, 2021
+      Version 1.0 was released in error, as we got our git repositories mixed
+      up (which is really a beginner's mistake - but at least we are being
+      honest why this happened...). This paper was submitted multiple times to
+      SIGGRAPH before being accepted, and due to this there are several
+      branches of ART that were created for the various versions of the model.
+      
+      We are also finally moving ART to proper external gitlab source hosting,
+      which will be made official for the 2.0.4 release, and which was already
+      partially used for some internal work. The combination of these two
+      factors caused us to momentarily lose track of which version of the
+      code was actually used to generate the results for the final paper.
+      
+      This version is now the correct one which can work with the data file
+      that is being provided. We apologise profusely to anyone who wasted
+      time trying to make the old code from a previous SIGGRAPH submission
+      work! :(
+      
+      With ART securely on gitlab in the future, this sort of thing should
+      not happen ever again.
+
+1.0   May 17th, 2021
+      Initial release - PLEASE DISREGARD!
 
 ============================================================================ */
 
@@ -60,7 +82,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef ARPRAGUESKYMODEL_USE_NEW
 
 const int transsvdrank = 12;
-const double safety_altitude = 50.0;
+const double safety_altitude = 0.0; //50.0;
 
 double double_from_half(const unsigned short value)
 {
@@ -103,7 +125,7 @@ int compute_pp_coefs_from_float(const int nbreaks, const double * breaks, const 
 }
 
 void printErrorAndExit(const char * message) {
-    fprintf(stderr, "%s", message);
+	fprintf(stderr, "%s", message);
 	fprintf(stderr, "\n");
 	fflush(stderr);
 	exit(-1);
@@ -377,6 +399,8 @@ void read_polarisation(ArPragueSkyModelState * state, FILE * handle)
 	free(polarisation_temp);
 }
 
+#include "unistd.h"
+
 ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
 	const char  * library_path
 	)
@@ -384,15 +408,13 @@ ArPragueSkyModelState  * arpragueskymodelstate_alloc_init(
 	ArPragueSkyModelState * state = ALLOC(ArPragueSkyModelState);
 
 	char filename[1024];
-	//sprintf(filename, "%s/SkyModel/Full.dat", library_path);
-	//sprintf(filename, "%s/SkyModel/FullHazy.dat", library_path);
-	//sprintf(filename, "%s/SkyModel/Full_Float.dat", library_path);
-	//sprintf(filename, "%s/SkyModel/VisLow.dat", library_path);
-	//sprintf(filename, "%s/SkyModel/VisGround.dat", library_path);
-	sprintf(filename, "%s/SkyModel/FullPol.dat", library_path);
-	//sprintf(filename, "%s/SkyModel/FullPol_Float.dat", library_path);
-	//sprintf(filename, "%s/SkyModel/VisLowPol.dat", library_path);
-	//sprintf(filename, "%s/SkyModel/VisGroundPol.dat", library_path);
+	sprintf(filename, "%s/SkyModel/SkyModelDataset.dat", library_path);
+    
+    if ( access(filename, F_OK | R_OK) != 0 )
+    {
+        ART_ERRORHANDLING_FATAL_ERROR("sky model dataset not found, full path was %s",filename);
+    }
+    
 	FILE * handle = fopen(filename, "rb");
 
 	// Read data
@@ -619,7 +641,7 @@ void arpragueskymodel_compute_angles(
             & directionToZenithN
             );
 
-    *zero  = acos(cosThetaCor); 
+    *zero  = acos(cosThetaCor);
 
 
     // Zenith angle (theta) - uncorrected version goes outside
@@ -784,7 +806,7 @@ double interpolate_elevation(
     gamma_segment,
     alpha_segment,
     zero_segment,
-    control_params_low);    
+    control_params_low);
 
   if (factor < 1e-6 || elevation_low >= (state->elevations - 1))
   {
@@ -809,7 +831,7 @@ double interpolate_elevation(
     gamma_segment,
     alpha_segment,
     zero_segment,
-    control_params_high); 
+    control_params_high);
 
   return lerp(res_low, res_high, factor);
 }
@@ -1738,7 +1760,6 @@ double arpragueskymodel_calc_transmittance_svd(
 	}
 	return trans[0];
 }
-
 
 void arpragueskymodel_findInArray(const float *arr, const int arrLength, const double value, int *index, int *inc, double *w)
 {
@@ -3009,7 +3030,7 @@ double arpragueskymodel_radiance(
   const double shadow_v_val = eval_pp(zero, shadow_v_nbreaks, shadow_v_breaks, control_params_interpolated + shadow_v_offset);
   const double shadow_h_val = eval_pp(theta, shadow_h_nbreaks, shadow_h_breaks, control_params_interpolated + shadow_h_offset);
 
-  const double res = 
+  const double res =
     background_val
     + solar_max_val * solar_ratio_val
     + backglow_vertical_val * backglow_ratio_val
