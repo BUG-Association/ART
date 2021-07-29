@@ -269,6 +269,8 @@ void explainFunction(
         ART_GV  * art_gv
         )
 {
+    (void) art_gv;
+    
     printf(
 "This application is named after the Ravenous Bugblatter Beast of Traal.\n"
 "At the time the first version of this tool was written (in the early hours\n"

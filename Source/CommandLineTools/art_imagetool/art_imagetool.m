@@ -716,8 +716,6 @@ int art_imagetool(
             ART_ERRORHANDLING_FATAL_ERROR(
                 "invalid pixel coordinates, use <xc>:<yc> format"
                 );
-
-        IVec2D  sizeOfInputImage;
         
         const char  * inputFileName = argv[1];
 
