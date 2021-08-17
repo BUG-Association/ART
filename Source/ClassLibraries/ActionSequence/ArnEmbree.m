@@ -30,9 +30,27 @@
 #import <ArnEmbree.h>
 #import <RayCastingCommonMacros.h>
 #import <ARM_RayCasting.h>
-#import <unistd.h>
 #import "ArnLeafNodeBBoxCollection.h"
 #import "ArnBSPTree.h"
+
+#if defined(__APPLE__)
+#include <sys/syscall.h>
+#define ((pid_t)syscall(SYS_thread_selfid);
+
+#elif defined(unix) || defined(__unix__) || defined(__unix)
+#include <unistd.h>
+#include <sys/syscall.h>
+
+#ifndef SYS_gettid
+#error "SYS_gettid unavailable on this system"
+#endif
+
+#define gettid() ((pid_t)syscall(SYS_gettid))
+
+#endif
+
+
+
 
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
