@@ -100,7 +100,21 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
     {
         nativeValue = ALLOC(ArRSSpectrum2D);
 
-        *nativeValue = newSpectrum;
+        // Make a local copy
+        nativeValue->size             = newSpectrum.size;
+        nativeValue->stride           = newSpectrum.stride;
+        nativeValue->excitation_start = newSpectrum.excitation_start;
+        nativeValue->excitation_step  = newSpectrum.excitation_step;
+        nativeValue->emission_start   = newSpectrum.emission_start;
+        nativeValue->emission_step    = newSpectrum.emission_step;
+        nativeValue->scale            = newSpectrum.scale;
+
+        nativeValue->array = ALLOC_ARRAY(double, nativeValue->size);
+        memcpy(
+            nativeValue->array, 
+            newSpectrum.array,
+            nativeValue->size * sizeof(double)
+            );
 
         [ self _setup ];
     }
@@ -122,6 +136,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         cx500_free(art_gv, hiresVerticalSums);
     if(hiresHorizontalSums)
         cx500_free(art_gv, hiresHorizontalSums);
+
+    FREE_ARRAY(nativeValue->array);
+    FREE(nativeValue);
         
     [ super dealloc ];
 }

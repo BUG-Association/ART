@@ -384,6 +384,21 @@ ART_MODULE_INTERFACE(ARM_Colour)
 
     #define EXTERNAL_COLOUR(__path) \
         EXTERNAL((__path),0,ARP_COLOUR,ARP_COLOUR_VAL)
+
+    /**
+     * @brief Load spectrum from BFC measurement file
+     *
+     * Loads a spectrum from the BFC file created by LabSphere BFC-450 
+     * spectrophotometer.
+     *
+     * @def BFC_COLOUR_MEASUREMENT(path)
+     *
+     * @param path  char*  Path the the file to load.
+     */
+    #define BFC_COLOUR_MEASUREMENT(__path) \
+        ART_PARSE_EXISTING_FILE( \
+            (__path), \
+            ArnRSSpectrum2D)
 /**
  * @popsection
  */

@@ -696,6 +696,8 @@ do{ \
                 [ ALLOC_INIT_OBJECT(ArnRSSpectrum2D)
                     :   spectrum
                     ];
+
+            FREE_ARRAY(spectrum.array);
         }
         else
         {

@@ -24,26 +24,19 @@
 
 =========================================================================== */
 
-#define ART_LIBRARY_NAME     ART_Parser
+#include "ART_Foundation.h"
 
-#import "ART_Parser.h"
+ART_MODULE_INTERFACE(ArfBFC)
 
-ART_LIBRARY_INITIALISATION_FUNCTION
-(
-    ART_PERFORM_MODULE_INITIALISATION( ArfICCProfile )
-    ART_PERFORM_MODULE_INITIALISATION( ArfHeightfield )
-    ART_PERFORM_MODULE_INITIALISATION( ArfMeasurementArchive )
-    ART_PERFORM_MODULE_INITIALISATION( ArfArm )
-    ART_PERFORM_MODULE_INITIALISATION( ArfNative )
-    ART_PERFORM_MODULE_INITIALISATION( ArfPLY )
-    ART_PERFORM_MODULE_INITIALISATION( ArfVol )
-    ART_PERFORM_MODULE_INITIALISATION( ArfBFC )
-    ART_PERFORM_MODULE_INITIALISATION( ArcBinaryCoder )
-    ART_PERFORM_MODULE_INITIALISATION( ArcObjCCoder )
-    ART_PERFORM_MODULE_INITIALISATION( ART_Parse_File )
-)
+#import "ART_Scenegraph.h"
 
-ART_AUTOMATIC_LIBRARY_SHUTDOWN_FUNCTION
+@interface ArfBFC
+        : ArcObject
+        < ArpParser, ArpFiletype, ArpFileheader >
+{
+    ArcFile  * file;
+}
 
+@end
 
 // ===========================================================================
