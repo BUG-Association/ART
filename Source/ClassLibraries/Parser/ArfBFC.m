@@ -128,7 +128,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
                 );
 
 
-    char buff[255] = {0};
+    char buff[256] = {0};
 
     /* 
      Retro engineered file structure for the LabSphere BFC-450 output
@@ -290,7 +290,8 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
             if (n_matches != 1) {
                 ART_ERRORHANDLING_FATAL_ERROR(
                     """BFC file %s malformed!\n"""
-                    """Could not match a measurement value."""
+                    """Could not match a measurement value.""",
+                    [ file name ]
                 );
             }
         }
