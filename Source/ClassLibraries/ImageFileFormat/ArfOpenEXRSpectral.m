@@ -88,7 +88,22 @@ ARFRASTERIMAGE_DEFAULT_IMPLEMENTATION(LightAlpha,exrspectral)
             return arfiletypematch_impossible;
         }
     } else {
-        return arfiletypematch_exact;
+        // From the OpenEXR documentation:
+        // https://openexr.readthedocs.io/en/latest/ReadingAndWritingImageFiles.html#is-this-an-openexr-file
+        
+        char buffer[4];
+
+        [ stream read
+            :   buffer
+            :   1
+            :   4
+            ];
+        
+        if (buffer[0] == 0x76 && buffer[1] == 0x2f && buffer[2] == 0x31 && buffer[3] == 0x01) {
+            return arfiletypematch_exact;
+        } else {
+            return arfiletypematch_impossible;
+        }
     }
 }
 
