@@ -15,8 +15,16 @@ if ( APPLE )
 		AdvancedRenderingToolkit
 		PROPERTIES
 			FRAMEWORK TRUE
-			FRAMEWORK_VERSION 2.0
+			FRAMEWORK_VERSION A
+  			# "current version" in semantic format in Mach-O binary file
+  			VERSION ${ART_VERSION_MAJOR}.${ART_VERSION_MINOR}.${ART_VERSION_PATCH}
+  			# "compatibility version" in semantic format in Mach-O binary file
+			# the logic here is that anything with the same major version number
+			# should work together
+  			SOVERSION ${ART_VERSION_MAJOR}.0.0
 		)
+
+	target_link_options(AdvancedRenderingToolkit INTERFACE "LINKER:-rpath,$ENV{HOME}/Library/Frameworks")
 
 # This gets rid of a stupid warning in Xcode > 4.4 - but only for this one
 # target. Which is almost useless, since we still get warnings about the 

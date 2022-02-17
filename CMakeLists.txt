@@ -162,6 +162,7 @@ if ( APPLE )
     		message("Building for MacOS 11 or later, activating code signing")
 		set(CMAKE_XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "-o linker-signed")
 	endif ()
+
 	set( art_resource_directory_location "Library" )
 	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE -DART_4_OPENSTEP -D_ART_WITHOUT_JPEGLIB" )
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GNU_SOURCE -DART_4_OPENSTEP -D_ART_WITHOUT_JPEGLIB" )
