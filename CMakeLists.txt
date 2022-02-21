@@ -7,10 +7,6 @@ set ( ART_VERSION_MINOR 1 )
 set ( ART_VERSION_PATCH 0 )
 set ( ART_VERSION_DEVTAG -gamutmapping )
 
-if ( APPLE )
-set(CMAKE_MACOSX_RPATH 1)
-endif ( APPLE )
-
 set(CMAKE_CXX_STANDARD 11)
 
 # configure a header file to pass some of the CMake settings
@@ -154,6 +150,8 @@ message("Executables will be installed in '${art_executable_directory}'")
 # (depending on platform)
 
 if ( APPLE )
+	set(CMAKE_MACOSX_RPATH 1)
+	set(CMAKE_INSTALL_RPATH "$ENV{HOME}/Library/Frameworks/" )
 	if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin" 
     		AND CMAKE_HOST_SYSTEM_VERSION VERSION_GREATER_EQUAL 20
 # leaving this here in case we ever need to be specific for MacOS 11, saves me having to google this again

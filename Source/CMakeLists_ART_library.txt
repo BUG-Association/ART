@@ -24,7 +24,7 @@ if ( APPLE )
   			SOVERSION ${ART_VERSION_MAJOR}.0.0
 		)
 
-	target_link_options(AdvancedRenderingToolkit INTERFACE "LINKER:-rpath,$ENV{HOME}/Library/Frameworks")
+#	target_link_options(AdvancedRenderingToolkit INTERFACE "LINKER:-rpath,$ENV{HOME}/Library/Frameworks")
 
 # This gets rid of a stupid warning in Xcode > 4.4 - but only for this one
 # target. Which is almost useless, since we still get warnings about the 
