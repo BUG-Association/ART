@@ -88,7 +88,6 @@ void lab_c_debugprintf(
         const ART_GV    * art_gv,
         const ArCIELab  * c0
         );
-
-
+        
 #endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARCIELAB_H_ */
 /* ======================================================================== */

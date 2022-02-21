@@ -24,40 +24,31 @@
 
 =========================================================================== */
 
-#ifndef _ART_FOUNDATION_COLOUR_AND_LIGHT_H_
-#define _ART_FOUNDATION_COLOUR_AND_LIGHT_H_
+#define ART_MODULE_NAME     ArCIELch
 
-#include "ART_Foundation_System.h"
-
-ART_LIBRARY_INTERFACE(ART_Foundation_ColourAndSpectra)
-
-#include "ArCIExyY.h"
-#include "ArCIEXYZ.h"
-#include "ArCIELab.h"
 #include "ArCIELch.h"
-#include "ArCIELabUInt.h"
-#include "ArCIELuv.h"
-#include "ArRGB.h"
-#include "ArHSV.h"
-#include "ArRGBUInt.h"
-#include "ArSpectrum8.h"
-#include "ArSpectrum11.h"
-#include "ArSpectrum18.h"
-#include "ArSpectrum46.h"
-#include "ArSpectrum500.h"
 
-#include "ArSpectrum.h"
-#include "ArSpectralSample.h"
+ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
-#include "ArDataType.h"
-#include "ArCMF.h"
+ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-#include "ArColourSpace.h"
-#include "ArColourTransform.h"
-#include "ColourAndSpectralDataConversion.h"
-#include "ArSpectrumSubsystemManagement.h"
-#include "SystemWhitepoint.h"
-#include "UpliftCoefficientCube.h"
 
-#endif /* _ART_FOUNDATION_COLOUR_AND_LIGHT_H_ */
+void lch_c_debugprintf(
+        const ART_GV    * art_gv,
+        const ArCIELch  * c_0
+        )
+{
+    (void) art_gv;
+    
+    printf( "CIE L*c*h* ( % 5.3f, % 5.3f, % 5.3f )\n",
+        ARCIELch_L(*c_0),
+        ARCIELch_c(*c_0),
+        ARCIELch_h(*c_0) * MATH_RAD_TO_DEG
+        );
+
+    fflush(stdout);
+}
+
+
+
 /* ======================================================================== */

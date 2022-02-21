@@ -5,7 +5,7 @@ project (ART)
 set ( ART_VERSION_MAJOR 2 )
 set ( ART_VERSION_MINOR 1 )
 set ( ART_VERSION_PATCH 0 )
-set ( ART_VERSION_DEVTAG )
+set ( ART_VERSION_DEVTAG -gamutmapping )
 
 if ( APPLE )
 set(CMAKE_MACOSX_RPATH 1)

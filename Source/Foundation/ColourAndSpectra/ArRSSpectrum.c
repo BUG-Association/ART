@@ -109,6 +109,72 @@ ArRSSpectrum rsspectrum(
     return s;
 }
 
+void rsspectrum_macadam(
+        const unsigned int    centralWavelength,
+        const unsigned int    widthDiv2,
+              ArRSSpectrum  * rss
+        )
+{
+    ARRSS_START(*rss) = 380 NM;
+    ARRSS_STEP(*rss)  = 1 NM;
+    ARRSS_SCALE(*rss) = 1.0;
+    
+    if ( ARRSS_SIZE(*rss) != 360 )
+    {
+        ARRSS_SIZE(*rss)  = 360;
+        
+        if ( ARRSS_ARRAY(*rss) )
+        {
+            FREE_ARRAY(ARRSS_ARRAY(*rss));
+            
+        }
+        
+        ARRSS_ARRAY(*rss) = ALLOC_ARRAY( double, ARRSS_SIZE(*rss) );
+    }
+
+    int  dist380cwl = M_ABS( 380 - (int)centralWavelength );
+    int  dist740cwl = M_ABS( 740 - (int)centralWavelength );
+
+    for ( int i = 0; i < (int)ARRSS_SIZE(*rss); i++ )
+    {
+        ARRSS_ARRAY_I(*rss,i) = 0.;
+
+        int  wl = i + 380;
+        int  dist = M_ABS( (int)centralWavelength - wl );
+        
+        if ( dist < (int)widthDiv2 )
+        {
+            ARRSS_ARRAY_I(*rss,i) = 1.;
+        }
+        else
+        {
+            int  dist380 = M_ABS( 380 - wl );
+
+            if ( dist380 < (int)widthDiv2 )
+            {
+                if (    dist740cwl < (int)widthDiv2
+                     && dist380 < (int)widthDiv2 - dist740cwl )
+                {
+                    ARRSS_ARRAY_I(*rss,i) = 1.;
+                }
+            }
+            else
+            {
+                int  dist740 = M_ABS( 740 - wl );
+                
+                if ( dist740 < (int)widthDiv2 )
+                {
+                    if (    dist380cwl < (int)widthDiv2
+                         && dist740 < (int)widthDiv2 - dist380cwl )
+                    {
+                        ARRSS_ARRAY_I(*rss,i) = 1.;
+                    }
+                }
+            }
+        }
+    }
+}
+
 void rss_free_contents(
         const ART_GV        * art_gv,
               ArRSSpectrum  * rss
@@ -117,6 +183,15 @@ void rss_free_contents(
     (void) art_gv;
     
     FREE_ARRAY( ARRSS_ARRAY(*rss) );
+}
+
+void rss_free(
+        const ART_GV        * art_gv,
+              ArRSSpectrum  * rss
+        )
+{
+    rss_free_contents( art_gv, rss );
+    FREE( rss );
 }
 
 /* ---------------------------------------------------------------------------

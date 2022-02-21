@@ -246,7 +246,7 @@ void lab_c_debugprintf(
 {
     (void) art_gv;
     
-    printf( "CIE L* a* b* ( % 5.3f, % 5.3f, % 5.3f )\n",
+    printf( "CIE L*a*b* ( % 5.3f, % 5.3f, % 5.3f )\n",
         ARCIELab_L(*c_0),
         ARCIELab_a(*c_0),
         ARCIELab_b(*c_0)

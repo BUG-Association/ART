@@ -187,18 +187,39 @@ int tonemap(
             :   "clip to given white luminance"
             ];
 
-    id  rgbClippingOpt =
+    id  rgbGMClippingOpt =
         [ FLAG_OPTION
-            :   "clipRGB"
-            :   "cl"
-            :   "clip out of gamut RGB values"
+            :   "gmclip"
+            :   "gcl"
+            :   "clip out of gamut RGB"
+            ];
+
+    id  rgbGMLinearOpt =
+        [ FLAG_OPTION
+            :   "gmlinear"
+            :   "gli"
+            :   "move out of gamut RGB straight to L axis"
+            ];
+
+    id  rgbGMNodeOpt =
+        [ FLAG_OPTION
+            :   "gmnode"
+            :   "gno"
+            :   "move out of gamut RGB towards 50 L"
+            ];
+
+    id  rgbGMCuspOpt =
+        [ FLAG_OPTION
+            :   "gmcusp"
+            :   "gcu"
+            :   "move out of gamut RGB towards L of max saturation cusp"
             ];
 
     id  rgbFlagOpt =
         [ FLAG_OPTION
             :   "flagRGB"
             :   "fl"
-            :   "flag out of gamut RGB values"
+            :   "flag out of gamut RGB"
             ];
 
     id  lpFilterOpt =
@@ -297,15 +318,53 @@ int tonemap(
         ,   XC( [ inputImage size ] )
         ,   YC( [ inputImage size ] )
         ];
+        
+    unsigned int number_of_specified_gm = 0;
 
-    if ( [ rgbClippingOpt hasBeenSpecified ] )
+    if ( [ rgbGMClippingOpt hasBeenSpecified ] )
     {
-        setRGBGamutMappingMethod(art_gv, arrgb_gm_clipping , 0.5);
+        setRGBGamutMappingMethod(art_gv, arrgb_gm_clipping );
+        number_of_specified_gm++;
+    }
+
+    if ( [ rgbGMLinearOpt hasBeenSpecified ] )
+    {
+        setRGBGamutMappingMethod(art_gv, arrgb_gm_linear );
+        number_of_specified_gm++;
+    }
+
+    if ( [ rgbGMNodeOpt hasBeenSpecified ] )
+    {
+        setRGBGamutMappingMethod(art_gv, arrgb_gm_node );
+        number_of_specified_gm++;
+    }
+
+    if ( [ rgbGMCuspOpt hasBeenSpecified ] )
+    {
+        setRGBGamutMappingMethod(art_gv, arrgb_gm_cusp );
+        number_of_specified_gm++;
+    }
+    
+    if ( number_of_specified_gm > 1 )
+    {
+        ART_ERRORHANDLING_FATAL_ERROR(
+            "more than one gamut mapping strategy specified"
+            );
     }
 
     if ( [ rgbFlagOpt hasBeenSpecified ] )
     {
-        setRGBGamutMappingMethod(art_gv, arrgb_gm_clipping | arrgb_gm_flag_neg | arrgb_gm_flag_above_one, 0.);
+        if (    [ rgbGMCuspOpt hasBeenSpecified ]
+             || [ rgbGMNodeOpt hasBeenSpecified ]
+             || [ rgbGMLinearOpt hasBeenSpecified ] )
+        {
+            ART_ERRORHANDLING_WARNING(
+                "flagging out of gamut RGB colours implies RGB clipping, other gamut mapping "
+                "strategy overridden"
+                );
+        }
+        
+        setRGBGamutMappingMethod(art_gv, arrgb_gm_clipping | arrgb_gm_flag_neg | arrgb_gm_flag_above_one );
     }
 
     /* ------------------------------------------------------------------

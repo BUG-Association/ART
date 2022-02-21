@@ -35,6 +35,7 @@ ART_MODULE_INTERFACE(ArCIEColourConversions)
 #include "ArCIExyY.h"
 #include "ArCIEXYZ.h"
 #include "ArCIELab.h"
+#include "ArCIELch.h"
 #include "ArCIELuv.h"
 #include "ArColourTransform.h"
 
@@ -55,8 +56,10 @@ typedef enum ArRGBGamutMapping
 {
     arrgb_gm_clipping       = 0x00,
     arrgb_gm_linear         = 0x01,
+    arrgb_gm_cusp           = 0x02,
+    arrgb_gm_node           = 0x03,
 #ifndef _ART_WITHOUT_LCMS_
-    arrgb_gm_lcms           = 0x02,
+    arrgb_gm_lcms           = 0x04,
 #endif
     arrgb_gm_flag_neg       = 0x10,
     arrgb_gm_flag_above_one = 0x20,
@@ -75,8 +78,7 @@ ArRGBGamutMapping currentRGBGamutMappingMethod(
 
 void setRGBGamutMappingMethod(
               ART_GV             * art_gv,
-        const ArRGBGamutMapping    method,
-        const double               focus_luminance
+        const ArRGBGamutMapping    method
         );
 
 void xyz_mat_to_xyz(
@@ -184,6 +186,18 @@ void xyz_d_mul_c(
         const ART_GV    * art_gv,
         const double      d0,
               ArCIEXYZ  * cr
+        );
+
+void lch_to_lab(
+        const ART_GV    * art_gv,
+        const ArCIELch  * lch,
+              ArCIELab  * lab
+        );
+
+void lab_to_lch(
+        const ART_GV    * art_gv,
+        const ArCIELab  * lab,
+              ArCIELch  * lch
         );
 
 #endif /* _ART_FOUNDATION_COLOURANDSPECTRA_ARCIECOLOURCONVERSIONS_H_ */
