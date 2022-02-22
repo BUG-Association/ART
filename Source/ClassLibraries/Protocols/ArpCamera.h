@@ -44,6 +44,10 @@ ART_MODULE_INTERFACE(ArpCamera)
         : (const IVec2D *) inImageSize
         ;
 
+- (void) setTime
+        : (double) inTime
+        ;
+
 - (void) setupForObject
         : (ArNode <ArpBBox> *) inObject
         : (ArcObject <ArpReporter> *) reporter

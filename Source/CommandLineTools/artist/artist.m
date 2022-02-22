@@ -170,6 +170,13 @@ int artist(
             :   "only render specified pixel range (y coord)"
             ]
     };
+    
+    id timeOpt =
+        [ FLOAT_OPTION
+            :   "time"
+            :   "time"
+            :   "set a time to render the image at"
+            ];
 
     id retOpt =
         [ FLAG_OPTION
@@ -608,6 +615,11 @@ int artist(
         }
     }
 
+    // Set the user-specified time to the final camera
+    if ( [ timeOpt hasBeenSpecified ] )
+    {
+        [ [ sceneGraph camera ] setTime: [ timeOpt doubleValue ] ];
+    }
 
 // =============================   PHASE 5   =================================
 //

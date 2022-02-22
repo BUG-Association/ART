@@ -50,12 +50,13 @@ ART_MODULE_INTERFACE(Ray3D)
 
 typedef struct Ray3D
 {
-    Pnt3D point;
-    Vec3D vector;
+    Pnt3D  point;
+    Vec3D  vector;
+    double time;
 }
 Ray3D;
 
-#define RAY3D(_pnt,_vec)        ((Ray3D){ (_pnt), (_vec) })
+#define RAY3D(_pnt,_vec)        ((Ray3D){ (_pnt), (_vec), 0.0 })
 #define RAY3D_PV                RAY3D
 #define RAY3D_PP(_pnt0,_pnt1)   ((Ray3D){ (_pnt0), \
                                           VEC3D( XC(_pnt1)-XC(_pnt0),\

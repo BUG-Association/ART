@@ -383,6 +383,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnFisheyeCamera)
     imageSize = *inImageSize;
 }
 
+- (void) setTime
+        : (double) inTime
+{
+    ray.time = inTime;
+}
+
 - (id) withTwist
         : (double) newTwist
 {

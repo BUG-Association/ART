@@ -197,6 +197,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
     imageSize = *inImageSize;
 }
 
+- (void) setTime
+        : (double) inTime
+{
+    ray.time = inTime;
+}
+
 - (void) setupForObject
         : (ArNode <ArpBBox> *) inObject
         : (ArcObject <ArpReporter> *) reporter

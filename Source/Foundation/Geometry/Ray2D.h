@@ -50,8 +50,9 @@ ART_MODULE_INTERFACE(Ray2D)
 
 typedef struct Ray2D
 {
-    Pnt2D point;
-    Vec2D vector;
+    Pnt2D  point;
+    Vec2D  vector;
+    double time;
 }
 Ray2D;
 

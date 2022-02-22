@@ -72,6 +72,8 @@ void ray3de_init(
           1.0,
         & RAY3DE_INVVEC(*r3de)
         );
+    
+    r3de->time = r3d->time;
 
     RAY3DE_DIR(*r3de) = ray3ddir_init(r3d);
 }
