@@ -1,8 +1,8 @@
 
 /* ===========================================================================
 
-    Copyright (c) 1996-2021 The ART Development Team
-    ------------------------------------------------
+    Copyright (c) The ART Development Team
+    --------------------------------------
 
     For a comprehensive list of the members of the development team, and a
     description of their respective contributions, see the file
