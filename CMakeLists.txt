@@ -4,12 +4,8 @@ project (ART)
 
 set ( ART_VERSION_MAJOR 2 )
 set ( ART_VERSION_MINOR 1 )
-set ( ART_VERSION_PATCH 0 )
+set ( ART_VERSION_PATCH 1 )
 set ( ART_VERSION_DEVTAG )
-
-if ( APPLE )
-set(CMAKE_MACOSX_RPATH 1)
-endif ( APPLE )
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -154,6 +150,13 @@ message("Executables will be installed in '${art_executable_directory}'")
 # (depending on platform)
 
 if ( APPLE )
+	set(CMAKE_MACOSX_RPATH 1)
+	# this is set to avoid warnings about "too new" framework versions
+	# during ARM -> ART translations
+	set(CMAKE_OSX_DEPLOYMENT_TARGET 11.0)
+	# this is set so that cmake > 3.0 generates codes which also finds
+	# the framework when installed locally in your library
+	set(CMAKE_INSTALL_RPATH "$ENV{HOME}/Library/Frameworks/" )
 	if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin" 
     		AND CMAKE_HOST_SYSTEM_VERSION VERSION_GREATER_EQUAL 20
 # leaving this here in case we ever need to be specific for MacOS 11, saves me having to google this again

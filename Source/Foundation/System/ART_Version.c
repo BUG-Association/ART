@@ -1,7 +1,7 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2021 The ART Development Team
-    ------------------------------------------------
+    Copyright (c) The ART Development Team
+    --------------------------------------
 
     For a comprehensive list of the members of the development team, and a
     description of their respective contributions, see the file
@@ -36,7 +36,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 #define ART_SHORT_NAME_STRING "ART"
 #define ART_LONG_NAME_STRING  "Advanced Rendering Toolkit"
 
-#define ART_COPYRIGHT_STRING  "(c) 1996-2021 by the ART development team"
+#define ART_COPYRIGHT_STRING  "(c) 1996-2022 by the ART development team"
 
 const char  * art_short_name_string =   ART_SHORT_NAME_STRING;
 const char  * art_long_name_string =    ART_LONG_NAME_STRING;

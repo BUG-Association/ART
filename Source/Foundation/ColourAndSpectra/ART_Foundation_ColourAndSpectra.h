@@ -1,7 +1,7 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2021 The ART Development Team
-    ------------------------------------------------
+    Copyright (c) The ART Development Team
+    --------------------------------------
 
     For a comprehensive list of the members of the development team, and a
     description of their respective contributions, see the file
@@ -34,6 +34,7 @@ ART_LIBRARY_INTERFACE(ART_Foundation_ColourAndSpectra)
 #include "ArCIExyY.h"
 #include "ArCIEXYZ.h"
 #include "ArCIELab.h"
+#include "ArCIELch.h"
 #include "ArCIELabUInt.h"
 #include "ArCIELuv.h"
 #include "ArRGB.h"
