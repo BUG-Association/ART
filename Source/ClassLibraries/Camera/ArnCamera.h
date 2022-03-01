@@ -45,6 +45,9 @@ ART_MODULE_INTERFACE(ArnCamera)
 
     double      xscale;
     double      yscale;
+    
+    double      shutterOpen;
+    double      shutterClose;
 
     HTrafo3D    world2camera;
     HTrafo3D    camera2world;

@@ -77,6 +77,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
         twist =             0.0 DEGREES;
         near =              0.0;
         ratio =             1.0;
+        shutterOpen =       0.0;
+        shutterClose =      0.0;
         [self _setupCamera];
     }
     
@@ -122,6 +124,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
         twist =             newTwist;
         near =              newNear;
         ratio =             newRatio;
+        shutterOpen =       0.0;
+        shutterClose =      0.0;
         [self _setupCamera];
     }
     return self;
@@ -141,6 +145,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
 
     copiedInstance->xscale = xscale;
     copiedInstance->yscale = yscale;
+    
+    copiedInstance->shutterOpen = shutterOpen;
+    copiedInstance->shutterClose = shutterClose;
 
     copiedInstance->world2camera = world2camera;
     copiedInstance->camera2world = camera2world;
@@ -172,6 +179,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
 
     copiedInstance->xscale = xscale;
     copiedInstance->yscale = yscale;
+    
+    copiedInstance->shutterOpen = shutterOpen;
+    copiedInstance->shutterClose = shutterClose;
 
     copiedInstance->world2camera = world2camera;
     copiedInstance->camera2world = camera2world;
@@ -197,10 +207,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
     imageSize = *inImageSize;
 }
 
-- (void) setTime
-        : (double) inTime
+- (void) setShutterSpeed
+        : (double) shutterOpen
+        : (double) shutterClose
 {
-    ray.time = inTime;
+    self->shutterOpen = shutterOpen;
+    self->shutterClose = shutterClose;
 }
 
 - (void) setupForObject
@@ -456,6 +468,21 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
     (void) randomGenerator;
     Vec3D  mainRayVector;
     Vec3D  auxRayVector, auxWorldVector;
+    
+    Pnt3D offsetPos = ray.point;
+    if ( fabs(shutterOpen - shutterClose) > DBL_EPSILON )
+    {
+        double shutterOpenLength = shutterClose - shutterOpen;
+        double unitSample = [ randomGenerator valueFromNewSequence ];
+        outRay->time = shutterOpen + unitSample * shutterOpenLength;
+        
+        YC(offsetPos) += unitSample * 20;
+        ZC(offsetPos) += unitSample * 20;
+    }
+    else
+    {
+        outRay->time = shutterOpen;
+    }
 
     XC(mainRayVector) = XC(*pixelCoordinates) - xscale;
     YC(mainRayVector) = YC(*pixelCoordinates) - yscale;
@@ -475,12 +502,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
         vec3d_v_htrafo3d_v(&mainRayVector, near2world, &nearVector);
         pnt3d_vp_add_p(
             & nearVector,
-            & ray.point,
+            & offsetPos,
             & outRay->point
             );
     }
     else
-        outRay->point = ray.point;
+        outRay->point = offsetPos;
 
     vec3d_norm_v( & RAY3D_V(*outRay) );
     

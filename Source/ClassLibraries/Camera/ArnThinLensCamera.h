@@ -65,7 +65,9 @@ ART_MODULE_INTERFACE(ArnThinLensCamera)
     Vec3D       worldSpaceViewingDirection;
     double      worldSpaceCameraFocalDistance;
     double      worldSpaceCameraRotation;
-    double      time;
+    
+    double      shutterOpen;
+    double      shutterClose;
 
     //   Temporary variables
 

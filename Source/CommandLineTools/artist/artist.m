@@ -171,11 +171,12 @@ int artist(
             ]
     };
     
-    id timeOpt =
-        [ FLOAT_OPTION
-            :   "time"
-            :   "time"
-            :   "set a time to render the image at"
+    id shutterOpt =
+        [ STRING_OPTION
+            :   "shutterSpeed"
+            :   "sh"
+            :   "<sopen>:<sclose>"
+            :   "set the time interval in which the camera collects light"
             ];
 
     id retOpt =
@@ -616,9 +617,33 @@ int artist(
     }
 
     // Set the user-specified time to the final camera
-    if ( [ timeOpt hasBeenSpecified ] )
+    // -> Change this to the setShutterSpeed method
+    if ( [ shutterOpt hasBeenSpecified ] )
     {
-        [ [ sceneGraph camera ] setTime: [ timeOpt doubleValue ] ];
+        // Parse the two double values from input
+        const char * shutterString = [ shutterOpt cStringValue ];
+        const char * separatorPtr = strchr(shutterString, ':');
+        
+        // If the separator is present, there need to be both values present
+        if ( separatorPtr && separatorPtr != shutterString && separatorPtr[1] )
+        {
+            double shutterOpen = atof(shutterString);
+            double shutterClose = atof(separatorPtr + 1);
+            
+            [ [ sceneGraph camera ]
+                setShutterSpeed: shutterOpen
+                               : shutterClose
+            ];
+        }
+        else
+        {
+            double timeSample = atof(shutterString);
+            
+            [ [ sceneGraph camera ]
+                setShutterSpeed: timeSample
+                               : timeSample
+            ];
+        }
     }
 
 // =============================   PHASE 5   =================================

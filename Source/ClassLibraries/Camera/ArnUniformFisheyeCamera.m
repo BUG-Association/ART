@@ -385,11 +385,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnUniformFisheyeCamera)
     imageSize = *inImageSize;
 }
 
-- (void) setTime
-        : (double) inTime
+- (void) setShutterSpeed
+        : (double) shutterOpen
+        : (double) shutterClose
 {
-    ray.time = inTime;
-} 
+    self->shutterOpen = shutterOpen;
+    self->shutterClose = shutterClose;
+}
 
 - (id) withTwist
         : (double) newTwist

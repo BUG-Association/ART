@@ -44,8 +44,9 @@ ART_MODULE_INTERFACE(ArpCamera)
         : (const IVec2D *) inImageSize
         ;
 
-- (void) setTime
-        : (double) inTime
+- (void) setShutterSpeed
+        : (double) shutterOpen
+        : (double) shutterClose
         ;
 
 - (void) setupForObject

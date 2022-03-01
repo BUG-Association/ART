@@ -411,10 +411,12 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
     [ self _setupCamera ];
 }
 
-- (void) setTime
-        : (double) inTime
+- (void) setShutterSpeed
+        : (double) shutterOpen
+        : (double) shutterClose
 {
-    time = inTime;
+    self->shutterOpen = shutterOpen;
+    self->shutterClose = shutterClose;
 }
 
 - (void) setupForObject
@@ -491,8 +493,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnThinLensCamera)
         & cameraSpaceRayStart,
         & camera2world,
         & RAY3D_POINT(*worldSpaceViewingRay) );
-    
-    worldSpaceViewingRay->time = time;
 
 #ifdef WITH_POLARISATION
     //   This does not work, and will have to be fixed during the renovation
