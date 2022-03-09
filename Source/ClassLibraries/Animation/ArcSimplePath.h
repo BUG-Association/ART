@@ -1,6 +1,6 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2021 The ART Development Team
+    Copyright (c) 1996-2022 The ART Development Team
     ------------------------------------------------
 
     For a comprehensive list of the members of the development team, and a
@@ -26,39 +26,45 @@
 
 #include "ART_Foundation.h"
 
-ART_LIBRARY_INTERFACE(ART_ClassLibraries)
+#import "ArpPath.h"
 
-#include "ART_MiscellaneousStructs.h"
-#include "ART_Protocols.h"
-#include "ART_MiscellaneousClasses.h"
-#include "ART_Scenegraph.h"
-#include "ART_Parser.h"
-#include "ART_ColourAndSpectra.h"
-#include "ART_Expression.h"
-#include "ART_ImageData.h"
-#include "ART_ImageFileFormat.h"
-#include "ART_ImageActions.h"
-#include "ART_Trafo.h"
-#include "ART_Camera.h"
-#include "ART_Physics.h"
-#include "ART_Shape.h"
-#include "ART_SkyModel.h"
-#include "ART_RayCasting.h"
-#include "ART_SurfaceMaterial.h"
-#include "ART_EmissiveSurfaceMaterial.h"
-#include "ART_EnvironmentMaterial.h"
-#include "ART_VolumeIntegrator.h"
-#include "ART_VolumeMaterial.h"
-#include "ART_VolumeData.h"
-#include "ART_Lightsource.h"
-#include "ART_ImageSampler.h"
-#include "ART_PhaseFunction.h"
-#include "ART_PathspaceIntegrator.h"
-#include "ART_ActionSequence.h"
-#include "ART_Animation.h"
-#include "ART_ARM_Interface.h"
+ART_MODULE_INTERFACE(ArcSimplePath)
 
-#include "ApplicationSupport.h"
-#include "ColourAndLightSubsystem.h"
+// I'm not sure if this should be a generic ArcObject or an ArNode that could
+// be used in the scenegraph. Right now, I'm using it as a simple generic
+// object, so it's that, but it's likely that it would be wiser to have it
+// directly in the scenegraph.
+
+@interface ArcSimplePath
+        : ArcObject
+        < ArpPath >
+{
+@public
+    double startTime;
+    Vec3D startTranslation;
+    
+    double endTime;
+    Vec3D endTranslation;
+}
+    
+
+- (void) setStartTranslation
+        : (double) timePoint
+        : (Vec3D) translation
+        ;
+
+- (void) setEndTranslation
+        : (double) timePoint
+        : (Vec3D) translation
+        ;
+
+- (id) init
+        : (double) startTime
+        : (Vec3D ) startTranslation
+        : (double) endTime
+        : (Vec3D ) endTranslation
+        ;
+
+@end
 
 // ===========================================================================

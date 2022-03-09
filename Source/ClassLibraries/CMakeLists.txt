@@ -22,6 +22,7 @@ file( APPEND ${source_group_file} "	)\n\n")
 
 add_subdirectory (ARM_Interface) 
 add_subdirectory (ActionSequence) 
+add_subdirectory (Animation)
 add_subdirectory (Camera) 
 add_subdirectory (ColourAndSpectra)
 add_subdirectory (EmissiveSurfaceMaterial) 

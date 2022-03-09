@@ -26,39 +26,12 @@
 
 #include "ART_Foundation.h"
 
-ART_LIBRARY_INTERFACE(ART_ClassLibraries)
+// I'm not sure if this sub-library should be called Animation or something
+// else. Nothing better came to mind yet, so I'll keep it like this for now
+// (but I'll have to come up with something better at some point).
 
-#include "ART_MiscellaneousStructs.h"
-#include "ART_Protocols.h"
-#include "ART_MiscellaneousClasses.h"
-#include "ART_Scenegraph.h"
-#include "ART_Parser.h"
-#include "ART_ColourAndSpectra.h"
-#include "ART_Expression.h"
-#include "ART_ImageData.h"
-#include "ART_ImageFileFormat.h"
-#include "ART_ImageActions.h"
-#include "ART_Trafo.h"
-#include "ART_Camera.h"
-#include "ART_Physics.h"
-#include "ART_Shape.h"
-#include "ART_SkyModel.h"
-#include "ART_RayCasting.h"
-#include "ART_SurfaceMaterial.h"
-#include "ART_EmissiveSurfaceMaterial.h"
-#include "ART_EnvironmentMaterial.h"
-#include "ART_VolumeIntegrator.h"
-#include "ART_VolumeMaterial.h"
-#include "ART_VolumeData.h"
-#include "ART_Lightsource.h"
-#include "ART_ImageSampler.h"
-#include "ART_PhaseFunction.h"
-#include "ART_PathspaceIntegrator.h"
-#include "ART_ActionSequence.h"
-#include "ART_Animation.h"
-#include "ART_ARM_Interface.h"
+ART_LIBRARY_INTERFACE(ART_Animation)
 
-#include "ApplicationSupport.h"
-#include "ColourAndLightSubsystem.h"
+#import "ArcSimplePath.h"
 
 // ===========================================================================

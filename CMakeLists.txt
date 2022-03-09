@@ -247,6 +247,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Source/ClassLibraries
   ${CMAKE_CURRENT_SOURCE_DIR}/Source/ClassLibraries/ARM_Interface
   ${CMAKE_CURRENT_SOURCE_DIR}/Source/ClassLibraries/ActionSequence
+  ${CMAKE_CURRENT_SOURCE_DIR}/Source/ClassLibraries/Animation
   ${CMAKE_CURRENT_SOURCE_DIR}/Source/ClassLibraries/Camera
   ${CMAKE_CURRENT_SOURCE_DIR}/Source/ClassLibraries/ColourAndSpectra
   ${CMAKE_CURRENT_SOURCE_DIR}/Source/ClassLibraries/EmissiveSurfaceMaterial

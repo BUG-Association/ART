@@ -106,6 +106,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
     return self;
 }
 
+- (id) withPath
+        : (ArcObject <ArpPath> *) newPath
+{
+    path = newPath;
+    return self;
+}
+
 - (id) init
         : (Ray3D) newRay
         : (IVec2D) newImageSize
@@ -158,6 +165,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
         *copiedInstance->near2world = *near2world;
     }
 
+    copiedInstance->path = path;
+    
     return copiedInstance;
 }
 
@@ -192,6 +201,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
         *copiedInstance->near2world = *near2world;
     }
 
+    copiedInstance->path = [ path copy ];
+    
     return copiedInstance;
 }
 
@@ -469,20 +480,30 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnCamera)
     Vec3D  mainRayVector;
     Vec3D  auxRayVector, auxWorldVector;
     
+    // All time related work starts here
     Pnt3D offsetPos = ray.point;
     if ( fabs(shutterOpen - shutterClose) > DBL_EPSILON )
     {
         double shutterOpenLength = shutterClose - shutterOpen;
         double unitSample = [ randomGenerator valueFromNewSequence ];
         outRay->time = shutterOpen + unitSample * shutterOpenLength;
-        
-        YC(offsetPos) += unitSample * 20;
-        ZC(offsetPos) += unitSample * 20;
+            
+        if (path)
+        {
+            HTrafo3D transform;
+            [ path getTransform
+                :  outRay->time
+                : &transform
+                ];
+            pnt3d_p_htrafo3d_p(&ray.point, &transform, &offsetPos);
+        }
     }
     else
     {
         outRay->time = shutterOpen;
     }
+    
+    // All time related work ends here
 
     XC(mainRayVector) = XC(*pixelCoordinates) - xscale;
     YC(mainRayVector) = YC(*pixelCoordinates) - yscale;

@@ -53,6 +53,8 @@ ART_MODULE_INTERFACE(ArnCamera)
     HTrafo3D    camera2world;
 
     HTrafo3D *  near2world;
+    
+    ArcObject <ArpPath> * path;
 }
 
 - (id) imageSize
@@ -77,6 +79,10 @@ ART_MODULE_INTERFACE(ArnCamera)
 
 - (id) withRatio
         : (double) newRatio
+        ;
+
+- (id) withPath
+        : (ArcObject <ArpPath> *) newPath
         ;
 
 - (id) init
