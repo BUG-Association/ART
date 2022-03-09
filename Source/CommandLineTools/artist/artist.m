@@ -624,7 +624,7 @@ int artist(
         const char * shutterString = [ shutterOpt cStringValue ];
         const char * separatorPtr = strchr(shutterString, ':');
         
-        // If the separator is present, there need to be both values present
+        // If the separator is present, there both values should be present
         if ( separatorPtr && separatorPtr != shutterString && separatorPtr[1] )
         {
             double shutterOpen = atof(shutterString);
@@ -645,6 +645,20 @@ int artist(
             ];
         }
     }
+    
+    // Temporary hideousness to make a first prototype animation,
+    // before I figure out how memory is handled properly.
+    // This will only work if the class is actually ArnCamera, but it
+    // hopefully shouldn't cause any damage if it isn't.
+    [ [ sceneGraph camera ]
+        withPath:
+          [ ALLOC_INIT_OBJECT_AUTORELEASE(ArcSimplePath)
+                          : 0.0
+                          : VEC3D(0.0, 0.0, 0.0)
+                          : 10.0
+                          : VEC3D(0.0, 500.0, 100.0)
+                          ]
+        ];
 
 // =============================   PHASE 5   =================================
 //
