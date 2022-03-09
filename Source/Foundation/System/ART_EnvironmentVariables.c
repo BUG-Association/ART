@@ -1,7 +1,7 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2021 The ART Development Team
-    ------------------------------------------------
+    Copyright (c) The ART Development Team
+    --------------------------------------
 
     For a comprehensive list of the members of the development team, and a
     description of their respective contributions, see the file
@@ -198,25 +198,7 @@ static const char * art_system_possible_resource_locations =
 
 static const char * art_osx_isysroot_directories =
     "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/"
-    "Developer/SDKs/MacOSX.sdk:"
-    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/"
-    "Developer/SDKs/MacOSX10.14.sdk:"
-    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/"
-    "Developer/SDKs/MacOSX10.13.sdk:"
-    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/"
-    "Developer/SDKs/MacOSX10.12.sdk:"
-    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/"
-    "Developer/SDKs/MacOSX10.11.sdk:"
-    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/"
-    "Developer/SDKs/MacOSX10.10.sdk:"
-    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/"
-    "Developer/SDKs/MacOSX10.9.sdk:"
-    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/"
-    "Developer/SDKs/MacOSX10.8.sdk:"
-    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/"
-    "Developer/SDKs/MacOSX10.7.sdk:"
-    "/Developer/SDKs/MacOSX10.7.sdk:"
-    "/Developer/SDKs/MacOSX10.6.sdk";
+    "Developer/SDKs/MacOSX.sdk:";
 
 //   Library (and framework locations) that will be added to -F in
 //   addition to what -isysroot says.

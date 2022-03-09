@@ -1,7 +1,7 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2021 The ART Development Team
-    ------------------------------------------------
+    Copyright (c) The ART Development Team
+    --------------------------------------
 
     For a comprehensive list of the members of the development team, and a
     description of their respective contributions, see the file
@@ -52,6 +52,8 @@ ArRSSpectrum;
 #define ARRSSPECTRUM_SCALE(__s)          (__s).scale
 #define ARRSSPECTRUM_ARRAY(__s)          (__s).array
 #define ARRSSPECTRUM_ARRAY_I(__s,__i)    ARRSSPECTRUM_ARRAY(__s)[(__i)]
+
+#define ARRSSPECTRUM_EMPTY               ((ArRSSpectrum){ 0, 0., 0., 0., NULL })
 
 #define ARRSSPECTRUM_SAMPLE(__s,__i) \
   (((int)(__i) >= 0 && (int)(__i) < (int) ARRSSPECTRUM_SIZE(__s) ) ?  \
@@ -106,6 +108,35 @@ ArRSSpectrum rsspectrum(
 
 #define RSS_END   -1.0
 
+/* ---------------------------------------------------------------------------
+
+    'rsspectrum_macadam'
+    
+    Returns an initialised visible range (380nm-740nm) ArRSSpectrum with
+    1nm step size which contains a MacAdam box spectrum centered around the
+    given wavelength, and with a box of the given width. Inputs are given
+    in integer nanometers. Box spectra that would extend beyond the visible
+    range assumed here loop around to the other end of the visible range, so
+    that a scan over the entire visible range will also generate purple tones.
+    
+    If the RSS that is passed to the function already contains a sample
+    array of the correct size, this is used directly. If not, the existing
+    array is freed, and a fitting one allocated instead.
+    
+    NOTE: within ART, wavelengths are usually given in SI units: so the
+          input parameters of this function would normally be doubles.
+          But it is typically used in a context where an integer for() loop
+          is used to probe the limits of the reflective gamut, so this
+          form makes more sense.
+
+------------------------------------------------------------------------aw- */
+
+void rsspectrum_macadam(
+        const unsigned int    centralWavelength,
+        const unsigned int    widthDiv2,
+              ArRSSpectrum  * rss
+        );
+
 void rss_free_contents(
         const ART_GV        * art_gv,
               ArRSSpectrum  * rss
@@ -113,10 +144,13 @@ void rss_free_contents(
 
 
 /* ---------------------------------------------------------------------------
+    
     'rss_integrate'
-        Integrates a regularly sampled spectrum in the bounds given by
+    
+    Integrates a regularly sampled spectrum in the bounds given by
         xmin and xmax.
---------------------------------------------------------------------------- */
+        
+------------------------------------------------------------------------aw- */
 
 double rss_integrate(
         const ART_GV        * art_gv,

@@ -1,7 +1,7 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2021 The ART Development Team
-    ------------------------------------------------
+    Copyright (c) The ART Development Team
+    --------------------------------------
 
     For a comprehensive list of the members of the development team, and a
     description of their respective contributions, see the file
@@ -24,16 +24,16 @@
 
 =========================================================================== */
 
-/* ------------------------------------------------------------------
+/* ---------------------------------------------------------------------------
 
-Definition of the ART .arm file format
-=======================================
+        Definition of the ART .arm file format
+        =======================================
 
-.arm is a special Objective-C file that describes an ART scene,
-or at least parts of it.
-See "ART for Newbies" and other documents for descriptions.
+        .arm is a special Objective-C file that describes an ART scene,
+        or at least parts of it.
+        See "ART for Newbies" and other documents for descriptions.
 
------------------------------------------------------------------- */
+--------------------------------------------------------------------------- */
 
 #define ART_MODULE_NAME     ArfArm
 
@@ -80,12 +80,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     //   Part 0 - the fixed args before the stub filename
 
 static ArConstString  fixed_gcc_arguments_string_part_0 =
-        "gcc -x objective-c";
+        "clang -x objective-c";
 
     //   Part 1 - the remaining fixed args after the stub filename
 
+    //   previously used option: -mmacosx-version-min=12.0
+    
 static ArConstString  fixed_gcc_arguments_string_part_1 =
-        "-mmacosx-version-min=10.6 -std=gnu99 -DART_4_OPENSTEP "
+        "-std=gnu99 -DART_4_OPENSTEP "
         "-framework Cocoa -framework AdvancedRenderingToolkit "
         ;
 
@@ -370,6 +372,14 @@ void translate_file(
           ART_LIBRARY_PATHS,
           libdir_prefix
         );
+
+#ifdef __APPLE__
+    cptr_argumentlist_add_stringarray_with_prefix(
+        & gcc_cptr_argument_list,
+          ART_LIBRARY_PATHS,
+          "-Wl,-rpath,"
+        );
+#endif
 
     char  ** gcc_argument_list;
 

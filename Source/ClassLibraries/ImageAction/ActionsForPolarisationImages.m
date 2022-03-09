@@ -1,7 +1,7 @@
 /* ===========================================================================
 
-    Copyright (c) 1996-2021 The ART Development Team
-    ------------------------------------------------
+    Copyright (c) The ART Development Team
+    --------------------------------------
 
     For a comprehensive list of the members of the development team, and a
     description of their respective contributions, see the file
@@ -516,26 +516,6 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWPolarisationVisualisa
     }
     
     return self;
-}
-
-#define  ArCIELCH       ArCIELab
-
-#define  ARCIELCH       ARCIELab
-#define  ARCIELCH_L     ARCIELab_L
-#define  ARCIELCH_C     ARCIELab_a
-#define  ARCIELCH_H     ARCIELab_b
-
-void  lch_to_lab(
-        ART_GV    * art_gv,
-        ArCIELCH  * lch,
-        ArCIELab  * lab
-        )
-{
-    (void)art_gv;
-    
-    ARCIELab_L(*lab) = ARCIELCH_L(*lch);
-    ARCIELab_a(*lab) = cos( ARCIELCH_H(*lch) ) * ARCIELCH_C(*lch);
-    ARCIELab_b(*lab) = sin( ARCIELCH_H(*lch) ) * ARCIELCH_C(*lch);
 }
 
 - (void) performOn
