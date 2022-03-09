@@ -86,6 +86,8 @@ ART_LIBRARY_INTERFACE(ART_Protocols)
 #import "ArpVolume.h"
 #import "ArpVolumeIntegrator.h"
 
+#import "ArpPath.h"
+
 #import "GlobalTableOfNodeClasses.h"
 
 #endif // _ART_PROTOCOLS_H_
