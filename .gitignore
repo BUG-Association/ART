@@ -2,6 +2,7 @@
 *.artraw
 *.tiff
 *.pdf
+!specification.pdf
 Documentation/generated
 Documentation/timestamp.tex
 
