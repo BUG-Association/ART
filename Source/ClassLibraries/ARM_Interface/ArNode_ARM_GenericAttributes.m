@@ -101,6 +101,24 @@ static ArNode * apply_attributes(
 
             continue;
         }
+        
+        if ( [ attr[i] conformsToArProtocol: ARPROTOCOL(ArpPath) ] )
+        {
+            ART__CODE_IS_WORK_IN_PROGRESS__GENERATE_WARNING
+            continue;
+            
+            // This piece of code is temporarily disabled, because
+            // in the current state of implementation, introducing
+            // this object breaks rendering.
+            
+            node =
+                [ ALLOC_INIT_OBJECT_AUTORELEASE(AraPath)
+                    : HARD_NODE_REFERENCE(node)
+                    : HARD_NODE_REFERENCE(attr[i])
+                    ];
+            
+            continue;
+        }
 
         if ( [ attr[i] conformsToArProtocol: ARPROTOCOL(ArpTrafo3D) ] )
         {

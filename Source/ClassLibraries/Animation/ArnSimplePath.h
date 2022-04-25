@@ -26,18 +26,13 @@
 
 #include "ART_Foundation.h"
 
-#import "ArpPath.h"
+ART_MODULE_INTERFACE( ArnSimplePath )
 
-ART_MODULE_INTERFACE(ArcSimplePath)
+#include "ART_Scenegraph.h"
 
-// I'm not sure if this should be a generic ArcObject or an ArNode that could
-// be used in the scenegraph. Right now, I'm using it as a simple generic
-// object, so it's that, but it's likely that it would be wiser to have it
-// directly in the scenegraph.
-
-@interface ArcSimplePath
-        : ArcObject
-        < ArpPath >
+@interface ArnSimplePath
+        : ArNode
+        < ArpConcreteClass, ArpPath, ArpCoding >
 {
 @public
     double startTime;

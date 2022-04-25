@@ -160,6 +160,15 @@ ART_MODULE_INTERFACE(ArnGraphTraversal)
         : (ArNode <ArpAssignmentTable> *)  variableAssignments
         ;
 
+- (void) pushPathRef
+        : (ArNodeRef  ) newPath
+        : (ArNodeRef *) nodeRefStore
+        ;
+
+- (void) popPath
+        : (ArNodeRef *) nodeRefStore
+        ;
+
 @end
 
 //   Canonically-named long versions of the accessor macros for the

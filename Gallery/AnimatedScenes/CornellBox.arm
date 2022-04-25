@@ -256,21 +256,21 @@ ArObj createBox(ART_GV * art_gv) {
 
 ARM_MAIN_FUNCTION(CornellBox)
 {
-    ArObj scene_geometry =
-        UNION(
-            createBox(art_gv),
-            createShortBlock(art_gv),
-            createTallBlock(art_gv),
-            UNION_END
-            );
-
     id path = 
-        [ ALLOC_INIT_OBJECT_AUTORELEASE(ArcSimplePath)
+        [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnSimplePath)
                 : 0.0
                 : VEC3D(0.0, 0.0, 0.0)
                 : 10.0
                 : VEC3D(0.0, 500.0, 100.0)
                 ];
+
+    ArObj scene_geometry =
+        UNION(
+            createBox(art_gv),
+            [ createShortBlock(art_gv) apply : TRANSLATION(50.0, 50.0, 0.0) ],
+            [ createTallBlock(art_gv) apply: path ],
+            UNION_END
+            );
 
     id camera =
         [ CAMERA
@@ -279,12 +279,10 @@ ARM_MAIN_FUNCTION(CornellBox)
             zoom:      1
             ];
 
-    // I can't pass the path object like this, because it gets deallocated
-    // for some reason. I'm sure it's just my lack of understanding of
-    // how the memory management works. I'll have to investigate this properly
-    // later.
-    //[ camera withPath: path ];
     [ camera withTwist: -90 DEGREES ];
+
+    // Test if attrobutes can modify the camera
+    [ camera apply: TRANSLATION(500.0, 500.0, 0.0) ];
 
     id actionsquence = 
         ACTION_SEQUENCE(

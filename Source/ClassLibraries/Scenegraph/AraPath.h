@@ -24,14 +24,28 @@
 
 =========================================================================== */
 
+#ifndef _ARAPATH_H_
+#define _ARAPATH_H_
+
 #include "ART_Foundation.h"
 
-// I'm not sure if this sub-library should be called Animation or something
-// else. Nothing better came to mind yet, so I'll keep it like this for now
-// (but I'll have to come up with something better at some point).
+ART_MODULE_INTERFACE(AraPath)
 
-ART_LIBRARY_INTERFACE( ART_Animation )
+#import "ArAttribute.h"
 
-#import "ArnSimplePath.h"
+@interface AraPath
+        : AraSingle
+        < ArpConcreteClass >
+{
+}
+
+- (id) init
+        : (ArNodeRef) newNode
+        : (ArNodeRef) newPath
+        ;
+
+@end
+
+#endif // _ARAPATH_H_
 
 // ===========================================================================

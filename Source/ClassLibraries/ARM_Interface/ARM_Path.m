@@ -24,14 +24,12 @@
 
 =========================================================================== */
 
-#include "ART_Foundation.h"
+#define ART_MODULE_NAME     ARM_Path
 
-// I'm not sure if this sub-library should be called Animation or something
-// else. Nothing better came to mind yet, so I'll keep it like this for now
-// (but I'll have to come up with something better at some point).
+#import "ARM_Path.h"
 
-ART_LIBRARY_INTERFACE( ART_Animation )
+ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
-#import "ArnSimplePath.h"
+ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 // ===========================================================================

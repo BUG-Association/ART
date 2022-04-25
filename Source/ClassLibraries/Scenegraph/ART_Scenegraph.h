@@ -37,6 +37,7 @@ ART_LIBRARY_INTERFACE(ART_Scenegraph)
 #import "AraVertices.h"
 #import "AraWorld.h"
 #import "AraCombinedAttributes.h"
+#import "AraPath.h"
 
 #import "ArnCompoundFace.h"
 #import "ArnAssignmentTable.h"

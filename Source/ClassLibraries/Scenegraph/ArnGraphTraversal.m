@@ -478,6 +478,19 @@ ARPNODE_DEFAULT_IMPLEMENTATION(ArnGraphTraversal)
         ];
 }
 
+- (void) pushPathRef
+        : (ArNodeRef  ) newPath
+        : (ArNodeRef *) nodeRefStore
+{
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+}
+
+- (void) popPath
+        : (ArNodeRef *) nodeRefStore
+{
+    ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
+}
+
 @end
 
 // ===========================================================================

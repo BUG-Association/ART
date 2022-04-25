@@ -24,21 +24,22 @@
 
 =========================================================================== */
 
-#define ART_MODULE_NAME     ArcSimplePath
+#define ART_MODULE_NAME     ArnSimplePath
 
-#include "ART_Foundation.h"
-
-#import "ArcSimplePath.h"
+#import "ArnSimplePath.h"
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
     (void) art_gv;
-    
+    [ ArnSimplePath registerWithRuntime ];
 )
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-@implementation ArcSimplePath
+
+@implementation ArnSimplePath
+
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSimplePath)
 
 - (void) setStartTranslation
         : (double) timePoint
@@ -96,7 +97,17 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     ZC(*transform) = ZC(interpolation);
 }
 
+- (void) code
+        : (ArcObject<ArpCoder> *) coder
+{
+    [ super code : coder ];
 
+    [ coder codeDouble : &startTime ];
+    [ coder codeVec3D  : &startTranslation ];
+    [ coder codeDouble : &endTime ];
+    [ coder codeVec3D  : &endTranslation ];
+}
+ 
 @end
 
 // ===========================================================================

@@ -650,15 +650,15 @@ int artist(
     // before I figure out how memory is handled properly.
     // This will only work if the class is actually ArnCamera, but it
     // hopefully shouldn't cause any damage if it isn't.
-    [ [ sceneGraph camera ]
-        withPath:
-          [ ALLOC_INIT_OBJECT_AUTORELEASE(ArcSimplePath)
-                          : 0.0
-                          : VEC3D(0.0, 0.0, 0.0)
-                          : 10.0
-                          : VEC3D(0.0, 500.0, 100.0)
-                          ]
-        ];
+    //[ [ sceneGraph camera ]
+    //    withPath:
+    //      [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnSimplePath)
+    //                      : 0.0
+    //                      : VEC3D(0.0, 0.0, 0.0)
+    //                      : 10.0
+    //                      : VEC3D(0.0, 500.0, 100.0)
+    //                      ]
+    //    ];
 
 // =============================   PHASE 5   =================================
 //
