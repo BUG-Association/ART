@@ -44,9 +44,28 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
 
 - (void) _setup
 {
+    ArRSSpectrum2D* fluoValue = ALLOC(ArRSSpectrum2D);
+
+    // Make a local copy: we need to strip part of the reraditation in _setup
+    fluoValue->size             = nativeValue->size;
+    fluoValue->stride           = nativeValue->stride;
+    fluoValue->excitation_start = nativeValue->excitation_start;
+    fluoValue->excitation_step  = nativeValue->excitation_step;
+    fluoValue->emission_start   = nativeValue->emission_start;
+    fluoValue->emission_step    = nativeValue->emission_step;
+    fluoValue->scale            = nativeValue->scale;
+
+    fluoValue->array = ALLOC_ARRAY(double, fluoValue->size);
+
+    memcpy(
+        fluoValue->array,
+        nativeValue->array,
+        fluoValue->size * sizeof(double)
+        );
+
     ArRSSpectrum  rss_temp;
 
-    rss2d_to_rss( nativeValue, & rss_temp );
+    rss2d_to_rss( fluoValue, & rss_temp );
 
 //    rss_c_mathematicaprintf( art_gv, & rss_temp );
 
@@ -62,14 +81,16 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
 
     rss_free_contents( art_gv, & rss_temp );
 
-    rss2d_strip_noncrosstalk_data( art_gv, nativeValue );
+    // This function changes "fluoValue". That is why we need a local copy.
+    // The nativeValue is used to marshal the internal variables.
+    rss2d_strip_noncrosstalk_data( art_gv, fluoValue );
 
     if ( ! crosstalk )
         crosstalk = arcrosstalk_alloc( art_gv );
     if ( ! hiresCrosstalk )
         hiresCrosstalk = cx500_alloc(art_gv);
 
-    rss2d_to_cx500( art_gv, nativeValue, hiresCrosstalk );
+    rss2d_to_cx500( art_gv, fluoValue, hiresCrosstalk );
     cx500_to_crosstalk( art_gv, hiresCrosstalk, crosstalk );
 
     if( ! hiresVerticalSums )
@@ -88,6 +109,10 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         hiresHorizontalSums
     );
     
+    // Clear the local copy
+    FREE_ARRAY(fluoValue->array);
+    FREE(fluoValue);
+
 //    arcrosstalk_x_mathematicaprintf( art_gv, crosstalk );
 }
 
@@ -100,7 +125,21 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
     {
         nativeValue = ALLOC(ArRSSpectrum2D);
 
-        *nativeValue = newSpectrum;
+        // Make a local copy
+        nativeValue->size             = newSpectrum.size;
+        nativeValue->stride           = newSpectrum.stride;
+        nativeValue->excitation_start = newSpectrum.excitation_start;
+        nativeValue->excitation_step  = newSpectrum.excitation_step;
+        nativeValue->emission_start   = newSpectrum.emission_start;
+        nativeValue->emission_step    = newSpectrum.emission_step;
+        nativeValue->scale            = newSpectrum.scale;
+
+        nativeValue->array = ALLOC_ARRAY(double, nativeValue->size);
+        memcpy(
+            nativeValue->array, 
+            newSpectrum.array,
+            nativeValue->size * sizeof(double)
+            );
 
         [ self _setup ];
     }
@@ -122,6 +161,9 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         cx500_free(art_gv, hiresVerticalSums);
     if(hiresHorizontalSums)
         cx500_free(art_gv, hiresHorizontalSums);
+
+    FREE_ARRAY(nativeValue->array);
+    FREE(nativeValue);
         
     [ super dealloc ];
 }
@@ -138,6 +180,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
           outSpectrum
         );
 }
+
 - (void) getHiresSpectrum
         : (ArcPointContext *) locationInfo
         : (ArSpectrum500 *) outSpectrum

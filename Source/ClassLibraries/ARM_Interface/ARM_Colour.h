@@ -260,6 +260,48 @@ ART_MODULE_INTERFACE(ARM_Colour)
             : (_cC) \
             : (_cE) \
             ]
+
+    /**
+     * @brief Load spectrum from BFC measurement file
+     *
+     * Loads a spectrum from the BFC file created by LabSphere BFC-450 
+     * spectrophotometer.
+     *
+     * @def BFC_COLOUR_MEASUREMENT(path)
+     *
+     * @param path  char*   Path the the file to load.
+     */
+    #define BFC_COLOUR_MEASUREMENT(__path) \
+        ART_PARSE_EXISTING_FILE( \
+            (__path), \
+            ArnRSSpectrum2D)
+
+    /**
+     * @brief Load specturm from GMM fit
+     *
+     * @def GMM_FIT(filename)
+     *
+     * @param filename  char*   The path where the fit result is.
+     *
+     */
+    #define GMM_FIT(_filename)                     \
+        ART_PARSE_EXISTING_FILE(                   \
+            (_filename),                           \
+            Arn2DGMMSpectrum                       \
+        )
+
+    /**
+     * @brief Load specturm from GMM fit - DEBUG TODO Compact
+     *
+     * @def GMM_FIT(filename)
+     *
+     * @param filename  char*   The path where the fit result is.
+     */
+    #define GMM_FIT_DEBUG(_filename)               \
+        ART_PARSE_EXISTING_FILE(                   \
+            (_filename),                           \
+            Arn2DGMMSpectrumDebugTab               \
+        )
 /**
  * @popsection
  */

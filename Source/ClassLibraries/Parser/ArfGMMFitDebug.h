@@ -24,28 +24,19 @@
 
 =========================================================================== */
 
-#define ART_LIBRARY_NAME     ART_ColourAndSpectra
+#include "ART_Foundation.h"
 
-#import "ART_ColourAndSpectra.h"
+ART_MODULE_INTERFACE(ArfGMMFitDebug)
 
-ART_LIBRARY_INITIALISATION_FUNCTION
-(
-    ART_PERFORM_MODULE_INITIALISATION( Arn2DGMMSpectrum )
-    ART_PERFORM_MODULE_INITIALISATION( Arn2DGMMSpectrumDebugTab ) // TODO Compact
-    ART_PERFORM_MODULE_INITIALISATION( ArnConstSpectrum )
-    ART_PERFORM_MODULE_INITIALISATION( ArnSellmeierDispersion )
-    ART_PERFORM_MODULE_INITIALISATION( ArnBlackbodyRadiation )
-    ART_PERFORM_MODULE_INITIALISATION( ArnGaussianSpectrum )
-    ART_PERFORM_MODULE_INITIALISATION( ArnRSSpectrum2D )
-    ART_PERFORM_MODULE_INITIALISATION( ArnColourMatchingFunctions )
-    ART_PERFORM_MODULE_INITIALISATION( ArnColourSpace )
-    ART_PERFORM_MODULE_INITIALISATION( ArnColourTransform )
-    ART_PERFORM_MODULE_INITIALISATION( ArnCalculatedSpectrum )
-    ART_PERFORM_MODULE_INITIALISATION( ArnSyntheticFluorescentSpectrum )
-    ART_PERFORM_MODULE_INITIALISATION( ArnImageMap )
-)
+#import "ART_Scenegraph.h"
 
-ART_AUTOMATIC_LIBRARY_SHUTDOWN_FUNCTION
+@interface ArfGMMFitDebug
+        : ArcObject
+        < ArpParser, ArpFiletype, ArpFileheader >
+{
+    ArcFile  * file;
+}
 
+@end
 
 // ===========================================================================

@@ -38,6 +38,10 @@ ART_LIBRARY_INTERFACE(ART_Parser)
 #import "ArcBinaryCoder.h"
 #import "ArcObjCCoder.h"
 
+#import "ArfBFC.h"
+#import "ArfGMMFit.h"
+#import "ArfGMMFitDebug.h" // TODO Compact
+
 #import "ART_Parse_File.h"
 
 // ===========================================================================
