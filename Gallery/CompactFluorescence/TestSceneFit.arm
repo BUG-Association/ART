@@ -1,0 +1,392 @@
+#ifndef SAMPLES
+#define SAMPLES 36
+#endif
+
+#ifndef RECURSION
+#define RECURSION 2
+#endif
+
+/**
+ * GROUND FUNCTION
+ */
+
+/* GRID FUNCTIONS */
+
+id createSymetricLinesExpression(
+        ART_GV  * art_gv,
+        id        inputValue,
+        double    frequency,
+        double    thickness
+        )
+{
+    // R -> [0, 1]
+    id periodicExpr =
+            DD_XMOD_D( 
+                    DD_MUL_D( inputValue, CONST_D( frequency ) ),
+                    CONST_D( 1.0 )
+                    );
+            
+    // Lines
+    id gridExpr =
+        DD_SUB_D(
+            CONST_D( 1.0 ),
+            DDD_PULSE_D(
+                CONST_D( thickness / 2.0 ),
+                CONST_D( 1.0 - thickness / 2.0 ),
+                periodicExpr
+                )
+            );
+
+    return gridExpr;
+}
+
+
+id createXYGridSurface(
+        ART_GV  * art_gv,
+        id        coordinates,
+        id        mainSurface,
+        id        gridSurface,
+        double    thickness,    // Portion of the periodic interval
+        double    frequency
+        )
+{
+    id xLinesExpr =
+        createSymetricLinesExpression(
+            art_gv,
+            P2_X( coordinates ),
+            frequency,
+            thickness
+            );
+    id yLinesExpr =
+        createSymetricLinesExpression(
+            art_gv,
+            P2_Y( coordinates ),
+            frequency,
+            thickness
+            );
+    
+    id xyGridExpr =
+        DD_MAX_D(
+            xLinesExpr,
+            yLinesExpr
+            );
+    
+    return
+        MAPPED_SURFACE( 
+            xyGridExpr,
+            SURFACE_MAP(
+                0.0, mainSurface,
+                0.95, gridSurface,
+                MAP_END
+                )
+            );
+}
+
+
+ArObj createQuad(ART_GV * art_gv)
+{
+  Pnt3D * points = ALLOC_ARRAY(Pnt3D, 5);
+  
+  points[0] = PNT3D(-.5, -.5, 0.);
+  points[1] = PNT3D( .5, -.5, 0.);
+  points[2] = PNT3D( .5,  .5, 0.);
+  points[3] = PNT3D(-.5,  .5, 0.);
+  points[4] = PNT3D_HUGE;
+
+  ArObj plane = QUADRANGLE(0, 1, 2, 3);
+
+  ArObj vertices =
+    arnvertexset(art_gv,
+         points,
+         NULL,
+         NULL,
+         NULL,
+         NULL
+         );
+
+  return [plane apply: vertices];
+}
+
+
+ArObj createLight(ART_GV * art_gv)
+{
+  ArObj plane = createQuad(art_gv);
+
+  ArObj spectrum450 =
+    CONST_COLOUR_PSSPECTRUM(1.0,
+                            PNT2D( 380.0 NANOMETER, 0.0 ),
+                            PNT2D( 400.0 NANOMETER, 0.0 ),
+                            PNT2D( 430.0 NANOMETER, 0.1 ),
+                            PNT2D( 460.0 NANOMETER, 1.0 ),
+                            PNT2D( 480.0 NANOMETER, 0.1 ),
+                            PNT2D( 530.0 NANOMETER, 0.0 ),
+                            PNT2D( 800.0 NANOMETER, 0.0 ),
+                            PSS_END
+                            );
+  
+  return [plane apply: LAMBERT_EMITTER(spectrum450, 1.0)];
+}
+
+ArObj createGround(ART_GV * art_gv)
+{
+  ArObj plane = createQuad(art_gv);
+
+  double sz = 700.0;
+  
+  // Surface material
+  ArObj ground_fluo = BFC_COLOUR_MEASUREMENT("Fluorophores/PHP8RVWH.BFC");
+  ArObj grey  = LAMBERT_MATERIAL( CONST_COLOUR_GREY(0.0) );
+  ArObj white = LAMBERT_MATERIAL(ground_fluo);
+  
+  double threshold = 0.1;
+
+  ArObj surface =
+        createXYGridSurface(
+            art_gv,
+            TEXTURE_COORDS,
+            grey,
+            white,
+            threshold,
+            sz
+            );
+
+  return
+    [plane apply
+    : USCALE(sz)
+    : surface
+     ];
+}
+
+
+/**
+ * Ball
+ */
+
+ArNode * createGroovedSphere(
+        ART_GV  * art_gv,
+        double    angle,
+        double    secondaryRadius
+        )
+{
+    double  deltaAngle = atan( secondaryRadius );
+    double  angleA = angle - deltaAngle;
+    double  angleB = angle + deltaAngle;
+    
+    id mainTorus = 
+        [ TORUS( ( 1.0 / cos(angle) ) * secondaryRadius ) apply
+            : USCALE( cos(angle) )
+            : TRANSLATION( 0.0, 0.0, sin(angle) ) 
+            ];
+
+    double  torusFactorA = 
+        ( 1.0 / ( ( 1.0 - secondaryRadius ) * cos(angleA) ) ) * secondaryRadius;
+        
+    id subTorusA = 
+        [ TORUS( torusFactorA ) apply
+            : USCALE( ( 1.0 - secondaryRadius ) * cos(angleA) )
+            : TRANSLATION( 0.0, 0.0, ( 1.0 - secondaryRadius ) * sin(angleA) ) 
+            ];
+
+
+    double  torusFactorB = 
+        ( 1.0 / ( ( 1.0 - secondaryRadius ) * cos(angleB) ) ) * secondaryRadius;
+
+    id subTorusB = 
+        [ TORUS( torusFactorB ) apply
+            : USCALE( ( 1.0 - secondaryRadius ) * cos(angleB) )
+            : TRANSLATION( 0.0, 0.0, ( 1.0 - secondaryRadius ) * sin(angleB) ) 
+            ];
+
+    id grooveObj =  [ mainTorus sub : [ subTorusA or : subTorusB ] ];
+    id groovePair = [ grooveObj or : [ grooveObj apply : ROT_X( 180 DEGREES )]];
+        
+    id  allGrooves =
+        UNION(
+            groovePair,
+            [ groovePair apply: ROT_X( 90 DEGREES ) ],
+            [ groovePair apply: ROT_Y( 90 DEGREES ) ],
+            UNION_END
+            );
+
+    return [ SPHERE sub: allGrooves ];
+}
+
+ArObj createColumn(ART_GV* art_gv)
+{
+  double column_height = 3.;
+  double inset_margin = 0.5;
+  double inset_size = 0.075;
+  double inset_height = column_height - 2 * inset_margin;
+
+  double platform_width = 1.3;
+  
+  id column_main   = [ CYLINDER apply: SCALE(1, 1, column_height)];
+  
+  id column_rm     = [ CYLINDER apply: SCALE(inset_size, inset_size, inset_height)];
+  id bottom_sphere = [ SPHERE   apply: USCALE(inset_size) ];
+  id top_sphere    = [ bottom_sphere apply: TRANSLATION_Z(inset_height)];
+
+  id platform = UNION(CYLINDER, TORUS(1), UNION_END);
+  id platform_cut = [ CYLINDER apply: TRANSLATION_Z(.5) : SCALE(2., 2., 1.) ];
+  
+  platform = [ platform sub: platform_cut ];
+  platform = [ platform apply: SCALE(0.6, 0.6, 0.2) ];
+
+  id cone_add = [ CONE apply: TRANSLATION_Z(-1) : USCALE(1.1) ];
+
+  cone_add = [ cone_add apply: TRANSLATION_Z(column_height) ];
+  
+  id platform_top = [ platform apply: TRANSLATION_Z(column_height) ];
+  
+  column_rm = UNION(column_rm, bottom_sphere, top_sphere, UNION_END);  
+  column_rm = [column_rm apply:TRANSLATION(1., 0., inset_margin)];
+
+  int n_steps = 24;
+  double rot = 360 DEGREES / n_steps;
+  
+  for (int i = 0; i < n_steps; i++) {
+    column_rm = [column_rm apply: ROT_Z(rot)];
+    column_main = [column_main sub: column_rm];
+  }
+
+  id torus_rm = [ TORUS(0.45) apply: SCALE(1.7, 1.7, 0.3)];
+  torus_rm = [torus_rm apply: TRANSLATION_Z(2.7)];
+  column_main = [column_main sub: torus_rm];
+
+  return UNION(
+           platform,
+           platform_top,
+           cone_add,
+           column_main,
+           UNION_END);
+}
+
+ArObj createStage(ART_GV* art_gv,
+          ArObj fluo0,
+          ArObj fluo1,
+          ArObj fluo2)
+{
+  double ball_sz = 0.4;
+  
+  id ball = createGroovedSphere(art_gv, 22 DEGREES, 0.1);
+
+  ball = [ball apply
+         : TRANSLATION_Z(1.25)
+         : USCALE(ball_sz)
+         : TRANSLATION_Z(3.)];
+
+  ArObj statue = PLY_MESH("Models/Serapis.ply");
+  
+  statue = [statue apply: USCALE(0.025)  : TRANSLATION(0, 0.2, 3.1)];
+  statue = [statue apply: LAMBERT_MATERIAL(fluo1)];
+
+  ArObj teapot = PLY_MESH("Models/Teapot.ply");
+
+  teapot = [teapot apply: USCALE(0.22) :ROT_Z(20 DEGREES) :TRANSLATION(0.5, -0.5, 3.1)];
+  teapot = [teapot apply: LAMBERT_MATERIAL(fluo2)];
+  
+  id ball_bl =
+    [ball apply
+    : TRANSLATION(-0.63, -0.63, 0)
+    : LAMBERT_MATERIAL(fluo0)
+     ];
+  
+  return
+    UNION(statue,
+      ball_bl,
+      teapot,
+      createColumn(art_gv),
+      UNION_END);
+}
+
+ARM_MAIN_FUNCTION(TestSceneFit)
+{
+  ArObj fit_0 = GMM_FIT("Fluorophores/TEXTYELL.gmm");
+  ArObj fit_1 = GMM_FIT("Fluorophores/HERPIPIN.gmm");
+  ArObj fit_2 = GMM_FIT("Fluorophores/POLYORAN.gmm");
+
+  ArObj column = createStage(art_gv, fit_0, fit_1, fit_2);
+
+  double r_c = 10 DEGREES;
+  double t_c = 3.1;
+  
+  ArObj light = createLight(art_gv);
+
+  light = [light apply
+          : ROT_X(-90 DEGREES)
+          : SCALE(10, 10, 1.)
+          : TRANSLATION(0., -20., 30.)
+          : ROT_Z(-20 DEGREES)
+       ];
+
+  
+  id scene_geometry =
+    UNION(
+      column,
+      createGround(art_gv),
+      light,
+      UNION_END
+      );
+
+  int width = 400;
+
+  id camera =
+    [ CAMERA imageSize: IVEC2D(width, width)
+           ray: RAY3D(PNT3D(0,-27,13),VEC3D(0,1,-.35))
+          zoom: 7.8
+    ];
+  
+  id actionsequence =
+    ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+            
+            [ LIGHTSOURCE_COLLECTOR
+              sampler2D: STANDARD_SAMPLER_2D
+              resolution: 5
+               type: arlightsourcetype_area
+              ],
+            
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+                        maximalRecursion: RECURSION
+                        mode:            arpathtracermode_mis
+                    ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       SAMPLES
+                randomValueGeneration: PSEUDORANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_RAW_TO_ARTCSP
+                removeSource: NO
+            ],
+
+            STANDARD_GLOBAL_TONEMAPPING_OPERATOR,
+                        
+            STANDARD_LUMINANCE_CLIPPING,
+
+            [ IMAGECONVERSION_ARTCSP_TO_TIFF
+                removeSource:    YES
+                bitsPerChannel:  8
+                ],
+            
+            ACTION_SEQUENCE_END
+            );
+
+    id skylight =
+      [ HOSEK_SKYLIGHT
+            elevation   : 40 DEGREES
+        azimuth     : -125.0 DEGREES
+            turbidity   : 2.0
+            groundAlbedo: CONST_COLOUR_GREY(0.1)
+            ];
+
+    return
+        [ SCENE
+            sceneGeometry : scene_geometry
+            camera        : camera
+            actionSequence: actionsequence
+            ];
+
+}

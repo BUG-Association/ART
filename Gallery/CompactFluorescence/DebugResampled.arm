@@ -1,0 +1,189 @@
+#ifndef SAMPLES
+#define SAMPLES 256
+#endif
+
+#ifndef RECURSION
+#define RECURSION 2
+#endif
+
+
+ArObj createQuad(ART_GV * art_gv)
+{
+  Pnt3D * points = ALLOC_ARRAY(Pnt3D, 5);
+  
+  points[0] = PNT3D(-.5, -.5, 0.);
+  points[1] = PNT3D( .5, -.5, 0.);
+  points[2] = PNT3D( .5,  .5, 0.);
+  points[3] = PNT3D(-.5,  .5, 0.);
+  points[4] = PNT3D_HUGE;
+
+  ArObj plane = QUADRANGLE(0, 1, 2, 3);
+
+  ArObj vertices =
+    arnvertexset(art_gv,
+         points,
+         NULL,
+         NULL,
+         NULL,
+         NULL
+         );
+
+  return [plane apply: vertices];
+}
+
+
+ArObj createLight(ART_GV * art_gv)
+{
+  ArObj plane = createQuad(art_gv);
+
+  ArObj spectrum450 =
+    CONST_COLOUR_PSSPECTRUM(1.0,
+                            PNT2D( 380.0 NANOMETER, 0.0 ),
+                            PNT2D( 400.0 NANOMETER, 0.0 ),
+                            PNT2D( 430.0 NANOMETER, 0.1 ),
+                            PNT2D( 460.0 NANOMETER, 1.0 ),
+                            PNT2D( 480.0 NANOMETER, 0.1 ),
+                            PNT2D( 530.0 NANOMETER, 0.0 ),
+                            PNT2D( 800.0 NANOMETER, 0.0 ),
+                            PSS_END
+                            );
+  
+  return [plane apply: LAMBERT_EMITTER(spectrum450, 1.0)];
+}
+
+ArNode * createGroovedSphere(
+        ART_GV  * art_gv,
+        double    angle,
+        double    secondaryRadius
+        )
+{
+    double  deltaAngle = atan( secondaryRadius );
+    double  angleA = angle - deltaAngle;
+    double  angleB = angle + deltaAngle;
+    
+    id mainTorus = 
+        [ TORUS( ( 1.0 / cos(angle) ) * secondaryRadius ) apply
+            : USCALE( cos(angle) )
+            : TRANSLATION( 0.0, 0.0, sin(angle) ) 
+            ];
+
+    double  torusFactorA = 
+        ( 1.0 / ( ( 1.0 - secondaryRadius ) * cos(angleA) ) ) * secondaryRadius;
+        
+    id subTorusA = 
+        [ TORUS( torusFactorA ) apply
+            : USCALE( ( 1.0 - secondaryRadius ) * cos(angleA) )
+            : TRANSLATION( 0.0, 0.0, ( 1.0 - secondaryRadius ) * sin(angleA) ) 
+            ];
+
+
+    double  torusFactorB = 
+        ( 1.0 / ( ( 1.0 - secondaryRadius ) * cos(angleB) ) ) * secondaryRadius;
+
+    id subTorusB = 
+        [ TORUS( torusFactorB ) apply
+            : USCALE( ( 1.0 - secondaryRadius ) * cos(angleB) )
+            : TRANSLATION( 0.0, 0.0, ( 1.0 - secondaryRadius ) * sin(angleB) ) 
+            ];
+
+    id grooveObj =  [ mainTorus sub : [ subTorusA or : subTorusB ] ];
+    id groovePair = [ grooveObj or : [ grooveObj apply : ROT_X( 180 DEGREES )]];
+        
+    id  allGrooves =
+        UNION(
+            groovePair,
+            [ groovePair apply: ROT_X( 90 DEGREES ) ],
+            [ groovePair apply: ROT_Y( 90 DEGREES ) ],
+            UNION_END
+            );
+
+    return [ SPHERE sub: allGrooves ];
+}
+
+ARM_MAIN_FUNCTION(DebugResampled)
+{
+  ArObj fit_0 = BFC_COLOUR_MEASUREMENT("Fluorophores/TEXTYELL.GMM.BFC");
+  ArObj fit_1 = BFC_COLOUR_MEASUREMENT("Fluorophores/HERPIPIN.GMM.BFC");
+  ArObj fit_2 = BFC_COLOUR_MEASUREMENT("Fluorophores/POLYORAN.GMM.BFC");
+
+  id ball = createGroovedSphere(art_gv, 22 DEGREES, 0.1);
+
+  ball = [ball apply
+         : TRANSLATION_Z(1.25)
+         : USCALE(0.4)
+         : TRANSLATION_Z(3.)];
+
+  id ball_bl =
+       [ball apply
+       : LAMBERT_MATERIAL(fit_2)];
+
+  ArObj light = createLight(art_gv);
+
+  light = [light apply
+          : ROT_X(-90 DEGREES)
+          : SCALE(10, 10, 1.)
+          : TRANSLATION(0., -20., 30.)
+          : ROT_Z(-20 DEGREES)
+       ];
+
+  
+  id scene_geometry =
+    UNION(
+      ball_bl,
+      light,
+      UNION_END
+      );
+
+  int width = 100;
+
+  id camera =
+    [ CAMERA imageSize: IVEC2D(width, width)
+           ray: RAY3D(PNT3D(0,-27,13),VEC3D(0,1,-.35))
+          zoom: 20
+    ];
+  
+  id actionsequence =
+    ACTION_SEQUENCE(
+            CREATE_STANDARD_RAYCASTING_ACCELERATION_STRUCTURE,
+            
+            [ LIGHTSOURCE_COLLECTOR
+              sampler2D: STANDARD_SAMPLER_2D
+              resolution: 5
+               type: arlightsourcetype_area
+              ],
+            
+            [ STOCHASTIC_PIXEL_SAMPLER
+                sampleProvider:
+                    [ PATHTRACER
+                        rayCaster:        STANDARD_RAYCASTER
+                        maximalRecursion: RECURSION
+                        mode:            arpathtracermode_mis
+                    ]
+                sampleSplattingKernel: TENT_KERNEL
+                samplesPerPixel:       SAMPLES
+                randomValueGeneration: PSEUDORANDOM_SEQUENCE
+            ],
+
+            [ IMAGECONVERSION_RAW_TO_SPECTRAL_EXR
+                removeSource: YES
+            ],
+            
+            ACTION_SEQUENCE_END
+            );
+
+    id skylight =
+      [ HOSEK_SKYLIGHT
+            elevation   : 40 DEGREES
+        azimuth     : -125.0 DEGREES
+            turbidity   : 2.0
+            groundAlbedo: CONST_COLOUR_GREY(0.1)
+            ];
+
+    return
+        [ SCENE
+            sceneGeometry : scene_geometry
+            camera        : camera
+            actionSequence: actionsequence
+            ];
+
+}
