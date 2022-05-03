@@ -29,7 +29,6 @@
 ART_LIBRARY_INTERFACE(ART_ColourAndSpectra)
 
 #import "Arn2DGMMSpectrum.h"
-#import "Arn2DGMMSpectrumDebugTab.h"
 #import "ArnConstSpectrum.h"
 #import "ArnSellmeierDispersion.h"
 #import "ArnBlackbodyRadiation.h"

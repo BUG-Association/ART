@@ -290,18 +290,6 @@ ART_MODULE_INTERFACE(ARM_Colour)
             Arn2DGMMSpectrum                       \
         )
 
-    /**
-     * @brief Load specturm from GMM fit - DEBUG TODO Compact
-     *
-     * @def GMM_FIT(filename)
-     *
-     * @param filename  char*   The path where the fit result is.
-     */
-    #define GMM_FIT_DEBUG(_filename)               \
-        ART_PARSE_EXISTING_FILE(                   \
-            (_filename),                           \
-            Arn2DGMMSpectrumDebugTab               \
-        )
 /**
  * @popsection
  */

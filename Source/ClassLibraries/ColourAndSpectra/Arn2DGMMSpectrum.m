@@ -1104,8 +1104,6 @@ ARPVALUES_NULLARY_EVALENVTYPE_IMPLEMENTATION(arevalenv_none)
     return 1;
 }
 
-
-
 @end
 
 // ===========================================================================

@@ -30,14 +30,10 @@
 
 #import "ART_ColourAndSpectra.h"
 
-static const char * arfbfc_magic_string =
-                    "";
-static const char * arfbfc_short_class_name =
-                    "BFC";
-static const char * arfbfc_long_class_name =
-                    "BFC fluorescent measurement";
-const char * arfbfc_exts[] =
-                    { "bfc", "BFC", 0 };
+static const char * arfbfc_magic_string = "";
+static const char * arfbfc_short_class_name = "BFC";
+static const char * arfbfc_long_class_name = "BFC fluorescent measurement";
+const char * arfbfc_exts[] = { "bfc", "BFC", 0 };
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
@@ -77,23 +73,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
 + (ArFiletypeMatch) matchWithStream
     : (ArcObject <ArpStream> *) stream
 {
-    /* TODO */
     return arfiletypematch_exact;
-
-    char  buffer[5];
-
-    [ stream read
-        :   buffer
-        :   1
-        :   4
-        ];
-
-    buffer[4] = 0;
-
-    if ( strstr(buffer, [self magicString]) != 0 )
-        return arfiletypematch_exact;
-    else
-        return arfiletypematch_impossible;
 }
 
 - (id) initWithFile: (ArcFile *) newFile
@@ -279,7 +259,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
                 );
         }
 
-        // read a whole line
+        // Read a whole line
         for (int i_ex = 0; i_ex < n_excitations; i_ex++) {
             const int n_matches = 
                 fscanf(

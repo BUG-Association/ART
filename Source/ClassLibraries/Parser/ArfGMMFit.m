@@ -30,14 +30,10 @@
 #import "Arn2DGMMSpectrum.h"
 
 
-static const char * arfgmmfit_magic_string =
-    "";
-static const char * arfgmmfit_short_class_name =
-    "GMM";
-static const char * arfgmmfit_long_class_name =
-    "GMM Fit";
-const char * arfgmmfit_exts[] =
-    { "gmm", 0 };
+static const char * arfgmmfit_magic_string = "";
+static const char * arfgmmfit_short_class_name = "GMM";
+static const char * arfgmmfit_long_class_name = "GMM Fit";
+const char * arfgmmfit_exts[] = { "gmm", "GMM", 0 };
 
 ART_MODULE_INITIALISATION_FUNCTION
 (
@@ -78,21 +74,6 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
         : (ArcObject <ArpStream> *) stream
 {
     return arfiletypematch_exact;
-    // TODO
-    char  buffer[5];
-    
-    [ stream read
-         :   buffer
-         :   1
-         :   4
-         ];
-    
-    buffer[4] = 0;
-    
-    if ( strstr(buffer, [self magicString]) != 0 )
-        return arfiletypematch_exact;
-    else
-        return arfiletypematch_impossible;
 }
 
 - initWithFile: (ArcFile *) newFile
@@ -119,10 +100,10 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
         : (ArNode **) objectPtr
         : (ArList *) externals
 {
-    FILE *pFile = fopen( [ file name ], "r");
+    FILE *pFile = fopen( [ file name ], "rb");
 
     if (pFile != NULL) {
-// GMM params
+        // GMM params
         unsigned int n_gaussians = 0;
         double* means            = NULL;
         double* covariances      = NULL;

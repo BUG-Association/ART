@@ -40,7 +40,6 @@ ART_LIBRARY_INTERFACE(ART_Parser)
 
 #import "ArfBFC.h"
 #import "ArfGMMFit.h"
-#import "ArfGMMFitDebug.h" // TODO Compact
 
 #import "ART_Parse_File.h"
 
