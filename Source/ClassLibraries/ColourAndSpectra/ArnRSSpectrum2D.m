@@ -67,7 +67,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
 
     rss2d_to_rss( fluoValue, & rss_temp );
 
-//    rss_c_mathematicaprintf( art_gv, & rss_temp );
+    // rss_c_mathematicaprintf( art_gv, & rss_temp );
 
     if ( ! mainDiagonal )
         mainDiagonal = spc_alloc( art_gv );
@@ -77,7 +77,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
     rss_to_spc( art_gv, & rss_temp, mainDiagonal );
     rss_to_s500( art_gv, & rss_temp, hiresMainDiagonal );
 
-//    spc_c_mathematicaprintf( art_gv, mainDiagonal );
+    // spc_c_mathematicaprintf( art_gv, mainDiagonal );
 
     rss_free_contents( art_gv, & rss_temp );
 
@@ -89,7 +89,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
         crosstalk = arcrosstalk_alloc( art_gv );
     if ( ! hiresCrosstalk )
         hiresCrosstalk = cx500_alloc(art_gv);
-
+    
     rss2d_to_cx500( art_gv, fluoValue, hiresCrosstalk );
     cx500_to_crosstalk( art_gv, hiresCrosstalk, crosstalk );
 
@@ -113,7 +113,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnRSSpectrum2D)
     FREE_ARRAY(fluoValue->array);
     FREE(fluoValue);
 
-//    arcrosstalk_x_mathematicaprintf( art_gv, crosstalk );
+    // arcrosstalk_x_mathematicaprintf( art_gv, crosstalk );
 }
 
 - (id) init

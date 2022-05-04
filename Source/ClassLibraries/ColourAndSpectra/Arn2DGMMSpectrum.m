@@ -602,7 +602,7 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2DGMMSpectrum)
             } while (
                    (pathDirection == arpathdirection_from_eye   && (sampled_wl_nm >= in_wl_nm))
                 || (pathDirection == arpathdirection_from_light && (sampled_wl_nm <= in_wl_nm))
-                || sampled_wl_nm > ARCROSSTALK500_UPPER_BOUND);
+                || sampled_wl_nm < ARCROSSTALK500_LOWER_BOUND || sampled_wl_nm > ARCROSSTALK500_UPPER_BOUND);
 
             ARWL_WI(*outputWavelength, i) = sampled_wl_nm NM;
 
@@ -789,6 +789,8 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(Arn2DGMMSpectrum)
                 NANO_FROM_UNIT(lambda_o)
             );
     }
+
+    ASSERT_NONNEGATIVE_DOUBLE(res)
 
     return _scaling_attenuation * res;
 }
