@@ -355,9 +355,13 @@ void rss2d_to_cx500(
     unsigned int  rss_s_x = RSS2D_SIZE_X(*rss2d);
     unsigned int  rss_s_y = RSS2D_SIZE_Y(*rss2d);
 
-    double  sampleSize =
-          NANO_FROM_UNIT(ARRSS2D_EX_STEP(*rss2d));
+    unsigned int xStart = NANO_FROM_UNIT(ARRSS2D_EX_START(*rss2d));
+    unsigned int yStart = NANO_FROM_UNIT(ARRSS2D_EM_START(*rss2d));
 
+    unsigned int xEnd = xStart + NANO_FROM_UNIT(ARRSS2D_EX_STEP(*rss2d)) * (rss_s_x - 1);
+    unsigned int yEnd = yStart + NANO_FROM_UNIT(ARRSS2D_EM_STEP(*rss2d)) * (rss_s_y - 1);
+
+    double  sampleSize = NANO_FROM_UNIT(ARRSS2D_EX_STEP(*rss2d));
     double  ex_step_div_2 = ARRSS2D_EX_STEP(*rss2d) / 2.0;
     double  em_step_div_2 = ARRSS2D_EM_STEP(*rss2d) / 2.0;
 
@@ -368,6 +372,11 @@ void rss2d_to_cx500(
             int x1 = (int) NANO_FROM_UNIT(ARRSS2D_EX_START(*rss2d) + ex_step_div_2 + ARRSS2D_EX_STEP(*rss2d) * x );
             int y0 = (int) NANO_FROM_UNIT(ARRSS2D_EM_START(*rss2d) - em_step_div_2 + ARRSS2D_EM_STEP(*rss2d) * y );
             int y1 = (int) NANO_FROM_UNIT(ARRSS2D_EM_START(*rss2d) + em_step_div_2 + ARRSS2D_EM_STEP(*rss2d) * y );
+
+            x0 = M_MAX(x0, xStart);
+            x1 = M_MIN(x1, xEnd);
+            y0 = M_MAX(y0, yStart);
+            y1 = M_MIN(y1, yEnd);
 
             x0 -= RSS2D_TO_X_START;
             x1 -= RSS2D_TO_X_START;
