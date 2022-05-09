@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Single script converter of reradiation matrices from native ART and BFC formats to their corresponding GMM representations.
 
 # Author: Wei Xue <xuewei4d@gmail.com>
