@@ -13,7 +13,6 @@ import numpy as np
 
 from abc import ABCMeta, abstractmethod
 from time import time
-from pip import main
 
 from scipy import linalg
 from scipy.special import betaln, digamma, gammaln, logsumexp
@@ -24,7 +23,6 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils import check_array, check_random_state
 from sklearn.utils.extmath import row_norms
 from sklearn.utils.validation import check_is_fitted, _check_sample_weight, _deprecate_positional_args
-from sympy import arg
 
 ###############################################################################
 # Base class for mixture models
@@ -2408,6 +2406,8 @@ class GMM:
             Path to the file to save.
         """
         with open(output, 'w') as f:
+            f.write('gmm\n')
+            f.write('gaussians:\n')
             f.write('{}\n'.format(len(self.mixing_coefs)))
 
             f.write('means:\n')
@@ -2647,8 +2647,7 @@ if __name__ == "__main__":
         action="store_true",
         help=(
             "Save resulting GMM as an ASCII file providing "
-            "human-readable output usable for debugging. "
-            "For use in the ART renderer use the default binary output."
+            "human-readable output usable for debugging."
         ),
     )
 

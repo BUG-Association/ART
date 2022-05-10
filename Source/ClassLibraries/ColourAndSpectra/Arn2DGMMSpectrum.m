@@ -43,7 +43,6 @@ double eval_gaussian_2d(
         xx * (inv_covariance->x[0][0] * xx + inv_covariance->x[1][0] * yy) +
         yy * (inv_covariance->x[0][1] * xx + inv_covariance->x[1][1] * yy);
 
-
     return exp(-.5 * v) / (2.*M_PI*sqrt(covariance_det));
 }
 

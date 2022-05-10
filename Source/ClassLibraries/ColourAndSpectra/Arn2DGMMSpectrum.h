@@ -79,7 +79,6 @@ typedef struct {
 // Internal initialization.
 - (void) _setup;
 
-
 - (double) reradiation
         : (const double) lambda_i
         : (const double) lambda_o
