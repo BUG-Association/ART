@@ -28,7 +28,7 @@
 
 #import "ArcSampleCounter.h"
 
-#import "ArnImageSamplerBase.h"
+
 
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
@@ -53,7 +53,7 @@ int int_num_digits(int x)
 - (id) init
         : (ArcObject <ArpReporter> *) newReporter
         : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
-        : (ArnImageSamplerBase *) newImageSampler
+        : (id<ArpImageSamplerMessenger> ) newImageSampler
         : (int) newTargetSamples
 {
     reporter = newReporter;

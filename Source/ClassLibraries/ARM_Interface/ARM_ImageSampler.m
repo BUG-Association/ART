@@ -24,6 +24,7 @@
 
 =========================================================================== */
 
+
 #define ART_MODULE_NAME     ARM_ImageSampler
 
 #import "ARM_ImageSampler.h"
@@ -94,6 +95,47 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
     return self;
 }
+
+
+- (id) sampleProvider
+
+                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
+        sampleSplattingKernel    : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
+        samplesPerPixel         : (unsigned int) newNumberOfSamples
+        randomValueGeneration   : (int) newRandomValueGeneration
+{
+    return
+        [ self init
+            :   newRaySampler
+            :   newReconstructionKernel
+            :   newNumberOfSamples
+            :   newRandomValueGeneration
+            ];
+}
+
+@end
+
+@implementation ArnMySampler ( ARM_Interface )
+
+- (id) sampleProvider
+
+                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
+        samplesPerPixel         : (unsigned int) newNumberOfSamples
+        randomValueGeneration   : (int) newRandomValueGeneration
+{
+    id  defaultReconstructionKernel =
+        [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnBoxReconstructionKernel) ];
+
+    [ self init
+        :   newRaySampler
+        :   defaultReconstructionKernel
+        :   newNumberOfSamples
+        :   newRandomValueGeneration
+        ];
+
+    return self;
+}
+
 
 - (id) sampleProvider
 

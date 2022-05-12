@@ -30,7 +30,7 @@ ART_MODULE_INTERFACE(ArcSampleCounter)
 
 #include "ART_Protocols.h"
 
-@class ArnImageSamplerBase;
+
 
 @interface ArcSampleCounter
         : ArcObject
@@ -38,7 +38,7 @@ ART_MODULE_INTERFACE(ArcSampleCounter)
     int                        targetSamples;
     
     ArcObject <ArpReporter>  * reporter;
-    ArnImageSamplerBase      * imageSampler;
+    id<ArpImageSamplerMessenger>       imageSampler;
 
     ArClock                    startClock;
     ArClock                    endClock;
@@ -51,7 +51,7 @@ ART_MODULE_INTERFACE(ArcSampleCounter)
 - (id) init
         : (ArcObject <ArpReporter> *) newReporter
         : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
-        : (ArnImageSamplerBase *) newImageSampler
+        : (id<ArpImageSamplerMessenger> ) newImageSampler
         : (int) newTargetSamples
         ;
 
