@@ -108,8 +108,6 @@ ART_MODULE_INTERFACE(ArnStochasticImageSampler)
     //   number of WLs div 4 in the deterministic case, precomputed
     
     int             wavelengthSteps;
-
-    unsigned int                          coresToUse;
 }
 
 - (id) init
@@ -117,7 +115,6 @@ ART_MODULE_INTERFACE(ArnStochasticImageSampler)
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples
         : (int) newRandomValueGeneration
-        : (int) cores
         ;
 
 - (void) useDeterministicWavelengths

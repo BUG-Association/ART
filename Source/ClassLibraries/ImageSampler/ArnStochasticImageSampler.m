@@ -62,7 +62,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSampler)
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples
         : (int) newRandomValueGeneration
-        : (int) cores
 {
     self =
         [ super init
@@ -74,8 +73,6 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnStochasticImageSampler)
 
     deterministicWavelengths = NO;
     wavelengthSteps = 1;
-    numberOfRenderThreads = (coresToUse==0)?
-            art_maximum_number_of_working_threads(art_gv):coresToUse;
     
     return self;
 }
@@ -490,7 +487,6 @@ ArPixelID;
 {
     [ super code: coder ];
     [ coder codeBOOL: & deterministicWavelengths ];
-    [ coder codeUInt: & coresToUse ];
     
     if ( [ coder isReading ] )
     {
@@ -502,8 +498,6 @@ ArPixelID;
         {
             wavelengthSteps = 1;
         }
-        numberOfRenderThreads = (coresToUse==0)?
-            art_maximum_number_of_working_threads(art_gv):coresToUse;
     }
 }
 

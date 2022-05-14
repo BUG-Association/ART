@@ -341,7 +341,15 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     samples_per_window_adaptive=samples_per_window;
     samples_issued=0;
     samples_per_window= MIN(overallNumberOfSamplesPerPixel-samples_issued,samples_per_window);
-
+    numberOfRenderThreads = art_maximum_number_of_working_threads(art_gv);
+    if ( deterministicWavelengths )
+    {
+        [ self useDeterministicWavelengths ];
+    }
+    else
+    {
+        wavelengthSteps = 1;
+    }
     if(samples_per_window==0){
         finishedGeneratingRenderTasks=true;
     }
@@ -352,7 +360,6 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples
         : (int) newRandomValueGeneration
-        : (int) cores
 {
 
     self =
@@ -363,12 +370,9 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
 
     if ( self )
     {
-        
-        coresToUse=cores;
         overallNumberOfSamplesPerPixel = newNumberOfSamples;
         randomValueGeneration = newRandomValueGeneration;
-        deterministicWavelengths = NO;
-        wavelengthSteps = 1;        
+        deterministicWavelengths = NO;       
         [self setupInternalVariables];
     }
     return self;
@@ -410,7 +414,6 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
 {
     (void)nWorld;
     (void)nCamera;
-    printf("Using %d cores\n",numberOfRenderThreads);
     pthread_barrier_init(&renderingDone, NULL, numberOfRenderThreads+1);
     pthread_barrier_init(&mergingDone, NULL, 2);
     pthread_barrier_init(&final_write_barrier, NULL, 2);
@@ -1766,7 +1769,6 @@ ArPixelID;
     [ super code: coder ];
 
     [ coder codeUInt: & overallNumberOfSamplesPerPixel ];
-    [ coder codeUInt: & coresToUse ];
     [ coder codeInt:  & randomValueGeneration ];
     [ coder codeBOOL: & deterministicWavelengths ];
     
@@ -1774,14 +1776,6 @@ ArPixelID;
     {
         
         [ self setupInternalVariables ];
-        if ( deterministicWavelengths )
-        {
-            [ self useDeterministicWavelengths ];
-        }
-        else
-        {
-            wavelengthSteps = 1;
-        }
     }
     
 

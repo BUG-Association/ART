@@ -79,15 +79,6 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         randomValueGeneration   : (int) newRandomValueGeneration
         ;
 
-- (id) sampleProvider
-
-                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
-        sampleSplattingKernel    : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
-        samplesPerPixel         : (unsigned int) newNumberOfSamples
-        randomValueGeneration   : (int) newRandomValueGeneration
-        numberOfCores : (int) cores
-        ;
-
 @end
 #define MY_SAMPLER  \
     ALLOC_OBJECT_AUTORELEASE(ArnMySampler)
@@ -105,14 +96,6 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         sampleSplattingKernel   : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         samplesPerPixel         : (unsigned int) newNumberOfSamples
         randomValueGeneration   : (int) newRandomValueGeneration
-        ;
-- (id) sampleProvider
-
-                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
-        sampleSplattingKernel    : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
-        samplesPerPixel         : (unsigned int) newNumberOfSamples
-        randomValueGeneration   : (int) newRandomValueGeneration
-        numberOfCores : (int) cores
         ;
 @end
 

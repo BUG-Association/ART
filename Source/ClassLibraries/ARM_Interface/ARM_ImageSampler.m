@@ -131,7 +131,6 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         :   defaultReconstructionKernel
         :   newNumberOfSamples
         :   newRandomValueGeneration
-        : 0
         ];
 
     return self;
@@ -151,24 +150,6 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
             :   newReconstructionKernel
             :   newNumberOfSamples
             :   newRandomValueGeneration
-            : 0
-            ];
-}
-- (id) sampleProvider
-
-                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
-        sampleSplattingKernel    : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
-        samplesPerPixel         : (unsigned int) newNumberOfSamples
-        randomValueGeneration   : (int) newRandomValueGeneration
-        numberOfCores : (int) cores
-{
-    return
-        [ self init
-            :   newRaySampler
-            :   newReconstructionKernel
-            :   newNumberOfSamples
-            :   newRandomValueGeneration
-            :   cores
             ];
 }
 
@@ -190,7 +171,6 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         :   defaultReconstructionKernel
         :   newNumberOfSamples
         :   newRandomValueGeneration
-        : 0
         ];
 
     return self;
@@ -210,24 +190,6 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
             :   newReconstructionKernel
             :   newNumberOfSamples
             :   newRandomValueGeneration
-            : 0
-            ];
-}
-- (id) sampleProvider
-
-                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
-        sampleSplattingKernel    : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
-        samplesPerPixel         : (unsigned int) newNumberOfSamples
-        randomValueGeneration   : (int) newRandomValueGeneration
-        numberOfCores : (int) cores
-{
-    return
-        [ self init
-            :   newRaySampler
-            :   newReconstructionKernel
-            :   newNumberOfSamples
-            :   newRandomValueGeneration
-            :   cores
             ];
 }
 @end
