@@ -1,3 +1,4 @@
+#include <stdio.h>
 #define ART_MODULE_NAME     ArnMySampler
 
 
@@ -123,7 +124,7 @@ void push_queue(queue_t* q,task_t* t){
     task_t** data=q->data;
     data[head]=t;
     head++;
-    q->head=(head==(*q).max_size)?0:head;
+    q->head=head%q->max_size;
     q->length++;
 }
 
@@ -179,7 +180,7 @@ void push_render_queue(render_queue_t*restrict q,task_t * restrict task){
 
 struct merge_queue_t{
     queue_t queue1,queue2;
-    queue_t* current,*inactive;;
+    queue_t* current,*inactive;
      
     pthread_mutex_t lock;
     pthread_cond_t cond_var;
@@ -332,25 +333,26 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
 
 - (void) setupInternalVariables
 {
-    deterministicWavelengths = NO;
     finishedGeneratingRenderTasks=NO;
     renderThreadsShouldTerminate = NO;
     workingThreadsAreDone=NO;
-    wavelengthSteps = 1;
     window_iterator=0;
     samples_per_window=1024;
     samples_per_window_adaptive=samples_per_window;
     samples_issued=0;
     samples_per_window= MIN(overallNumberOfSamplesPerPixel-samples_issued,samples_per_window);
-        if(samples_per_window==0){
-            finishedGeneratingRenderTasks=true;
-        }
+
+    if(samples_per_window==0){
+        finishedGeneratingRenderTasks=true;
+    }
+
 }
 - (id) init
         : (ArNode <ArpPathspaceIntegrator> * ) newPathspaceIntegrator
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples
         : (int) newRandomValueGeneration
+        : (int) cores
 {
 
     self =
@@ -362,9 +364,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     if ( self )
     {
         
-        numberOfRenderThreads = art_maximum_number_of_working_threads(art_gv);
+        coresToUse=cores;
         overallNumberOfSamplesPerPixel = newNumberOfSamples;
-        randomValueGeneration = newRandomValueGeneration;        
+        randomValueGeneration = newRandomValueGeneration;
+        deterministicWavelengths = NO;
+        wavelengthSteps = 1;        
         [self setupInternalVariables];
     }
     return self;
@@ -406,7 +410,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
 {
     (void)nWorld;
     (void)nCamera;
-    
+    printf("Using %d cores\n",numberOfRenderThreads);
     pthread_barrier_init(&renderingDone, NULL, numberOfRenderThreads+1);
     pthread_barrier_init(&mergingDone, NULL, 2);
     pthread_barrier_init(&final_write_barrier, NULL, 2);
@@ -924,9 +928,8 @@ ArPixelID;
                 int  subpixelIdx = (t->sample_start  +sample) % numberOfSubpixelSamples;
 
                 if ( renderThreadsShouldTerminate )
-                {
                     goto FREE_SAMPLE_VALUE;
-                }
+                
                 for ( int w = 0; w < wavelengthSteps; w++ )
                 {
                     [ THREAD_RANDOM_GENERATOR reInitializeWith
@@ -1763,16 +1766,25 @@ ArPixelID;
     [ super code: coder ];
 
     [ coder codeUInt: & overallNumberOfSamplesPerPixel ];
+    [ coder codeUInt: & coresToUse ];
+    [ coder codeInt:  & randomValueGeneration ];
+    [ coder codeBOOL: & deterministicWavelengths ];
     
     if ( [ coder isReading ] )
     {
-        numberOfRenderThreads =
-            art_maximum_number_of_working_threads(art_gv);
         
         [ self setupInternalVariables ];
+        if ( deterministicWavelengths )
+        {
+            [ self useDeterministicWavelengths ];
+        }
+        else
+        {
+            wavelengthSteps = 1;
+        }
     }
     
-    [ coder codeInt:  & randomValueGeneration ];
+
 }
 - (void) useDeterministicWavelengths
 {

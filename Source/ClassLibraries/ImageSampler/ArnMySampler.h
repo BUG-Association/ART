@@ -33,6 +33,7 @@ typedef struct task_t task_t;
         unsigned int                          overallNumberOfSamplesPerPixel;
         int                                   randomValueGeneration;
         unsigned int                          numberOfRenderThreads;
+        unsigned int                          coresToUse;
         ArNode <ArpWorld, ArpBBox>          * world;
         ArNode <ArpLightsourceCollection>   * lightsources;
         ArNode <ArpCamera>                  * camera;
@@ -111,6 +112,7 @@ typedef struct task_t task_t;
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples
         : (int) newRandomValueGeneration
+        : (int) cores
         ;
 
 - (const char *) preSamplingMessage
