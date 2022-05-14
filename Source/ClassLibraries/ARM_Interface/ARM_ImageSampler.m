@@ -91,7 +91,6 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         :   defaultReconstructionKernel
         :   newNumberOfSamples
         :   newRandomValueGeneration
-        : 0
         ];
 
     return self;
@@ -111,26 +110,9 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
             :   newReconstructionKernel
             :   newNumberOfSamples
             :   newRandomValueGeneration
-            : 0
             ];
 }
-- (id) sampleProvider
 
-                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
-        sampleSplattingKernel    : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
-        samplesPerPixel         : (unsigned int) newNumberOfSamples
-        randomValueGeneration   : (int) newRandomValueGeneration
-        numberOfCores : (int) cores
-{
-    return
-        [ self init
-            :   newRaySampler
-            :   newReconstructionKernel
-            :   newNumberOfSamples
-            :   newRandomValueGeneration
-            : 0
-            ];
-}
 @end
 
 @implementation ArnMySampler ( ARM_Interface )
@@ -186,7 +168,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
             :   newReconstructionKernel
             :   newNumberOfSamples
             :   newRandomValueGeneration
-            : 0
+            :   cores
             ];
 }
 
@@ -196,7 +178,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 - (id) sampleProvider
 
-                                : (ArNode <ArpPathspaceIntegrator> *) newPathspaceIntegrator
+                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         samplesPerPixel         : (unsigned int) newNumberOfSamples
         randomValueGeneration   : (int) newRandomValueGeneration
 {
@@ -204,31 +186,50 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnBoxReconstructionKernel) ];
 
     [ self init
-        :   newPathspaceIntegrator
+        :   newRaySampler
         :   defaultReconstructionKernel
         :   newNumberOfSamples
         :   newRandomValueGeneration
+        : 0
         ];
 
     return self;
 }
 
+
 - (id) sampleProvider
 
-                                : (ArNode <ArpPathspaceIntegrator> *) newPathspaceIntegrator
-        sampleSplattingKernel   : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
+                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
+        sampleSplattingKernel    : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         samplesPerPixel         : (unsigned int) newNumberOfSamples
         randomValueGeneration   : (int) newRandomValueGeneration
 {
     return
         [ self init
-            :   newPathspaceIntegrator
+            :   newRaySampler
             :   newReconstructionKernel
             :   newNumberOfSamples
             :   newRandomValueGeneration
+            : 0
             ];
 }
+- (id) sampleProvider
 
+                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
+        sampleSplattingKernel    : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
+        samplesPerPixel         : (unsigned int) newNumberOfSamples
+        randomValueGeneration   : (int) newRandomValueGeneration
+        numberOfCores : (int) cores
+{
+    return
+        [ self init
+            :   newRaySampler
+            :   newReconstructionKernel
+            :   newNumberOfSamples
+            :   newRandomValueGeneration
+            :   cores
+            ];
+}
 @end
 
 @implementation ArnStochasticImageSamplerRGBA ( ARM_Interface )
