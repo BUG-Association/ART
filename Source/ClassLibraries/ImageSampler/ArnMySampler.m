@@ -293,21 +293,17 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     if (finishedGeneratingRenderTasks){
         if (poisoned_render) {
             return false;
-        }else{
-            t->work_tile=NULL;
-            t->window=NULL;
-            t->samples=0;
-            poisoned_render=true;
-            return true;
         }
-    }else{
-        t->samples=samples_per_window;
-        t->window=&render_windows[window_iterator];
-        t->sample_start=samples_issued;
-        [self task_next_iteration];
+        t->work_tile=NULL;
+        poisoned_render=true;
         return true;
     }
-    return false;
+    
+    t->samples=samples_per_window;
+    t->window=&render_windows[window_iterator];
+    t->sample_start=samples_issued;
+    [self task_next_iteration];
+    return true;
 }
 - (void) task_next_iteration
 {
@@ -599,8 +595,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     [self init_tile: &merge_image : imageSize];
     
     tile_size=IVEC2D(16, 16);
-    
-    div_roundup(XC(imageSize)-XC(imageOrigin), XC(tile_size));
+
     
     tiles_X=div_roundup(XC(imageSize)-XC(imageOrigin), XC(tile_size));
     tiles_Y=div_roundup(YC(imageSize)-YC(imageOrigin), YC(tile_size));
@@ -750,10 +745,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     // //   Detach n render threads.
 
     [ sampleCounter start ];
-
-    for ( unsigned int i = 0; i < numberOfRenderThreads; i++ )
+    unsigned int i = 0;
+    ArcUnsignedInteger  * index;
+    for ( ; i < numberOfRenderThreads; i++ )
     {
-        ArcUnsignedInteger  * index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
+        index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
 
         if ( ! art_thread_detach(@selector(renderThread:), self,  index))
             ART_ERRORHANDLING_FATAL_ERROR(
@@ -762,35 +758,29 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
                 );
     }
     
-    {
-        int i=numberOfRenderThreads;
-        ArcUnsignedInteger  * index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
+    
+    index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i++ ];
 
-        if ( ! art_thread_detach(@selector(mergeThread:), self,  index))
-            ART_ERRORHANDLING_FATAL_ERROR(
-                "could not detach rendering thread %d",
-                i
-                );
-    }
-    {
-        int i=numberOfRenderThreads+1;
-        ArcUnsignedInteger  * index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
-
-        if ( ! art_thread_detach(@selector(terminalIOThread:), self,  index))
+    if ( ! art_thread_detach(@selector(mergeThread:), self,  index))
         ART_ERRORHANDLING_FATAL_ERROR(
-            "could not detach terminal I/O thread"
+            "could not detach rendering thread %d",
+            i
             );
-    }
-    {
-        int i=numberOfRenderThreads+2;
-        ArcUnsignedInteger  * index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
 
-        if ( ! art_thread_detach(@selector(writeThread:), self,  index))
-        ART_ERRORHANDLING_FATAL_ERROR(
-            "could not detach terminal I/O thread"
-            );
-    }
+    index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i++ ];
 
+    if ( ! art_thread_detach(@selector(terminalIOThread:), self,  index))
+    ART_ERRORHANDLING_FATAL_ERROR(
+        "could not detach terminal I/O thread"
+        );
+
+    index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i++ ];
+
+    if ( ! art_thread_detach(@selector(writeThread:), self,  index))
+    ART_ERRORHANDLING_FATAL_ERROR(
+        "could not detach terminal I/O thread"
+        );
+    
 
     struct sigaction sa;
 
@@ -861,21 +851,17 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
 
     pthread_barrier_wait(&mergingDone);
     
-    //ASK WHERE EXACTLY IS A GOOD PLACE FOR THIS?
-    write( read_thread_pipe[1], "q", 1 );
     pthread_mutex_lock(&writeThreadMutex);
     workingThreadsAreDone=YES;
     pthread_cond_signal(&writeThreadCond);
     pthread_mutex_unlock(&writeThreadMutex);
     
-    // //   The basic structure of the threaded renderer is such that it
-    // //   is able to write partially-done images even before all threads
-    // //   terminate. Writing of such intermediate images is triggered via
-    // //   user signals, which have to be reset after use.
-    
-    
 
-    // //   This shuts down the I/O watching thread for interactive mode
+    
+    
+    //This shuts down the I/O watching thread for interactive mode
+    //ASK: WHERE EXACTLY IS A GOOD PLACE FOR THIS?
+    write( read_thread_pipe[1], "q", 1 );
     
     
     
@@ -928,8 +914,8 @@ ArPixelID;
             if(!unfinished[x + y*XC(imageSize)])
                 continue;
             for(int sample=0;sample<t->samples;sample++){
-                int  subpixelIdx = (t->sample_start  +sample) % numberOfSubpixelSamples;
-
+                px_id.sampleIndex = t->sample_start  +sample;
+                int  subpixelIdx = (px_id.sampleIndex) % numberOfSubpixelSamples;
                 if ( renderThreadsShouldTerminate )
                     goto FREE_SAMPLE_VALUE;
                 
@@ -1037,13 +1023,13 @@ ArPixelID;
 
                     if ( validSample )
                     {
+                        int xc=x-XC(t->window->start);
+                        int yc=y-YC(t->window->start);
+                        IVec2D size=t->work_tile->size;
                         if ( splattingKernelWidth == 1 )
                         {
                             for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                             {
-                                int xc=x-XC(t->window->start);
-                                int yc=y-YC(t->window->start);
-                                IVec2D size=t->work_tile->size;
                                 t->work_tile->samples[ 
                                     im*XC(size) * YC(size) 
                                     + yc*XC(size)+xc]+=1.0;
@@ -1060,9 +1046,8 @@ ArPixelID;
                         }
                         else
                         {
-                            int xc=x-XC(t->window->start)+splattingKernelOffset;
-                            int yc=y-YC(t->window->start)+splattingKernelOffset;
-                            IVec2D size=t->work_tile->size;
+                            xc=xc+splattingKernelOffset;
+                            yc=yc+splattingKernelOffset;
                             for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ )
                             {
                                 for ( unsigned int l = 0; l < splattingKernelArea; l++ )
@@ -1139,11 +1124,10 @@ ArPixelID;
 -(void) merge_task
     :(task_t*) t
 {
-    IVec2D ts=t->work_tile->size;
-
+    IVec2D size=t->work_tile->size;
     for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ ){
-        for (int y=0; y<YC(ts); y++) {
-            for (int x=0; x<XC(ts); x++) {
+        for (int y=0; y<YC(size); y++) {
+            for (int x=0; x<XC(size); x++) {
                 int cX=XC(t->window->start)-splattingKernelOffset+x;
                 int cY=YC(t->window->start)-splattingKernelOffset+y;
                 if (   cX >= 0
@@ -1154,12 +1138,12 @@ ArPixelID;
                     merge_image.samples[
                         cX+cY*XC(imageSize)+im*XC(imageSize)*YC(imageSize)
                         ]+=
-                        t->work_tile->samples[im*XC(ts)*YC(ts)+x+y*XC(ts)];
+                        t->work_tile->samples[im*XC(size)*YC(size)+x+y*XC(size)];
                     
                     
                     arlightalpha_l_add_l(
                         art_gv, 
-                        t->work_tile->image[im]->data[x+y*XC(ts)], 
+                        t->work_tile->image[im]->data[x+y*XC(size)], 
                         merge_image.image[im]->data[cX+cY*XC(imageSize)]);
                 }
             }
@@ -1300,7 +1284,7 @@ ArPixelID;
             {
                 for ( int x = 0; x < XC(imageSize); x++ )
                 {
-                    //ASK:Is there more elegant way
+                    
                     arlightalpha_l_init_l(
                           art_gv,
                           ARLIGHTALPHA_NONE_A0,
