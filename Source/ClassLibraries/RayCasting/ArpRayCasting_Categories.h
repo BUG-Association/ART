@@ -64,6 +64,7 @@ ART_MODULE_INTERFACE(ArpRayCasting_Categories)
 @interface AraSurfaceMaterial               ( RayCasting ) < ArpRayCasting > @end
 @interface AraTrafo3D               ( RayCasting ) < ArpRayCasting > @end
 @interface AraVertices              ( RayCasting ) < ArpRayCasting > @end
+@interface AraPath                  ( RayCasting ) < ArpRayCasting > @end
 @interface AraVariables             ( RayCasting ) < ArpRayCasting > @end
 @interface AraWorld                 ( RayCasting ) < ArpRayCasting > @end
 @interface AraCombinedAttributes    ( RayCasting ) < ArpRayCasting > @end
@@ -75,6 +76,7 @@ ART_MODULE_INTERFACE(AraRulesRayCasting)
 ART_MODULE_INTERFACE(AraSurfaceRayCasting)
 ART_MODULE_INTERFACE(AraTrafo3DRayCasting)
 ART_MODULE_INTERFACE(AraVerticesRayCasting)
+ART_MODULE_INTERFACE(AraPathRayCasting)
 ART_MODULE_INTERFACE(AraVariablesRayCasting)
 ART_MODULE_INTERFACE(AraWorldRayCasting)
 ART_MODULE_INTERFACE(AraCombinedAttributesRayCasting)
