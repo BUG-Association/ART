@@ -46,11 +46,50 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraPath)
 - (ArNode <ArpVolumeMaterial> *) volumeMaterial_at_WorldPnt3D
         : (ArnRayCaster *) rayCaster
 {
+    Pnt3D  pointStore = TESTPOINT;
+
+    HTrafo3D forward;
+    [ PATH forwardTrafo
+        :   WORLDSPACE_RAY.time
+        : & forward
+        ];
+    HTrafo3D backward;
+    [ PATH backwardTrafo
+        :   WORLDSPACE_RAY.time
+        : & backward
+        ];
+    
+    id trafo = [ ALLOC_INIT_OBJECT(ArnHTrafo3D)
+                    : forward
+                    : backward
+                    ];
+    RETAIN_OBJECT(trafo);
+
+    [ trafo backtrafoPnt3D
+        : & pointStore
+        : & TESTPOINT
+        ];
+
+    ArNodeRef  trafoStore;
+
+    [ rayCaster pushTrafo3DRef
+        :   WEAK_NODE_REFERENCE( trafo )
+        : & trafoStore
+        ];
+
     ArNode <ArpVolumeMaterial>  * result =
         [ SUBNODE volumeMaterial_at_WorldPnt3D
             :   rayCaster
             ];
 
+    [ rayCaster popTrafo3D
+        : & trafoStore
+        ];
+
+    TESTPOINT = pointStore;
+
+    RELEASE_OBJECT(trafo);
+    
     return result;
 }
 
@@ -58,6 +97,63 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraPath)
         : (ArnRayCaster *) rayCaster
         : (ArcSurfacePoint **) surfacePoint
 {
+    Pnt3D  pointStore  = TESTPOINT;
+    Vec3D  normalStore = TESTNORMAL;
+
+    HTrafo3D forward;
+    [ PATH forwardTrafo
+        :   WORLDSPACE_RAY.time
+        : & forward
+        ];
+    HTrafo3D backward;
+    [ PATH backwardTrafo
+        :   WORLDSPACE_RAY.time
+        : & backward
+        ];
+    
+    id trafo = [ ALLOC_INIT_OBJECT(ArnHTrafo3D)
+                    : forward
+                    : backward
+                    ];
+    RETAIN_OBJECT(trafo);
+    
+    [ trafo backtrafoPnt3D
+        : & pointStore
+        : & TESTPOINT
+        ];
+
+    if ( vec3d_v_valid( & normalStore ) )
+    {
+        Vec3D  newNormal;
+
+        [ trafo backtrafoNormalVec3D
+            : & normalStore
+            : & newNormal
+            ];
+
+        TESTNORMAL = newNormal;
+    }
+
+    ArNodeRef  trafoStore;
+
+    [ rayCaster pushTrafo3DRef
+        :   WEAK_NODE_REFERENCE( trafo )
+        : & trafoStore
+        ];
+
+    [ SUBNODE getArcSurfacePoint_for_WorldPnt3DE
+        :   rayCaster
+        :   surfacePoint
+        ];
+
+    [ rayCaster popTrafo3D
+        : & trafoStore
+        ];
+
+    TESTPOINT  = pointStore;
+    TESTNORMAL = normalStore;
+    
+    RELEASE_OBJECT(trafo);
 }
 
 - (void) getIntersectionList
@@ -65,6 +161,47 @@ ARPRAYCASTING_DEFAULT_IMPLEMENTATION(AraPath)
         : (Range) range_of_t
         : (struct ArIntersectionList *) intersectionList
 {
+    ArNodeRef  trafoStore;
+    Ray3DE    ray3DEStore;
+
+    HTrafo3D forward;
+    [ PATH forwardTrafo
+        :   WORLDSPACE_RAY.time
+        : & forward
+        ];
+    HTrafo3D backward;
+    [ PATH backwardTrafo
+        :   WORLDSPACE_RAY.time
+        : & backward
+        ];
+    
+    id trafo = [ ALLOC_INIT_OBJECT(ArnHTrafo3D)
+                    : forward
+                    : backward
+                    ];
+    
+    [ rayCaster pushTrafo3DRef
+        :   WEAK_NODE_REFERENCE( trafo )
+        : & trafoStore
+        : & ray3DEStore
+        ];
+
+    INTERSECTION_TEST_DEBUG_OUTPUT_INITIAL_LIST;
+
+    INTERSECTION_TEST_DEBUG_CALLING_SUBNODE(SUBNODE,"");
+
+    [ SUBNODE getIntersectionList
+        :   rayCaster
+        :   range_of_t
+        :   intersectionList
+        ];
+
+    INTERSECTION_TEST_DEBUG_OUTPUT_RESULT_LIST;
+
+    [ rayCaster popTrafo3D
+        : & trafoStore
+        : & ray3DEStore
+        ];
 }
 
 @end

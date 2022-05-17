@@ -31,9 +31,14 @@ ART_MODULE_INTERFACE(ArpPath)
 
 @protocol ArpPath
 
-- (void) getTransform
+- (void) forwardTrafo
         : (double    ) time
-        : (HTrafo3D *) transform
+        : (HTrafo3D *) trafo
+        ;
+
+- (void) backwardTrafo
+        : (double    ) time
+        : (HTrafo3D *) trafo
         ;
 
 @end

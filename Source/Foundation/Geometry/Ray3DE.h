@@ -64,7 +64,6 @@ typedef struct Ray3DE
 {
     Ray3D     ray;
     Vec3D     invVec;
-    double    time;
     Ray3DDir  rayDir;
 }
 Ray3DE;

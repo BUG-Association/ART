@@ -75,13 +75,13 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSimplePath)
     return self;
 }
 
-- (void) getTransform
+- (void) forwardTrafo
         : (double    ) time
-        : (HTrafo3D *) transform
+        : (HTrafo3D *) trafo
 {
-    double transformInterval = endTime - startTime;
+    double trafoInterval = endTime - startTime;
     double offsetTime = time - startTime;
-    double unitTime = offsetTime / transformInterval;
+    double unitTime = offsetTime / trafoInterval;
     
     if (unitTime < 0) unitTime = 0;
     else if (unitTime > 1) unitTime = 1;
@@ -91,10 +91,32 @@ ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnSimplePath)
     vec3d_dv_mul_v(unitTime, &interpolation, &interpolation);
     vec3d_vv_add_v(&startTranslation, &interpolation, &interpolation);
     
-    *transform = HTRAFO3D_UNIT;
-    XC(*transform) = XC(interpolation);
-    YC(*transform) = YC(interpolation);
-    ZC(*transform) = ZC(interpolation);
+    *trafo = HTRAFO3D_UNIT;
+    XC(*trafo) = XC(interpolation);
+    YC(*trafo) = YC(interpolation);
+    ZC(*trafo) = ZC(interpolation);
+}
+
+- (void) backwardTrafo
+        : (double    ) time
+        : (HTrafo3D *) trafo
+{
+    double trafoInterval = endTime - startTime;
+    double offsetTime = time - startTime;
+    double unitTime = offsetTime / trafoInterval;
+    
+    if (unitTime < 0) unitTime = 0;
+    else if (unitTime > 1) unitTime = 1;
+    
+    Vec3D interpolation;
+    vec3d_vv_sub_v(&startTranslation, &endTranslation, &interpolation);
+    vec3d_dv_mul_v(unitTime, &interpolation, &interpolation);
+    vec3d_vv_add_v(&startTranslation, &interpolation, &interpolation);
+    
+    *trafo = HTRAFO3D_UNIT;
+    XC(*trafo) = XC(interpolation);
+    YC(*trafo) = YC(interpolation);
+    ZC(*trafo) = ZC(interpolation);
 }
 
 - (void) code
