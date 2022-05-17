@@ -1,3 +1,4 @@
+#include "ArTime.h"
 #include <stdio.h>
 #define ART_MODULE_NAME     ArnMySampler
 
@@ -747,6 +748,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     [ sampleCounter start ];
     unsigned int i = 0;
     ArcUnsignedInteger  * index;
+    ArTime  debugStart, debugRender,debugMerge,debugWrite;
+    artime_now(&debugStart);
     for ( ; i < numberOfRenderThreads; i++ )
     {
         index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
@@ -845,11 +848,13 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     artime_now( & beginTime );
 
     pthread_barrier_wait(&renderingDone);
+    artime_now(&debugRender);
     task_t merge_poison;
     merge_poison.work_tile=NULL;
     push_merge_queue(&merge_queue, &merge_poison);
 
     pthread_barrier_wait(&mergingDone);
+    artime_now(&debugMerge);
     
     pthread_mutex_lock(&writeThreadMutex);
     workingThreadsAreDone=YES;
@@ -866,6 +871,13 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     
     
     pthread_barrier_wait(&final_write_barrier);
+    artime_now(&debugWrite);
+    printf("\n");
+    printf("Rendering Took (render+merge) %f +%f=%f\n",
+        artime_seconds(&debugRender)-artime_seconds(&debugStart),
+        artime_seconds(&debugMerge)-artime_seconds(&debugRender),
+        artime_seconds(&debugMerge)-artime_seconds(&debugStart));
+    printf("Write time %f\n",artime_seconds(&debugWrite)-artime_seconds(&debugMerge));
     
 }
 - (void)renderThread
@@ -1106,6 +1118,9 @@ ArPixelID;
         
         //todo:adaptively increase samples
         while(merge_queue.inactive->length>0){
+            if(merge_queue.inactive->length>4){
+                printf("merging %lu",merge_queue.inactive->length);
+            }
             task_t* curr_task=peek_queue(merge_queue.inactive);
             if(is_poison(curr_task))
             {
@@ -1168,6 +1183,11 @@ ArPixelID;
         
         unsigned int  overallNumberOfPixels = YC(imageSize) * XC(imageSize);
         double writeThreadWallClockDuration;
+        ArnLightAlphaImage  * out =
+                [ ALLOC_OBJECT(ArnLightAlphaImage)
+                    initWithSize
+                    :   IVEC2D(XC(imageSize), YC(imageSize))
+                    ];
         for ( unsigned int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
         {
             //   first, we figure out the average number of samples per pixel
@@ -1185,7 +1205,7 @@ ArPixelID;
                 for ( int x = 0; x < XC(imageSize); x++ )
                 {
                     unsigned int  pixelSampleCount = 0;
-                    
+                    //ASK: this is weird... why are we doing this with int and not doubles???
                     pixelSampleCount +=merge_image.samples[ 
                         imgIdx*XC(imageSize) * YC(imageSize) + x +y*XC(imageSize)];
                     
@@ -1275,11 +1295,7 @@ ArPixelID;
                 ];
             
             FREE( rendertimeString );
-            ArnLightAlphaImage  * out =
-                [ ALLOC_OBJECT(ArnLightAlphaImage)
-                    initWithSize
-                    :   IVEC2D(XC(imageSize), YC(imageSize))
-                    ];
+            
             for ( int y = 0; y < YC(imageSize); y++ )
             {
                 for ( int x = 0; x < XC(imageSize); x++ )
@@ -1318,13 +1334,13 @@ ArPixelID;
                     }
                 }
 
-                [ outputImage[imgIdx] setPlainImage
-                    :   IPNT2D(0,0)
-                    :   out
-                    ];
             }
-            RELEASE_OBJECT(out);
+            [ outputImage[imgIdx] setPlainImage
+                :   IPNT2D(0,0)
+                :   out
+                ];
         }
+        RELEASE_OBJECT(out);
         
         //   We might have been woken by a SIGUSR sent by 'impresario'.
         
