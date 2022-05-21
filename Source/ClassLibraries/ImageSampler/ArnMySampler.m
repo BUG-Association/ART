@@ -1,5 +1,9 @@
-#include "ArTime.h"
-#include <stdio.h>
+#include "ArLightAlpha.h"
+#include "ArRGB.h"
+#include "ArSpectrum.h"
+#include "ArcObject.h"
+#include "ColourConversionConstructorMacros.h"
+#include "include/ArRGB.h"
 #define ART_MODULE_NAME     ArnMySampler
 
 
@@ -23,21 +27,21 @@
 //TODO:handle fail states
 
 
-pthread_mutex_t  * signal_handler_mutex;
-pthread_cond_t   * signal_handler_cond;
+pthread_mutex_t  * _signal_handler_mutex;
+pthread_cond_t   * _signal_handler_cond;
 
-volatile sig_atomic_t  received_signal;
+volatile sig_atomic_t  _received_signal;
 
 int _image_sampler_received_signal(
         )
 {
-    return received_signal;
+    return _received_signal;
 }
 
 void _image_sampler_reset_received_signals(
         )
 {
-    received_signal = 0;
+    _received_signal = 0;
 }
 
 void _image_sampler_sigusr1_handler(
@@ -46,10 +50,10 @@ void _image_sampler_sigusr1_handler(
 {
     (void) sig;
     
-    received_signal = 1;
-    pthread_mutex_lock( signal_handler_mutex );
-    pthread_cond_signal( signal_handler_cond );
-    pthread_mutex_unlock( signal_handler_mutex );
+    _received_signal = 1;
+    pthread_mutex_lock( _signal_handler_mutex );
+    pthread_cond_signal( _signal_handler_cond );
+    pthread_mutex_unlock( _signal_handler_mutex );
 }
 
 void _image_sampler_sigusr2_handler(
@@ -58,10 +62,10 @@ void _image_sampler_sigusr2_handler(
 {
     (void) sig;
     
-    received_signal = 2;
-    pthread_mutex_lock( signal_handler_mutex );
-    pthread_cond_signal( signal_handler_cond );
-    pthread_mutex_unlock( signal_handler_mutex );
+    _received_signal = 2;
+    pthread_mutex_lock( _signal_handler_mutex );
+    pthread_cond_signal( _signal_handler_cond );
+    pthread_mutex_unlock( _signal_handler_mutex );
 }
 
 void _image_sampler_sigint_handler(
@@ -70,10 +74,10 @@ void _image_sampler_sigint_handler(
 {
     (void) sig;
     
-    received_signal = 3;
-    pthread_mutex_lock( signal_handler_mutex );
-    pthread_cond_signal( signal_handler_cond );
-    pthread_mutex_unlock( signal_handler_mutex );
+    _received_signal = 3;
+    pthread_mutex_lock( _signal_handler_mutex );
+    pthread_cond_signal( _signal_handler_cond );
+    pthread_mutex_unlock( _signal_handler_mutex );
 }
 
 
@@ -334,7 +338,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     renderThreadsShouldTerminate = NO;
     workingThreadsAreDone=NO;
     window_iterator=0;
-    samples_per_window=1024;
+    samples_per_window=128;
     samples_per_window_adaptive=samples_per_window;
     samples_issued=0;
     samples_per_window= MIN(overallNumberOfSamplesPerPixel-samples_issued,samples_per_window);
@@ -419,8 +423,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     pthread_cond_init( & writeThreadCond, NULL);
     sem_init(&tonemapAndOpenThreadSem, 0, 1);
 
-    signal_handler_mutex = & writeThreadMutex;
-    signal_handler_cond  = & writeThreadCond;
+    _signal_handler_mutex = & writeThreadMutex;
+    _signal_handler_cond  = & writeThreadCond;
     if ( overallNumberOfSamplesPerPixel == 0 )
     {
         asprintf(
@@ -446,6 +450,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
             :  self
             :  overallNumberOfSamplesPerPixel
             ];
+    
+    
     randomGenerator =
         ALLOC_ARRAY(
             ArcObject <ArpRandomGenerator> *,
@@ -621,7 +627,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     splattingKernelWidthDiv2 = splattingKernelWidth / 2;
     splattingKernelArea   = M_SQR( splattingKernelWidth );
     splattingKernelOffset = (splattingKernelWidth - 1) / 2;
-    IVec2D padded_tile_size=IVEC2D(XC(tile_size)+2*splattingKernelOffset,YC(tile_size)+2*splattingKernelOffset);
+    padded_tile_size=IVEC2D(XC(tile_size)+2*splattingKernelOffset,YC(tile_size)+2*splattingKernelOffset);
     buffer_size=TILE_CONSTANT*numberOfRenderThreads;
     tiles = ALLOC_ARRAY(
             tile_t,
@@ -642,7 +648,9 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
             push_render_queue(&render_queue, &task_buffer[i]);
         }
     }
-
+    tev = [ ALLOC_INIT_OBJECT(ArcTevIntegration)];
+    [tev createImage: XC(imageSize) : YC(imageSize) ];
+    tev_update_tile =ALLOC_ARRAY(float, 3*XC(padded_tile_size)*YC(padded_tile_size));
 
     
     // //   2D sample coordinates are pre-generated for the entire packet
@@ -916,7 +924,11 @@ ArPixelID;
         ALLOC_ARRAY( ArPathspaceResult *, numberOfImagesToWrite );
     
     ArPixelID  px_id;
-    
+    // arlightalpha_to_spc(const ART_GV *art_gv, const ArLightAlpha *c0, ArSpectrum *cr)
+    // to_rgb
+    // spc_to_rgb(const ART_GV *art_gv, const ArSpectrum *c0, ArRGB *cr)
+    // arlightalpha_
+    // spc_to_rgba32(const ART_GV *art_gv, const ArSpectrum *c0, ArRGBA32 *cr)
     px_id.threadIndex = THREAD_INDEX;
     px_id.globalRandomSeed = arrandom_global_seed(art_gv);
     for (int y=YC(t->window->start); y<YC(t->window->end); y++) {
@@ -1128,6 +1140,7 @@ ArPixelID;
             }
             pop_queue(merge_queue.inactive);
             [self merge_task : curr_task];
+            [self tev_task : curr_task];
             if([self make_task: curr_task]){
                 push_render_queue(&render_queue, curr_task);
             }
@@ -1164,7 +1177,80 @@ ArPixelID;
             }
         }
     }
-   
+}
+-(void) tev_task
+    :(task_t*) t
+{
+    if(!tev.connected){
+        return;
+    }
+    image_window_t tev_window;
+    XC(tev_window.start)=MAX(XC(t->window->start)-splattingKernelOffset,0);
+    YC(tev_window.start)=MAX(YC(t->window->start)-splattingKernelOffset,0);
+    XC(tev_window.end)=MIN(XC(t->window->end)+splattingKernelOffset,XC(imageSize));
+    YC(tev_window.end)=MIN(YC(t->window->end)+splattingKernelOffset,YC(imageSize));
+
+    
+    ArLightAlpha* l = arlightalpha_alloc(art_gv);
+    ArSpectrum* s = spc_alloc(art_gv);
+    ArRGB* rgb =rgb_alloc(art_gv);
+
+    
+    for ( unsigned int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
+    {
+        size_t i=0;
+        //TODO make this work for multiple images
+        for ( int y = YC(tev_window.start); y < YC(tev_window.end); y++ )
+        {
+            for ( int x = XC(tev_window.start); x < XC(tev_window.end); x++ )
+            {
+                
+                arlightalpha_l_init_l(
+                        art_gv,
+                        ARLIGHTALPHA_NONE_A0,
+                        l
+                    );
+                arlightalpha_l_add_l(
+                        art_gv,
+                        merge_image.image[imgIdx]->data[x +y*XC(imageSize)],
+                        l
+                    );
+                double  pixelSampleCount = merge_image.samples[ imgIdx*XC(imageSize) * YC(imageSize) + x +y*XC(imageSize)];
+
+                if ( pixelSampleCount > 0.0 )
+                {
+                    arlightalpha_d_mul_l(
+                            art_gv,
+                            1.0 / pixelSampleCount,
+                            l
+                        );
+                }
+                arlightalpha_to_spc(art_gv, l, s);
+                spc_to_rgb(art_gv, s, rgb);
+                //ARFLOATRGB_OF_ARRGB(rgb);
+                
+                ArFloatRGB frbg=ARFLOATRGB_OF_ARRGB((*rgb));
+                
+                // ARFLOATRGB(_r, _g, _b)
+                // rg
+                // frbg.c.x[1]
+                tev_update_tile[i]=ARRGB_R(frbg);
+                tev_update_tile[i+1]=ARRGB_G(frbg);
+                tev_update_tile[i+2]=ARRGB_B(frbg);
+                i+=3;
+            }
+
+        }
+        [tev updateImage:
+            XC(tev_window.start) :
+            YC(tev_window.start):
+            XC(tev_window.end)-XC(tev_window.start) :
+            YC(tev_window.end)-YC(tev_window.start) :
+            tev_update_tile];
+    }
+    arlightalpha_free(art_gv,l);
+    spc_free(art_gv,s);
+    rgb_free(art_gv,rgb);
 }
 - (void)writeThread
     : (ArcUnsignedInteger *) threadIndex
@@ -1626,6 +1712,8 @@ ArPixelID;
     FREE_ARRAY(task_buffer);
     FREE_ARRAY(render_windows);
 
+    RELEASE_OBJECT(tev);
+    FREE_ARRAY(tev_update_tile);
 }
 
 - (void) performOn

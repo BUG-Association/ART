@@ -4,6 +4,7 @@
 
 #import "ART_Scenegraph.h"
 #import "ART_ImageData.h"
+#include "ArcTevIntegration.h"
 
 
 ART_MODULE_INTERFACE(ArnMySampler)
@@ -104,6 +105,10 @@ typedef struct task_t task_t;
         pthread_mutex_t                       writeThreadMutex;
         pthread_cond_t                        writeThreadCond;
         sem_t tonemapAndOpenThreadSem;
+
+        ArcTevIntegration* tev;
+        float * tev_update_tile;
+        IVec2D padded_tile_size;
 }
 
 - (id) init
