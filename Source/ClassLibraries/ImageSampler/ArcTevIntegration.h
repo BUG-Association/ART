@@ -1,45 +1,65 @@
 #include "ART_Foundation.h"
-#import "ART_Scenegraph.h"
-#include <stdint.h>
-#include "ArNode.h"
-#include "sys/socket.h"
-#include "netinet/in.h"
-#include <arpa/inet.h>
-//ArpImageSampler, ArpImageSamplerMessenger, 
-        //ArpCoding
+#include <bits/stdint-uintn.h>
 
 typedef  struct {
     char* data;
+    char* end;
     uint32_t len;
     uint32_t max_size;
-    char* end;
-} char_buff;
+} message_buffer;
 
 @interface ArcTevIntegration 
         : ArcObject
 {
-        struct sockaddr_in address;
         int socket_handle;
+        char* _hostName;
+        char* _hostPort;
         BOOL _connected;
-        char_buff buffer;
+        message_buffer buffer;
 }
 @property BOOL connected;
 - (id) init
         ;
-- (void) retryConnection
+- (void) switchHost
+        :(const char*) hostName
+        :(uint32_t) hostPort
+        ;
+- (void) tryConnection
         ;
 
 - (void) createImage
+        :(const char*) name
+        :(BOOL) grabfocus
+        :(const char*) channel_names
+        :(int32_t) channel_number
         :(int32_t) width
         :(int32_t) height
         ;
+- (void) openImage
+        :(const char*) name
+        :(BOOL) grabfocus
+        :(const char*) channel_selector
+        ;
+- (void) closeImage
+        :(const char*) name
+        ;
+- (void) reloadImage
+        :(const char*) name
+        :(BOOL) grabfocus
+        ;
         
 - (void) updateImage
+        :(const char*) name
+        :(BOOL) grabfocus
+        :(const char*) channel_names
+        :(int32_t) channel_number
+        :(const int64_t*)channel_offsets
+        :(const int64_t*)channel_strides
         :(int32_t) x
         :(int32_t) y
         :(int32_t) width
         :(int32_t) height
-        :(float*) data
+        :(const float*) data
         ;
 - (void)dealloc; 
 

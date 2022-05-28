@@ -8,26 +8,47 @@
 
 
 ART_MODULE_INTERFACE(ArnMySampler)
-struct tile_t{
-    ArnLightAlphaImage** image;
-    double* samples;
-    IVec2D size;
-};
-typedef struct tile_t tile_t;
-struct image_window_t{
-    IVec2D start,end; 
-};
-typedef struct image_window_t image_window_t;
+typedef struct {
+        ArnLightAlphaImage** image;
+        double* samples;
+        IVec2D size;
+}tile_t;
+typedef struct image_window_t{
+        IVec2D start,end; 
+}image_window_t;
 
-struct task_t{
-    tile_t* work_tile;
-    image_window_t* window; 
-    int samples;
-    int sample_start;
-};
-typedef struct task_t task_t;
+typedef enum {
+        RENDER_TASK,
+        MERGE_TASK,
+        POISON
+}task_type_t;
+typedef struct {
+        task_type_t type;
+        tile_t* work_tile;
+        image_window_t* window; 
+        int samples;
+        int sample_start;
+}task_t;
 
-@interface ArnMySampler 
+typedef struct {
+        size_t tail,head,length,max_size;
+        task_t* data;    
+}queue_t;
+typedef struct {
+        queue_t queue;
+        queue_t* current;
+        pthread_mutex_t lock;
+        pthread_cond_t cond_var;
+} render_queue_t;
+typedef struct {
+        queue_t queue1,queue2;
+        queue_t* current,*inactive;
+
+        pthread_mutex_t lock;
+        pthread_cond_t cond_var;
+} merge_queue_t;
+
+@interface ArnTiledStochasticSampler 
         : ArnBinary
         <ArpImageSampler, ArpImageSamplerMessenger, ArpAction,ArpConcreteClass, ArpCoding>
 {
@@ -63,6 +84,7 @@ typedef struct task_t task_t;
         IVec2D                                imageSize;
         IPnt2D                                imageOrigin;
         IVec2D                                tile_size;
+        IVec2D  padded_tile_size;
 
         ArWavelengthSamplingData              spectralSamplingData;
         ArSpectralSampleSplattingData         spectralSplattingData;
@@ -73,7 +95,6 @@ typedef struct task_t task_t;
         BOOL* unfinished;
         BOOL finishedGeneratingRenderTasks;
         BOOL poisoned_render;
-        task_t* task_buffer;
         unsigned int numberOfImagesToWrite;
         image_window_t* render_windows;
         unsigned int window_iterator;
@@ -87,7 +108,6 @@ typedef struct task_t task_t;
         unsigned int tiles_Y;
 
         unsigned int    splattingKernelWidth;
-        unsigned int    splattingKernelWidthDiv2;
         unsigned int    splattingKernelArea;
         int             splattingKernelOffset;
 
@@ -108,7 +128,14 @@ typedef struct task_t task_t;
 
         ArcTevIntegration* tev;
         float * tev_update_tile;
-        IVec2D padded_tile_size;
+        ArLightAlpha* tev_light;
+        ArSpectrum* tev_spectrum;
+        ArRGB* tev_rgb;
+        char**  tev_names;
+
+        render_queue_t render_queue;
+        merge_queue_t merge_queue;
+
 }
 
 - (id) init

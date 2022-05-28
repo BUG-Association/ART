@@ -30,7 +30,7 @@
  */
 
 #import "ARM_Foundation.h"
-#include "ArnMySampler.h"
+
 
 ART_MODULE_INTERFACE(ARM_ImageSampler)
 
@@ -64,7 +64,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         ;
 @end
 
-@interface ArnMySampler ( ARM_Interface )
+@interface ArnTiledStochasticSampler ( ARM_Interface )
 
 - (id) sampleProvider
                                 : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
@@ -80,8 +80,8 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         ;
 
 @end
-#define MY_SAMPLER  \
-    ALLOC_OBJECT_AUTORELEASE(ArnMySampler)
+#define TILED_STOCHASTIC_SAMPLER  \
+    ALLOC_OBJECT_AUTORELEASE(ArnTiledStochasticSampler)
 
 @interface ArnStochasticImageSampler ( ARM_Interface )
 

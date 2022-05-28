@@ -1,15 +1,13 @@
-#include "ArLightAlpha.h"
-#include "ArRGB.h"
-#include "ArSpectrum.h"
-#include "ArcObject.h"
-#include "ColourConversionConstructorMacros.h"
-#include "include/ArRGB.h"
+#include "include/ART_SystemDatatypes.h"
+#include <stdio.h>
 #define ART_MODULE_NAME     ArnMySampler
 
 
 
+#include "ColourConversionConstructorMacros.h"
 
-#import "ArnMySampler.h"
+
+#import "ArnTiledStochasticSampler.h"
 
 #import "FoundationAssertionMacros.h"
 #import "ApplicationSupport.h"
@@ -24,6 +22,8 @@
 
 
 #define TILE_CONSTANT 3
+#define LOCALHOST "127.0.0.1"
+#define TEV_PORT 14158
 //TODO:handle fail states
 
 
@@ -80,33 +80,21 @@ void _image_sampler_sigint_handler(
     pthread_mutex_unlock( _signal_handler_mutex );
 }
 
-
-
-
-
-bool is_poison(task_t *t){
-    return NULL==t->work_tile;
-}
-
-struct queue_t{
-    size_t tail,head,length,max_size;
-    task_t** data;    
-};
-typedef struct queue_t queue_t;
-
 int div_roundup(int divident,int divisor){
     return (divident+(divisor-1))/divisor;
 }
 
-bool init_queue(queue_t* q,size_t task_number){
+void init_queue(queue_t* q,size_t task_number){
 
     q->tail=0;
     q->head=0;
     q->length=0;
     q->max_size=task_number;
-    q->data=ALLOC_ARRAY(task_t*, task_number);
-    
-    return (bool)q->data;
+    q->data=ALLOC_ARRAY_ZERO(task_t, task_number);
+    if(!q->data){
+        perror("Failed queue buffer allocation\n");
+        exit(1);
+    }
 }
 
 void free_queue(queue_t* q){
@@ -120,16 +108,26 @@ void pop_queue(queue_t* q){
     q->length--;
 }
 
-task_t* peek_queue(queue_t* q){
+task_t peek_queue(queue_t* q){
     return q->data[q->tail];
 }
 
-void push_queue(queue_t* q,task_t* t){
-    size_t head=q->head;
-    task_t** data=q->data;
-    data[head]=t;
-    head++;
-    q->head=head%q->max_size;
+void push_queue(queue_t* q,task_t t){
+    if(q->length+1>q->max_size){
+        size_t new_size=q->max_size+1;
+        task_t* new_ptr =REALLOC_ARRAY((q->data), task_t, new_size);
+        if(new_ptr){
+            q->data=new_ptr;
+            q->max_size=new_size;
+        }else{
+            perror("Failed queue buffer reallocation\n");
+            exit(1);
+        }
+    }
+    size_t head_idx=q->head;
+
+    q->data[head_idx]=t;
+    q->head=(head_idx+1)%q->max_size;
     q->length++;
 }
 
@@ -139,14 +137,10 @@ void push_queue(queue_t* q,task_t* t){
 #define SYNC_COND_PTR (&q->cond_var)
 #define SYNC_QUEUE (*q->current)
 #define SYNC_QUEUE_PTR (q->current)
-struct render_queue_t{
-    queue_t queue;
-    queue_t* current;
-    pthread_mutex_t lock;
-    pthread_cond_t cond_var;
-} render_queue;
-typedef struct render_queue_t render_queue_t;
 
+bool is_poison(task_t* t){
+    return POISON==t->type;
+}
 bool init_render_queue(render_queue_t* q,size_t task_number){
     SYNC_QUEUE_PTR=&q->queue;
     init_queue(SYNC_QUEUE_PTR,task_number);
@@ -162,18 +156,18 @@ void free_render_queue(render_queue_t* q){
     pthread_cond_destroy(SYNC_COND_PTR);
 }
 
-task_t* pop_render_queue(render_queue_t* q){
+task_t pop_render_queue(render_queue_t* q){
     pthread_mutex_lock(SYNC_LOCK_PTR);
     while(SYNC_QUEUE.length==0)
         pthread_cond_wait(SYNC_COND_PTR, SYNC_LOCK_PTR);
-    task_t* ret=peek_queue(SYNC_QUEUE_PTR);
-    if (!is_poison(ret))
+    task_t ret=peek_queue(SYNC_QUEUE_PTR);
+    if (!is_poison(&ret))
         pop_queue(SYNC_QUEUE_PTR);
     pthread_mutex_unlock(SYNC_LOCK_PTR);
     return ret;
 }
 
-void push_render_queue(render_queue_t*restrict q,task_t * restrict task){
+void push_render_queue(render_queue_t* q,task_t  task){
     pthread_mutex_lock(SYNC_LOCK_PTR);
     
     push_queue(SYNC_QUEUE_PTR, task);
@@ -183,14 +177,8 @@ void push_render_queue(render_queue_t*restrict q,task_t * restrict task){
 }
 
 
-struct merge_queue_t{
-    queue_t queue1,queue2;
-    queue_t* current,*inactive;
-     
-    pthread_mutex_t lock;
-    pthread_cond_t cond_var;
-} merge_queue;
-typedef struct merge_queue_t merge_queue_t;
+
+
 
 bool init_merge_queue(merge_queue_t* q,size_t task_number){
     SYNC_QUEUE_PTR=&q->queue1;
@@ -212,7 +200,7 @@ void free_merge_queue(merge_queue_t* q){
 
 
 
-void push_merge_queue(merge_queue_t* q,task_t* task){
+void push_merge_queue(merge_queue_t* q,task_t task){
     pthread_mutex_lock(SYNC_LOCK_PTR);
     push_queue(SYNC_QUEUE_PTR, task);
     pthread_mutex_unlock(SYNC_LOCK_PTR);
@@ -236,13 +224,13 @@ void swap_merge_queue(merge_queue_t* q){
 ART_MODULE_INITIALISATION_FUNCTION
 (
     (void) art_gv;
-    [ ArnMySampler registerWithRuntime ];
+    [ ArnTiledStochasticSampler registerWithRuntime ];
 )
 
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-@implementation ArnMySampler
+@implementation ArnTiledStochasticSampler
 
 - (void) init_tile
     :(tile_t*) tile
@@ -260,7 +248,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
             double,
             numberOfImagesToWrite*XC(tile->size) * YC(tile->size)
             );
-    [self clean_tile:tile];
 }
 
 - (void) clean_tile
@@ -299,7 +286,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         if (poisoned_render) {
             return false;
         }
-        t->work_tile=NULL;
+        t->type=POISON;
         poisoned_render=true;
         return true;
     }
@@ -307,6 +294,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     t->samples=samples_per_window;
     t->window=&render_windows[window_iterator];
     t->sample_start=samples_issued;
+    t->type=RENDER_TASK;
     [self task_next_iteration];
     return true;
 }
@@ -329,8 +317,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 
 
-ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnMySampler)
-ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
+ARPCONCRETECLASS_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
+ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
 
 - (void) setupInternalVariables
 {
@@ -381,7 +369,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
 
 - (id) copy
 {
-    ArnMySampler * copiedInstance = [ super copy ];
+    ArnTiledStochasticSampler * copiedInstance = [ super copy ];
 
     ART__CODE_IS_WORK_IN_PROGRESS__EXIT_WITH_ERROR
 
@@ -391,7 +379,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
 - (id) deepSemanticCopy
         : (ArnGraphTraversal *) traversal
 {
-    ArnMySampler  * copiedInstance =
+    ArnTiledStochasticSampler  * copiedInstance =
         [ super deepSemanticCopy
             :   traversal
             ];
@@ -485,10 +473,9 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
         outputImage[i] = image[i];
     imageSize = [ outputImage[0] size ];
     imageOrigin = [ outputImage[0] origin ];
+    
 
-    //get valid pixels bool array.
-    //ASK: difference in scanline
-    //size of this is 2MB for 1900x1080p picture if bool=1B
+
     unfinished=ALLOC_ARRAY(BOOL, YC(imageSize)*XC(imageSize));
     for ( int y = 0; y < YC(imageSize); y++ )
     {
@@ -624,7 +611,6 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     }  
   
     splattingKernelWidth  = [ RECONSTRUCTION_KERNEL supportSize ];
-    splattingKernelWidthDiv2 = splattingKernelWidth / 2;
     splattingKernelArea   = M_SQR( splattingKernelWidth );
     splattingKernelOffset = (splattingKernelWidth - 1) / 2;
     padded_tile_size=IVEC2D(XC(tile_size)+2*splattingKernelOffset,YC(tile_size)+2*splattingKernelOffset);
@@ -641,17 +627,32 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     }
     init_render_queue(&render_queue, buffer_size);
     init_merge_queue(&merge_queue, buffer_size);
-    task_buffer=ALLOC_ARRAY(task_t, buffer_size);
+    
     for (size_t i =0; i< buffer_size; i++) {
-        task_buffer[i].work_tile=&tiles[i];
-        if([self make_task: &task_buffer[i]]){
-            push_render_queue(&render_queue, &task_buffer[i]);
+        task_t task;
+        task.work_tile=&tiles[i];
+
+        if([self make_task: &task]){
+            push_render_queue(&render_queue, task);
         }
     }
     tev = [ ALLOC_INIT_OBJECT(ArcTevIntegration)];
-    [tev createImage: XC(imageSize) : YC(imageSize) ];
-    tev_update_tile =ALLOC_ARRAY(float, 3*XC(padded_tile_size)*YC(padded_tile_size));
+    [tev switchHost:LOCALHOST :TEV_PORT];
+    [tev tryConnection];
+    tev_names=ALLOC_ARRAY(char*,numberOfResultImages);
 
+    for (int i =0; i<numberOfResultImages; i++) {
+        const char* imgName=[ (ArnFileImage <ArpImage> *)outputImage[i] fileName ];
+        const char* tevSuffix=".tev_rgb";
+        size_t namelen=strlen(imgName)+strlen(tevSuffix)+1;
+        tev_names[i]=ALLOC_ARRAY(char,namelen);
+        sprintf(tev_names[i], "%s%s", imgName,tevSuffix);
+        [tev createImage:tev_names[i] :YES :"RGB" :3:XC(imageSize) :YC(imageSize) ];
+    }
+    tev_update_tile =ALLOC_ARRAY(float, 3*XC(padded_tile_size)*YC(padded_tile_size));
+    tev_light = arlightalpha_alloc(art_gv);
+    tev_spectrum = spc_alloc(art_gv);
+    tev_rgb =rgb_alloc(art_gv);
     
     // //   2D sample coordinates are pre-generated for the entire packet
 
@@ -858,8 +859,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     pthread_barrier_wait(&renderingDone);
     artime_now(&debugRender);
     task_t merge_poison;
-    merge_poison.work_tile=NULL;
-    push_merge_queue(&merge_queue, &merge_poison);
+    merge_poison.type=POISON;
+    push_merge_queue(&merge_queue, merge_poison);
 
     pthread_barrier_wait(&mergingDone);
     artime_now(&debugMerge);
@@ -897,10 +898,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnMySampler)
     (void) threadPool;
     
     while(!renderThreadsShouldTerminate){
-        task_t* curr_task= pop_render_queue(&render_queue);
-        if(is_poison(curr_task))
+        task_t curr_task= pop_render_queue(&render_queue);
+        if(is_poison(&curr_task))
             break;
-        [self render_task : curr_task: threadIndex];
+        [self render_task : &curr_task: threadIndex];
+        curr_task.type=MERGE_TASK;
         push_merge_queue(&merge_queue, curr_task);
     }
     
@@ -1128,20 +1130,19 @@ ArPixelID;
     while(true){
         swap_merge_queue(&merge_queue);
         
-        //todo:adaptively increase samples
+        if(merge_queue.inactive->length>=numberOfRenderThreads/2){
+            samples_per_window_adaptive=samples_per_window*2;
+        }
         while(merge_queue.inactive->length>0){
-            if(merge_queue.inactive->length>4){
-                printf("merging %lu",merge_queue.inactive->length);
-            }
-            task_t* curr_task=peek_queue(merge_queue.inactive);
-            if(is_poison(curr_task))
+            task_t curr_task=peek_queue(merge_queue.inactive);
+            if(is_poison(&curr_task))
             {
                 goto END;
             }
             pop_queue(merge_queue.inactive);
-            [self merge_task : curr_task];
-            [self tev_task : curr_task];
-            if([self make_task: curr_task]){
+            [self merge_task : &curr_task];
+            [self tev_task : &curr_task];
+            if([self make_task: &curr_task]){
                 push_render_queue(&render_queue, curr_task);
             }
         }
@@ -1190,12 +1191,6 @@ ArPixelID;
     XC(tev_window.end)=MIN(XC(t->window->end)+splattingKernelOffset,XC(imageSize));
     YC(tev_window.end)=MIN(YC(t->window->end)+splattingKernelOffset,YC(imageSize));
 
-    
-    ArLightAlpha* l = arlightalpha_alloc(art_gv);
-    ArSpectrum* s = spc_alloc(art_gv);
-    ArRGB* rgb =rgb_alloc(art_gv);
-
-    
     for ( unsigned int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
     {
         size_t i=0;
@@ -1208,12 +1203,12 @@ ArPixelID;
                 arlightalpha_l_init_l(
                         art_gv,
                         ARLIGHTALPHA_NONE_A0,
-                        l
+                        tev_light
                     );
                 arlightalpha_l_add_l(
                         art_gv,
                         merge_image.image[imgIdx]->data[x +y*XC(imageSize)],
-                        l
+                        tev_light
                     );
                 double  pixelSampleCount = merge_image.samples[ imgIdx*XC(imageSize) * YC(imageSize) + x +y*XC(imageSize)];
 
@@ -1222,18 +1217,14 @@ ArPixelID;
                     arlightalpha_d_mul_l(
                             art_gv,
                             1.0 / pixelSampleCount,
-                            l
+                            tev_light
                         );
                 }
-                arlightalpha_to_spc(art_gv, l, s);
-                spc_to_rgb(art_gv, s, rgb);
-                //ARFLOATRGB_OF_ARRGB(rgb);
+                arlightalpha_to_spc(art_gv, tev_light, tev_spectrum);
+                spc_to_rgb(art_gv, tev_spectrum, tev_rgb);
                 
-                ArFloatRGB frbg=ARFLOATRGB_OF_ARRGB((*rgb));
+                ArFloatRGB frbg=ARFLOATRGB_OF_ARRGB((*tev_rgb));
                 
-                // ARFLOATRGB(_r, _g, _b)
-                // rg
-                // frbg.c.x[1]
                 tev_update_tile[i]=ARRGB_R(frbg);
                 tev_update_tile[i+1]=ARRGB_G(frbg);
                 tev_update_tile[i+2]=ARRGB_B(frbg);
@@ -1241,16 +1232,25 @@ ArPixelID;
             }
 
         }
+
+
+        const int64_t channel_offsets[]={0,1,2};
+        const int64_t channel_strides[]={3,3,3};
+    
         [tev updateImage:
-            XC(tev_window.start) :
+            tev_names[imgIdx]:
+            NO:
+            "RGB":
+            3:
+            channel_offsets:
+            channel_strides:
+            XC(tev_window.start):
             YC(tev_window.start):
             XC(tev_window.end)-XC(tev_window.start) :
             YC(tev_window.end)-YC(tev_window.start) :
             tev_update_tile];
     }
-    arlightalpha_free(art_gv,l);
-    spc_free(art_gv,s);
-    rgb_free(art_gv,rgb);
+    
 }
 - (void)writeThread
     : (ArcUnsignedInteger *) threadIndex
@@ -1399,16 +1399,6 @@ ArPixelID;
                         );
                     double  pixelSampleCount = merge_image.samples[ imgIdx*XC(imageSize) * YC(imageSize) + x +y*XC(imageSize)];
 
-                    
-                    
-                    //ASK: SHOULD I ALSO ASSERT?
-                    // ASSERT_VALID_LIGHTALPHA(
-                    //     PIXEL_SAMPLE_VALUE(x,y,threadIdx,imgIdx)
-                    //     );
-                        
-                    
-                    
-                    
 
                     if ( pixelSampleCount > 0.0 )
                     {
@@ -1640,7 +1630,7 @@ ArPixelID;
             [ FILE_IMAGE
                 :   [ (ArnFileImage <ArpImage> *)outputImage[imgIdx] fileName ]
                 ];
-
+        
         [ localNodestack push
             :   HARD_NODE_REFERENCE(image)
             ];
@@ -1709,11 +1699,18 @@ ArPixelID;
     FREE_ARRAY(tiles);
 
     FREE_ARRAY(unfinished);
-    FREE_ARRAY(task_buffer);
     FREE_ARRAY(render_windows);
 
     RELEASE_OBJECT(tev);
     FREE_ARRAY(tev_update_tile);
+
+    for (int i =0; i<numberOfResultImages; i++) {
+        FREE_ARRAY(tev_names[i]);
+    }
+    FREE_ARRAY(tev_names);
+    arlightalpha_free(art_gv,tev_light);
+    spc_free(art_gv,tev_spectrum);
+    rgb_free(art_gv,tev_rgb);
 }
 
 - (void) performOn
@@ -1781,7 +1778,6 @@ ArPixelID;
         arlist_pop_noderef( & imageRefList, & imageRef );
 
         image[i] = (ArNode <ArpImageWriter> *)ARNODEREF_POINTER(imageRef);
-        
         [ nodeStack push
             :   HARD_NODE_REFERENCE(image[i])
             ];

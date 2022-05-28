@@ -38,6 +38,6 @@ ART_LIBRARY_INTERFACE(ART_ImageSampler)
 #import "ArnStochasticSampler.h"
 #import "ArnStochasticSamplerVerticalMirror.h"
 
-#import "ArnMySampler.h"
+#import "ArnTiledStochasticSampler.h"
 
 // ===========================================================================

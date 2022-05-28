@@ -115,7 +115,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 @end
 
-@implementation ArnMySampler ( ARM_Interface )
+@implementation ArnTiledStochasticSampler ( ARM_Interface )
 
 - (id) sampleProvider
 
