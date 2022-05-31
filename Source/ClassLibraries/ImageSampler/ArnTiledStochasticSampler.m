@@ -1,5 +1,6 @@
+
 #include "include/ART_SystemDatatypes.h"
-#include <stdio.h>
+#include <semaphore.h>
 #define ART_MODULE_NAME     ArnMySampler
 
 
@@ -19,41 +20,38 @@
 #include <signal.h>
 #include <unistd.h>
 #include <termios.h> 
+#include <stdlib.h>
 
 
 #define TILE_CONSTANT 3
 #define LOCALHOST "127.0.0.1"
 #define TEV_PORT 14158
-//TODO:handle fail states
 
 
-pthread_mutex_t  * _signal_handler_mutex;
-pthread_cond_t   * _signal_handler_cond;
 
-volatile sig_atomic_t  _received_signal;
-
-int _image_sampler_received_signal(
-        )
-{
-    return _received_signal;
+//ASK THIS MIGHT NOT BE IDEAL... These things should be in the instance, but without closures I am not sure how I would make it work.
+struct termios original;
+sem_t writeSem;
+sem_t writeTonemapSem;
+sem_t writeExitSem;
+render_queue_t render_queue;
+merge_queue_t merge_queue;
+void AtExit(){
+    tcsetattr( STDIN_FILENO, TCSANOW, & original );
 }
 
-void _image_sampler_reset_received_signals(
-        )
-{
-    _received_signal = 0;
-}
-
+void prepend_merge_queue(merge_queue_t* q,task_t task);
 void _image_sampler_sigusr1_handler(
         int  sig
         )
 {
     (void) sig;
-    
-    _received_signal = 1;
-    pthread_mutex_lock( _signal_handler_mutex );
-    pthread_cond_signal( _signal_handler_cond );
-    pthread_mutex_unlock( _signal_handler_mutex );
+    //   USR1 is "write a partially completed image, and go to sleep"
+    if(sem_trywait(&writeSem)==0){
+        task_t task;
+        task.type=WRITE;
+        prepend_merge_queue(&merge_queue,task);
+    }
 }
 
 void _image_sampler_sigusr2_handler(
@@ -61,11 +59,14 @@ void _image_sampler_sigusr2_handler(
         )
 {
     (void) sig;
-    
-    _received_signal = 2;
-    pthread_mutex_lock( _signal_handler_mutex );
-    pthread_cond_signal( _signal_handler_cond );
-    pthread_mutex_unlock( _signal_handler_mutex );
+    //   USR2 writes the current result image, but also tonemaps and
+    //   opens it.
+    if(sem_trywait(&writeTonemapSem)==0){
+        task_t task;
+        task.type=WRITE_TONEMAP;
+        prepend_merge_queue(&merge_queue,task);
+    }
+
 }
 
 void _image_sampler_sigint_handler(
@@ -73,12 +74,14 @@ void _image_sampler_sigint_handler(
         )
 {
     (void) sig;
-    
-    _received_signal = 3;
-    pthread_mutex_lock( _signal_handler_mutex );
-    pthread_cond_signal( _signal_handler_cond );
-    pthread_mutex_unlock( _signal_handler_mutex );
+    //   SIGINT writes the current result image, exits afterward.
+    if(sem_trywait(&writeExitSem)==0){
+        task_t task;
+        task.type=WRITE_EXIT;
+        prepend_merge_queue(&merge_queue,task);
+    }  
 }
+
 
 int div_roundup(int divident,int divisor){
     return (divident+(divisor-1))/divisor;
@@ -131,6 +134,28 @@ void push_queue(queue_t* q,task_t t){
     q->length++;
 }
 
+void prepend_queue(queue_t* q,task_t t){
+    if(q->length+1>q->max_size){
+        size_t new_size=q->max_size+1;
+        task_t* new_ptr =REALLOC_ARRAY((q->data), task_t, new_size);
+        if(new_ptr){
+            q->data=new_ptr;
+            q->max_size=new_size;
+        }else{
+            perror("Failed queue buffer reallocation\n");
+            exit(1);
+        }
+    }
+
+    
+    if(q->tail==0)
+        q->tail=q->max_size-1;
+    else
+        q->tail--;
+    q->data[q->tail]=t;
+    q->length++;
+}
+
 #define SYNC_LOCK (q->lock)
 #define SYNC_LOCK_PTR (&q->lock)
 #define SYNC_COND (q->cond_var)
@@ -138,9 +163,7 @@ void push_queue(queue_t* q,task_t t){
 #define SYNC_QUEUE (*q->current)
 #define SYNC_QUEUE_PTR (q->current)
 
-bool is_poison(task_t* t){
-    return POISON==t->type;
-}
+
 bool init_render_queue(render_queue_t* q,size_t task_number){
     SYNC_QUEUE_PTR=&q->queue;
     init_queue(SYNC_QUEUE_PTR,task_number);
@@ -161,7 +184,7 @@ task_t pop_render_queue(render_queue_t* q){
     while(SYNC_QUEUE.length==0)
         pthread_cond_wait(SYNC_COND_PTR, SYNC_LOCK_PTR);
     task_t ret=peek_queue(SYNC_QUEUE_PTR);
-    if (!is_poison(&ret))
+    if (ret.type!=POISON)
         pop_queue(SYNC_QUEUE_PTR);
     pthread_mutex_unlock(SYNC_LOCK_PTR);
     return ret;
@@ -203,6 +226,13 @@ void free_merge_queue(merge_queue_t* q){
 void push_merge_queue(merge_queue_t* q,task_t task){
     pthread_mutex_lock(SYNC_LOCK_PTR);
     push_queue(SYNC_QUEUE_PTR, task);
+    pthread_mutex_unlock(SYNC_LOCK_PTR);
+    pthread_cond_signal(SYNC_COND_PTR);
+}
+
+void prepend_merge_queue(merge_queue_t* q,task_t task){
+    pthread_mutex_lock(SYNC_LOCK_PTR);
+    prepend_queue(SYNC_QUEUE_PTR, task);
     pthread_mutex_unlock(SYNC_LOCK_PTR);
     pthread_cond_signal(SYNC_COND_PTR);
 }
@@ -294,7 +324,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     t->samples=samples_per_window;
     t->window=&render_windows[window_iterator];
     t->sample_start=samples_issued;
-    t->type=RENDER_TASK;
+    t->type=RENDER;
     [self task_next_iteration];
     return true;
 }
@@ -405,14 +435,12 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     (void)nCamera;
     pthread_barrier_init(&renderingDone, NULL, numberOfRenderThreads+1);
     pthread_barrier_init(&mergingDone, NULL, 2);
-    pthread_barrier_init(&final_write_barrier, NULL, 2);
     
-    pthread_mutex_init( & writeThreadMutex, NULL );
-    pthread_cond_init( & writeThreadCond, NULL);
-    sem_init(&tonemapAndOpenThreadSem, 0, 1);
+    
+    sem_init(&writeSem, 0, 1);
+    sem_init(&writeTonemapSem, 0, 1);
+    sem_init(&writeExitSem, 0, 1);
 
-    _signal_handler_mutex = & writeThreadMutex;
-    _signal_handler_cond  = & writeThreadCond;
     if ( overallNumberOfSamplesPerPixel == 0 )
     {
         asprintf(
@@ -473,8 +501,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         outputImage[i] = image[i];
     imageSize = [ outputImage[0] size ];
     imageOrigin = [ outputImage[0] origin ];
-    
-
+   
 
     unfinished=ALLOC_ARRAY(BOOL, YC(imageSize)*XC(imageSize));
     for ( int y = 0; y < YC(imageSize); y++ )
@@ -587,7 +614,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         & spectralSplattingData
         );
     [self init_tile: &merge_image : imageSize];
-    
+    [self clean_tile:&merge_image];
     tile_size=IVEC2D(16, 16);
 
     
@@ -637,7 +664,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         }
     }
     tev = [ ALLOC_INIT_OBJECT(ArcTevIntegration)];
-    [tev switchHost:LOCALHOST :TEV_PORT];
+    [tev setHost:LOCALHOST :TEV_PORT];
     [tev tryConnection];
     tev_names=ALLOC_ARRAY(char*,numberOfResultImages);
 
@@ -733,9 +760,12 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
                     = v - splattingKernelOffset;
             }
     }
-
+    
+    tcgetattr( STDIN_FILENO, & original );
+    atexit(AtExit);
     
 }
+
 
 - (void) sampleImage
         : (ArNode <ArpWorld> *) world
@@ -757,7 +787,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     [ sampleCounter start ];
     unsigned int i = 0;
     ArcUnsignedInteger  * index;
-    ArTime  debugStart, debugRender,debugMerge,debugWrite;
+    ArTime  debugStart, debugRender,debugMerge;
     artime_now(&debugStart);
     for ( ; i < numberOfRenderThreads; i++ )
     {
@@ -786,21 +816,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         "could not detach terminal I/O thread"
         );
 
-    index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i++ ];
-
-    if ( ! art_thread_detach(@selector(writeThread:), self,  index))
-    ART_ERRORHANDLING_FATAL_ERROR(
-        "could not detach terminal I/O thread"
-        );
-    
-
     struct sigaction sa;
-
-    _image_sampler_reset_received_signals();
-
-    sa.sa_handler = _image_sampler_sigusr1_handler;
     sa.sa_flags = 0;
     sigemptyset( & sa.sa_mask );
+
+    sa.sa_handler = _image_sampler_sigusr1_handler;
 
     if ( sigaction( SIGUSR1, & sa, NULL ) == -1 )
     {
@@ -832,62 +852,38 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         fprintf(stderr, "Error creating pipe to I/O thread\n");
     }
 
-    // //   Wait for the results to come in, and assemble them into a final
-    // //   result image.
-    
-    
-
-    // /* ------------------------------------------------------------------
-    //     IMPORTANT: unlike all other timings done in ART the duration of
-    //     the main image writing thread (from which the duration of the
-    //     whole ray-based rendering pass is computed) is based on elapsed
-    //     time, and not on system time used.
-    //     The reason for this is that the multi-threaded nature of the
-    //     pixel sampler makes most other options pretty useless. The
-    //     user time of the write thread is far less than the true rendering
-    //     time - it spends most of its time sleeping and waiting for the
-    //     rendering thread(s) - while the user time of the rendering
-    //     thread(s) might differ by a considerable amount. If you have
-    //     too much time on your hands you can try computing the average
-    //     of the rendering thread user times and returning _that_. :-)
-    // ---------------------------------------------------------------aw- */
-
-    
-
     artime_now( & beginTime );
 
     pthread_barrier_wait(&renderingDone);
+    //This shuts down the I/O watching thread for interactive mode
+    write( read_thread_pipe[1], "q", 1 );
     artime_now(&debugRender);
-    task_t merge_poison;
-    merge_poison.type=POISON;
-    push_merge_queue(&merge_queue, merge_poison);
-
+    if(sem_trywait(&writeExitSem)==0){
+        task_t task;
+        task.type=WRITE_EXIT;
+        push_merge_queue(&merge_queue,task);
+    }
     pthread_barrier_wait(&mergingDone);
     artime_now(&debugMerge);
     
-    pthread_mutex_lock(&writeThreadMutex);
-    workingThreadsAreDone=YES;
-    pthread_cond_signal(&writeThreadCond);
-    pthread_mutex_unlock(&writeThreadMutex);
+
     
 
     
     
-    //This shuts down the I/O watching thread for interactive mode
-    //ASK: WHERE EXACTLY IS A GOOD PLACE FOR THIS?
-    write( read_thread_pipe[1], "q", 1 );
+    artime_now( & endTime );
+    // int writeThreadWallClockDuration =
     
-    
-    
-    pthread_barrier_wait(&final_write_barrier);
-    artime_now(&debugWrite);
+
+    [ sampleCounter stop
+        :artime_seconds( & endTime )- artime_seconds( & beginTime)
+        ];
+
     printf("\n");
     printf("Rendering Took (render+merge) %f +%f=%f\n",
         artime_seconds(&debugRender)-artime_seconds(&debugStart),
         artime_seconds(&debugMerge)-artime_seconds(&debugRender),
-        artime_seconds(&debugMerge)-artime_seconds(&debugStart));
-    printf("Write time %f\n",artime_seconds(&debugWrite)-artime_seconds(&debugMerge));
-    
+        artime_seconds(&debugMerge)-artime_seconds(&debugStart));    
 }
 - (void)renderThread
     : (ArcUnsignedInteger *) threadIndex
@@ -899,10 +895,10 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     
     while(!renderThreadsShouldTerminate){
         task_t curr_task= pop_render_queue(&render_queue);
-        if(is_poison(&curr_task))
+        if(curr_task.type==POISON)
             break;
         [self render_task : &curr_task: threadIndex];
-        curr_task.type=MERGE_TASK;
+        curr_task.type=MERGE;
         push_merge_queue(&merge_queue, curr_task);
     }
     
@@ -1135,16 +1131,40 @@ ArPixelID;
         }
         while(merge_queue.inactive->length>0){
             task_t curr_task=peek_queue(merge_queue.inactive);
-            if(is_poison(&curr_task))
-            {
-                goto END;
-            }
             pop_queue(merge_queue.inactive);
-            [self merge_task : &curr_task];
-            [self tev_task : &curr_task];
-            if([self make_task: &curr_task]){
-                push_render_queue(&render_queue, curr_task);
+            switch (curr_task.type) {
+                case MERGE:
+                    [self merge_task : &curr_task];
+                    [self tev_task : &curr_task];
+                    if([self make_task: &curr_task]){
+                        push_render_queue(&render_queue, curr_task);
+                    }
+                    break;
+                case WRITE:
+                    [self writeImage];
+                    sem_post(&writeSem);
+                    break;
+                case WRITE_TONEMAP:
+                    [self writeImage];
+                    ArcUnsignedInteger  * index = [ 
+                        ALLOC_INIT_OBJECT(ArcUnsignedInteger):numberOfRenderThreads+2];
+
+                    if ( ! art_thread_detach(@selector(tonemapAndOpenProc:), self,  index))
+                        ART_ERRORHANDLING_FATAL_ERROR(
+                            "could not detach intermediate result tone mapping "
+                            "& display thread"
+                            );
+                    break;
+                case WRITE_EXIT:
+                    renderThreadsShouldTerminate = YES;
+                    [self writeImage];
+                case POISON:
+                    goto END;
+                default:
+                    break;
             }
+            
+            
         }
     }
     END: 
@@ -1194,12 +1214,12 @@ ArPixelID;
     for ( unsigned int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
     {
         size_t i=0;
-        //TODO make this work for multiple images
         for ( int y = YC(tev_window.start); y < YC(tev_window.end); y++ )
         {
             for ( int x = XC(tev_window.start); x < XC(tev_window.end); x++ )
             {
-                
+                size_t idx=x +y*XC(imageSize);
+                double  pixelSampleCount = merge_image.samples[ imgIdx*XC(imageSize) * YC(imageSize) + idx];
                 arlightalpha_l_init_l(
                         art_gv,
                         ARLIGHTALPHA_NONE_A0,
@@ -1207,10 +1227,9 @@ ArPixelID;
                     );
                 arlightalpha_l_add_l(
                         art_gv,
-                        merge_image.image[imgIdx]->data[x +y*XC(imageSize)],
+                        merge_image.image[imgIdx]->data[idx],
                         tev_light
                     );
-                double  pixelSampleCount = merge_image.samples[ imgIdx*XC(imageSize) * YC(imageSize) + x +y*XC(imageSize)];
 
                 if ( pixelSampleCount > 0.0 )
                 {
@@ -1252,239 +1271,161 @@ ArPixelID;
     }
     
 }
-- (void)writeThread
-    : (ArcUnsignedInteger *) threadIndex
+- (void)writeImage
 {
-    NSAutoreleasePool  * threadPool;
-    threadPool = [ [ NSAutoreleasePool alloc ] init ];
-    (void) threadPool;
-    //ASK:THIS IS MAYBE NOT GOOD
-    pthread_mutex_lock( & writeThreadMutex );    
-    do
+   
+    unsigned int  overallNumberOfPixels = YC(imageSize) * XC(imageSize);
+    double writeThreadWallClockDuration;
+    ArnLightAlphaImage  *  out =
+            [ ALLOC_OBJECT(ArnLightAlphaImage)
+                initWithSize
+                :   IVEC2D(XC(imageSize), YC(imageSize))
+                ];
+
+    for ( unsigned int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
     {
+        //   first, we figure out the average number of samples per pixel
+        //   this goes into the image statistics that are saved
+        //   along with the command line
         
-        pthread_cond_wait( & writeThreadCond, & writeThreadMutex );
+        unsigned int  maxSamples = 0;
+        unsigned int  minSamples = 0xffffffff;
+
+        unsigned long int  overallSampleCount = 0;
+        unsigned long int  nonzeroPixels = 0;
         
-        //   we splice all the thread images, and write them to disk
-        
-        unsigned int  overallNumberOfPixels = YC(imageSize) * XC(imageSize);
-        double writeThreadWallClockDuration;
-        ArnLightAlphaImage  * out =
-                [ ALLOC_OBJECT(ArnLightAlphaImage)
-                    initWithSize
-                    :   IVEC2D(XC(imageSize), YC(imageSize))
-                    ];
-        for ( unsigned int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
+        for ( int y = 0; y < YC(imageSize); y++ )
         {
-            //   first, we figure out the average number of samples per pixel
-            //   this goes into the image statistics that are saved
-            //   along with the command line
-            
-            unsigned int  maxSamples = 0;
-            unsigned int  minSamples = 0xffffffff;
-
-            unsigned long int  overallSampleCount = 0;
-            unsigned long int  nonzeroPixels = 0;
-            
-            for ( int y = 0; y < YC(imageSize); y++ )
+            for ( int x = 0; x < XC(imageSize); x++ )
             {
-                for ( int x = 0; x < XC(imageSize); x++ )
+                unsigned int  pixelSampleCount = 0;
+                size_t idx=x +y*XC(imageSize);
+                //ASK: this is weird... why are we doing this with int and not doubles???
+                pixelSampleCount +=merge_image.samples[ 
+                    imgIdx*XC(imageSize) * YC(imageSize) + idx];
+                
+                if ( pixelSampleCount > 0 )
                 {
-                    unsigned int  pixelSampleCount = 0;
-                    //ASK: this is weird... why are we doing this with int and not doubles???
-                    pixelSampleCount +=merge_image.samples[ 
-                        imgIdx*XC(imageSize) * YC(imageSize) + x +y*XC(imageSize)];
+                    nonzeroPixels++;
+                
+                    if ( pixelSampleCount < minSamples )
+                        minSamples = pixelSampleCount;
                     
-                    if ( pixelSampleCount > 0 )
-                    {
-                        nonzeroPixels++;
-                    
-                        if ( pixelSampleCount < minSamples )
-                            minSamples = pixelSampleCount;
-                        
-                        overallSampleCount += pixelSampleCount;
-                    }
-                    
-                    if ( pixelSampleCount > maxSamples )
-                        maxSamples = pixelSampleCount;
+                    overallSampleCount += pixelSampleCount;
                 }
+                
+                if ( pixelSampleCount > maxSamples )
+                    maxSamples = pixelSampleCount;
             }
+        }
 
-            unsigned int  avgSamples = 0;
-            
+        unsigned int  avgSamples = 0;
+        
+        if ( nonzeroPixels > 0 )
+        {
+            avgSamples = (unsigned int)
+                ( (double) overallSampleCount / (double) nonzeroPixels );
+        }
+        
+        char  * samplecountString = NULL;
+        
+        double  percentageOfZeroPixels =
+            ( 1.0 - ( 1.0 * nonzeroPixels / overallNumberOfPixels )) * 100.0;
+
+        if ( percentageOfZeroPixels > 1.0 )
+        {
             if ( nonzeroPixels > 0 )
             {
-                avgSamples = (unsigned int)
-                    ( (double) overallSampleCount / (double) nonzeroPixels );
-            }
-            
-            char  * samplecountString = NULL;
-            
-            double  percentageOfZeroPixels =
-                ( 1.0 - ( 1.0 * nonzeroPixels / overallNumberOfPixels )) * 100.0;
-
-            if ( percentageOfZeroPixels > 1.0 )
-            {
-                if ( nonzeroPixels > 0 )
-                {
-                    asprintf(
-                        & samplecountString,
-                          "%.0f%% pixels with zero samples,"
-                          " rest: %d/%d/%d min/avg/max spp",
-                          percentageOfZeroPixels,
-                          minSamples,
-                          avgSamples,
-                          maxSamples
-                        );
-                }
-                else
-                {
-                    asprintf(
-                        & samplecountString,
-                          "0 spp"
-                        );
-                }
+                asprintf(
+                    & samplecountString,
+                        "%.0f%% pixels with zero samples,"
+                        " rest: %d/%d/%d min/avg/max spp",
+                        percentageOfZeroPixels,
+                        minSamples,
+                        avgSamples,
+                        maxSamples
+                    );
             }
             else
             {
                 asprintf(
                     & samplecountString,
-                      "%d/%d/%d min/avg/max spp",
-                      minSamples,
-                      avgSamples,
-                      maxSamples
+                        "0 spp"
                     );
             }
-
-            [ outputImage[imgIdx] setSamplecountString
-                :   samplecountString
-                ];
-            
-            FREE( samplecountString );
-
-            artime_now( & endTime );
-
-            writeThreadWallClockDuration =
-                  artime_seconds( & endTime )
-                - artime_seconds( & beginTime);
-
-            char  * rendertimeString = NULL;
-            
+        }
+        else
+        {
             asprintf(
-                & rendertimeString,
-                  "%.0f seconds",
-                  writeThreadWallClockDuration
+                & samplecountString,
+                    "%d/%d/%d min/avg/max spp",
+                    minSamples,
+                    avgSamples,
+                    maxSamples
                 );
+        }
 
-            [ outputImage[imgIdx] setRendertimeString
-                :   rendertimeString
-                ];
-            
-            FREE( rendertimeString );
-            
-            for ( int y = 0; y < YC(imageSize); y++ )
+        [ outputImage[imgIdx] setSamplecountString
+            :   samplecountString
+            ];
+        
+        FREE( samplecountString );
+
+        artime_now( & endTime );
+
+        writeThreadWallClockDuration =
+                artime_seconds( & endTime )
+            - artime_seconds( & beginTime);
+
+        char  * rendertimeString = NULL;
+        
+        asprintf(
+            & rendertimeString,
+                "%.0f seconds",
+                writeThreadWallClockDuration
+            );
+
+        [ outputImage[imgIdx] setRendertimeString
+            :   rendertimeString
+            ];
+        
+        FREE( rendertimeString );
+        
+        for ( int y = 0; y < YC(imageSize); y++ )
+        {
+            for ( int x = 0; x < XC(imageSize); x++ )
             {
-                for ( int x = 0; x < XC(imageSize); x++ )
-                {
-                    
-                    arlightalpha_l_init_l(
-                          art_gv,
-                          ARLIGHTALPHA_NONE_A0,
-                          out->data[XC(imageSize)*y+x]
-                        );
-                    arlightalpha_l_add_l(
-                            art_gv,
-                            merge_image.image[imgIdx]->data[x +y*XC(imageSize)],
-                            out->data[XC(imageSize)*y+x]
-                        );
-                    double  pixelSampleCount = merge_image.samples[ imgIdx*XC(imageSize) * YC(imageSize) + x +y*XC(imageSize)];
-
-
-                    if ( pixelSampleCount > 0.0 )
-                    {
-                        arlightalpha_d_mul_l(
-                              art_gv,
-                              1.0 / pixelSampleCount,
-                              out->data[XC(imageSize)*y+x]
-                            );
-                    }
-                }
-
-            }
-            [ outputImage[imgIdx] setPlainImage
-                :   IPNT2D(0,0)
-                :   out
-                ];
-        }
-        RELEASE_OBJECT(out);
-        
-        //   We might have been woken by a SIGUSR sent by 'impresario'.
-        
-        //   USR1 is "write a partially completed image, and go to sleep"
-        //   So we just reset the flag, if we were woken by this (work already
-        //   done by the code above).
-        
-        int  receivedSignal =
-            _image_sampler_received_signal();
-        
-        if ( receivedSignal == 1 )
-        {
-            _image_sampler_reset_received_signals();
-        }
-        
-        //   USR2 writes the current result image, but also tonemaps and
-        //   opens it.
-        
-        if ( receivedSignal == 2 )
-        {
-            _image_sampler_reset_received_signals();
-            
-            //   The semaphore basically only ensures that at most, there is only
-            //   one tone mapping thread going on at any time.
-            //   (so that one cannot shoot down 'artist' by bombarding it with
-            //   SIGUSR2 signals)
-            
-            //   The semaphore is incremented by the tone mapping thread, once it is
-            //   done.
-            sem_wait(&tonemapAndOpenThreadSem);
-            
-
-            
-
-            ArcUnsignedInteger  * index =
-                [ ALLOC_INIT_OBJECT(ArcUnsignedInteger)
-                    :   numberOfRenderThreads+3
-                    ];
-
-            if ( ! art_thread_detach(@selector(tonemapAndOpenProc:), self,  index))
-                ART_ERRORHANDLING_FATAL_ERROR(
-                    "could not detach intermediate result tone mapping "
-                    "& display thread"
+                size_t idx=XC(imageSize)*y+x;
+                arlightalpha_l_init_l(
+                        art_gv,
+                        ARLIGHTALPHA_NONE_A0,
+                        out->data[idx]
                     );
-        }
+                arlightalpha_l_add_l(
+                        art_gv,
+                        merge_image.image[imgIdx]->data[idx],
+                        out->data[idx]
+                    );
+                double  pixelSampleCount = merge_image.samples[ imgIdx*overallNumberOfPixels + idx];
 
-        if ( receivedSignal == 3 )
-        {
-            _image_sampler_reset_received_signals();
-            signal(SIGINT, SIG_DFL);
-            renderThreadsShouldTerminate = YES;
+
+                if ( pixelSampleCount > 0.0 )
+                {
+                    arlightalpha_d_mul_l(
+                            art_gv,
+                            1.0 / pixelSampleCount,
+                            out->data[idx]
+                        );
+                }
+            }
+
         }
+        [ outputImage[imgIdx] setPlainImage
+            :   IPNT2D(0,0)
+            :   out
+            ];
     }
-    while( ! workingThreadsAreDone );
-    artime_now( & endTime );
-
-    int writeThreadWallClockDuration =
-          artime_seconds( & endTime )
-        - artime_seconds( & beginTime);
-
-    [ sampleCounter stop
-        :  writeThreadWallClockDuration
-        ];
-
-    
-    
-    pthread_mutex_unlock( & writeThreadMutex );
-    pthread_barrier_wait(&final_write_barrier);
+    RELEASE_OBJECT(out);
 }
 - (void) terminalIOThread
     : (ArcUnsignedInteger *) threadIndex
@@ -1498,11 +1439,10 @@ ArPixelID;
     {
         setvbuf(stdout,NULL,_IONBF,0);
 
-        struct termios old_termios, new_termios;
+        struct termios new_termios;
         
-        tcgetattr( STDIN_FILENO, & old_termios );
+        tcgetattr( STDIN_FILENO, & new_termios );
 
-        new_termios = old_termios;
 
         // disable canonical mode and echo
         new_termios.c_lflag &= (~ICANON & ~ECHO);
@@ -1576,9 +1516,8 @@ ArPixelID;
         }
         //   we only terminate if we got a 'q' via the pipe, not via the
         //   keyboard
+        // ASK: why are we bothering with the pipe???
         while( !( line[0] == 'q' && lenB > 0 ) );
-
-        tcsetattr( 0, TCSANOW, & old_termios );
     }
         
 }
@@ -1648,7 +1587,7 @@ ArPixelID;
     [ threadPool release ];
 
     //   Release the semaphore
-    sem_post(&tonemapAndOpenThreadSem);
+    sem_post(&writeTonemapSem);
 }
 - (void) cleanupAfterImageSampling
         : (ArNode <ArpWorld> *) world
@@ -1661,11 +1600,12 @@ ArPixelID;
     free_merge_queue(&merge_queue);
     pthread_barrier_destroy(&renderingDone);
     pthread_barrier_destroy(&mergingDone);
-    pthread_barrier_destroy(&final_write_barrier);
-    pthread_mutex_destroy(&writeThreadMutex);
-    pthread_cond_destroy(&writeThreadCond);
-    sem_destroy(&tonemapAndOpenThreadSem);
+    sem_destroy(&writeSem);
+    sem_destroy(&writeTonemapSem);
+    sem_destroy(&writeExitSem);
     RELEASE_OBJECT( sampleCounter );
+    
+    FREE_ARRAY(preSamplingMessage);
 
     for ( unsigned int i = 0; i < numberOfRenderThreads; i++ )
     {

@@ -20,7 +20,7 @@ typedef  struct {
 @property BOOL connected;
 - (id) init
         ;
-- (void) switchHost
+- (void) setHost
         :(const char*) hostName
         :(uint32_t) hostPort
         ;

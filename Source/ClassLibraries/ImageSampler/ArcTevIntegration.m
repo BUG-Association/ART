@@ -159,7 +159,7 @@ void char_buff_set_len(message_buffer * buff){
     clean_char_buff(&buffer);
     char_buff_append_uint32(&buffer, 0); //reserved for length
 }
-- (void) switchHost
+- (void) setHost
     :(const char*) hostName
     :(uint32_t) hostPort
 {

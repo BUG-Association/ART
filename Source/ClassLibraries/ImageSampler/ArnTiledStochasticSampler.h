@@ -18,9 +18,12 @@ typedef struct image_window_t{
 }image_window_t;
 
 typedef enum {
-        RENDER_TASK,
-        MERGE_TASK,
-        POISON
+        RENDER,
+        MERGE,
+        WRITE,
+        WRITE_TONEMAP,
+        WRITE_EXIT,
+        POISON,
 }task_type_t;
 typedef struct {
         task_type_t type;
@@ -121,10 +124,8 @@ typedef struct {
         ArTime  beginTime, endTime;
         pthread_barrier_t renderingDone;
         pthread_barrier_t mergingDone;
-        pthread_barrier_t final_write_barrier;
-        pthread_mutex_t                       writeThreadMutex;
-        pthread_cond_t                        writeThreadCond;
-        sem_t tonemapAndOpenThreadSem;
+
+
 
         ArcTevIntegration* tev;
         float * tev_update_tile;
@@ -133,9 +134,10 @@ typedef struct {
         ArRGB* tev_rgb;
         char**  tev_names;
 
-        render_queue_t render_queue;
-        merge_queue_t merge_queue;
 
+        
+
+        
 }
 
 - (id) init
