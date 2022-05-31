@@ -133,7 +133,7 @@ typedef struct {
         ArSpectrum* tev_spectrum;
         ArRGB* tev_rgb;
         char**  tev_names;
-
+        ArnLightAlphaImage  *  out;
 
         
 

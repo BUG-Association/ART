@@ -760,7 +760,11 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
                     = v - splattingKernelOffset;
             }
     }
-    
+    out =
+            [ ALLOC_OBJECT(ArnLightAlphaImage)
+                initWithSize
+                :   IVEC2D(XC(imageSize), YC(imageSize))
+                ];
     tcgetattr( STDIN_FILENO, & original );
     atexit(AtExit);
     
@@ -773,22 +777,16 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         : (ArNode <ArpImageWriter> **) image
         : (int) numberOfResultImages
 {
+
+
+    //   This function sets the stage for the rendering processes to do their
+    //   work, starts them, and then sleeps until they are done.
     
-
-
-
-    // pthread_mutex_lock( & writeThreadMutex );
-
-    // //   This function sets the stage for the rendering processes to do their
-    // //   work, starts them, and then sleeps until they are done.
-    
-    // //   Detach n render threads.
+    //   Detach n render threads.
 
     [ sampleCounter start ];
     unsigned int i = 0;
     ArcUnsignedInteger  * index;
-    ArTime  debugStart, debugRender,debugMerge;
-    artime_now(&debugStart);
     for ( ; i < numberOfRenderThreads; i++ )
     {
         index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
@@ -857,33 +855,18 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     pthread_barrier_wait(&renderingDone);
     //This shuts down the I/O watching thread for interactive mode
     write( read_thread_pipe[1], "q", 1 );
-    artime_now(&debugRender);
     if(sem_trywait(&writeExitSem)==0){
         task_t task;
         task.type=WRITE_EXIT;
         push_merge_queue(&merge_queue,task);
     }
     pthread_barrier_wait(&mergingDone);
-    artime_now(&debugMerge);
-    
 
-    
-
-    
-    
     artime_now( & endTime );
-    // int writeThreadWallClockDuration =
-    
 
     [ sampleCounter stop
         :artime_seconds( & endTime )- artime_seconds( & beginTime)
         ];
-
-    printf("\n");
-    printf("Rendering Took (render+merge) %f +%f=%f\n",
-        artime_seconds(&debugRender)-artime_seconds(&debugStart),
-        artime_seconds(&debugMerge)-artime_seconds(&debugRender),
-        artime_seconds(&debugMerge)-artime_seconds(&debugStart));    
 }
 - (void)renderThread
     : (ArcUnsignedInteger *) threadIndex
@@ -1276,11 +1259,7 @@ ArPixelID;
    
     unsigned int  overallNumberOfPixels = YC(imageSize) * XC(imageSize);
     double writeThreadWallClockDuration;
-    ArnLightAlphaImage  *  out =
-            [ ALLOC_OBJECT(ArnLightAlphaImage)
-                initWithSize
-                :   IVEC2D(XC(imageSize), YC(imageSize))
-                ];
+    
 
     for ( unsigned int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
     {
@@ -1425,7 +1404,6 @@ ArPixelID;
             :   out
             ];
     }
-    RELEASE_OBJECT(out);
 }
 - (void) terminalIOThread
     : (ArcUnsignedInteger *) threadIndex
@@ -1651,6 +1629,8 @@ ArPixelID;
     arlightalpha_free(art_gv,tev_light);
     spc_free(art_gv,tev_spectrum);
     rgb_free(art_gv,tev_rgb);
+    RELEASE_OBJECT(out);
+
 }
 
 - (void) performOn
