@@ -1,6 +1,8 @@
 
+#include "ArcMessageQueue.h"
 #include "include/ART_SystemDatatypes.h"
 #include <semaphore.h>
+#include <stdio.h>
 #define ART_MODULE_NAME     ArnMySampler
 
 
@@ -29,11 +31,10 @@
 
 
 
-//ASK THIS MIGHT NOT BE IDEAL... These things should be in the instance, but without closures I am not sure how I would make it work.
 struct termios original;
 sem_t writeSem;
-sem_t writeTonemapSem;
-sem_t writeExitSem;
+// sem_t writeTonemapSem;
+// sem_t writeExitSem;
 render_queue_t render_queue;
 merge_queue_t merge_queue;
 void AtExit(){
@@ -41,45 +42,25 @@ void AtExit(){
 }
 
 void prepend_merge_queue(merge_queue_t* q,task_t task);
-void _image_sampler_sigusr1_handler(
-        int  sig
-        )
-{
-    (void) sig;
-    //   USR1 is "write a partially completed image, and go to sleep"
-    if(sem_trywait(&writeSem)==0){
+
+void try_prepend_merge_queue(sem_t* semaphore,task_type_t type){
+    if(semaphore==NULL||sem_trywait(semaphore)==0){
         task_t task;
-        task.type=WRITE;
+        task.type=type;
         prepend_merge_queue(&merge_queue,task);
-    }
+    }  
 }
-
-void _image_sampler_sigusr2_handler(
-        int  sig
-        )
-{
-    (void) sig;
-    //   USR2 writes the current result image, but also tonemaps and
-    //   opens it.
-    if(sem_trywait(&writeTonemapSem)==0){
-        task_t task;
-        task.type=WRITE_TONEMAP;
-        prepend_merge_queue(&merge_queue,task);
-    }
-
-}
-
 void _image_sampler_sigint_handler(
         int  sig
         )
 {
     (void) sig;
     //   SIGINT writes the current result image, exits afterward.
-    if(sem_trywait(&writeExitSem)==0){
+    if(sem_wait(&writeSem)==0){
         task_t task;
         task.type=WRITE_EXIT;
         prepend_merge_queue(&merge_queue,task);
-    }  
+    } 
 }
 
 
@@ -95,8 +76,7 @@ void init_queue(queue_t* q,size_t task_number){
     q->max_size=task_number;
     q->data=ALLOC_ARRAY_ZERO(task_t, task_number);
     if(!q->data){
-        perror("Failed queue buffer allocation\n");
-        exit(1);
+        ART_ERRORHANDLING_FATAL_ERROR("Failed queue buffer allocation");
     }
 }
 
@@ -123,8 +103,8 @@ void push_queue(queue_t* q,task_t t){
             q->data=new_ptr;
             q->max_size=new_size;
         }else{
-            perror("Failed queue buffer reallocation\n");
-            exit(1);
+            ART_ERRORHANDLING_FATAL_ERROR("Failed queue buffer reallocation\n");
+
         }
     }
     size_t head_idx=q->head;
@@ -142,8 +122,8 @@ void prepend_queue(queue_t* q,task_t t){
             q->data=new_ptr;
             q->max_size=new_size;
         }else{
-            perror("Failed queue buffer reallocation\n");
-            exit(1);
+            ART_ERRORHANDLING_FATAL_ERROR("Failed queue buffer reallocation");
+
         }
     }
 
@@ -438,8 +418,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     
     
     sem_init(&writeSem, 0, 1);
-    sem_init(&writeTonemapSem, 0, 1);
-    sem_init(&writeExitSem, 0, 1);
+
 
     if ( overallNumberOfSamplesPerPixel == 0 )
     {
@@ -467,6 +446,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
             :  overallNumberOfSamplesPerPixel
             ];
     
+    messageQueue= [ALLOC_INIT_OBJECT(ArcMessageQueue)];
     
     randomGenerator =
         ALLOC_ARRAY(
@@ -664,16 +644,17 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         }
     }
     tev = [ ALLOC_INIT_OBJECT(ArcTevIntegration)];
-    [tev setHost:LOCALHOST :TEV_PORT];
+    [tev setHostName:LOCALHOST ];
+    [tev setHostPort:TEV_PORT];
     [tev tryConnection];
     tev_names=ALLOC_ARRAY(char*,numberOfResultImages);
 
     for (int i =0; i<numberOfResultImages; i++) {
         const char* imgName=[ (ArnFileImage <ArpImage> *)outputImage[i] fileName ];
         const char* tevSuffix=".tev_rgb";
-        size_t namelen=strlen(imgName)+strlen(tevSuffix)+1;
-        tev_names[i]=ALLOC_ARRAY(char,namelen);
-        sprintf(tev_names[i], "%s%s", imgName,tevSuffix);
+        asprintf(&tev_names[i],"%s%s", imgName,tevSuffix);
+    }
+    for (int i =0; i<numberOfResultImages; i++) {
         [tev createImage:tev_names[i] :YES :"RGB" :3:XC(imageSize) :YC(imageSize) ];
     }
     tev_update_tile =ALLOC_ARRAY(float, 3*XC(padded_tile_size)*YC(padded_tile_size));
@@ -761,10 +742,10 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
             }
     }
     out =
-            [ ALLOC_OBJECT(ArnLightAlphaImage)
-                initWithSize
-                :   IVEC2D(XC(imageSize), YC(imageSize))
-                ];
+        [ ALLOC_OBJECT(ArnLightAlphaImage)
+            initWithSize
+            :   IVEC2D(XC(imageSize), YC(imageSize))
+            ];
     tcgetattr( STDIN_FILENO, & original );
     atexit(AtExit);
     
@@ -814,28 +795,16 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         "could not detach terminal I/O thread"
         );
 
+    index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i++ ];
+
+    if ( ! art_thread_detach(@selector(MessageQueueThread:), self,  index))
+    ART_ERRORHANDLING_FATAL_ERROR(
+        "could not detach Message Queue thread"
+        );
+
     struct sigaction sa;
     sa.sa_flags = 0;
     sigemptyset( & sa.sa_mask );
-
-    sa.sa_handler = _image_sampler_sigusr1_handler;
-
-    if ( sigaction( SIGUSR1, & sa, NULL ) == -1 )
-    {
-        ART_ERRORHANDLING_FATAL_ERROR(
-            "could not install handler for SIGUSR1"
-            );
-    }
-
-    sa.sa_handler = _image_sampler_sigusr2_handler;
-
-    if ( sigaction( SIGUSR2, & sa, NULL ) == -1 )
-    {
-        ART_ERRORHANDLING_FATAL_ERROR(
-            "could not install handler for SIGUSR2"
-            );
-    }
-
     sa.sa_handler = _image_sampler_sigint_handler;
 
     if ( sigaction( SIGINT, & sa, NULL ) == -1 )
@@ -855,11 +824,12 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     pthread_barrier_wait(&renderingDone);
     //This shuts down the I/O watching thread for interactive mode
     write( read_thread_pipe[1], "q", 1 );
-    if(sem_trywait(&writeExitSem)==0){
-        task_t task;
-        task.type=WRITE_EXIT;
-        push_merge_queue(&merge_queue,task);
-    }
+
+    
+    task_t task;
+    task.type=WRITE_EXIT;
+    push_merge_queue(&merge_queue,task);
+    
     pthread_barrier_wait(&mergingDone);
 
     artime_now( & endTime );
@@ -868,6 +838,44 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         :artime_seconds( & endTime )- artime_seconds( & beginTime)
         ];
 }
+
+- (void)MessageQueueThread
+    : (ArcUnsignedInteger *) threadIndex
+{
+    
+    NSAutoreleasePool  * threadPool;
+    threadPool = [ [ NSAutoreleasePool alloc ] init ];
+    (void) threadPool;
+    (void) threadIndex;
+    
+    while(!renderThreadsShouldTerminate){
+        message_t msg= [messageQueue receiveMessage];
+        switch(msg.type){
+            case M_WRITE:
+                try_prepend_merge_queue(&writeSem,WRITE);
+                break;
+            case M_WRITE_TONEMAP:
+                try_prepend_merge_queue(&writeSem,WRITE_TONEMAP);
+                break;
+            case M_TERMINATE:
+                _image_sampler_sigint_handler(0);
+                break;
+            case M_PORT:
+                [tev setHostPort:*(uint32_t*)(msg.message_data)];
+                break;
+            case M_HOST:
+                [tev setHostName:msg.message_data];
+                break;
+            case M_TEV_CONNECT:
+                try_prepend_merge_queue(NULL,TEV_CONNECT);
+                break;
+            case M_INVALID:
+                return;
+        }
+    }
+
+}
+
 - (void)renderThread
     : (ArcUnsignedInteger *) threadIndex
 {
@@ -875,6 +883,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     NSAutoreleasePool  * threadPool;
     threadPool = [ [ NSAutoreleasePool alloc ] init ];
     (void) threadPool;
+    (void) threadIndex;
     
     while(!renderThreadsShouldTerminate){
         task_t curr_task= pop_render_queue(&render_queue);
@@ -905,11 +914,7 @@ ArPixelID;
         ALLOC_ARRAY( ArPathspaceResult *, numberOfImagesToWrite );
     
     ArPixelID  px_id;
-    // arlightalpha_to_spc(const ART_GV *art_gv, const ArLightAlpha *c0, ArSpectrum *cr)
-    // to_rgb
-    // spc_to_rgb(const ART_GV *art_gv, const ArSpectrum *c0, ArRGB *cr)
-    // arlightalpha_
-    // spc_to_rgba32(const ART_GV *art_gv, const ArSpectrum *c0, ArRGBA32 *cr)
+
     px_id.threadIndex = THREAD_INDEX;
     px_id.globalRandomSeed = arrandom_global_seed(art_gv);
     for (int y=YC(t->window->start); y<YC(t->window->end); y++) {
@@ -1105,6 +1110,7 @@ ArPixelID;
     NSAutoreleasePool  * threadPool;
     threadPool = [ [ NSAutoreleasePool alloc ] init ];
     (void) threadPool;
+    (void) threadIndex;
     
     while(true){
         swap_merge_queue(&merge_queue);
@@ -1130,7 +1136,7 @@ ArPixelID;
                 case WRITE_TONEMAP:
                     [self writeImage];
                     ArcUnsignedInteger  * index = [ 
-                        ALLOC_INIT_OBJECT(ArcUnsignedInteger):numberOfRenderThreads+2];
+                        ALLOC_INIT_OBJECT(ArcUnsignedInteger):numberOfRenderThreads+4];
 
                     if ( ! art_thread_detach(@selector(tonemapAndOpenProc:), self,  index))
                         ART_ERRORHANDLING_FATAL_ERROR(
@@ -1143,11 +1149,19 @@ ArPixelID;
                     [self writeImage];
                 case POISON:
                     goto END;
-                default:
+                case TEV_CONNECT:
+                    if([tev tryConnection]){
+                        for (size_t i =0; i<numberOfImagesToWrite; i++) {
+                            [tev createImage:tev_names[i] :YES :"RGB" :3:XC(imageSize) :YC(imageSize) ];
+                        }
+                    }
                     break;
-            }
-            
-            
+                case RENDER:
+                    ART_ERRORHANDLING_FATAL_ERROR(
+                            "render task in merge queue"
+                            );
+                    break;
+                }
         }
     }
     END: 
@@ -1185,7 +1199,7 @@ ArPixelID;
 -(void) tev_task
     :(task_t*) t
 {
-    if(!tev.connected){
+    if(!tev->connected){
         return;
     }
     image_window_t tev_window;
@@ -1478,17 +1492,22 @@ ArPixelID;
             {
                 if ( line[0] == 'w' )
                 {
-                    _image_sampler_sigusr1_handler( SIGUSR1 );
+                    try_prepend_merge_queue(&writeSem,WRITE);
                 }
 
                 if ( line[0] == 'd' )
                 {
-                    _image_sampler_sigusr2_handler( SIGUSR2 );
+                    try_prepend_merge_queue(&writeSem,WRITE_TONEMAP);
                 }
 
                 if ( line[0] == 't' )
                 {
-                    _image_sampler_sigint_handler( SIGINT );
+                    _image_sampler_sigint_handler(0);
+                }
+
+                if ( line[0] == 'c' )
+                {
+                    try_prepend_merge_queue(NULL,TEV_CONNECT);
                 }
             }
         }
@@ -1565,7 +1584,7 @@ ArPixelID;
     [ threadPool release ];
 
     //   Release the semaphore
-    sem_post(&writeTonemapSem);
+    sem_post(&writeSem);
 }
 - (void) cleanupAfterImageSampling
         : (ArNode <ArpWorld> *) world
@@ -1573,15 +1592,14 @@ ArPixelID;
         : (ArNode <ArpImageWriter> **) image
         : (int) numberOfResultImages
 {
-    //ASK stochastic cleans up in dealloc not in cleanup, where should i do it?
     free_render_queue(&render_queue);
     free_merge_queue(&merge_queue);
     pthread_barrier_destroy(&renderingDone);
     pthread_barrier_destroy(&mergingDone);
     sem_destroy(&writeSem);
-    sem_destroy(&writeTonemapSem);
-    sem_destroy(&writeExitSem);
+
     RELEASE_OBJECT( sampleCounter );
+    RELEASE_OBJECT(messageQueue);
     
     FREE_ARRAY(preSamplingMessage);
 

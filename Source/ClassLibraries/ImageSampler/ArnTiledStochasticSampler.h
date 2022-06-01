@@ -4,7 +4,6 @@
 
 #import "ART_Scenegraph.h"
 #import "ART_ImageData.h"
-#include "ArcTevIntegration.h"
 
 
 ART_MODULE_INTERFACE(ArnMySampler)
@@ -23,6 +22,7 @@ typedef enum {
         WRITE,
         WRITE_TONEMAP,
         WRITE_EXIT,
+        TEV_CONNECT,
         POISON,
 }task_type_t;
 typedef struct {
@@ -135,9 +135,7 @@ typedef struct {
         char**  tev_names;
         ArnLightAlphaImage  *  out;
 
-        
-
-        
+        ArcMessageQueue* messageQueue;
 }
 
 - (id) init
