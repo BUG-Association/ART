@@ -1,6 +1,4 @@
-
-#include "ArcMessageQueue.h"
-#include "include/ART_SystemDatatypes.h"
+#include "ART_SystemDatatypes.h"
 #include <semaphore.h>
 #include <stdio.h>
 #define ART_MODULE_NAME     ArnMySampler
@@ -21,6 +19,7 @@
 #include <unistd.h>
 #include <termios.h> 
 #include <stdlib.h>
+#include <fcntl.h>  
 
 
 #define TILE_CONSTANT 3
@@ -81,7 +80,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
 
 
 struct termios original;
-sem_t writeSem;
+sem_t* writeSem;
 // sem_t writeTonemapSem;
 // sem_t writeExitSem;
 render_queue_t render_queue;
@@ -105,7 +104,7 @@ void _image_sampler_sigint_handler(
 {
     (void) sig;
     //   SIGINT writes the current result image, exits afterward.
-    if(sem_wait(&writeSem)==0){
+    if(sem_wait(writeSem)==0){
         art_task_t task;
         task.type=WRITE_EXIT;
         prepend_merge_queue(&merge_queue,task);
@@ -464,9 +463,17 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     (void)nCamera;
     pthread_barrier_init(&renderingDone, NULL, numberOfRenderThreads+1);
     pthread_barrier_init(&mergingDone, NULL, 2);
+
+
+    char* sem_name;
+    asprintf(&sem_name,"artist_%d", getpid());
     
-    
-    sem_init(&writeSem, 0, 1);
+    writeSem=sem_open(sem_name, O_CREAT|O_EXCL, S_IRUSR|S_IWUSR, 1);
+    FREE_ARRAY(sem_name);
+    if(writeSem==SEM_FAILED){
+        perror("semaphore");
+        ART_ERRORHANDLING_FATAL_ERROR("Failed to create semaphore");
+    } 
 
 
     if ( overallNumberOfSamplesPerPixel == 0 )
@@ -901,10 +908,10 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         message_t msg= [messageQueue receiveMessage];
         switch(msg.type){
             case M_WRITE:
-                try_prepend_merge_queue(&writeSem,WRITE);
+                try_prepend_merge_queue(writeSem,WRITE);
                 break;
             case M_WRITE_TONEMAP:
-                try_prepend_merge_queue(&writeSem,WRITE_TONEMAP);
+                try_prepend_merge_queue(writeSem,WRITE_TONEMAP);
                 break;
             case M_TERMINATE:
                 _image_sampler_sigint_handler(0);
@@ -1180,7 +1187,7 @@ ArPixelID;
                     break;
                 case WRITE:
                     [self writeImage];
-                    sem_post(&writeSem);
+                    sem_post(writeSem);
                     break;
                 case WRITE_TONEMAP:
                     [self writeImage];
@@ -1541,12 +1548,12 @@ ArPixelID;
             {
                 if ( line[0] == 'w' )
                 {
-                    try_prepend_merge_queue(&writeSem,WRITE);
+                    try_prepend_merge_queue(writeSem,WRITE);
                 }
 
                 if ( line[0] == 'd' )
                 {
-                    try_prepend_merge_queue(&writeSem,WRITE_TONEMAP);
+                    try_prepend_merge_queue(writeSem,WRITE_TONEMAP);
                 }
 
                 if ( line[0] == 't' )
@@ -1633,7 +1640,7 @@ ArPixelID;
     [ threadPool release ];
 
     //   Release the semaphore
-    sem_post(&writeSem);
+    sem_post(writeSem);
 }
 - (void) cleanupAfterImageSampling
         : (ArNode <ArpWorld> *) world
@@ -1645,7 +1652,13 @@ ArPixelID;
     free_merge_queue(&merge_queue);
     pthread_barrier_destroy(&renderingDone);
     pthread_barrier_destroy(&mergingDone);
-    sem_destroy(&writeSem);
+
+    char* sem_name;
+    asprintf(&sem_name,"art_sem_%d", getpid());
+    if(sem_unlink(sem_name)==-1){
+        perror("semaphore_unlink");
+    } 
+    FREE_ARRAY(sem_name);
 
     RELEASE_OBJECT( sampleCounter );
     RELEASE_OBJECT(messageQueue);

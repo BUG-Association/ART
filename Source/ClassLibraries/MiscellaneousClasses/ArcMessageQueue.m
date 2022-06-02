@@ -1,9 +1,3 @@
-
-
-
-
-
-#include <stdio.h>
 #define ART_MODULE_NAME     ArcMessageQueue
 
 #include <sys/types.h>
