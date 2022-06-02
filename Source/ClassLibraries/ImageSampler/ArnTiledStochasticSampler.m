@@ -5,8 +5,6 @@
 #include <stdio.h>
 #define ART_MODULE_NAME     ArnMySampler
 
-
-
 #include "ColourConversionConstructorMacros.h"
 
 
@@ -30,6 +28,57 @@
 #define TEV_PORT 14158
 
 
+#ifdef __APPLE__
+
+int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count)
+{
+    if(count == 0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+    if(pthread_mutex_init(&barrier->mutex, 0) < 0)
+    {
+        return -1;
+    }
+    if(pthread_cond_init(&barrier->cond, 0) < 0)
+    {
+        pthread_mutex_destroy(&barrier->mutex);
+        return -1;
+    }
+    barrier->tripCount = count;
+    barrier->count = 0;
+
+    return 0;
+}
+
+int pthread_barrier_destroy(pthread_barrier_t *barrier)
+{
+    pthread_cond_destroy(&barrier->cond);
+    pthread_mutex_destroy(&barrier->mutex);
+    return 0;
+}
+
+int pthread_barrier_wait(pthread_barrier_t *barrier)
+{
+    pthread_mutex_lock(&barrier->mutex);
+    ++(barrier->count);
+    if(barrier->count >= barrier->tripCount)
+    {
+        barrier->count = 0;
+        pthread_cond_broadcast(&barrier->cond);
+        pthread_mutex_unlock(&barrier->mutex);
+        return 1;
+    }
+    else
+    {
+        pthread_cond_wait(&barrier->cond, &(barrier->mutex));
+        pthread_mutex_unlock(&barrier->mutex);
+        return 0;
+    }
+}
+#endif // __APPLE__
+
 
 struct termios original;
 sem_t writeSem;
@@ -41,11 +90,11 @@ void AtExit(){
     tcsetattr( STDIN_FILENO, TCSANOW, & original );
 }
 
-void prepend_merge_queue(merge_queue_t* q,task_t task);
+void prepend_merge_queue(merge_queue_t* q,art_task_t task);
 
-void try_prepend_merge_queue(sem_t* semaphore,task_type_t type){
+void try_prepend_merge_queue(sem_t* semaphore,art_task_type_t type){
     if(semaphore==NULL||sem_trywait(semaphore)==0){
-        task_t task;
+        art_task_t task;
         task.type=type;
         prepend_merge_queue(&merge_queue,task);
     }  
@@ -57,7 +106,7 @@ void _image_sampler_sigint_handler(
     (void) sig;
     //   SIGINT writes the current result image, exits afterward.
     if(sem_wait(&writeSem)==0){
-        task_t task;
+        art_task_t task;
         task.type=WRITE_EXIT;
         prepend_merge_queue(&merge_queue,task);
     } 
@@ -74,7 +123,7 @@ void init_queue(queue_t* q,size_t task_number){
     q->head=0;
     q->length=0;
     q->max_size=task_number;
-    q->data=ALLOC_ARRAY_ZERO(task_t, task_number);
+    q->data=ALLOC_ARRAY_ZERO(art_task_t, task_number);
     if(!q->data){
         ART_ERRORHANDLING_FATAL_ERROR("Failed queue buffer allocation");
     }
@@ -91,14 +140,14 @@ void pop_queue(queue_t* q){
     q->length--;
 }
 
-task_t peek_queue(queue_t* q){
+art_task_t peek_queue(queue_t* q){
     return q->data[q->tail];
 }
 
-void push_queue(queue_t* q,task_t t){
+void push_queue(queue_t* q,art_task_t t){
     if(q->length+1>q->max_size){
         size_t new_size=q->max_size+1;
-        task_t* new_ptr =REALLOC_ARRAY((q->data), task_t, new_size);
+        art_task_t* new_ptr =REALLOC_ARRAY((q->data), art_task_t, new_size);
         if(new_ptr){
             q->data=new_ptr;
             q->max_size=new_size;
@@ -114,10 +163,10 @@ void push_queue(queue_t* q,task_t t){
     q->length++;
 }
 
-void prepend_queue(queue_t* q,task_t t){
+void prepend_queue(queue_t* q,art_task_t t){
     if(q->length+1>q->max_size){
         size_t new_size=q->max_size+1;
-        task_t* new_ptr =REALLOC_ARRAY((q->data), task_t, new_size);
+        art_task_t* new_ptr =REALLOC_ARRAY((q->data), art_task_t, new_size);
         if(new_ptr){
             q->data=new_ptr;
             q->max_size=new_size;
@@ -159,18 +208,18 @@ void free_render_queue(render_queue_t* q){
     pthread_cond_destroy(SYNC_COND_PTR);
 }
 
-task_t pop_render_queue(render_queue_t* q){
+art_task_t pop_render_queue(render_queue_t* q){
     pthread_mutex_lock(SYNC_LOCK_PTR);
     while(SYNC_QUEUE.length==0)
         pthread_cond_wait(SYNC_COND_PTR, SYNC_LOCK_PTR);
-    task_t ret=peek_queue(SYNC_QUEUE_PTR);
+    art_task_t ret=peek_queue(SYNC_QUEUE_PTR);
     if (ret.type!=POISON)
         pop_queue(SYNC_QUEUE_PTR);
     pthread_mutex_unlock(SYNC_LOCK_PTR);
     return ret;
 }
 
-void push_render_queue(render_queue_t* q,task_t  task){
+void push_render_queue(render_queue_t* q,art_task_t  task){
     pthread_mutex_lock(SYNC_LOCK_PTR);
     
     push_queue(SYNC_QUEUE_PTR, task);
@@ -203,14 +252,14 @@ void free_merge_queue(merge_queue_t* q){
 
 
 
-void push_merge_queue(merge_queue_t* q,task_t task){
+void push_merge_queue(merge_queue_t* q,art_task_t task){
     pthread_mutex_lock(SYNC_LOCK_PTR);
     push_queue(SYNC_QUEUE_PTR, task);
     pthread_mutex_unlock(SYNC_LOCK_PTR);
     pthread_cond_signal(SYNC_COND_PTR);
 }
 
-void prepend_merge_queue(merge_queue_t* q,task_t task){
+void prepend_merge_queue(merge_queue_t* q,art_task_t task){
     pthread_mutex_lock(SYNC_LOCK_PTR);
     prepend_queue(SYNC_QUEUE_PTR, task);
     pthread_mutex_unlock(SYNC_LOCK_PTR);
@@ -290,7 +339,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 
 - (BOOL) make_task
-    :(task_t*) t
+    :(art_task_t*) t
 {
     if (finishedGeneratingRenderTasks){
         if (poisoned_render) {
@@ -336,7 +385,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     renderThreadsShouldTerminate = NO;
     workingThreadsAreDone=NO;
     window_iterator=0;
-    samples_per_window=128;
+    samples_per_window=16;
     samples_per_window_adaptive=samples_per_window;
     samples_issued=0;
     samples_per_window= MIN(overallNumberOfSamplesPerPixel-samples_issued,samples_per_window);
@@ -636,7 +685,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     init_merge_queue(&merge_queue, buffer_size);
     
     for (size_t i =0; i< buffer_size; i++) {
-        task_t task;
+        art_task_t task;
         task.work_tile=&tiles[i];
 
         if([self make_task: &task]){
@@ -826,7 +875,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     write( read_thread_pipe[1], "q", 1 );
 
     
-    task_t task;
+    art_task_t task;
     task.type=WRITE_EXIT;
     push_merge_queue(&merge_queue,task);
     
@@ -886,7 +935,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     (void) threadIndex;
     
     while(!renderThreadsShouldTerminate){
-        task_t curr_task= pop_render_queue(&render_queue);
+        art_task_t curr_task= pop_render_queue(&render_queue);
         if(curr_task.type==POISON)
             break;
         [self render_task : &curr_task: threadIndex];
@@ -906,7 +955,7 @@ typedef struct ArPixelID
 }
 ArPixelID;
 -(void) render_task
-    :(task_t*) t
+    :(art_task_t*) t
     : (ArcUnsignedInteger *) threadIndex
 {
     [self clean_tile : t->work_tile];
@@ -1119,7 +1168,7 @@ ArPixelID;
             samples_per_window_adaptive=samples_per_window*2;
         }
         while(merge_queue.inactive->length>0){
-            task_t curr_task=peek_queue(merge_queue.inactive);
+            art_task_t curr_task=peek_queue(merge_queue.inactive);
             pop_queue(merge_queue.inactive);
             switch (curr_task.type) {
                 case MERGE:
@@ -1168,7 +1217,7 @@ ArPixelID;
     pthread_barrier_wait(&mergingDone);
 }
 -(void) merge_task
-    :(task_t*) t
+    :(art_task_t*) t
 {
     IVec2D size=t->work_tile->size;
     for ( unsigned int im = 0; im < numberOfImagesToWrite; im++ ){
@@ -1197,7 +1246,7 @@ ArPixelID;
     }
 }
 -(void) tev_task
-    :(task_t*) t
+    :(art_task_t*) t
 {
     if(!tev->connected){
         return;

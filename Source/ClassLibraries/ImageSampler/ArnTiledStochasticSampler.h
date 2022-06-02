@@ -2,6 +2,24 @@
 //ASK: shouldn't this be in foundation???
 #include <semaphore.h>
 
+#ifdef __APPLE__
+#ifndef PTHREAD_BARRIER_H_
+#define PTHREAD_BARRIER_H_
+
+#include <pthread.h>
+#include <errno.h>
+
+typedef int pthread_barrierattr_t;
+typedef struct
+{
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+    int count;
+    int tripCount;
+} pthread_barrier_t;
+#endif
+#endif
+
 #import "ART_Scenegraph.h"
 #import "ART_ImageData.h"
 
@@ -24,18 +42,18 @@ typedef enum {
         WRITE_EXIT,
         TEV_CONNECT,
         POISON,
-}task_type_t;
+}art_task_type_t;
 typedef struct {
-        task_type_t type;
+        art_task_type_t type;
         tile_t* work_tile;
         image_window_t* window; 
         int samples;
         int sample_start;
-}task_t;
+}art_task_t;
 
 typedef struct {
         size_t tail,head,length,max_size;
-        task_t* data;    
+        art_task_t* data;
 }queue_t;
 typedef struct {
         queue_t queue;
