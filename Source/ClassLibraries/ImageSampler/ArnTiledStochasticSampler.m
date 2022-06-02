@@ -25,6 +25,7 @@
 #define TILE_CONSTANT 3
 #define LOCALHOST "127.0.0.1"
 #define TEV_PORT 14158
+#define SEMAPHORE_FORMAT "/art_%d"
 
 
 #ifdef __APPLE__
@@ -81,8 +82,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
 
 struct termios original;
 sem_t* writeSem;
-// sem_t writeTonemapSem;
-// sem_t writeExitSem;
+
 render_queue_t render_queue;
 merge_queue_t merge_queue;
 void AtExit(){
@@ -466,7 +466,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
 
 
     char* sem_name;
-    asprintf(&sem_name,"artist_%d", getpid());
+    asprintf(&sem_name,SEMAPHORE_FORMAT, getpid());
     
     writeSem=sem_open(sem_name, O_CREAT|O_EXCL, S_IRUSR|S_IWUSR, 1);
     FREE_ARRAY(sem_name);
@@ -1210,6 +1210,7 @@ ArPixelID;
                         for (size_t i =0; i<numberOfImagesToWrite; i++) {
                             [tev createImage:tev_names[i] :YES :"RGB" :3:XC(imageSize) :YC(imageSize) ];
                         }
+                        [self repaintTevImage];
                     }
                     break;
                 case RENDER:
@@ -1252,6 +1253,15 @@ ArPixelID;
         }
     }
 }
+-(void) repaintTevImage
+{
+    art_task_t t;
+    for(size_t i =0;i<tiles_X*tiles_Y;i++){
+        t.window=&render_windows[i];
+        [self tev_task:&t];
+    }
+}
+
 -(void) tev_task
     :(art_task_t*) t
 {
@@ -1653,8 +1663,11 @@ ArPixelID;
     pthread_barrier_destroy(&renderingDone);
     pthread_barrier_destroy(&mergingDone);
 
+    if(sem_close(writeSem)==-1){
+        perror("semaphore_close");
+    } 
     char* sem_name;
-    asprintf(&sem_name,"art_sem_%d", getpid());
+    asprintf(&sem_name,SEMAPHORE_FORMAT, getpid());
     if(sem_unlink(sem_name)==-1){
         perror("semaphore_unlink");
     } 
