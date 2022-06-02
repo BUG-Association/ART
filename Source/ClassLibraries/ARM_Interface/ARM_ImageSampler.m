@@ -24,6 +24,7 @@
 
 =========================================================================== */
 
+
 #define ART_MODULE_NAME     ARM_ImageSampler
 
 #import "ARM_ImageSampler.h"
@@ -95,6 +96,47 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
     return self;
 }
 
+
+- (id) sampleProvider
+
+                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
+        sampleSplattingKernel    : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
+        samplesPerPixel         : (unsigned int) newNumberOfSamples
+        randomValueGeneration   : (int) newRandomValueGeneration
+{
+    return
+        [ self init
+            :   newRaySampler
+            :   newReconstructionKernel
+            :   newNumberOfSamples
+            :   newRandomValueGeneration
+            ];
+}
+
+@end
+
+@implementation ArnTiledStochasticSampler ( ARM_Interface )
+
+- (id) sampleProvider
+
+                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
+        samplesPerPixel         : (unsigned int) newNumberOfSamples
+        randomValueGeneration   : (int) newRandomValueGeneration
+{
+    id  defaultReconstructionKernel =
+        [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnBoxReconstructionKernel) ];
+
+    [ self init
+        :   newRaySampler
+        :   defaultReconstructionKernel
+        :   newNumberOfSamples
+        :   newRandomValueGeneration
+        ];
+
+    return self;
+}
+
+
 - (id) sampleProvider
 
                                 : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
@@ -117,7 +159,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
 
 - (id) sampleProvider
 
-                                : (ArNode <ArpPathspaceIntegrator> *) newPathspaceIntegrator
+                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
         samplesPerPixel         : (unsigned int) newNumberOfSamples
         randomValueGeneration   : (int) newRandomValueGeneration
 {
@@ -125,7 +167,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         [ ALLOC_INIT_OBJECT_AUTORELEASE(ArnBoxReconstructionKernel) ];
 
     [ self init
-        :   newPathspaceIntegrator
+        :   newRaySampler
         :   defaultReconstructionKernel
         :   newNumberOfSamples
         :   newRandomValueGeneration
@@ -134,22 +176,22 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
     return self;
 }
 
+
 - (id) sampleProvider
 
-                                : (ArNode <ArpPathspaceIntegrator> *) newPathspaceIntegrator
-        sampleSplattingKernel   : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
+                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
+        sampleSplattingKernel    : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         samplesPerPixel         : (unsigned int) newNumberOfSamples
         randomValueGeneration   : (int) newRandomValueGeneration
 {
     return
         [ self init
-            :   newPathspaceIntegrator
+            :   newRaySampler
             :   newReconstructionKernel
             :   newNumberOfSamples
             :   newRandomValueGeneration
             ];
 }
-
 @end
 
 @implementation ArnStochasticImageSamplerRGBA ( ARM_Interface )

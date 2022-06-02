@@ -31,6 +31,7 @@
 
 #import "ARM_Foundation.h"
 
+
 ART_MODULE_INTERFACE(ARM_ImageSampler)
 
 #import "ART_ImageSampler.h"
@@ -61,9 +62,26 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         samplesPerPixel         : (unsigned int) newNumberOfSamples
         randomValueGeneration   : (int) newRandomValueGeneration
         ;
-
 @end
 
+@interface ArnTiledStochasticSampler ( ARM_Interface )
+
+- (id) sampleProvider
+                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
+        samplesPerPixel         : (unsigned int) newNumberOfSamples
+        randomValueGeneration   : (int) newRandomValueGeneration
+        ;
+
+- (id) sampleProvider
+                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
+        sampleSplattingKernel   : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
+        samplesPerPixel         : (unsigned int) newNumberOfSamples
+        randomValueGeneration   : (int) newRandomValueGeneration
+        ;
+
+@end
+#define TILED_STOCHASTIC_SAMPLER  \
+    ALLOC_OBJECT_AUTORELEASE(ArnTiledStochasticSampler)
 
 @interface ArnStochasticImageSampler ( ARM_Interface )
 
@@ -79,8 +97,8 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         samplesPerPixel         : (unsigned int) newNumberOfSamples
         randomValueGeneration   : (int) newRandomValueGeneration
         ;
-
 @end
+
 
 #define UNLIMITED   0
 

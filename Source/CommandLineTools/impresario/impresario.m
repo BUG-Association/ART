@@ -24,7 +24,11 @@
 
 =========================================================================== */
 
+#include "ARM_Foundation.h"
 #import "AdvancedRenderingToolkit.h"
+#include <stdlib.h>
+#include "ArcObject.h"
+#include "ArcMessageQueue.h"
 
 #include <stdio.h> 
 #include <unistd.h>
@@ -33,6 +37,8 @@
 
 #define INVALID_PID                -1
 #define DEFAULT_REPEAT_FREQUENCY    15
+#define LOCALHOST "127.0.0.1"
+#define TEV_PORT 14158
 
 //   Small function from stackoverflow
 
@@ -65,28 +71,25 @@ int impresario(
     ART_APPLICATION_MAIN_OPTIONS_FOLLOW
 
     id  writeOption =
-        [ [ INTEGER_OPTION
+        [ FLAG_OPTION
             :   "writeImage"
             :   "w"
-            :   "<pid>"
             :   "only write current result image to disk"
-            ] withDefaultIntegerValue: INVALID_PID ];
+            ] ;
 
     id  displayOption =
-        [ [ INTEGER_OPTION
+        [ FLAG_OPTION
             :   "displayImage"
             :   "d"
-            :   "<pid>"
             :   "write, tonemap & open current result image"
-            ] withDefaultIntegerValue: INVALID_PID ];
+            ];
 
     id  terminateOption =
-        [ [ INTEGER_OPTION
+        [ FLAG_OPTION
             :   "terminateSampling"
             :   "t"
-            :   "<pid>"
             :   "terminate image sampling & proceed with action sequence"
-            ] withDefaultIntegerValue: INVALID_PID ];
+            ];
 
     id  repeatOption =
         [ [ INTEGER_OPTION
@@ -95,6 +98,14 @@ int impresario(
             :   "<seconds>"
             :   "repeat -w/-d every n seconds until 'artist' terminates"
             ] withDefaultIntegerValue: DEFAULT_REPEAT_FREQUENCY ];
+
+    id  pidOption =
+        [ [ INTEGER_OPTION
+            :   "processId"
+            :   "i"
+            :   "<pid>"
+            :   "sets pid for other commands"
+            ] withDefaultIntegerValue: INVALID_PID ];
 
     id  allOption =
         [ FLAG_OPTION
@@ -111,8 +122,30 @@ int impresario(
             :   "send commands to a specific running ART app"
             ] withDefaultCStringValue: "artist" ];
 
-    char  * synopsis_string;
+    id  tevHostNameOption =
+        [ [ STRING_OPTION
+            :   "tevHost"
+            :   "n"
+            :   "<tev host name>"
+            :   "sets host name for tev viewer"
+            ] withDefaultCStringValue: LOCALHOST ];
+    id  tevPortOption =
+        [ [ INTEGER_OPTION
+            :   "tevPort"
+            :   "p"
+            :   "<tev port>"
+            :   "sets port for tev viewer"
+            ]  withDefaultIntegerValue: TEV_PORT ];
+    id  connectTevOption =
+        [ FLAG_OPTION
+            :   "tevConnect"
+            :   "c"
+            :   "retry connection to tev"
+            ] ;
+    
 
+    char  * synopsis_string;
+    //TODO:UPDATE SYNOPSIS
     asprintf(
 	& synopsis_string,
           "This tool is capable of writing (-w) or displaying (-d) intermediate results from\n"
@@ -140,28 +173,52 @@ int impresario(
         "impresario [command] <optional pid>"
         );
     
-    int  pid_we_will_talk_to = INVALID_PID;
-    int  numberOfIPCOptions = 0;
+    int  numberOfWriteOptions = 0;
+    int  numberOfTevOptions = 0;
     
     if ( [ writeOption hasBeenSpecified ] )
-    {
-        pid_we_will_talk_to = [ writeOption integerValue ];
-        numberOfIPCOptions++;
+    {   
+        numberOfWriteOptions++;
     }
     
     if ( [ displayOption hasBeenSpecified ] )
     {
-        pid_we_will_talk_to = [ displayOption integerValue ];
-        numberOfIPCOptions++;
+        numberOfWriteOptions++;
     }
     
     if ( [ terminateOption hasBeenSpecified ] )
-    {
-        pid_we_will_talk_to = [ terminateOption integerValue ];
-        numberOfIPCOptions++;
+    {   
+        numberOfWriteOptions++;
     }
     
-    if ( numberOfIPCOptions == 0 )
+
+
+    if ( [ tevHostNameOption hasBeenSpecified ] )
+    {   
+        numberOfTevOptions++;
+    }
+    
+    if ( [ tevHostNameOption hasBeenSpecified ] )
+    {   
+        numberOfTevOptions++;
+    }
+    
+    if ( [ connectTevOption hasBeenSpecified ] )
+    {   
+        numberOfTevOptions++;
+    }
+
+    if ( numberOfWriteOptions > 1 )
+    {
+        fprintf(stderr,"Conflicting IPC write options specified!\n\n");
+
+        [ ArcOption fprintShortUsageAndExit
+            :   art_gv
+            :   stderr
+            ];
+    }
+    
+    if ( numberOfWriteOptions == 0 && numberOfTevOptions==0)
     {
         fprintf(stderr,"No renderer IPC option specified!\n\n");
 
@@ -170,16 +227,8 @@ int impresario(
             :   stderr
             ];
     }
-
-    if ( numberOfIPCOptions > 1 )
-    {
-        fprintf(stderr,"Conflicting IPC options specified!\n\n");
-
-        [ ArcOption fprintShortUsageAndExit
-            :   art_gv
-            :   stderr
-            ];
-    }
+    
+    
     
     if (   [ terminateOption hasBeenSpecified ]
         && [ repeatOption hasBeenSpecified ] )
@@ -191,21 +240,39 @@ int impresario(
             :   stderr
             ];
     }
+
+    //TODO/ASK REPEATED INTERACTING WITH TEV MIGHT NOT MAKE SENSE
     
-    if (   [ repeatOption hasBeenSpecified ]
-        && [ allOption hasBeenSpecified ] )
+    if (   [ terminateOption hasBeenSpecified ]
+        && numberOfTevOptions>0 )
     {
-        fprintf(
-            stderr,
-            "Repeated sending of commands to all running "
-            "instances not supported\n\n"
-            );
+        fprintf(stderr,"Terminating and interacting with tev makes no sense!\n\n");
 
         [ ArcOption fprintShortUsageAndExit
             :   art_gv
             :   stderr
             ];
     }
+    
+
+
+
+
+
+    // if (   [ repeatOption hasBeenSpecified ]
+    //     && [ allOption hasBeenSpecified ] )
+    // {
+    //     fprintf(
+    //         stderr,
+    //         "Repeated sending of commands to all running "
+    //         "instances not supported\n\n"
+    //         );
+
+    //     [ ArcOption fprintShortUsageAndExit
+    //         :   art_gv
+    //         :   stderr
+    //         ];
+    // }
     
     int  * pid = NULL;
     int    number_of_artist_pids = 0;
@@ -226,6 +293,7 @@ int impresario(
         return 0;
     }
     
+    int  pid_we_will_talk_to = [pidOption integerValue];
     //   Sanity check: if the user did specify a pid, we check the list
     //   of running artists, to see if it's actually there.
     
@@ -235,8 +303,10 @@ int impresario(
 
         for ( int i = 0; i < number_of_artist_pids; i++ )
         {
-            if( pid[i] == pid_we_will_talk_to )
+            if( pid[i] == pid_we_will_talk_to ){
                 user_specified_pid_is_running_artist = YES;
+                break;
+            }
         }
 
         if ( ! user_specified_pid_is_running_artist )
@@ -332,6 +402,10 @@ int impresario(
     
     BOOL  artist_is_still_alive = NO;
     BOOL  first_signal = YES;
+    ArcMessageQueue* messageQueue= [ALLOC_INIT_OBJECT(ArcMessageQueue)];
+    [messageQueue clearMessages];
+    
+    
     
     if ( [ repeatOption hasBeenSpecified ] )
     {
@@ -345,6 +419,7 @@ int impresario(
 
     do
     {
+
         if ( [ writeOption hasBeenSpecified ] )
         {
             if (   number_of_artist_pids > 1
@@ -357,7 +432,7 @@ int impresario(
                 for ( int i = 0; i < number_of_artist_pids; i++ )
                 {
                     printf("%d ", pid[i]);
-                    kill( pid[i], SIGUSR1 );
+                    [messageQueue sendSimpleMessage:pid[i] :M_WRITE];
                 }
             }
             else
@@ -375,8 +450,7 @@ int impresario(
                 {
                     printf(".");
                 }
-                
-                kill( pid_we_will_talk_to, SIGUSR1 );
+                [messageQueue sendSimpleMessage:pid_we_will_talk_to :M_WRITE];
             }
         }
 
@@ -392,7 +466,7 @@ int impresario(
                 for ( int i = 0; i < number_of_artist_pids; i++ )
                 {
                     printf("%d ", pid[i]);
-                    kill( pid[i], SIGUSR2 );
+                    [messageQueue sendSimpleMessage:pid[i] :M_WRITE_TONEMAP];
                 }
             }
             else
@@ -411,7 +485,7 @@ int impresario(
                     printf(".");
                 }
                 
-                kill( pid_we_will_talk_to, SIGUSR2 );
+                [messageQueue sendSimpleMessage:pid_we_will_talk_to :M_WRITE_TONEMAP];
             }
         }
         
@@ -427,7 +501,7 @@ int impresario(
                 for ( int i = 0; i < number_of_artist_pids; i++ )
                 {
                     printf("%d ", pid[i]);
-                    kill( pid[i], SIGINT );
+                    [messageQueue sendSimpleMessage:pid[i] :M_TERMINATE];
                 }
             }
             else
@@ -436,11 +510,84 @@ int impresario(
                     "Sending termination signal to PID %d.",
                     pid_we_will_talk_to
                     );
-                
-                kill( pid_we_will_talk_to, SIGINT );
+                [messageQueue sendSimpleMessage:pid_we_will_talk_to :M_TERMINATE];
             }
         }
         
+        if ( [ tevHostNameOption hasBeenSpecified ] )
+        {
+            if (   number_of_artist_pids > 1
+                && [ allOption hasBeenSpecified ] )
+            {
+                printf(
+                    "Sending host name to PIDs: "
+                    );
+                
+                for ( int i = 0; i < number_of_artist_pids; i++ )
+                {
+                    printf("%d ", pid[i]);
+                    [messageQueue sendHostName:pid[i] : [tevHostNameOption cStringValue]];
+                }
+            }
+            else
+            {
+                printf(
+                    "Sending host name to PID %d.",
+                    pid_we_will_talk_to
+                    );
+                [messageQueue sendHostName:pid_we_will_talk_to : [tevHostNameOption cStringValue]];
+            }
+        }
+
+        if ( [ tevPortOption hasBeenSpecified ] )
+        {
+            if (   number_of_artist_pids > 1
+                && [ allOption hasBeenSpecified ] )
+            {
+                printf(
+                    "Sending host port to PIDs: "
+                    );
+                
+                for ( int i = 0; i < number_of_artist_pids; i++ )
+                {
+                    printf("%d ", pid[i]);
+                    [messageQueue sendHostPort:pid[i] : [tevPortOption integerValue]];
+                }
+            }
+            else
+            {
+                printf(
+                    "Sending host port to PID %d.",
+                    pid_we_will_talk_to
+                    );
+                [messageQueue sendHostPort:pid_we_will_talk_to : [tevPortOption integerValue]];
+            }
+        }
+
+        if ( [ connectTevOption hasBeenSpecified ] )
+        {
+            if (   number_of_artist_pids > 1
+                && [ allOption hasBeenSpecified ] )
+            {
+                printf(
+                    "Sending connect to tev signal to PIDs: "
+                    );
+                
+                for ( int i = 0; i < number_of_artist_pids; i++ )
+                {
+                    printf("%d ", pid[i]);
+                    [messageQueue sendSimpleMessage: pid[i] : M_TEV_CONNECT];
+                }
+            }
+            else
+            {
+                printf(
+                    "Sending connect to tev signal to PID %d.",
+                    pid_we_will_talk_to
+                    );
+                [messageQueue sendSimpleMessage: pid_we_will_talk_to : M_TEV_CONNECT];
+            }
+        }
         if ( [ repeatOption hasBeenSpecified ] )
         {
             fflush(stdout);
@@ -462,24 +609,28 @@ int impresario(
                 );
 
             //   See if our dude is still there
-            
-            artist_is_still_alive = NO;
-            
-            for ( int i = 0; i < number_of_artist_pids; i++ )
-            {
-                if( pid[i] == pid_we_will_talk_to )
-                    artist_is_still_alive = YES;
-            }
-            
             //   If not, say goodbye
             
-            if ( ! artist_is_still_alive )
-            {
-                printf(
-                    "\n\nPID %d is no longer running, terminating.\n",
-                    pid_we_will_talk_to
-                    );
+            artist_is_still_alive = NO;
+            if([allOption hasBeenSpecified]){
+                artist_is_still_alive=number_of_artist_pids>0;
+                //TODO: We should clear messages for disapeared pids
+            }else{
+                for ( int i = 0; i < number_of_artist_pids; i++ )
+                {
+                    if( pid[i] == pid_we_will_talk_to )
+                        artist_is_still_alive = YES;
+                }
+                if ( ! artist_is_still_alive )
+                {
+                    printf(
+                        "\n\nPID %d is no longer running, terminating.\n",
+                        pid_we_will_talk_to
+                        );
+                    [messageQueue  clearMessages:pid_we_will_talk_to];
+                }
             }
+            
         }
         else
         {

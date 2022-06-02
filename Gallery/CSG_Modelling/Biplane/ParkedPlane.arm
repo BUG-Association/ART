@@ -188,7 +188,7 @@ ARM_MAIN_FUNCTION(ParkedPlane)
                 type:        arlightsourcetype_area
             ],
 
-            [ STOCHASTIC_PIXEL_SAMPLER
+            [ TILED_STOCHASTIC_SAMPLER
                 sampleProvider:
                     [ PATHTRACER
                         rayCaster:        STANDARD_RAYCASTER

@@ -48,6 +48,8 @@ ART_LIBRARY_INTERFACE(ART_MiscellaneousClasses)
 #import "ArIntersectionList.h"
 #import "ArcPhaseInterfaceCache.h"
 #import "ArcPhaseInterfaceIsotropic.h"
+#import "ArcTevIntegration.h"
+#import "ArcMessageQueue.h"
 
 #import "Pnt3DE_Trafo.h"
 
