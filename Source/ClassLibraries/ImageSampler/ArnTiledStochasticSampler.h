@@ -1,4 +1,5 @@
 #include "ART_Foundation.h"
+#include "IVec2D.h"
 //ASK: shouldn't this be in foundation???
 #include <semaphore.h>
 
@@ -118,15 +119,14 @@ typedef struct {
         BOOL poisoned_render;
         unsigned int numberOfImagesToWrite;
         image_window_t* render_windows;
-        unsigned int window_iterator;
-        unsigned int samples_per_window;
-        unsigned int samples_per_window_adaptive;
-        unsigned int samples_issued;
+        long window_iterator;
+        long samples_per_window;
+        long samples_per_window_adaptive;
+        long samples_issued;
         BOOL renderThreadsShouldTerminate;
-        BOOL workingThreadsAreDone;
-
-        unsigned int tiles_X;
-        unsigned int tiles_Y;
+        
+        IVec2D tiles_dim;
+        
 
         unsigned int    splattingKernelWidth;
         unsigned int    splattingKernelArea;
@@ -138,7 +138,7 @@ typedef struct {
         double        * sampleSplattingFactor;
         IPnt2D        * sampleSplattingOffset;
 
-        int                                   read_thread_pipe[2];
+
         ArTime  beginTime, endTime;
         pthread_barrier_t renderingDone;
         pthread_barrier_t mergingDone;

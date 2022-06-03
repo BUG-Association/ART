@@ -359,7 +359,8 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 - (void) task_next_iteration
 {
     window_iterator++;
-    if(window_iterator==tiles_X*tiles_Y){
+    
+    if(window_iterator==XC(tiles_dim)*YC(tiles_dim)){
         [ sampleCounter step
             :   samples_per_window
             ];
@@ -382,7 +383,6 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
 {
     finishedGeneratingRenderTasks=NO;
     renderThreadsShouldTerminate = NO;
-    workingThreadsAreDone=NO;
     window_iterator=0;
     samples_per_window=16;
     samples_per_window_adaptive=samples_per_window;
@@ -654,15 +654,15 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     tile_size=IVEC2D(16, 16);
 
     
-    tiles_X=div_roundup(XC(imageSize)-XC(imageOrigin), XC(tile_size));
-    tiles_Y=div_roundup(YC(imageSize)-YC(imageOrigin), YC(tile_size));
-    render_windows= ALLOC_ARRAY(image_window_t, tiles_X*tiles_Y);
+    XC(tiles_dim)=div_roundup(XC(imageSize)-XC(imageOrigin), XC(tile_size));
+    YC(tiles_dim)=div_roundup(YC(imageSize)-YC(imageOrigin), YC(tile_size));
+    render_windows= ALLOC_ARRAY(image_window_t, XC(tiles_dim)*YC(tiles_dim));
 
     int y_start=YC(imageOrigin);
-    for (unsigned int y=0; y<tiles_Y; y++) {
+    for (int y=0; y<YC(tiles_dim); y++) {
         int x_start=XC(imageOrigin);
-        for (unsigned int x=0; x<tiles_X; x++) {
-            image_window_t* curr=&render_windows[y*tiles_X+x];
+        for (int x=0; x<XC(tiles_dim); x++) {
+            image_window_t* curr=&render_windows[y*XC(tiles_dim)+x];
             curr->start=IVEC2D(x_start, y_start);
             int x_end=MIN(x_start+XC(tile_size), XC(imageSize));
             int y_end=MIN(y_start+YC(tile_size), YC(imageSize));
@@ -870,16 +870,10 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
             );
     }
 
-    if( pipe( read_thread_pipe ) == -1 )
-    {
-        fprintf(stderr, "Error creating pipe to I/O thread\n");
-    }
-
     artime_now( & beginTime );
 
     pthread_barrier_wait(&renderingDone);
-    //This shuts down the I/O watching thread for interactive mode
-    write( read_thread_pipe[1], "q", 1 );
+    
 
     
     art_task_t task;
@@ -1255,8 +1249,8 @@ ArPixelID;
 }
 -(void) repaintTevImage
 {
-    art_task_t t;
-    for(size_t i =0;i<tiles_X*tiles_Y;i++){
+    for(int i =0;i<XC(tiles_dim)*YC(tiles_dim);i++){
+        art_task_t t;
         t.window=&render_windows[i];
         [self tev_task:&t];
     }
@@ -1508,79 +1502,38 @@ ArPixelID;
         // at least one character must be written before read returns
         new_termios.c_cc[VMIN] = 1;
 
-        // no timeout
+        //no timeout
         new_termios.c_cc[VTIME] = 0;
         
         tcsetattr( STDIN_FILENO, TCSANOW, & new_termios );
 
-        char  lineA[256]; ssize_t  lenA;
-        char  lineB[256]; ssize_t  lenB;
-        char * line; ssize_t  len;
+        char  line[256]; 
+        ssize_t  len;
         do{
-            int  r,nfds = 0;
-            fd_set rd, wr, er;
-
-            FD_ZERO(&rd);
-            FD_ZERO(&wr);
-            FD_ZERO(&er);
-            FD_SET(STDIN_FILENO, &rd);
-            nfds = M_MAX(nfds, STDIN_FILENO);
-            FD_SET(read_thread_pipe[0], &rd);
-            nfds = M_MAX(nfds, read_thread_pipe[0]);
-
-            r = select(nfds + 1, &rd, &wr, &er, NULL);
-            (void)r;
-            lenA = 0;
-            lenB = 0;
+            len=read(STDIN_FILENO,line,256); 
             
-            if ( FD_ISSET(STDIN_FILENO, &rd) )
-            {
-                lenA=read(STDIN_FILENO,lineA,256); lineA[lenA]='\0';
-            }
+            if( len == 0 )
+                continue;
             
-            if ( FD_ISSET(read_thread_pipe[0], &rd) )
-            {
-                lenB=read(read_thread_pipe[0],lineB,256); lineB[lenB]='\0';
-            }
-            
-            if (lenA > 0 )
-            {
-                line = lineA;
-                len = lenA;
-            }
-            else
-            {
-                line = lineB;
-                len = lenB;
-            }
-
-            if( len > 0 )
-            {
-                if ( line[0] == 'w' )
-                {
+            switch (line[0]) {
+                case 'w':
                     try_prepend_merge_queue(writeSem,WRITE);
-                }
-
-                if ( line[0] == 'd' )
-                {
+                    break;
+                case 'd':
                     try_prepend_merge_queue(writeSem,WRITE_TONEMAP);
-                }
-
-                if ( line[0] == 't' )
-                {
+                    break;
+                case 't':
                     _image_sampler_sigint_handler(0);
-                }
-
-                if ( line[0] == 'c' )
-                {
+                    break;
+                case 'c':
                     try_prepend_merge_queue(NULL,TEV_CONNECT);
-                }
+                    break;
+                default:
+                    break;
             }
+            
         }
-        //   we only terminate if we got a 'q' via the pipe, not via the
-        //   keyboard
-        // ASK: why are we bothering with the pipe???
-        while( !( line[0] == 'q' && lenB > 0 ) );
+        while( !renderThreadsShouldTerminate );
     }
         
 }
