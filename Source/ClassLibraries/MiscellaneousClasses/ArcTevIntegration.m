@@ -57,7 +57,17 @@ float htolefloat(float x){
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
+@interface ArcTevIntegration ()
+- (void) send
+    ;
 
+-(void) appendChannelNames
+    :(const char*) channel_names
+    :(int32_t) channel_number
+    ;
+- (void) bufferStart
+    ;
+@end
 @implementation ArcTevIntegration
 
 
@@ -79,20 +89,24 @@ void clean_char_buff(message_buffer * buff){
     buff->len=0;
     buff->end=buff->data;
 }
-void grow_char_buff(message_buffer * buff){
-    char* new_ptr=REALLOC_ARRAY(buff->data, char, buff->max_size*2);
+void grow_char_buff(message_buffer * buff,uint32_t growTo){
+    uint32_t new_size=buff->max_size;
+    while (new_size<growTo) {
+        new_size*=2;
+    }
+    char* new_ptr=REALLOC_ARRAY(buff->data, char, new_size);
     if(new_ptr){
         buff->data=new_ptr;
         buff->end=buff->data+buff->len;
-        buff->max_size*=2;
+        buff->max_size=new_size;
     }else{
         ART_ERRORHANDLING_FATAL_ERROR("Failed tev buffer reallocation");
     }
 }
 
 void check_size(message_buffer * buff,uint32_t s){
-    while(buff->len+s>=buff->max_size)
-        grow_char_buff(buff);
+    if(buff->len+s>=buff->max_size)
+        grow_char_buff(buff,buff->len+s);
 }
 void char_buff_append_uint32(message_buffer * buff,uint32_t n){
     uint32_t len_bytes =sizeof(n);
@@ -129,13 +143,13 @@ void char_buff_append_char(message_buffer * buff,char n){
     buff->end+=len_bytes;
 }
 void char_buff_append_str(message_buffer * buff,const char* n){
-    unsigned long len=strlen(n)+1;
-    check_size(buff, len);
-    for (unsigned long i=0; i<len; i++) {
+    uint32_t len_bytes=(strlen(n)+1)*sizeof(char);
+    check_size(buff, len_bytes);
+    for (uint32_t i=0; i<len_bytes; i++) {
         buff->end[i]=n[i];
     }
-    buff->len+=len;
-    buff->end+=len;
+    buff->len+=len_bytes;
+    buff->end+=len_bytes;
 }
 void char_buff_append_float_array(message_buffer * buff,const float* data,size_t floats){
     uint32_t len_bytes =sizeof(float)*floats;
@@ -174,7 +188,10 @@ void char_buff_set_len(message_buffer * buff){
     :(const char*) hostName
 {
     FREE_ARRAY(_hostName);
-    asprintf(&_hostName, "%s", hostName);
+    
+    if(asprintf(&_hostName, "%s", hostName)==-1){
+        ART_ERRORHANDLING_FATAL_ERROR("asprintf failed");
+    }
 }
 - (void) setHostPort
     :(uint32_t) hostPort
@@ -183,13 +200,15 @@ void char_buff_set_len(message_buffer * buff){
         return;
     }
     FREE_ARRAY(_hostPort);
-    asprintf(&_hostPort, "%u", hostPort);
+    if(asprintf(&_hostPort, "%u", hostPort)==-1){
+        ART_ERRORHANDLING_FATAL_ERROR("asprintf failed");
+    }
 }
 typedef struct addrinfo addrinfo;
 - (BOOL)tryConnection {
-    BOOL ret=NO;
+    
     if (_hostName==NULL|| _hostPort==NULL) {
-        return ret;
+        return connected;
     }
     addrinfo hints;
     memset(&hints, 0, sizeof(hints));
@@ -211,13 +230,12 @@ typedef struct addrinfo addrinfo;
                 }
                 socket_handle=potentialSocket;
                 connected=YES;
-                ret=YES;
                 break;
             }
         }
         freeaddrinfo(copy_free);
     }
-    return ret;
+    return connected;
 }
 
 - (void) send
@@ -269,7 +287,7 @@ typedef struct addrinfo addrinfo;
     char_buff_append_int32(&buffer, channel_number);
     for (int i=0; i<channel_number; i++) {
         char_buff_append_char(&buffer, channel_names[i]);
-        char_buff_append_char(&buffer, 0);
+        char_buff_append_char(&buffer, '\0');
     }
 }
 - (void) updateImage

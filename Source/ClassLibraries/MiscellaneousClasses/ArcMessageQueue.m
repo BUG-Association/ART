@@ -1,3 +1,4 @@
+
 #define ART_MODULE_NAME     ArcMessageQueue
 
 #include <sys/types.h>
@@ -15,7 +16,11 @@ typedef struct {
 } msgbuf_t;
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
-
+@interface ArcMessageQueue()
+- (void) messageSend 
+    : (msgbuf_t*) mbuff
+    ;
+@end
 
 @implementation ArcMessageQueue
 
@@ -26,7 +31,6 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
     if ( self )
     {
-        //TODO: it would be better to do this with some other file.
         key_t key=ftok("/", 46290);
         message_queue= msgget(key, IPC_CREAT|ALL_MODE);
         process_id=getpid();
@@ -103,6 +107,9 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     msgbuf_t m;
     m.mtext.type=M_HOST;
     m.mtype=pid;
+    if(strlen(name)+1>MAX_MESSAGE_LENGTH){
+        ART_ERRORHANDLING_FATAL_ERROR("hostname too long");
+    }
     sprintf(m.mtext.message_data,"%s",name);
     [self messageSend:&m];
 }

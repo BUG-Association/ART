@@ -1,7 +1,4 @@
 #include "ART_Foundation.h"
-#include "IVec2D.h"
-//ASK: shouldn't this be in foundation???
-#include <semaphore.h>
 
 #ifdef __APPLE__
 #ifndef PTHREAD_BARRIER_H_
@@ -30,130 +27,71 @@ typedef struct {
         ArnLightAlphaImage** image;
         double* samples;
         IVec2D size;
-}tile_t;
+}art_tile_t;
 typedef struct image_window_t{
         IVec2D start,end; 
-}image_window_t;
-
-typedef enum {
-        RENDER,
-        MERGE,
-        WRITE,
-        WRITE_TONEMAP,
-        WRITE_EXIT,
-        TEV_CONNECT,
-        POISON,
-}art_task_type_t;
-typedef struct {
-        art_task_type_t type;
-        tile_t* work_tile;
-        image_window_t* window; 
-        int samples;
-        int sample_start;
-}art_task_t;
-
-typedef struct {
-        size_t tail,head,length,max_size;
-        art_task_t* data;
-}queue_t;
-typedef struct {
-        queue_t queue;
-        queue_t* current;
-        pthread_mutex_t lock;
-        pthread_cond_t cond_var;
-} render_queue_t;
-typedef struct {
-        queue_t queue1,queue2;
-        queue_t* current,*inactive;
-
-        pthread_mutex_t lock;
-        pthread_cond_t cond_var;
-} merge_queue_t;
+}art_image_window_t;
 
 @interface ArnTiledStochasticSampler 
         : ArnBinary
         <ArpImageSampler, ArpImageSamplerMessenger, ArpAction,ArpConcreteClass, ArpCoding>
-{
-        unsigned int                          overallNumberOfSamplesPerPixel;
-        int                                   randomValueGeneration;
-        unsigned int                          numberOfRenderThreads;
-        ArNode <ArpWorld, ArpBBox>          * world;
-        ArNode <ArpLightsourceCollection>   * lightsources;
-        ArNode <ArpCamera>                  * camera;
-        ArNode <ArpImageWriter>            ** outputImage;
-       
-        
-        ArNode <ArpPathspaceIntegrator>    ** pathspaceIntegrator;
-        ArFreelist                          * pathspaceResultFreelist;
+{      
 
-        
-        ArcSampleCounter                    * sampleCounter;
-        
+        int                                     randomValueGenerationSeed;
+        int                                     numberOfRenderThreads;
+        int                                     numberOfTiles;
+        int                                     numberOfImagesToWrite;
+        int                                     windowIterator;
+        int                                     samplesPerEpoch;
+        int                                     samplesPerEpochAdaptive;
+        int                                     samplesIssued;
+        int                                     numberOfSubpixelSamples; 
+        int                                     splattingKernelWidth;
+        int                                     splattingKernelArea;
+        int                                     splattingKernelOffset;
+        int                                     wavelengthSteps;
+        long                                    targetNumberOfSamplesPerPixel;
+        IVec2D                                  imageSize;
+        IPnt2D                                  imageOrigin;
+        IVec2D                                  tilesDimension;
+        IVec2D                                  tileSize;
+        IVec2D                                  paddedTileSize;
+        art_tile_t                              mergingImage;
+        BOOL                                    useDeterministicWavelengths;
+        BOOL                                    finishedGeneratingRenderTasks;
+        BOOL                                    poisonedRenderThreads;
+        BOOL                                    renderThreadsShouldTerminate;
+        ArSpectralSampleSplattingData           spectralSplattingData;
+        ArWavelengthSamplingData                spectralSamplingData;
+        ArSequenceID                            startingSequenceID;
+        ArTime                                  beginTime;
+        ArTime                                  endTime;
+        pthread_barrier_t                       renderingDone;
+        pthread_barrier_t                       mergingDone;
 
-        ArcObject <ArpRandomGenerator>     ** randomGenerator;
-        
-        //   Special operation mode: don't jitter the wavelengths
-    
-        BOOL            deterministicWavelengths;
-        
-        //   Steps needed to traverse the wavelength range
-        //   1 if stochastic, as only one sample is taken
-        //   number of WLs div 4 in the deterministic case, precomputed
-        
-        int             wavelengthSteps;
-        char          * preSamplingMessage;
-
-        IVec2D                                imageSize;
-        IPnt2D                                imageOrigin;
-        IVec2D                                tile_size;
-        IVec2D  padded_tile_size;
-
-        ArWavelengthSamplingData              spectralSamplingData;
-        ArSpectralSampleSplattingData         spectralSplattingData;
-
-        size_t buffer_size;
-        tile_t* tiles;
-        tile_t merge_image;
-        BOOL* unfinished;
-        BOOL finishedGeneratingRenderTasks;
-        BOOL poisoned_render;
-        unsigned int numberOfImagesToWrite;
-        image_window_t* render_windows;
-        long window_iterator;
-        long samples_per_window;
-        long samples_per_window_adaptive;
-        long samples_issued;
-        BOOL renderThreadsShouldTerminate;
-        
-        IVec2D tiles_dim;
-        
-
-        unsigned int    splattingKernelWidth;
-        unsigned int    splattingKernelArea;
-        int             splattingKernelOffset;
-
-        ArSequenceID    startingSequenceID;
-        unsigned int        numberOfSubpixelSamples;
-        Pnt2D         * sampleCoord;
-        double        * sampleSplattingFactor;
-        IPnt2D        * sampleSplattingOffset;
-
-
-        ArTime  beginTime, endTime;
-        pthread_barrier_t renderingDone;
-        pthread_barrier_t mergingDone;
-
-
-
-        ArcTevIntegration* tev;
-        float * tev_update_tile;
-        ArLightAlpha* tev_light;
-        ArSpectrum* tev_spectrum;
-        ArRGB* tev_rgb;
-        char**  tev_names;
-        ArnLightAlphaImage  *  out;
-
-        ArcMessageQueue* messageQueue;
+        ArNode<ArpWorld, ArpBBox>*              world;
+        ArNode<ArpLightsourceCollection>*       lightsources;
+        ArNode<ArpCamera>*                      camera;
+        ArFreelist*                             pathspaceResultFreelist;
+        ArcSampleCounter*                       sampleCounter;
+        art_tile_t*                             tilesBuffer;
+        art_image_window_t*                     taskWindows;
+        BOOL*                                   unfinished;
+        Pnt2D*                                  sampleCoordinates;
+        double*                                 sampleSplattingFactor;
+        float*                                  tevUpdateBuffer;
+        char*                                   preSamplingMessage;
+        IPnt2D*                                 sampleSplattingOffset;
+        ArnLightAlphaImage*                     writeBuffer;
+        ArcTevIntegration*                      tev;
+        ArLightAlpha*                           tevLight;
+        ArSpectrum*                             tevSpectrum;
+        ArRGB*                                  tevRGB;
+        ArcMessageQueue*                        messageQueue;
+        char**                                  tevImageNames;
+        ArNode<ArpImageWriter>**                outputImage;
+        ArNode<ArpPathspaceIntegrator>**        pathspaceIntegrator;
+        ArcObject<ArpRandomGenerator>**         randomGenerator;
 }
 
 - (id) init
@@ -161,12 +99,7 @@ typedef struct {
         : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
         : (unsigned int) newNumberOfSamples
         : (int) newRandomValueGeneration
-        ;
-
-- (const char *) preSamplingMessage
-        ;
-
-- (const char *) postSamplingMessage
+        : (int) newStartingSamplesPerEpoch
         ;
 
 - (void) useDeterministicWavelengths

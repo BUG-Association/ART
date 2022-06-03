@@ -78,7 +78,13 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         samplesPerPixel         : (unsigned int) newNumberOfSamples
         randomValueGeneration   : (int) newRandomValueGeneration
         ;
-
+- (id) sampleProvider
+                                : (ArNode <ArpPathspaceIntegrator> *) newRaySampler
+        sampleSplattingKernel   : (ArNode <ArpReconstructionKernel> *) newReconstructionKernel
+        samplesPerPixel         : (unsigned int) newNumberOfSamples
+        randomValueGeneration   : (int) newRandomValueGeneration
+        startingSamplesPerEpoch : (int) newStartingSamplesPerEpoch
+        ;
 @end
 #define TILED_STOCHASTIC_SAMPLER  \
     ALLOC_OBJECT_AUTORELEASE(ArnTiledStochasticSampler)
