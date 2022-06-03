@@ -13,12 +13,12 @@
 typedef struct {
     long mtype;
     message_t mtext;
-} msgbuf_t;
+} message_buffer_t;
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 @interface ArcMessageQueue()
 - (void) messageSend 
-    : (msgbuf_t*) mbuff
+    : (message_buffer_t*) messageBuffer
     ;
 @end
 
@@ -26,16 +26,15 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 - (id) init
 {
-    
     self = [ super init ];
 
     if ( self )
     {
-        key_t key=ftok("/", 46290);
-        message_queue= msgget(key, IPC_CREAT|ALL_MODE);
-        process_id=getpid();
+        key_t key = ftok("/", 46290);
+        messageQueue = msgget(key, IPC_CREAT|ALL_MODE);
+        ourProcessId = getpid();
 
-        if(message_queue==-1){
+        if(messageQueue == -1){
             ART_ERRORHANDLING_FATAL_ERROR("Failed to create/join Message Queue");
         }
     }
@@ -44,82 +43,108 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 }
 - (void)dealloc
 {
-    
     [super dealloc];
 }
 
-- (void)clearMessages {
-    msgbuf_t m;
+- (void)clearMessages 
+{
+    message_buffer_t messageBuffer;
     while(true){
-        int r=msgrcv(message_queue, &m, sizeof(message_t), 0, IPC_NOWAIT);
-        if(r==-1&&errno==ENOMSG)
+        int r = msgrcv(
+            messageQueue, 
+            &messageBuffer, 
+            sizeof(message_t), 
+            0, 
+            IPC_NOWAIT);
+        if(r == -1&& errno == ENOMSG)
             break;
     }
 }
 
 - (void)clearMessages:(long)pid {
-    msgbuf_t m;
+    message_buffer_t messageBuffer;
     while(true){
-        int r=msgrcv(message_queue, &m, sizeof(message_t), pid, IPC_NOWAIT);
-        if(r==-1&&errno==ENOMSG)
+        int r = msgrcv(
+            messageQueue, 
+            &messageBuffer, 
+            sizeof(message_t), 
+            pid, 
+            IPC_NOWAIT);
+        if(r == -1 && errno == ENOMSG)
             break;
     }
 }
 
-- (message_t)receiveMessage {
-    msgbuf_t m;
+- (message_t)receiveMessage 
+{
+    message_buffer_t messageBuffer;
     while(true){
-        int r=msgrcv(message_queue, &m, sizeof(message_t), process_id, 0);
-        
-        if(r!=-1)
+        int r = msgrcv(
+            messageQueue, 
+            &messageBuffer, 
+            sizeof(message_t), 
+            ourProcessId, 
+            0);
+        if(r != -1)
             break;
-        if(errno==EINTR)
+        if(errno == EINTR)
             continue;
-        m.mtext.type=M_INVALID;
+        messageBuffer.mtext.type = M_INVALID;
     }
-    return m.mtext;
+    return messageBuffer.mtext;
 }
 
 
-- (void) messageSend : (msgbuf_t*) mbuff{
+- (void) messageSend
+    : (message_buffer_t*) messageBuffer
+{
     while(true){
-        int r=msgsnd(message_queue, mbuff, sizeof(message_t),0);
-        if(r!=-1)
-        {
+        int r = msgsnd(
+            messageQueue, 
+            messageBuffer, 
+            sizeof(message_t),
+            0);
+        if(r != -1)
             break;
-        }
-        if(errno==EINTR)
-        {
+        if(errno == EINTR)
             continue;
-        }
         return;
     }
 }
 
-- (void)sendSimpleMessage:(long)pid :(message_type_t)message_type {
-    msgbuf_t m;
-    m.mtext.type=message_type;
-    m.mtype=pid;
-    [self messageSend:&m];
+- (void)sendSimpleMessage
+    :(long) pid 
+    :(message_type_t) messageType 
+{
+    message_buffer_t messageBuffer;
+    messageBuffer.mtext.type = messageType;
+    messageBuffer.mtype = pid;
+    [self messageSend: &messageBuffer];
 }
 
-- (void)sendHostName:(long)pid :(const char *)name {
-    msgbuf_t m;
-    m.mtext.type=M_HOST;
-    m.mtype=pid;
-    if(strlen(name)+1>MAX_MESSAGE_LENGTH){
+- (void)sendHostName
+    :(long) pid 
+    :(const char *) name 
+{
+    message_buffer_t messageBuffer;
+    messageBuffer.mtext.type = M_HOST;
+    messageBuffer.mtype = pid;
+    if(strlen(name) + 1 > MAX_MESSAGE_LENGTH){
         ART_ERRORHANDLING_FATAL_ERROR("hostname too long");
     }
-    sprintf(m.mtext.message_data,"%s",name);
-    [self messageSend:&m];
+    sprintf(messageBuffer.mtext.message_data,"%s",name);
+    [self messageSend:&messageBuffer];
 }
 
-- (void)sendHostPort:(long)pid :(uint32_t) port {
-    msgbuf_t m;
-    m.mtext.type=M_PORT;
-    m.mtype=pid;
-    *(uint32_t*)(m.mtext.message_data)=port;
-    [self messageSend:&m];
+- (void)sendHostPort
+    :(long) pid 
+    :(uint32_t) port 
+{
+    message_buffer_t messageBuffer;
+    messageBuffer.mtext.type = M_PORT;
+    messageBuffer.mtype = pid;
+    *(uint32_t*)(messageBuffer.mtext.message_data) = port;
+    [self messageSend: &messageBuffer];
 }
 
 @end

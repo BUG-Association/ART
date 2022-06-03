@@ -1,4 +1,5 @@
 #include "ART_SystemDatatypes.h"
+#include "IVec2D.h"
 #include "Pnt2D.h"
 #include <semaphore.h>
 
@@ -96,7 +97,7 @@ typedef struct {
         int sample_start;
 }art_task_t;
 typedef struct {
-        long tail,head,length,max_size;
+        long tail, head, length, max_size;
         art_task_t* data;
 }queue_t;
 typedef struct {
@@ -113,21 +114,20 @@ typedef struct {
         pthread_cond_t cond_var;
 } merge_queue_t;
 
-struct termios original;
-sem_t* writeSem;
+struct termios original_termios;
+sem_t* write_semaphore;
 
 render_queue_t render_queue;
 merge_queue_t merge_queue;
 void AtExit(){
-    tcsetattr( STDIN_FILENO, TCSANOW, & original );
+    tcsetattr( STDIN_FILENO, TCSANOW, & original_termios );
 }
 
 void prepend_merge_queue(merge_queue_t* q,art_task_t task);
 
 void try_prepend_merge_queue(sem_t* semaphore,art_task_type_t type){
     if(semaphore==NULL||sem_trywait(semaphore)==0){
-        art_task_t task;
-        task.type=type;
+        art_task_t task={.type = type};
         prepend_merge_queue(&merge_queue,task);
     }  
 }
@@ -137,25 +137,23 @@ void _image_sampler_sigint_handler(
 {
     (void) sig;
     //   SIGINT writes the current result image, exits afterward.
-    if(sem_wait(writeSem)==0){
-        art_task_t task;
-        task.type=WRITE_EXIT;
+    if(sem_wait(write_semaphore)==0){
+        art_task_t task={.type = WRITE_EXIT};
         prepend_merge_queue(&merge_queue,task);
     } 
 }
 
 
 int div_roundup(int divident,int divisor){
-    return (divident+(divisor-1))/divisor;
+    return (divident + divisor - 1) / divisor;
 }
 
 void init_queue(queue_t* q,size_t task_number){
-
-    q->tail=0;
-    q->head=0;
-    q->length=0;
-    q->max_size=task_number;
-    q->data=ALLOC_ARRAY_ZERO(art_task_t, task_number);
+    q->tail = 0;
+    q->head = 0;
+    q->length = 0;
+    q->max_size = task_number;
+    q->data = ALLOC_ARRAY_ZERO(art_task_t, task_number);
     if(!q->data){
         ART_ERRORHANDLING_FATAL_ERROR("Failed queue buffer allocation");
     }
@@ -166,9 +164,9 @@ void free_queue(queue_t* q){
 }
 
 void pop_queue(queue_t* q){
-    size_t tail=q->tail;
+    size_t tail = q->tail;
     tail++;
-    q->tail=tail%q->max_size;
+    q->tail = tail % q->max_size;
     q->length--;
 }
 
@@ -177,42 +175,42 @@ art_task_t peek_queue(queue_t* q){
 }
 
 void push_queue(queue_t* q,art_task_t t){
-    if(q->length+1>q->max_size){
-        size_t new_size=q->max_size+1;
-        art_task_t* new_ptr =REALLOC_ARRAY((q->data), art_task_t, new_size);
+    if(q->length + 1 > q->max_size){
+        size_t new_size = q->max_size+1;
+        art_task_t* new_ptr = REALLOC_ARRAY((q->data), art_task_t, new_size);
         if(new_ptr){
-            q->data=new_ptr;
-            q->max_size=new_size;
+            q->data = new_ptr;
+            q->max_size = new_size;
         }else{
             ART_ERRORHANDLING_FATAL_ERROR("Failed queue buffer reallocation\n");
 
         }
     }
-    size_t head_idx=q->head;
+    size_t head_idx = q->head;
 
-    q->data[head_idx]=t;
-    q->head=(head_idx+1)%q->max_size;
+    q->data[head_idx] = t;
+    q->head = (head_idx + 1) % q->max_size;
     q->length++;
 }
 
 void prepend_queue(queue_t* q,art_task_t t){
-    if(q->length+1>q->max_size){
-        size_t new_size=q->max_size+1;
-        art_task_t* new_ptr =REALLOC_ARRAY((q->data), art_task_t, new_size);
+    if(q->length + 1 > q->max_size){
+        size_t new_size = q->max_size+1;
+        art_task_t* new_ptr = REALLOC_ARRAY((q->data), art_task_t, new_size);
         if(new_ptr){
-            q->data=new_ptr;
-            q->max_size=new_size;
+            q->data = new_ptr;
+            q->max_size = new_size;
         }else{
             ART_ERRORHANDLING_FATAL_ERROR("Failed queue buffer reallocation");
         }
     }
 
     
-    if(q->tail==0)
-        q->tail=q->max_size-1;
+    if(q->tail == 0)
+        q->tail = q->max_size-1;
     else
         q->tail--;
-    q->data[q->tail]=t;
+    q->data[q->tail] = t;
     q->length++;
 }
 
@@ -225,11 +223,11 @@ void prepend_queue(queue_t* q,art_task_t t){
 
 
 void init_render_queue(render_queue_t* q,size_t task_number){
-    SYNC_QUEUE_PTR=&q->queue;
+    SYNC_QUEUE_PTR = &q->queue;
     init_queue(SYNC_QUEUE_PTR,task_number);
     if(
-        pthread_mutex_init(SYNC_LOCK_PTR, NULL)!=0 ||
-        pthread_cond_init(SYNC_COND_PTR, NULL)!=0){
+        pthread_mutex_init(SYNC_LOCK_PTR, NULL) != 0 ||
+        pthread_cond_init(SYNC_COND_PTR, NULL) != 0){
             ART_ERRORHANDLING_FATAL_ERROR("Failed render queue sync primitives initialization");
     }
 }
@@ -237,18 +235,18 @@ void init_render_queue(render_queue_t* q,size_t task_number){
 void free_render_queue(render_queue_t* q){
     free_queue(SYNC_QUEUE_PTR);
     if(
-        pthread_mutex_destroy(SYNC_LOCK_PTR)!=0||
-        pthread_cond_destroy(SYNC_COND_PTR)!=0){
+        pthread_mutex_destroy(SYNC_LOCK_PTR) != 0 ||
+        pthread_cond_destroy(SYNC_COND_PTR) != 0){
             ART_ERRORHANDLING_FATAL_ERROR("Failed render queue sync primitives destruction");
     }
 }
 
 art_task_t pop_render_queue(render_queue_t* q){
     pthread_mutex_lock(SYNC_LOCK_PTR);
-    while(SYNC_QUEUE.length==0)
+    while(SYNC_QUEUE.length == 0)
         pthread_cond_wait(SYNC_COND_PTR, SYNC_LOCK_PTR);
-    art_task_t ret=peek_queue(SYNC_QUEUE_PTR);
-    if (ret.type!=POISON)
+    art_task_t ret = peek_queue(SYNC_QUEUE_PTR);
+    if (ret.type != POISON)
         pop_queue(SYNC_QUEUE_PTR);
     pthread_mutex_unlock(SYNC_LOCK_PTR);
     return ret;
@@ -264,13 +262,13 @@ void push_render_queue(render_queue_t* q,art_task_t  task){
 }
 
 void init_merge_queue(merge_queue_t* q,size_t task_number){
-    SYNC_QUEUE_PTR=&q->queue1;
-    q->inactive=&q->queue2;
+    SYNC_QUEUE_PTR = &q->queue1;
+    q->inactive = &q->queue2;
     init_queue(&q->queue1,task_number);
     init_queue(&q->queue2,task_number);
     if(
-        pthread_mutex_init(SYNC_LOCK_PTR, NULL)!=0 ||
-        pthread_cond_init(SYNC_COND_PTR, NULL)!=0){
+        pthread_mutex_init(SYNC_LOCK_PTR, NULL) != 0 ||
+        pthread_cond_init(SYNC_COND_PTR, NULL) != 0){
             ART_ERRORHANDLING_FATAL_ERROR("Failed merge queue sync primitives initialization");
     }
 }
@@ -279,8 +277,8 @@ void free_merge_queue(merge_queue_t* q){
     free_queue(&q->queue1);
     free_queue(&q->queue2);
     if(
-        pthread_mutex_destroy(SYNC_LOCK_PTR)!=0||
-        pthread_cond_destroy(SYNC_COND_PTR)!=0){
+        pthread_mutex_destroy(SYNC_LOCK_PTR) != 0 ||
+        pthread_cond_destroy(SYNC_COND_PTR) != 0){
             ART_ERRORHANDLING_FATAL_ERROR("Failed merge queue sync primitives destruction");
     }
 }
@@ -303,12 +301,12 @@ void prepend_merge_queue(merge_queue_t* q,art_task_t task){
 
 void swap_merge_queue(merge_queue_t* q){
     pthread_mutex_lock(SYNC_LOCK_PTR);
-    while(SYNC_QUEUE.length==0){
+    while(SYNC_QUEUE.length == 0){
         pthread_cond_wait(SYNC_COND_PTR, SYNC_LOCK_PTR);
     }
-    queue_t* tmp =SYNC_QUEUE_PTR;
-    SYNC_QUEUE_PTR=q->inactive;
-    q->inactive=tmp;
+    queue_t* tmp = SYNC_QUEUE_PTR;
+    SYNC_QUEUE_PTR = q->inactive;
+    q->inactive = tmp;
     pthread_mutex_unlock(SYNC_LOCK_PTR);
 }
 
@@ -372,17 +370,17 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     :(art_tile_t*) tile
     :(IVec2D) size
 {
-    tile->size=size;
-    tile->image=ALLOC_ARRAY(ArnLightAlphaImage*, numberOfImagesToWrite);
-    for (int i=0 ; i <numberOfImagesToWrite; i++) {
-        tile->image[i]=[ ALLOC_OBJECT(ArnLightAlphaImage)
+    tile->size = size;
+    tile->image = ALLOC_ARRAY(ArnLightAlphaImage*, numberOfOutputImages);
+    for (int i=0 ; i < numberOfOutputImages; i++) {
+        tile->image[i] = [ ALLOC_OBJECT(ArnLightAlphaImage)
                     initWithSize
                     :   tile->size
                     ];
     }
     tile->samples=ALLOC_ARRAY(
             double,
-            numberOfImagesToWrite*XC(tile->size) * YC(tile->size)
+            numberOfOutputImages * XC(tile->size) * YC(tile->size)
             );
 }
 
@@ -390,18 +388,18 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     :(art_tile_t*) tile
 {
     int tileArea=XC(tile->size)*YC(tile->size);
-    for ( int imgIdx=0 ; imgIdx <numberOfImagesToWrite; imgIdx++) {
+    for ( int imageIndex=0 ; imageIndex < numberOfOutputImages; imageIndex++) {
         for ( int y = 0; y < YC(tile->size); y++ )
         {
             for ( int x = 0; x < XC(tile->size); x++ )
             {
-                int tileIdx=x + y*XC(tile->size);
+                int tileIdx = x + y * XC(tile->size);
                 arlightalpha_l_init_l(
                         art_gv,
                         ARLIGHTALPHA_NONE_A0,
-                        tile->image[imgIdx]->data[tileIdx]
+                        tile->image[imageIndex]->data[tileIdx]
                     );
-                tile->samples[imgIdx * tileArea + tileIdx]=0.0;
+                tile->samples[imageIndex * tileArea + tileIdx] = 0.0;
             }
         }
     }
@@ -409,7 +407,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 - (void) freeTile
     :(art_tile_t*) tile
 {
-    for (int i=0 ; i <numberOfImagesToWrite; i++) {
+    for (int i = 0 ; i < numberOfOutputImages; i++) {
         RELEASE_OBJECT(tile->image[i]);
     }
     FREE_ARRAY(tile->image);
@@ -424,15 +422,15 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
         if (poisonedRenderThreads) {
             return false;
         }
-        tile->type=POISON;
-        poisonedRenderThreads=true;
+        tile->type = POISON;
+        poisonedRenderThreads = true;
         return true;
     }
     
-    tile->samples=samplesPerEpoch;
-    tile->window=&taskWindows[windowIterator];
-    tile->sample_start=samplesIssued;
-    tile->type=RENDER;
+    tile->samples = samplesPerEpoch;
+    tile->window = &taskWindows[windowIterator];
+    tile->sample_start = samplesIssued;
+    tile->type = RENDER;
     [self taskNextIteration];
     return true;
 }
@@ -440,15 +438,15 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 {
     windowIterator++;
     
-    if(windowIterator==XC(tilesDimension)*YC(tilesDimension)){
+    if(windowIterator == XC(tilesDimension) * YC(tilesDimension)){
         [ sampleCounter step
             :   samplesPerEpoch
             ];
-        windowIterator=0;
-        samplesIssued+=samplesPerEpoch;
-        samplesPerEpoch=samplesPerEpochAdaptive;
-        samplesPerEpoch= MIN(targetNumberOfSamplesPerPixel-samplesIssued,samplesPerEpoch);
-        if(samplesPerEpoch==0){
+        windowIterator = 0;
+        samplesIssued += samplesPerEpoch;
+        samplesPerEpoch = samplesPerEpochAdaptive;
+        samplesPerEpoch = MIN(targetNumberOfSamplesPerPixel - samplesIssued, samplesPerEpoch);
+        if(samplesPerEpoch == 0){
             finishedGeneratingRenderTasks=true;
         }
     }
@@ -461,12 +459,12 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
 
 - (void) setupInternalVariables
 {
-    finishedGeneratingRenderTasks=NO;
+    finishedGeneratingRenderTasks = NO;
     renderThreadsShouldTerminate = NO;
-    windowIterator=0;
-    samplesPerEpochAdaptive=samplesPerEpoch;
-    samplesIssued=0;
-    samplesPerEpoch= MIN(targetNumberOfSamplesPerPixel,samplesPerEpoch);
+    windowIterator = 0;
+    samplesPerEpochAdaptive = samplesPerEpoch;
+    samplesIssued = 0;
+    samplesPerEpoch = MIN(targetNumberOfSamplesPerPixel,samplesPerEpoch);
     numberOfRenderThreads = art_maximum_number_of_working_threads(art_gv);
     if ( useDeterministicWavelengths )
     {
@@ -476,8 +474,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     {
         wavelengthSteps = 1;
     }
-    if(samplesPerEpoch==0){
-        finishedGeneratingRenderTasks=true;
+    if(samplesPerEpoch == 0){
+        finishedGeneratingRenderTasks = true;
     }
 
 }
@@ -500,7 +498,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         targetNumberOfSamplesPerPixel = newNumberOfSamples;
         randomValueGenerationSeed = newRandomValueGeneration;
         useDeterministicWavelengths = NO;       
-        samplesPerEpoch=newStartingSamplesPerEpoch;
+        samplesPerEpoch = newStartingSamplesPerEpoch;
         
         [self setupInternalVariables];
     }
@@ -536,14 +534,14 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     SAMPLE_SPLATTING_FACTOR( __k, (__u) * splattingKernelWidth + (__v) )
 
 - (void) prepareForSampling
-        : (ArNode <ArpWorld> *) nWorld
-        : (ArNode <ArpCamera > *) nCamera
+        : (ArNode <ArpWorld> *) _world
+        : (ArNode <ArpCamera > *) _camera
         : (ArNode <ArpImageWriter> **) image
-        : (int) numberOfResultImages
+        : (int) _numberOfOutputImages
 {
-    (void)nWorld;
-    (void)nCamera;
-    pthread_barrier_init(&renderingDone, NULL, numberOfRenderThreads+1);
+    (void)_world;
+    (void)_camera;
+    pthread_barrier_init(&renderingDone, NULL, numberOfRenderThreads + 1);
     pthread_barrier_init(&mergingDone, NULL, 2);
 
 
@@ -552,9 +550,9 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         ART_ERRORHANDLING_FATAL_ERROR("asprintf failed");
     }
     
-    writeSem=sem_open(sem_name, O_CREAT|O_EXCL, S_IRUSR|S_IWUSR, 1);
+    write_semaphore=sem_open(sem_name, O_CREAT|O_EXCL, S_IRUSR|S_IWUSR, 1);
     FREE_ARRAY(sem_name);
-    if(writeSem==SEM_FAILED){
+    if(write_semaphore==SEM_FAILED){
         perror("semaphore");
         ART_ERRORHANDLING_FATAL_ERROR("Failed to create semaphore");
     } 
@@ -581,7 +579,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
             ART_ERRORHANDLING_FATAL_ERROR("asprintf failed");
         }
     }
-    numberOfImagesToWrite=numberOfResultImages;
+    numberOfOutputImages = _numberOfOutputImages;
     
     sampleCounter =
         [ ALLOC_INIT_OBJECT(ArcSampleCounter)
@@ -620,8 +618,8 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     }
 
     outputImage =
-        ALLOC_ARRAY(ArNode <ArpImageWriter> *, numberOfResultImages);
-    for ( int i = 0; i < numberOfResultImages; i++ )
+        ALLOC_ARRAY(ArNode <ArpImageWriter> *, numberOfOutputImages);
+    for ( int i = 0; i < numberOfOutputImages; i++ )
         outputImage[i] = image[i];
     imageSize = [ outputImage[0] size ];
     imageOrigin = [ outputImage[0] origin ];
@@ -636,7 +634,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
             ArReferenceFrame  referenceFrame;
             Ray3D             ray;
             
-            BOOL  corner00 =
+            BOOL res =
                 [ camera getWorldspaceRay
                     : & VEC2D(
                         x + 0,
@@ -647,7 +645,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
                     : & ray
                     ];
 
-            BOOL  corner01 =
+            res = res ||
                 [ camera getWorldspaceRay
                     : & VEC2D(
                         x + 0,
@@ -658,7 +656,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
                     : & ray
                     ];
 
-            BOOL  corner10 =
+            res = res ||
                 [ camera getWorldspaceRay
                     : & VEC2D(
                         x + 1,
@@ -669,7 +667,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
                     : & ray
                     ];
 
-            BOOL  corner11 =
+            res = res ||
                 [ camera getWorldspaceRay
                     : & VEC2D(
                         x + 1,
@@ -683,7 +681,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
             //   If any of the corners is a valid ray, the pixel has to
             //   be looked at
             
-            unfinished[x + y*XC(imageSize)] = corner00 || corner01 || corner10 || corner11;
+            unfinished[x + y*XC(imageSize)] = res;
         }
     }
 
@@ -742,44 +740,48 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     tileSize=IVEC2D(16, 16);
 
     
-    XC(tilesDimension)=div_roundup(XC(imageSize)-XC(imageOrigin), XC(tileSize));
-    YC(tilesDimension)=div_roundup(YC(imageSize)-YC(imageOrigin), YC(tileSize));
+    XC(tilesDimension) = div_roundup(XC(imageSize)-XC(imageOrigin), XC(tileSize));
+    YC(tilesDimension) = div_roundup(YC(imageSize)-YC(imageOrigin), YC(tileSize));
     taskWindows= ALLOC_ARRAY(art_image_window_t, XC(tilesDimension)*YC(tilesDimension));
 
-    int y_start=YC(imageOrigin);
+    int yStart=YC(imageOrigin);
     for (int y=0; y<YC(tilesDimension); y++) {
-        int x_start=XC(imageOrigin);
+        int xStart=XC(imageOrigin);
         for (int x=0; x<XC(tilesDimension); x++) {
-            art_image_window_t* curr=&taskWindows[y*XC(tilesDimension)+x];
-            curr->start=IVEC2D(x_start, y_start);
-            int x_end=MIN(x_start+XC(tileSize), XC(imageSize));
-            int y_end=MIN(y_start+YC(tileSize), YC(imageSize));
+            art_image_window_t* curr = &taskWindows[y * XC(tilesDimension) + x];
+            curr->start = IVEC2D(xStart, yStart);
+            IVec2D end;
+            XC(end) = MIN(xStart + XC(tileSize), XC(imageSize));
+            YC(end) = MIN(yStart + YC(tileSize), YC(imageSize));
             
-            curr->end=IVEC2D(x_end, y_end);
-            x_start=x_end;
+            curr->end = IVEC2D(XC(end), YC(end));
+            xStart = XC(end);
         }
-        y_start=MIN(y_start+YC(tileSize), YC(imageSize));
+        yStart=MIN(yStart+YC(tileSize), YC(imageSize));
     }  
   
     splattingKernelWidth  = [ RECONSTRUCTION_KERNEL supportSize ];
     splattingKernelArea   = M_SQR( splattingKernelWidth );
     splattingKernelOffset = (splattingKernelWidth - 1) / 2;
-    paddedTileSize=IVEC2D(XC(tileSize)+2*splattingKernelOffset,YC(tileSize)+2*splattingKernelOffset);
-    numberOfTiles=TILE_CONSTANT*numberOfRenderThreads;
+    paddedTileSize=
+        IVEC2D(
+            XC(tileSize) + 2 * splattingKernelOffset,
+            YC(tileSize) + 2 * splattingKernelOffset);
+    numberOfTilesInMemory=TILE_CONSTANT * numberOfRenderThreads;
     tilesBuffer = ALLOC_ARRAY(
             art_tile_t,
-            numberOfTiles
+            numberOfTilesInMemory
             );
     for ( int i = 0;
-          i < numberOfTiles;
+          i < numberOfTilesInMemory;
           i++ )
     {
         [self initTile: &tilesBuffer[i] : paddedTileSize];
     }
-    init_render_queue(&render_queue, numberOfTiles);
-    init_merge_queue(&merge_queue, numberOfTiles);
+    init_render_queue(&render_queue, numberOfTilesInMemory);
+    init_merge_queue(&merge_queue, numberOfTilesInMemory);
     
-    for (int i =0; i< numberOfTiles; i++) {
+    for (int i =0; i< numberOfTilesInMemory; i++) {
         art_task_t task;
         task.work_tile=&tilesBuffer[i];
 
@@ -791,9 +793,9 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     [tev setHostName:LOCALHOST ];
     [tev setHostPort:TEV_PORT];
     [tev tryConnection];
-    tevImageNames=ALLOC_ARRAY(char*,numberOfResultImages);
+    tevImageNames=ALLOC_ARRAY(char*,numberOfOutputImages);
 
-    for (int i =0; i<numberOfResultImages; i++) {
+    for (int i =0; i<numberOfOutputImages; i++) {
         const char* imgName=[ (ArnFileImage <ArpImage> *)outputImage[i] fileName ];
         const char* tevSuffix=".tev_rgb";
 
@@ -801,7 +803,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
             ART_ERRORHANDLING_FATAL_ERROR("asprintf failed");
         }
     }
-    for (int i =0; i<numberOfResultImages; i++) {
+    for (int i =0; i<numberOfOutputImages; i++) {
         [tev createImage:tevImageNames[i] :NO :"RGB" :3:XC(imageSize) :YC(imageSize) ];
     }
     tevUpdateBuffer =ALLOC_ARRAY(float, 3*XC(paddedTileSize)*YC(paddedTileSize));
@@ -893,7 +895,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
             initWithSize
             :   IVEC2D(XC(imageSize), YC(imageSize))
             ];
-    tcgetattr( STDIN_FILENO, & original );
+    tcgetattr( STDIN_FILENO, & original_termios );
     atexit(AtExit);
 }
 
@@ -902,7 +904,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         : (ArNode <ArpWorld> *) world
         : (ArNode <ArpCamera > *) camera
         : (ArNode <ArpImageWriter> **) image
-        : (int) numberOfResultImages
+        : (int) numberOfOutputImages
 {
 
 
@@ -914,12 +916,12 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     [ sampleCounter start ];
     artime_now( & beginTime );
     unsigned int i = 0;
-    ArcUnsignedInteger  * index;
+    ArcUnsignedInteger  * threadIndex;
     for ( ; i < (unsigned int)numberOfRenderThreads; i++ )
     {
-        index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
+        threadIndex = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i ];
 
-        if ( ! art_thread_detach(@selector(renderThread:), self,  index))
+        if ( ! art_thread_detach(@selector(renderThread:), self,  threadIndex))
             ART_ERRORHANDLING_FATAL_ERROR(
                 "could not detach rendering thread %d",
                 i
@@ -927,24 +929,24 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     }
     
     
-    index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i++ ];
+    threadIndex = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i++ ];
 
-    if ( ! art_thread_detach(@selector(mergeThread:), self,  index))
+    if ( ! art_thread_detach(@selector(mergeThread:), self,  threadIndex))
         ART_ERRORHANDLING_FATAL_ERROR(
             "could not detach rendering thread %d",
             i
             );
 
-    index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i++ ];
+    threadIndex = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i++ ];
 
-    if ( ! art_thread_detach(@selector(terminalIOThread:), self,  index))
+    if ( ! art_thread_detach(@selector(terminalIOThread:), self,  threadIndex))
     ART_ERRORHANDLING_FATAL_ERROR(
         "could not detach terminal I/O thread"
         );
 
-    index = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i++ ];
+    threadIndex = [ ALLOC_INIT_OBJECT(ArcUnsignedInteger) : i++ ];
 
-    if ( ! art_thread_detach(@selector(MessageQueueThread:), self,  index))
+    if ( ! art_thread_detach(@selector(MessageQueueThread:), self,  threadIndex))
     ART_ERRORHANDLING_FATAL_ERROR(
         "could not detach Message Queue thread"
         );
@@ -989,22 +991,22 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     (void) threadIndex;
     
     while(!renderThreadsShouldTerminate){
-        message_t msg= [messageQueue receiveMessage];
-        switch(msg.type){
+        message_t message= [messageQueue receiveMessage];
+        switch(message.type){
             case M_WRITE:
-                try_prepend_merge_queue(writeSem,WRITE);
+                try_prepend_merge_queue(write_semaphore,WRITE);
                 break;
             case M_WRITE_TONEMAP:
-                try_prepend_merge_queue(writeSem,WRITE_TONEMAP);
+                try_prepend_merge_queue(write_semaphore,WRITE_TONEMAP);
                 break;
             case M_TERMINATE:
                 _image_sampler_sigint_handler(0);
                 break;
             case M_PORT:
-                [tev setHostPort:*(uint32_t*)(msg.message_data)];
+                [tev setHostPort:*(uint32_t*)(message.message_data)];
                 break;
             case M_HOST:
-                [tev setHostName:msg.message_data];
+                [tev setHostName:message.message_data];
                 break;
             case M_TEV_CONNECT:
                 try_prepend_merge_queue(NULL,TEV_CONNECT);
@@ -1026,12 +1028,12 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     (void) threadIndex;
     
     while(!renderThreadsShouldTerminate){
-        art_task_t curr_task= pop_render_queue(&render_queue);
-        if(curr_task.type==POISON)
+        art_task_t currentTask= pop_render_queue(&render_queue);
+        if(currentTask.type==POISON)
             break;
-        [self renderTask : &curr_task: threadIndex];
-        curr_task.type=MERGE;
-        push_merge_queue(&merge_queue, curr_task);
+        [self renderTask : &currentTask: threadIndex];
+        currentTask.type=MERGE;
+        push_merge_queue(&merge_queue, currentTask);
     }
     
     pthread_barrier_wait(&renderingDone);
@@ -1046,27 +1048,27 @@ typedef struct ArPixelID
 }
 ArPixelID;
 -(void) renderTask
-    :(art_task_t*) t
+    :(art_task_t*) task
     : (ArcUnsignedInteger *) threadIndex
 {
-    [self cleanTile : t->work_tile];
+    [self cleanTile : task->work_tile];
     ArPathspaceResult  ** sampleValue =
-        ALLOC_ARRAY( ArPathspaceResult *, numberOfImagesToWrite );
+        ALLOC_ARRAY( ArPathspaceResult *, numberOfOutputImages );
     
-    for (int y=YC(t->window->start); y<YC(t->window->end); y++) {
-        for (int x=XC(t->window->start); x<XC(t->window->end); x++) {
+    for (int y=YC(task->window->start); y<YC(task->window->end); y++) {
+        for (int x=XC(task->window->start); x<XC(task->window->end); x++) {
             if(!unfinished[x + y*XC(imageSize)])
                 continue;
             if ( renderThreadsShouldTerminate )
                 goto FREE_SAMPLE_VALUE;
-            for(int sample=0;sample<t->samples;sample++){
+            for(int sample=0;sample<task->samples;sample++){
                 ArPixelID  px_id={
                     .threadIndex=THREAD_INDEX,
                     .globalRandomSeed = arrandom_global_seed(art_gv),
-                    .sampleIndex = t->sample_start  +sample,
+                    .sampleIndex = task->sample_start  +sample,
                     .pixelCoord=PNT2D(x, y)};
 
-                int  subpixelIdx = (px_id.sampleIndex) % numberOfSubpixelSamples;
+                int  subpixelIndex = (px_id.sampleIndex) % numberOfSubpixelSamples;
                 
                 for ( int w = 0; w < wavelengthSteps; w++ )
                 {
@@ -1116,8 +1118,8 @@ ArPixelID;
                     }
                     BOOL valid_ray=[ camera getWorldspaceRay
                              : & VEC2D(
-                                    x + XC(sampleCoordinates[subpixelIdx]),
-                                    y + YC(sampleCoordinates[subpixelIdx])
+                                    x + XC(sampleCoordinates[subpixelIndex]),
+                                    y + YC(sampleCoordinates[subpixelIndex])
                                     )
                              :   THREAD_RANDOM_GENERATOR
                              : & referenceFrame
@@ -1138,11 +1140,11 @@ ArPixelID;
                         {
                             if ( LIGHT_SUBSYSTEM_IS_IN_POLARISATION_MODE )
                             {
-                                for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                                for ( int imageIndex = 0; imageIndex < numberOfOutputImages; imageIndex++ )
                                     arlightsample_realign_to_coaxial_refframe_l(
                                           art_gv,
                                         & referenceFrame,
-                                          ARPATHSPACERESULT_LIGHTSAMPLE( *sampleValue[im] )
+                                          ARPATHSPACERESULT_LIGHTSAMPLE( *sampleValue[imageIndex] )
                                         );
                             }
                             
@@ -1151,7 +1153,7 @@ ArPixelID;
                     }
                     else
                     {
-                        for ( int im = 0; im < numberOfImagesToWrite; im++ )
+                        for ( int im = 0; im < numberOfOutputImages; im++ )
                         {
                             sampleValue[im] =
                                 (ArPathspaceResult*) arfreelist_pop(
@@ -1169,52 +1171,54 @@ ArPixelID;
 
                         validSample = TRUE;
                     }
-                    IVec2D currentTileSize=t->work_tile->size;
+                    IVec2D currentTileSize=task->work_tile->size;
                     int tileArea=XC(currentTileSize) * YC(currentTileSize);
                     if ( validSample )
                     {
-                        int xc=x-XC(t->window->start);
-                        int yc=y-YC(t->window->start);
-                        int tileIdx=yc*XC(currentTileSize)+xc;
+                        IVec2D tileCoordinate;
+                        XC(tileCoordinate) = x - XC(task->window->start);
+                        YC(tileCoordinate) = y - YC(task->window->start);
+
+                        int tileIndex=YC(tileCoordinate)*XC(currentTileSize)+XC(tileCoordinate);
                         if ( splattingKernelWidth == 1 )
                         {
-                            for ( int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
+                            for ( int imageIndex = 0; imageIndex < numberOfOutputImages; imageIndex++ )
                             {
-                                t->work_tile->samples[imgIdx * tileArea + tileIdx]+=1.0;
+                                task->work_tile->samples[imageIndex * tileArea + tileIndex] += 1.0;
                                            
                                 arlightalpha_wsd_sloppy_add_l(
                                       art_gv,
-                                      ARPATHSPACERESULT_LIGHTALPHASAMPLE(*sampleValue[imgIdx]),
+                                      ARPATHSPACERESULT_LIGHTALPHASAMPLE(*sampleValue[imageIndex]),
                                     & wavelength,
                                     & spectralSplattingData,
                                       3.0 DEGREES,
-                                      t->work_tile->image[imgIdx]->data[tileIdx]
+                                      task->work_tile->image[imageIndex]->data[tileIndex]
                                     );
                             }
                         }
                         else
                         {
-                            xc=xc+splattingKernelOffset;
-                            yc=yc+splattingKernelOffset;
-                            for ( int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
+                            
+                            XC(tileCoordinate) += splattingKernelOffset;
+                            YC(tileCoordinate) += splattingKernelOffset;
+                            for ( int imageIndex = 0; imageIndex < numberOfOutputImages; imageIndex++ )
                             {
-                                for ( int l = 0; l < splattingKernelArea; l++ )
+                                for ( int splatPixel = 0; splatPixel < splattingKernelArea; splatPixel++ )
                                 {
-                                    int  cX = xc + XC( sampleSplattingOffset[l] );
-                                    int  cY = yc + YC( sampleSplattingOffset[l] );
-                                    int tileIdx=cY*XC(currentTileSize)+cX;
-                                    t->work_tile->samples[ imgIdx * tileArea +tileIdx]
-                                        +=SAMPLE_SPLATTING_FACTOR( subpixelIdx, l );
+                                    int  offsetTileCoordinateX = XC(tileCoordinate) + XC( sampleSplattingOffset[splatPixel] );
+                                    int  offsetTileCoordinateY = YC(tileCoordinate) + YC( sampleSplattingOffset[splatPixel] );
+                                    int tileIdx = offsetTileCoordinateY * XC(currentTileSize) + offsetTileCoordinateX;
+                                    task->work_tile->samples[ imageIndex * tileArea + tileIdx]
+                                        += SAMPLE_SPLATTING_FACTOR( subpixelIndex, splatPixel );
                                     
-
                                     arlightalpha_dwsd_mul_sloppy_add_l(
                                             art_gv,
-                                            SAMPLE_SPLATTING_FACTOR( subpixelIdx, l ),
-                                            ARPATHSPACERESULT_LIGHTALPHASAMPLE(*sampleValue[imgIdx]),
+                                            SAMPLE_SPLATTING_FACTOR( subpixelIndex, splatPixel ),
+                                            ARPATHSPACERESULT_LIGHTALPHASAMPLE(*sampleValue[imageIndex]),
                                         & wavelength,
                                         & spectralSplattingData,
                                             5.0 DEGREES,
-                                            t->work_tile->image[imgIdx]->data[tileIdx]
+                                            task->work_tile->image[imageIndex]->data[tileIdx]
                                         );
 
                                 }
@@ -1222,12 +1226,12 @@ ArPixelID;
                         }
                     }
 
-                    for ( int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
+                    for ( int imageIndex = 0; imageIndex < numberOfOutputImages; imageIndex++ )
                     {
                         arpathspaceresult_free_to_freelist(
                               art_gv,
                             & pathspaceResultFreelist[THREAD_INDEX],
-                              sampleValue[imgIdx]
+                              sampleValue[imageIndex]
                             );
                     }
                 }
@@ -1268,7 +1272,7 @@ ArPixelID;
                     break;
                 case WRITE:
                     [self writeImage];
-                    sem_post(writeSem);
+                    sem_post(write_semaphore);
                     break;
                 case WRITE_TONEMAP:
                     [self writeImage];
@@ -1284,13 +1288,13 @@ ArPixelID;
                 case WRITE_EXIT:
                     renderThreadsShouldTerminate = YES;
                     [self writeImage];
-                    sem_post(writeSem);
+                    sem_post(write_semaphore);
                     goto END;
                 case POISON:
                     goto END;
                 case TEV_CONNECT:
                     if([tev tryConnection]){
-                        for (int i =0; i<numberOfImagesToWrite; i++) {
+                        for (int i =0; i<numberOfOutputImages; i++) {
                             [tev createImage:tevImageNames[i] :NO :"RGB" :3:XC(imageSize) :YC(imageSize) ];
                         }
                         [self repaintTevImage];
@@ -1308,31 +1312,31 @@ ArPixelID;
     pthread_barrier_wait(&mergingDone);
 }
 -(void) mergeTask
-    :(art_task_t*) t
+    :(art_task_t*) task
 {
-    IVec2D sizeTile=t->work_tile->size;
+    IVec2D sizeOfTile=task->work_tile->size;
     const int imageArea=XC(imageSize)*YC(imageSize);
-    const int tileArea=XC(sizeTile)*YC(sizeTile);
-    for ( int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ ){
-        for (int y=0; y<YC(sizeTile); y++) {
-            for (int x=0; x<XC(sizeTile); x++) {
-                int cX=XC(t->window->start)-splattingKernelOffset+x;
-                int cY=YC(t->window->start)-splattingKernelOffset+y;
-                if (   cX >= 0
-                    && cX < XC(imageSize)
-                    && cY >= 0
-                    && cY < YC(imageSize) 
+    const int tileArea=XC(sizeOfTile)*YC(sizeOfTile);
+    for ( int imageIndex = 0; imageIndex < numberOfOutputImages; imageIndex++ ){
+        for (int y=0; y<YC(sizeOfTile); y++) {
+            for (int x=0; x<XC(sizeOfTile); x++) {
+                int mergingImageX=XC(task->window->start)-splattingKernelOffset+x;
+                int mergingImageY=YC(task->window->start)-splattingKernelOffset+y;
+                if (   mergingImageX >= 0
+                    && mergingImageX < XC(imageSize)
+                    && mergingImageY >= 0
+                    && mergingImageY < YC(imageSize) 
                     )
                 {
-                    const int tileIdx=x + y * XC(sizeTile);
-                    const int mergeIdx=cX + cY * XC(imageSize);
-                    mergingImage.samples[imgIdx * imageArea + mergeIdx]+=
-                        t->work_tile->samples[imgIdx * tileArea + tileIdx];
+                    const int tileIndex=x + y * XC(sizeOfTile);
+                    const int mergingImageIndex=mergingImageX + mergingImageY * XC(imageSize);
+                    mergingImage.samples[imageIndex * imageArea + mergingImageIndex]+=
+                        task->work_tile->samples[imageIndex * tileArea + tileIndex];
                     
                     arlightalpha_l_add_l(
                         art_gv, 
-                        t->work_tile->image[imgIdx]->data[tileIdx], 
-                        mergingImage.image[imgIdx]->data[mergeIdx]
+                        task->work_tile->image[imageIndex]->data[tileIndex], 
+                        mergingImage.image[imageIndex]->data[mergingImageIndex]
                         );
                 }
             }
@@ -1342,35 +1346,35 @@ ArPixelID;
 -(void) repaintTevImage
 {
     for(int i =0;i<XC(tilesDimension)*YC(tilesDimension);i++){
-        art_task_t t;
-        t.window=&taskWindows[i];
-        [self tevTask:&t];
+        art_task_t task;
+        task.window=&taskWindows[i];
+        [self tevTask:&task];
     }
 }
 
 -(void) tevTask
-    :(art_task_t*) t
+    :(art_task_t*) task
 {
     if(!tev->connected){
         return;
     }
     art_image_window_t tevWindow;
-    XC(tevWindow.start)=MAX(XC(t->window->start)-splattingKernelOffset,0);
-    YC(tevWindow.start)=MAX(YC(t->window->start)-splattingKernelOffset,0);
-    XC(tevWindow.end)=MIN(XC(t->window->end)+splattingKernelOffset,XC(imageSize));
-    YC(tevWindow.end)=MIN(YC(t->window->end)+splattingKernelOffset,YC(imageSize));
+    XC(tevWindow.start)=MAX(XC(task->window->start)-splattingKernelOffset,0);
+    YC(tevWindow.start)=MAX(YC(task->window->start)-splattingKernelOffset,0);
+    XC(tevWindow.end)=MIN(XC(task->window->end)+splattingKernelOffset,XC(imageSize));
+    YC(tevWindow.end)=MIN(YC(task->window->end)+splattingKernelOffset,YC(imageSize));
 
     const int imageArea=XC(imageSize)*YC(imageSize);
 
-    for ( int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
+    for ( int imageIndex = 0; imageIndex < numberOfOutputImages; imageIndex++ )
     {
         size_t i=0;
         for ( int y = YC(tevWindow.start); y < YC(tevWindow.end); y++ )
         {
             for ( int x = XC(tevWindow.start); x < XC(tevWindow.end); x++ )
             {
-                size_t idx=x +y*XC(imageSize);
-                double  pixelSampleCount = mergingImage.samples[ imgIdx*imageArea + idx];
+                size_t index=x +y*XC(imageSize);
+                double  pixelSampleCount = mergingImage.samples[ imageIndex*imageArea + index];
                 arlightalpha_l_init_l(
                         art_gv,
                         ARLIGHTALPHA_NONE_A0,
@@ -1378,7 +1382,7 @@ ArPixelID;
                     );
                 arlightalpha_l_add_l(
                         art_gv,
-                        mergingImage.image[imgIdx]->data[idx],
+                        mergingImage.image[imageIndex]->data[index],
                         tevLight
                     );
 
@@ -1402,16 +1406,16 @@ ArPixelID;
             }
         }
 
-        const int64_t channel_offsets[]={0,1,2};
-        const int64_t channel_strides[]={3,3,3};
+        const int64_t channelOffsets[]={0,1,2};
+        const int64_t channelStrides[]={3,3,3};
     
         [tev updateImage:
-            tevImageNames[imgIdx]:
+            tevImageNames[imageIndex]:
             NO:
             "RGB":
             3:
-            channel_offsets:
-            channel_strides:
+            channelOffsets:
+            channelStrides:
             XC(tevWindow.start):
             YC(tevWindow.start):
             XC(tevWindow.end)-XC(tevWindow.start) :
@@ -1425,7 +1429,7 @@ ArPixelID;
 {
     const int imageArea=XC(imageSize)*YC(imageSize);
 
-    for ( int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
+    for ( int imageIndex = 0; imageIndex < numberOfOutputImages; imageIndex++ )
     {
         //   first, we figure out the average number of samples per pixel
         //   this goes into the image statistics that are saved
@@ -1442,10 +1446,10 @@ ArPixelID;
             for ( int x = 0; x < XC(imageSize); x++ )
             {
                 unsigned int  pixelSampleCount = 0;
-                size_t idx=x +y*XC(imageSize);
+                size_t index = x +y*XC(imageSize);
                 //ASK: this is weird... why are we doing this with int and not doubles???
-                pixelSampleCount +=mergingImage.samples[ 
-                    imgIdx*imageArea + idx];
+                pixelSampleCount += mergingImage.samples[ 
+                    imageIndex * imageArea + index];
                 
                 if ( pixelSampleCount > 0 )
                 {
@@ -1514,7 +1518,7 @@ ArPixelID;
             }
         }
 
-        [ outputImage[imgIdx] setSamplecountString
+        [ outputImage[imageIndex] setSamplecountString
             :   samplecountString
             ];
         
@@ -1532,7 +1536,7 @@ ArPixelID;
             ART_ERRORHANDLING_FATAL_ERROR("asprintf failed");
         }
 
-        [ outputImage[imgIdx] setRendertimeString
+        [ outputImage[imageIndex] setRendertimeString
             :   rendertimeString
             ];
         
@@ -1542,18 +1546,18 @@ ArPixelID;
         {
             for ( int x = 0; x < XC(imageSize); x++ )
             {
-                size_t idx=XC(imageSize)*y+x;
+                size_t index=XC(imageSize)*y+x;
                 arlightalpha_l_init_l(
                         art_gv,
                         ARLIGHTALPHA_NONE_A0,
-                        writeBuffer->data[idx]
+                        writeBuffer->data[index]
                     );
                 arlightalpha_l_add_l(
                         art_gv,
-                        mergingImage.image[imgIdx]->data[idx],
-                        writeBuffer->data[idx]
+                        mergingImage.image[imageIndex]->data[index],
+                        writeBuffer->data[index]
                     );
-                double  pixelSampleCount = mergingImage.samples[ imgIdx*imageArea + idx];
+                double  pixelSampleCount = mergingImage.samples[ imageIndex*imageArea + index];
 
 
                 if ( pixelSampleCount > 0.0 )
@@ -1561,13 +1565,13 @@ ArPixelID;
                     arlightalpha_d_mul_l(
                             art_gv,
                             1.0 / pixelSampleCount,
-                            writeBuffer->data[idx]
+                            writeBuffer->data[index]
                         );
                 }
             }
 
         }
-        [ outputImage[imgIdx] setPlainImage
+        [ outputImage[imageIndex] setPlainImage
             :   IPNT2D(0,0)
             :   writeBuffer
             ];
@@ -1585,21 +1589,21 @@ ArPixelID;
     {
         setvbuf(stdout,NULL,_IONBF,0);
 
-        struct termios new_termios;
+        struct termios modified_termios;
         
-        tcgetattr( STDIN_FILENO, & new_termios );
+        tcgetattr( STDIN_FILENO, & modified_termios );
 
 
         // disable canonical mode and echo
-        new_termios.c_lflag &= (~ICANON & ~ECHO);
+        modified_termios.c_lflag &= (~ICANON & ~ECHO);
 
         // at least one character must be written before read returns
-        new_termios.c_cc[VMIN] = 1;
+        modified_termios.c_cc[VMIN] = 1;
 
         //no timeout
-        new_termios.c_cc[VTIME] = 0;
+        modified_termios.c_cc[VTIME] = 0;
         
-        tcsetattr( STDIN_FILENO, TCSANOW, & new_termios );
+        tcsetattr( STDIN_FILENO, TCSANOW, & modified_termios );
 
         char  line[256]; 
         ssize_t  len;
@@ -1611,10 +1615,10 @@ ArPixelID;
             
             switch (line[0]) {
                 case 'w':
-                    try_prepend_merge_queue(writeSem,WRITE);
+                    try_prepend_merge_queue(write_semaphore,WRITE);
                     break;
                 case 'd':
-                    try_prepend_merge_queue(writeSem,WRITE_TONEMAP);
+                    try_prepend_merge_queue(write_semaphore,WRITE_TONEMAP);
                     break;
                 case 't':
                     _image_sampler_sigint_handler(0);
@@ -1670,14 +1674,14 @@ ArPixelID;
     //   place input image on node stack, and start stack machine
     //   loop over all output images
 
-    for ( int imgIdx = 0; imgIdx < numberOfImagesToWrite; imgIdx++ )
+    for ( int imageIndex = 0; imageIndex < numberOfOutputImages; imageIndex++ )
     {
         //   we effectively create copies of the actual output images
         //   handing over the originals should work as well, though
         
         ArnFileImage  * image =
             [ FILE_IMAGE
-                :   [ (ArnFileImage <ArpImage> *)outputImage[imgIdx] fileName ]
+                :   [ (ArnFileImage <ArpImage> *)outputImage[imageIndex] fileName ]
                 ];
         
         [ localNodestack push
@@ -1697,13 +1701,13 @@ ArPixelID;
     [ threadPool release ];
 
     //   Release the semaphore
-    sem_post(writeSem);
+    sem_post(write_semaphore);
 }
 - (void) cleanupAfterImageSampling
         : (ArNode <ArpWorld> *) world
         : (ArNode <ArpCamera > *) camera
         : (ArNode <ArpImageWriter> **) image
-        : (int) numberOfResultImages
+        : (int) _numberOfOutputImages
 {
     free_render_queue(&render_queue);
     free_merge_queue(&merge_queue);
@@ -1714,17 +1718,17 @@ ArPixelID;
         ART_ERRORHANDLING_FATAL_ERROR("barrier destroy failed");
     }
 
-    if(sem_close(writeSem)==-1){
+    if(sem_close(write_semaphore)==-1){
         ART_ERRORHANDLING_FATAL_ERROR("semaphore close failed");
     } 
-    char* sem_name;
-    if(asprintf(&sem_name,SEMAPHORE_FORMAT, getpid())==-1){
+    char* semaphoreName;
+    if(asprintf(&semaphoreName,SEMAPHORE_FORMAT, getpid())==-1){
         ART_ERRORHANDLING_FATAL_ERROR("asprintf failed");
     }
-    if(sem_unlink(sem_name)==-1){
+    if(sem_unlink(semaphoreName)==-1){
         ART_ERRORHANDLING_FATAL_ERROR("semaphore unlink failed");
     } 
-    FREE_ARRAY(sem_name);
+    FREE_ARRAY(semaphoreName);
 
     RELEASE_OBJECT( sampleCounter );
     RELEASE_OBJECT(messageQueue);
@@ -1756,7 +1760,7 @@ ArPixelID;
     }
 
     
-    for (int i =0; i<numberOfTiles; i++) {
+    for (int i =0; i<numberOfTilesInMemory; i++) {
         [self freeTile:&tilesBuffer[i]];
     }
     FREE_ARRAY(tilesBuffer);
@@ -1769,7 +1773,7 @@ ArPixelID;
     RELEASE_OBJECT(tev);
     FREE_ARRAY(tevUpdateBuffer);
 
-    for (int i =0; i<numberOfResultImages; i++) {
+    for (int i =0; i<numberOfOutputImages; i++) {
         FREE_ARRAY(tevImageNames[i]);
     }
     FREE_ARRAY(tevImageNames);
@@ -1822,7 +1826,7 @@ ArPixelID;
             lightRef = refFromStack;
     }
 
-    int  numberOfResultImages = arlist_length( & imageRefList );
+    int  _numberOfOutputImages = arlist_length( & imageRefList );
 
     //   The protocol checks were just done, so casting these things
     //   is safe.
@@ -1835,9 +1839,9 @@ ArPixelID;
 
 
     ArNode <ArpImageWriter>  ** image =
-        ALLOC_ARRAY( ArNode <ArpImageWriter> *, numberOfResultImages );
+        ALLOC_ARRAY( ArNode <ArpImageWriter> *, _numberOfOutputImages );
     
-    for ( int i = 0; i < numberOfResultImages; i++ )
+    for ( int i = 0; i < _numberOfOutputImages; i++ )
     {
         ArNodeRef  imageRef = ARNODEREF_NONE;
         
@@ -1880,21 +1884,21 @@ ArPixelID;
         :   world
         :   camera
         :   image
-        :   numberOfResultImages
+        :   _numberOfOutputImages
         ];
     
     [ self sampleImage
         :   world
         :   camera
         :   image
-        :   numberOfResultImages
+        :   _numberOfOutputImages
         ];
     
     [ self cleanupAfterImageSampling
         :   world
         :   camera
         :   image
-        :   numberOfResultImages
+        :   _numberOfOutputImages
         ];
 
     FREE_ARRAY( image );

@@ -39,8 +39,8 @@ typedef struct image_window_t{
 
         int                                     randomValueGenerationSeed;
         int                                     numberOfRenderThreads;
-        int                                     numberOfTiles;
-        int                                     numberOfImagesToWrite;
+        int                                     numberOfTilesInMemory;
+        int                                     numberOfOutputImages;
         int                                     windowIterator;
         int                                     samplesPerEpoch;
         int                                     samplesPerEpochAdaptive;

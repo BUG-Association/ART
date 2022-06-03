@@ -20,22 +20,22 @@ typedef struct {
 @interface ArcMessageQueue 
         : ArcObject
 {
-        int message_queue;
-        int process_id;
+        int messageQueue;
+        int ourProcessId;
 }
 
 - (id) init
         ;
 - (void) sendSimpleMessage
-        :(long)pid
-        :(message_type_t) message_type
+        :(long) pid
+        :(message_type_t) messageType
         ;
 - (void) sendHostPort
-        :(long)pid
+        :(long) pid
         :(uint32_t) port
         ;
 - (void) sendHostName
-        : (long)pid
+        : (long) pid
         : (const char *) name
         ;
 - (message_t) receiveMessage
@@ -43,7 +43,7 @@ typedef struct {
 - (void) clearMessages
         ;
 - (void) clearMessages
-        :(long)pid
+        :(long) pid
         ;
 - (void)dealloc; 
 

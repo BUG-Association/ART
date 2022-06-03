@@ -1,20 +1,19 @@
 #include "ART_Foundation.h"
-//#include <bits/stdint-uintn.h>
 
 typedef  struct {
     char* data;
     char* end;
     uint32_t len;
     uint32_t max_size;
-} message_buffer;
+} message_buffer_t;
 
 @interface ArcTevIntegration 
         : ArcObject
 {
-        int socket_handle;
-        char* _hostName;
-        char* _hostPort;
-        message_buffer buffer;
+        int socketHandle;
+        char* hostName;
+        char* hostPort;
+        message_buffer_t buffer;
         @public 
         BOOL connected;
 }
@@ -33,15 +32,15 @@ typedef  struct {
 - (void) createImage
         :(const char*) name
         :(BOOL) grabfocus
-        :(const char*) channel_names
-        :(int32_t) channel_number
+        :(const char*) channelNames
+        :(int32_t) channelNumber
         :(int32_t) width
         :(int32_t) height
         ;
 - (void) openImage
         :(const char*) name
         :(BOOL) grabfocus
-        :(const char*) channel_selector
+        :(const char*) channelSelector
         ;
 - (void) closeImage
         :(const char*) name
@@ -53,11 +52,11 @@ typedef  struct {
         
 - (void) updateImage
         :(const char*) name
-        :(BOOL) grabfocus
-        :(const char*) channel_names
-        :(int32_t) channel_number
-        :(const int64_t*)channel_offsets
-        :(const int64_t*)channel_strides
+        :(BOOL) grabFocus
+        :(const char*) channelNames
+        :(int32_t) channelNumber
+        :(const int64_t*)channelOffsets
+        :(const int64_t*)channelStrides
         :(int32_t) x
         :(int32_t) y
         :(int32_t) width
