@@ -174,6 +174,7 @@ void char_buff_set_len(message_buffer_t * buff){
         hostPort = NULL;
         connected = NO;
         init_char_buff(&buffer);   
+        signal(SIGPIPE, SIG_IGN);
     }
     
     return self;
