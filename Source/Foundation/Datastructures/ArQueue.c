@@ -32,6 +32,4 @@
 ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
-
-
 // ===========================================================================

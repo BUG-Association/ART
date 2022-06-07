@@ -1,4 +1,5 @@
 
+#include "ArQueue.h"
 #define ART_MODULE_NAME     ArnMySampler
 
 #include "ColourConversionConstructorMacros.h"
@@ -35,24 +36,30 @@ typedef enum {
         WRITE_EXIT,
         TEV_CONNECT,
         POISON,
-}art_task_type_t;
-struct art_task_t{
-        art_task_type_t type;
+}ArTaskType;
+typedef struct {
+        ArTaskType type;
         art_tile_t* work_tile;
         art_image_window_t* window; 
         int samples;
         int sample_start;
-};
+}ArTask;
+
+ARQUEUE_INTERFACE_FOR_TYPE(ArTask, ar_task, AR_TASK)
+
+ARQUEUE_IMPLEMENTATION_FOR_TYPE(ArTask, ar_task, AR_TASK)
+
+
 
 typedef struct {
-        queue_t queue;
-        queue_t* current;
+        ARQUEUE_TYPE(ArTask) queue;
+        ARQUEUE_TYPE(ArTask)* current;
         pthread_mutex_t lock;
         pthread_cond_t cond_var;
 } render_queue_t;
 typedef struct {
-        queue_t queue1,queue2;
-        queue_t* current,*inactive;
+        ARQUEUE_TYPE(ArTask) queue1,queue2;
+        ARQUEUE_TYPE(ArTask)* current,*inactive;
 
         pthread_mutex_t lock;
         pthread_cond_t cond_var;
@@ -67,11 +74,11 @@ void AtExit(){
     tcsetattr( STDIN_FILENO, TCSANOW, & original_termios );
 }
 
-void prepend_merge_queue(merge_queue_t* q,art_task_t task);
+void prepend_merge_queue(merge_queue_t* q,ArTask task);
 
-void try_prepend_merge_queue(sem_t* semaphore,art_task_type_t type){
+void try_prepend_merge_queue(sem_t* semaphore,ArTaskType type){
     if(semaphore==NULL||sem_trywait(semaphore)==0){
-        art_task_t task={.type = type};
+        ArTask task={.type = type};
         prepend_merge_queue(&merge_queue,task);
     }  
 }
@@ -82,7 +89,7 @@ void _image_sampler_sigint_handler(
     (void) sig;
     //   SIGINT writes the current result image, exits afterward.
     if(sem_wait(write_semaphore)==0){
-        art_task_t task={.type = WRITE_EXIT};
+        ArTask task={.type = WRITE_EXIT};
         prepend_merge_queue(&merge_queue,task);
     } 
 }
@@ -92,71 +99,7 @@ int div_roundup(int divident,int divisor){
     return (divident + divisor - 1) / divisor;
 }
 
-void init_queue(queue_t* q,size_t task_number){
-    q->tail = 0;
-    q->head = 0;
-    q->length = 0;
-    q->max_size = task_number;
-    q->data = ALLOC_ARRAY_ZERO(art_task_t, task_number);
-    if(!q->data){
-        ART_ERRORHANDLING_FATAL_ERROR("Failed queue buffer allocation");
-    }
-}
 
-void free_queue(queue_t* q){
-    FREE_ARRAY(q->data);
-}
-
-void pop_queue(queue_t* q){
-    size_t tail = q->tail;
-    tail++;
-    q->tail = tail % q->max_size;
-    q->length--;
-}
-
-art_task_t peek_queue(queue_t* q){
-    return q->data[q->tail];
-}
-
-void push_queue(queue_t* q,art_task_t t){
-    if(q->length + 1 > q->max_size){
-        size_t new_size = q->max_size+1;
-        art_task_t* new_ptr = REALLOC_ARRAY((q->data), art_task_t, new_size);
-        if(new_ptr){
-            q->data = new_ptr;
-            q->max_size = new_size;
-        }else{
-            ART_ERRORHANDLING_FATAL_ERROR("Failed queue buffer reallocation\n");
-
-        }
-    }
-    size_t head_idx = q->head;
-
-    q->data[head_idx] = t;
-    q->head = (head_idx + 1) % q->max_size;
-    q->length++;
-}
-
-void prepend_queue(queue_t* q,art_task_t t){
-    if(q->length + 1 > q->max_size){
-        size_t new_size = q->max_size+1;
-        art_task_t* new_ptr = REALLOC_ARRAY((q->data), art_task_t, new_size);
-        if(new_ptr){
-            q->data = new_ptr;
-            q->max_size = new_size;
-        }else{
-            ART_ERRORHANDLING_FATAL_ERROR("Failed queue buffer reallocation");
-        }
-    }
-
-    
-    if(q->tail == 0)
-        q->tail = q->max_size-1;
-    else
-        q->tail--;
-    q->data[q->tail] = t;
-    q->length++;
-}
 
 #define SYNC_LOCK (q->lock)
 #define SYNC_LOCK_PTR (&q->lock)
@@ -168,7 +111,7 @@ void prepend_queue(queue_t* q,art_task_t t){
 
 void init_render_queue(render_queue_t* q,size_t task_number){
     SYNC_QUEUE_PTR = &q->queue;
-    init_queue(SYNC_QUEUE_PTR,task_number);
+    ar_task_queue_init(SYNC_QUEUE_PTR,task_number);
     if(
         pthread_mutex_init(SYNC_LOCK_PTR, NULL) != 0 ||
         pthread_cond_init(SYNC_COND_PTR, NULL) != 0){
@@ -177,7 +120,7 @@ void init_render_queue(render_queue_t* q,size_t task_number){
 }
 
 void free_render_queue(render_queue_t* q){
-    free_queue(SYNC_QUEUE_PTR);
+    ar_task_queue_free(SYNC_QUEUE_PTR);
     if(
         pthread_mutex_destroy(SYNC_LOCK_PTR) != 0 ||
         pthread_cond_destroy(SYNC_COND_PTR) != 0){
@@ -185,21 +128,21 @@ void free_render_queue(render_queue_t* q){
     }
 }
 
-art_task_t pop_render_queue(render_queue_t* q){
+ArTask pop_render_queue(render_queue_t* q){
     pthread_mutex_lock(SYNC_LOCK_PTR);
     while(SYNC_QUEUE.length == 0)
         pthread_cond_wait(SYNC_COND_PTR, SYNC_LOCK_PTR);
-    art_task_t ret = peek_queue(SYNC_QUEUE_PTR);
+    ArTask ret = ar_task_queue_peek(SYNC_QUEUE_PTR);
     if (ret.type != POISON)
-        pop_queue(SYNC_QUEUE_PTR);
+        ar_task_queue_pop(SYNC_QUEUE_PTR);
     pthread_mutex_unlock(SYNC_LOCK_PTR);
     return ret;
 }
 
-void push_render_queue(render_queue_t* q,art_task_t  task){
+void push_render_queue(render_queue_t* q,ArTask  task){
     pthread_mutex_lock(SYNC_LOCK_PTR);
     
-    push_queue(SYNC_QUEUE_PTR, task);
+    ar_task_queue_push(SYNC_QUEUE_PTR, task);
     
     pthread_mutex_unlock(SYNC_LOCK_PTR);
     pthread_cond_broadcast(SYNC_COND_PTR);
@@ -208,8 +151,8 @@ void push_render_queue(render_queue_t* q,art_task_t  task){
 void init_merge_queue(merge_queue_t* q,size_t task_number){
     SYNC_QUEUE_PTR = &q->queue1;
     q->inactive = &q->queue2;
-    init_queue(&q->queue1,task_number);
-    init_queue(&q->queue2,task_number);
+    ar_task_queue_init(&q->queue1,task_number);
+    ar_task_queue_init(&q->queue2,task_number);
     if(
         pthread_mutex_init(SYNC_LOCK_PTR, NULL) != 0 ||
         pthread_cond_init(SYNC_COND_PTR, NULL) != 0){
@@ -218,8 +161,8 @@ void init_merge_queue(merge_queue_t* q,size_t task_number){
 }
 
 void free_merge_queue(merge_queue_t* q){
-    free_queue(&q->queue1);
-    free_queue(&q->queue2);
+    ar_task_queue_free(&q->queue1);
+    ar_task_queue_free(&q->queue2);
     if(
         pthread_mutex_destroy(SYNC_LOCK_PTR) != 0 ||
         pthread_cond_destroy(SYNC_COND_PTR) != 0){
@@ -229,16 +172,16 @@ void free_merge_queue(merge_queue_t* q){
 
 
 
-void push_merge_queue(merge_queue_t* q,art_task_t task){
+void push_merge_queue(merge_queue_t* q,ArTask task){
     pthread_mutex_lock(SYNC_LOCK_PTR);
-    push_queue(SYNC_QUEUE_PTR, task);
+    ar_task_queue_push(SYNC_QUEUE_PTR, task);
     pthread_mutex_unlock(SYNC_LOCK_PTR);
     pthread_cond_signal(SYNC_COND_PTR);
 }
 
-void prepend_merge_queue(merge_queue_t* q,art_task_t task){
+void prepend_merge_queue(merge_queue_t* q,ArTask task){
     pthread_mutex_lock(SYNC_LOCK_PTR);
-    prepend_queue(SYNC_QUEUE_PTR, task);
+    ar_task_queue_prepend(SYNC_QUEUE_PTR, task);
     pthread_mutex_unlock(SYNC_LOCK_PTR);
     pthread_cond_signal(SYNC_COND_PTR);
 }
@@ -248,7 +191,7 @@ void swap_merge_queue(merge_queue_t* q){
     while(SYNC_QUEUE.length == 0){
         pthread_cond_wait(SYNC_COND_PTR, SYNC_LOCK_PTR);
     }
-    queue_t* tmp = SYNC_QUEUE_PTR;
+    ARQUEUE_TYPE(ArTask)* tmp = SYNC_QUEUE_PTR;
     SYNC_QUEUE_PTR = q->inactive;
     q->inactive = tmp;
     pthread_mutex_unlock(SYNC_LOCK_PTR);
@@ -266,14 +209,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 - (void)taskNextIteration
     ;
 - (void) renderTask
-    :(art_task_t*) t
+    :(ArTask*) t
     : (ArcUnsignedInteger *) threadIndex
     ;
 - (void) mergeTask
-    :(art_task_t*) t
+    :(ArTask*) t
     ;
 - (void) tevTask
-    :(art_task_t*) t
+    :(ArTask*) t
     ;
 - (void)repaintTevImage
     ;
@@ -290,7 +233,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     :(art_tile_t*) tile
     ;
 - (BOOL) generateRenderTask
-    :(art_task_t*) tile
+    :(ArTask*) tile
     ;
 - (void)MessageQueueThread
     : (ArcUnsignedInteger *) threadIndex
@@ -360,7 +303,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 
 - (BOOL) generateRenderTask
-    :(art_task_t*) tile
+    :(ArTask*) tile
 {
     if (finishedGeneratingRenderTasks){
         if (poisonedRenderThreads) {
@@ -733,7 +676,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     init_merge_queue(&merge_queue, numberOfTilesInMemory);
     
     for (int i =0; i< numberOfTilesInMemory; i++) {
-        art_task_t task;
+        ArTask task;
         task.work_tile=&tilesBuffer[i];
 
         if([self generateRenderTask: &task]){
@@ -919,7 +862,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     
 
     
-    art_task_t task;
+    ArTask task;
     task.type=WRITE_EXIT;
     push_merge_queue(&merge_queue,task);
     
@@ -979,7 +922,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     (void) threadIndex;
     
     while(!renderThreadsShouldTerminate){
-        art_task_t currentTask= pop_render_queue(&render_queue);
+        ArTask currentTask= pop_render_queue(&render_queue);
         if(currentTask.type==POISON)
             break;
         [self renderTask : &currentTask: threadIndex];
@@ -999,7 +942,7 @@ typedef struct ArPixelID
 }
 ArPixelID;
 -(void) renderTask
-    :(art_task_t*) task
+    :(ArTask*) task
     : (ArcUnsignedInteger *) threadIndex
 {
     [self cleanTile : task->work_tile];
@@ -1206,13 +1149,13 @@ ArPixelID;
     
     while(true){
         swap_merge_queue(&merge_queue);
-        queue_t* queue=merge_queue.inactive;
+        ARQUEUE_TYPE(ArTask)* queue=merge_queue.inactive;
         if(queue->length>=2){
             samplesPerEpochAdaptive=samplesPerEpoch*2;
         }
         while(queue->length>0){
-            art_task_t curr_task=peek_queue(queue);
-            pop_queue(queue);
+            ArTask curr_task=ar_task_queue_peek(queue);
+            ar_task_queue_pop(queue);
             switch (curr_task.type) {
                 case MERGE:
                     [self mergeTask : &curr_task];
@@ -1263,7 +1206,7 @@ ArPixelID;
     pthread_barrier_wait(&mergingDone);
 }
 -(void) mergeTask
-    :(art_task_t*) task
+    :(ArTask*) task
 {
     IVec2D sizeOfTile=task->work_tile->size;
     const int imageArea=XC(imageSize)*YC(imageSize);
@@ -1297,14 +1240,14 @@ ArPixelID;
 -(void) repaintTevImage
 {
     for(int i =0;i<XC(tilesDimension)*YC(tilesDimension);i++){
-        art_task_t task;
+        ArTask task;
         task.window=&taskWindows[i];
         [self tevTask:&task];
     }
 }
 
 -(void) tevTask
-    :(art_task_t*) task
+    :(ArTask*) task
 {
     if(!tev->connected){
         return;
