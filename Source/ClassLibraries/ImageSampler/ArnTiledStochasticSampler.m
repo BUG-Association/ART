@@ -1,7 +1,3 @@
-#include "ART_SystemDatatypes.h"
-#include "IVec2D.h"
-#include "Pnt2D.h"
-#include <semaphore.h>
 
 #define ART_MODULE_NAME     ArnMySampler
 
@@ -30,56 +26,7 @@
 #define SEMAPHORE_FORMAT "/art_%d"
 
 
-#ifdef __APPLE__
 
-int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count)
-{
-    if(count == 0)
-    {
-        errno = EINVAL;
-        return -1;
-    }
-    if(pthread_mutex_init(&barrier->mutex, 0) < 0)
-    {
-        return -1;
-    }
-    if(pthread_cond_init(&barrier->cond, 0) < 0)
-    {
-        pthread_mutex_destroy(&barrier->mutex);
-        return -1;
-    }
-    barrier->tripCount = count;
-    barrier->count = 0;
-
-    return 0;
-}
-
-int pthread_barrier_destroy(pthread_barrier_t *barrier)
-{
-    pthread_cond_destroy(&barrier->cond);
-    pthread_mutex_destroy(&barrier->mutex);
-    return 0;
-}
-
-int pthread_barrier_wait(pthread_barrier_t *barrier)
-{
-    pthread_mutex_lock(&barrier->mutex);
-    ++(barrier->count);
-    if(barrier->count >= barrier->tripCount)
-    {
-        barrier->count = 0;
-        pthread_cond_broadcast(&barrier->cond);
-        pthread_mutex_unlock(&barrier->mutex);
-        return 1;
-    }
-    else
-    {
-        pthread_cond_wait(&barrier->cond, &(barrier->mutex));
-        pthread_mutex_unlock(&barrier->mutex);
-        return 0;
-    }
-}
-#endif // __APPLE__
 typedef enum {
         RENDER,
         MERGE,
@@ -89,17 +36,14 @@ typedef enum {
         TEV_CONNECT,
         POISON,
 }art_task_type_t;
-typedef struct {
+struct art_task_t{
         art_task_type_t type;
         art_tile_t* work_tile;
         art_image_window_t* window; 
         int samples;
         int sample_start;
-}art_task_t;
-typedef struct {
-        long tail, head, length, max_size;
-        art_task_t* data;
-}queue_t;
+};
+
 typedef struct {
         queue_t queue;
         queue_t* current;
@@ -439,15 +383,22 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     windowIterator++;
     
     if(windowIterator == XC(tilesDimension) * YC(tilesDimension)){
-        [ sampleCounter step
-            :   samplesPerEpoch
-            ];
-        windowIterator = 0;
-        samplesIssued += samplesPerEpoch;
+        int prevSamplesPerEpoch=samplesPerEpoch;
+        samplesIssued += prevSamplesPerEpoch;
         samplesPerEpoch = samplesPerEpochAdaptive;
         samplesPerEpoch = MIN(targetNumberOfSamplesPerPixel - samplesIssued, samplesPerEpoch);
+        windowIterator = 0;
         if(samplesPerEpoch == 0){
             finishedGeneratingRenderTasks=true;
+            [ sampleCounter step
+            :   prevSamplesPerEpoch
+            :   prevSamplesPerEpoch
+            ];
+        }else{
+            [ sampleCounter step
+            :   prevSamplesPerEpoch
+            :   samplesPerEpoch
+            ];
         }
     }
 }
@@ -462,9 +413,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     finishedGeneratingRenderTasks = NO;
     renderThreadsShouldTerminate = NO;
     windowIterator = 0;
-    samplesPerEpochAdaptive = samplesPerEpoch;
-    samplesIssued = 0;
-    samplesPerEpoch = MIN(targetNumberOfSamplesPerPixel,samplesPerEpoch);
+    
     numberOfRenderThreads = art_maximum_number_of_working_threads(art_gv);
     if ( useDeterministicWavelengths )
     {
@@ -474,10 +423,6 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     {
         wavelengthSteps = 1;
     }
-    if(samplesPerEpoch == 0){
-        finishedGeneratingRenderTasks = true;
-    }
-
 }
 - (id) init
         : (ArNode <ArpPathspaceIntegrator> * ) newPathspaceIntegrator
@@ -558,7 +503,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     } 
 
 
-    if ( targetNumberOfSamplesPerPixel == 0 )
+    if ( targetNumberOfSamplesPerPixel == UNLIMITED )
     {
         
         if(asprintf(
@@ -579,6 +524,12 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
             ART_ERRORHANDLING_FATAL_ERROR("asprintf failed");
         }
     }
+    samplesPerEpochAdaptive = samplesPerEpoch;
+    samplesIssued = 0;
+    samplesPerEpoch = MIN(targetNumberOfSamplesPerPixel,samplesPerEpoch);
+    if(samplesPerEpoch == 0){
+        finishedGeneratingRenderTasks = true;
+    }
     numberOfOutputImages = _numberOfOutputImages;
     
     sampleCounter =
@@ -586,7 +537,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
             :  ART_GLOBAL_REPORTER
             :  GATHERING_ESTIMATOR
             :  self
-            :  targetNumberOfSamplesPerPixel
+            :  samplesPerEpoch
             ];
     
     messageQueue= [ALLOC_INIT_OBJECT(ArcMessageQueue)];
@@ -1256,7 +1207,7 @@ ArPixelID;
     while(true){
         swap_merge_queue(&merge_queue);
         queue_t* queue=merge_queue.inactive;
-        if(queue->length>=numberOfRenderThreads){
+        if(queue->length>=2){
             samplesPerEpochAdaptive=samplesPerEpoch*2;
         }
         while(queue->length>0){

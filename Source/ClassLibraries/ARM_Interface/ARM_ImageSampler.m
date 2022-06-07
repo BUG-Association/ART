@@ -26,8 +26,8 @@
 
 
 #define ART_MODULE_NAME     ARM_ImageSampler
-
 #import "ARM_ImageSampler.h"
+#define SPP 2
 
 typedef struct ARM_ImageSamplers_GV
 {
@@ -131,7 +131,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
         :   defaultReconstructionKernel
         :   newNumberOfSamples
         :   newRandomValueGeneration
-        :   16
+        :   SPP
         ];
 
     return self;
@@ -150,7 +150,7 @@ ArNode <ArpSampling2D> * standard_sampler_2D(
             :   newReconstructionKernel
             :   newNumberOfSamples
             :   newRandomValueGeneration
-            :   16
+            :   SPP
             ];
 }
 

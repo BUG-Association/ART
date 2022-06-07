@@ -24,48 +24,29 @@
 
 =========================================================================== */
 
-#include "ART_Foundation.h"
+#ifndef _ART_FOUNDATION_SYSTEM_ARTENDIANNESS_H_
+#define _ART_FOUNDATION_SYSTEM_ARTENDIANNESS_H_
+#ifdef __APPLE__
+#include <machine/endian.h>
+#define htobe16(x) OSSwapHostToBigInt16(x)
+#define htole16(x) OSSwapHostToLittleInt16(x)
+#define be16toh(x) OSSwapBigToHostInt16(x)
+#define le16toh(x) OSSwapLittleToHostInt16(x)
 
-ART_MODULE_INTERFACE(ArcSampleCounter)
+#define htobe32(x) OSSwapHostToBigInt32(x)
+#define htole32(x) OSSwapHostToLittleInt32(x)
+#define be32toh(x) OSSwapBigToHostInt32(x)
+#define le32toh(x) OSSwapLittleToHostInt32(x)
 
-#include "ART_Protocols.h"
+#define htobe64(x) OSSwapHostToBigInt64(x)
+#define htole64(x) OSSwapHostToLittleInt64(x)
+#define be64toh(x) OSSwapBigToHostInt64(x)
+#define le64toh(x) OSSwapLittleToHostInt64(x)
+#else
+#include <endian.h>
+#endif
 
+float htolefloat(float x);
 
-
-@interface ArcSampleCounter
-        : ArcObject
-{
-
-    ArcObject <ArpReporter>  * reporter;
-    id<ArpImageSamplerMessenger>       imageSampler;
-
-    ArClock                    startClock;
-    ArClock                    endClock;
-
-    double                     totalSeconds;
-    int                        samplesSoFar;
-    int                        digits;
-}
-
-- (id) init
-        : (ArcObject <ArpReporter> *) newReporter
-        : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
-        : (id<ArpImageSamplerMessenger> ) newImageSampler
-        : (int) samplesPerEpoch
-        ;
-
-- (void) start
-        ;
-
-- (void) step
-        : (int) addedSamples
-        : (int) samplesPerEpoch
-        ;
-
-- (void) stop
-        : (double) duration
-        ;
-
-@end
-
-// ===========================================================================
+#endif /* _ART_FOUNDATION_SYSTEM_ARTENDIANNESS_H_ */
+/* ======================================================================== */

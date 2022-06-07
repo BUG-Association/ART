@@ -24,48 +24,14 @@
 
 =========================================================================== */
 
-#include "ART_Foundation.h"
+#define ART_MODULE_NAME     ArQueue
 
-ART_MODULE_INTERFACE(ArcSampleCounter)
-
-#include "ART_Protocols.h"
+#include "ArQueue.h"
 
 
+ART_NO_MODULE_INITIALISATION_FUNCTION_NECESSARY
 
-@interface ArcSampleCounter
-        : ArcObject
-{
+ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
-    ArcObject <ArpReporter>  * reporter;
-    id<ArpImageSamplerMessenger>       imageSampler;
-
-    ArClock                    startClock;
-    ArClock                    endClock;
-
-    double                     totalSeconds;
-    int                        samplesSoFar;
-    int                        digits;
-}
-
-- (id) init
-        : (ArcObject <ArpReporter> *) newReporter
-        : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
-        : (id<ArpImageSamplerMessenger> ) newImageSampler
-        : (int) samplesPerEpoch
-        ;
-
-- (void) start
-        ;
-
-- (void) step
-        : (int) addedSamples
-        : (int) samplesPerEpoch
-        ;
-
-- (void) stop
-        : (double) duration
-        ;
-
-@end
 
 // ===========================================================================

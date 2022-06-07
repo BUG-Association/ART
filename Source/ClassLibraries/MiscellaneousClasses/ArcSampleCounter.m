@@ -54,11 +54,10 @@ int int_num_digits(int x)
         : (ArcObject <ArpReporter> *) newReporter
         : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
         : (id<ArpImageSamplerMessenger> ) newImageSampler
-        : (int) newTargetSamples
+        : (int) samplesPerEpoch
 {
     reporter = newReporter;
     imageSampler = newImageSampler;
-    targetSamples = newTargetSamples;
     samplesSoFar = 0;
     
     [ reporter consolePrintf
@@ -66,17 +65,18 @@ int int_num_digits(int x)
         ,   [ imageSampler preSamplingMessage ]
         ];
 
+    //ASK: this function seems really weird and buggy.
     [ reporter beginTimedAction
-        :   "image sampling: %s, %d spp"
+        :   "image sampling: path tracing\n"
         ,   [ newPathspaceIntegrator descriptionString ]
-        ,   samplesSoFar
         ];
-
     [ reporter consolePrintf
-        :   "\b"
-        ];
+    :   "%d spp overall, current %d spp per tile pass"
+    ,   samplesSoFar
+    ,   samplesPerEpoch
+    ];
 
-    digits = int_num_digits( samplesSoFar );
+    digits = int_num_digits( samplesSoFar )+int_num_digits( samplesPerEpoch );
 
     return self;
 }
@@ -88,27 +88,24 @@ int int_num_digits(int x)
 }
 
 - (void) step
-        : (unsigned int) addedSamples
+        : (int) addedSamples
+        : (int) samplesPerEpoch
 {
     samplesSoFar += addedSamples;
 
-    [ reporter consolePrintf
-        :   "\b\b\b\b"
-        ];
-
-    for ( int i = 0; i < digits; i++ )
+    for ( int i = 0; i < digits+40; i++ )
     {
         [ reporter consolePrintf
             :   "\b"
             ];
     }
     
-    [ reporter consolePrintf
-        :   "%d spp"
+    [reporter consolePrintf
+        :   "%d spp overall, current %d spp per tile pass"
         ,   samplesSoFar
-        ];
+        ,   samplesPerEpoch];
     
-    digits = int_num_digits( samplesSoFar );
+    digits = int_num_digits( samplesSoFar )+int_num_digits( samplesPerEpoch );
 }
 
 - (void) stop
@@ -129,7 +126,7 @@ int int_num_digits(int x)
 - (void) dealloc
 {
     [ reporter modifyIndent
-        : digits - 2
+        : digits + 11
         ];
     
     [ reporter endActionWithTime

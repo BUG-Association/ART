@@ -47,6 +47,9 @@ ART_LIBRARY_INTERFACE(ART_Foundation_System)
 #include "ArRandom.h"
 #include "ArTime.h"
 #include "ArProgress.h"
+#include "ART_Pthreads.h"
+#include "ART_Semaphore.h"
+#include "ART_Endianness.h"
 
 #endif /* _ART_FOUNDATION_SYSTEM_H_ */
 /* ======================================================================== */

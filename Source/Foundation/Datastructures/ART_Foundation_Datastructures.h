@@ -38,6 +38,7 @@ ART_LIBRARY_INTERFACE(ART_Foundation_Datastructures)
 #include "ArTable.h"
 #include "ArSymbol.h"
 #include "ArOrder.h"
+#include "ArQueue.h"
 
 #endif /* _ART_FOUNDATION_DATASTRUCTURES_H_ */
 /* ======================================================================== */

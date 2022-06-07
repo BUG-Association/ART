@@ -1,26 +1,8 @@
 
-
 #define ART_MODULE_NAME     ArcTevIntegration
 
-#ifdef __APPLE__
-#include <machine/endian.h>
-#define htobe16(x) OSSwapHostToBigInt16(x)
-#define htole16(x) OSSwapHostToLittleInt16(x)
-#define be16toh(x) OSSwapBigToHostInt16(x)
-#define le16toh(x) OSSwapLittleToHostInt16(x)
 
-#define htobe32(x) OSSwapHostToBigInt32(x)
-#define htole32(x) OSSwapHostToLittleInt32(x)
-#define be32toh(x) OSSwapBigToHostInt32(x)
-#define le32toh(x) OSSwapLittleToHostInt32(x)
 
-#define htobe64(x) OSSwapHostToBigInt64(x)
-#define htole64(x) OSSwapHostToLittleInt64(x)
-#define be64toh(x) OSSwapBigToHostInt64(x)
-#define le64toh(x) OSSwapLittleToHostInt64(x)
-#else
-#include <endian.h>
-#endif
 #include <netinet/in.h>
 #include <stdio.h>
 #include <string.h>
@@ -38,23 +20,6 @@ const char
         UpdateImageV3 = 6, 
         OpenImageV2 = 7; 
     
-# if __BYTE_ORDER == __LITTLE_ENDIAN
-float htolefloat(float x){
-    return x;
-}
-# else
-float htolefloat(float x){
-    float le;
-    char * originalPtr = &x; 
-    char * returnPtr = &le;
-    for(int i = 0; i < 4; i++){
-        returnPtr[i] = originalPtr[3 - i];
-    }
-    return le;
-}
-#endif
-
-
 ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 
 @interface ArcTevIntegration ()
@@ -64,7 +29,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     :(const char*) channelNames
     :(int32_t) channelNumber
     ;
-- (void) bufferStart
+- (void) messageInit
     ;
 @end
 @implementation ArcTevIntegration
@@ -154,7 +119,7 @@ void char_buff_append_float_array(message_buffer_t * buff, const float* data, si
     uint32_t len_bytes = sizeof(float)*floats;
     check_size(buff, len_bytes);
     float* iter = (float*)buff->end;
-    for (unsigned long i = 0; i < floats; i++) {
+    for (size_t i = 0; i < floats; i++) {
         iter[i] = htolefloat(data[i]);
     }
     buff->len += len_bytes;
@@ -179,7 +144,7 @@ void char_buff_set_len(message_buffer_t * buff){
     
     return self;
 }
-- (void) bufferStart
+- (void) messageInit
 {
     clean_char_buff(&buffer);
     //reserved for length
@@ -234,21 +199,27 @@ typedef struct addrinfo addrinfo;
                 result->ai_family, 
                 result->ai_socktype, 
                 result->ai_protocol);
+
             if(potentialSocket == -1) 
                 continue;
+
             if(connect(
                 potentialSocket,
                 result->ai_addr,
                 result->ai_addrlen) == -1){
+
                 close(potentialSocket);
                 result = result->ai_next;
+
             }else{
+
                 if(connected){
                     close(socketHandle);
                 }
                 socketHandle = potentialSocket;
                 connected = YES;
                 break;
+
             }
         }
         freeaddrinfo(copy_free);
@@ -290,7 +261,7 @@ typedef struct addrinfo addrinfo;
 {
     if(!connected)
         return;
-    [self bufferStart];
+    [self messageInit];
     char_buff_append_char(&buffer,CreateImage);
     char_buff_append_char(&buffer,grabFocus); 
     char_buff_append_str(&buffer, name);
@@ -326,7 +297,7 @@ typedef struct addrinfo addrinfo;
 {
     if(!connected)
         return;
-    [self bufferStart];
+    [self messageInit];
     char_buff_append_char(&buffer,UpdateImageV3);
     char_buff_append_char(&buffer,grabFocus); 
     char_buff_append_str(&buffer, name);
@@ -357,7 +328,7 @@ typedef struct addrinfo addrinfo;
 {
     if(!connected)
         return;
-    [self bufferStart];
+    [self messageInit];
     char_buff_append_char(&buffer,OpenImageV2);
     char_buff_append_char(&buffer,grabFocus); 
     char_buff_append_str(&buffer, name);
@@ -370,7 +341,7 @@ typedef struct addrinfo addrinfo;
 {
     if(!connected)
         return;
-    [self bufferStart];
+    [self messageInit];
     char_buff_append_char(&buffer,CloseImage);
     char_buff_append_str(&buffer, name);
     [self send];
@@ -382,7 +353,7 @@ typedef struct addrinfo addrinfo;
 {
     if(!connected)
         return;
-    [self bufferStart];
+    [self messageInit];
     char_buff_append_char(&buffer,ReloadImage);
     char_buff_append_char(&buffer,grabFocus); 
     char_buff_append_str(&buffer, name);

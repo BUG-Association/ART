@@ -24,48 +24,10 @@
 
 =========================================================================== */
 
-#include "ART_Foundation.h"
-
-ART_MODULE_INTERFACE(ArcSampleCounter)
-
-#include "ART_Protocols.h"
+#ifndef _ART_FOUNDATION_SYSTEM_ARSEMAPHORE_H_
+#define _ART_FOUNDATION_SYSTEM_ARSEMAPHORE_H_
 
 
-
-@interface ArcSampleCounter
-        : ArcObject
-{
-
-    ArcObject <ArpReporter>  * reporter;
-    id<ArpImageSamplerMessenger>       imageSampler;
-
-    ArClock                    startClock;
-    ArClock                    endClock;
-
-    double                     totalSeconds;
-    int                        samplesSoFar;
-    int                        digits;
-}
-
-- (id) init
-        : (ArcObject <ArpReporter> *) newReporter
-        : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
-        : (id<ArpImageSamplerMessenger> ) newImageSampler
-        : (int) samplesPerEpoch
-        ;
-
-- (void) start
-        ;
-
-- (void) step
-        : (int) addedSamples
-        : (int) samplesPerEpoch
-        ;
-
-- (void) stop
-        : (double) duration
-        ;
-
-@end
-
-// ===========================================================================
+#include <semaphore.h>
+#endif /* _ART_FOUNDATION_SYSTEM_ARSEMAPHORE_H_ */
+/* ======================================================================== */

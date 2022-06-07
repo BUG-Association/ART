@@ -24,48 +24,24 @@
 
 =========================================================================== */
 
-#include "ART_Foundation.h"
+#ifndef _ART_FOUNDATION_ARQUEUE_H_
+#define _ART_FOUNDATION_ARQUEUE_H_
 
-ART_MODULE_INTERFACE(ArcSampleCounter)
+#include "ART_Foundation_System.h"
 
-#include "ART_Protocols.h"
+ART_MODULE_INTERFACE(ArQueue)
+//if neccessary it can be macrofied
+typedef struct art_task_t art_task_t;
+typedef struct {
+        long tail, head, length, max_size;
+        art_task_t* data;
+}queue_t;
 
 
 
-@interface ArcSampleCounter
-        : ArcObject
-{
 
-    ArcObject <ArpReporter>  * reporter;
-    id<ArpImageSamplerMessenger>       imageSampler;
+#define ARQUEUE_INTERFACE_FOR_TYPE( _Type, _type, _TYPE )
 
-    ArClock                    startClock;
-    ArClock                    endClock;
 
-    double                     totalSeconds;
-    int                        samplesSoFar;
-    int                        digits;
-}
-
-- (id) init
-        : (ArcObject <ArpReporter> *) newReporter
-        : (ArNode <ArpPathspaceIntegratorCore> *) newPathspaceIntegrator
-        : (id<ArpImageSamplerMessenger> ) newImageSampler
-        : (int) samplesPerEpoch
-        ;
-
-- (void) start
-        ;
-
-- (void) step
-        : (int) addedSamples
-        : (int) samplesPerEpoch
-        ;
-
-- (void) stop
-        : (double) duration
-        ;
-
-@end
-
-// ===========================================================================
+#endif /* _ART_FOUNDATION_ARQUEUE_H_ */
+/* ======================================================================== */

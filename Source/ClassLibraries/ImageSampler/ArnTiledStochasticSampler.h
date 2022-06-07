@@ -1,22 +1,5 @@
 #include "ART_Foundation.h"
 
-#ifdef __APPLE__
-#ifndef PTHREAD_BARRIER_H_
-#define PTHREAD_BARRIER_H_
-
-#include <pthread.h>
-#include <errno.h>
-
-typedef int pthread_barrierattr_t;
-typedef struct
-{
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
-    int count;
-    int tripCount;
-} pthread_barrier_t;
-#endif
-#endif
 
 #import "ART_Scenegraph.h"
 #import "ART_ImageData.h"
