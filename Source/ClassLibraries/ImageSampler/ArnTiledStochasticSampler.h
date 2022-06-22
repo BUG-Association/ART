@@ -10,10 +10,11 @@ typedef struct {
         ArnLightAlphaImage** image;
         double* samples;
         IVec2D size;
-}art_tile_t;
-typedef struct image_window_t{
-        IVec2D start,end; 
-}art_image_window_t;
+}ArTile;
+typedef struct{
+        IVec2D start,end;
+        int tileId; 
+}ArImageWindow;
 
 @interface ArnTiledStochasticSampler 
         : ArnBinary
@@ -39,7 +40,7 @@ typedef struct image_window_t{
         IVec2D                                  tilesDimension;
         IVec2D                                  tileSize;
         IVec2D                                  paddedTileSize;
-        art_tile_t                              mergingImage;
+        ArTile                              mergingImage;
         BOOL                                    useDeterministicWavelengths;
         BOOL                                    finishedGeneratingRenderTasks;
         BOOL                                    poisonedRenderThreads;
@@ -57,8 +58,8 @@ typedef struct image_window_t{
         ArNode<ArpCamera>*                      camera;
         ArFreelist*                             pathspaceResultFreelist;
         ArcSampleCounter*                       sampleCounter;
-        art_tile_t*                             tilesBuffer;
-        art_image_window_t*                     taskWindows;
+        ArTile*                             tilesBuffer;
+        ArImageWindow*                          taskWindows;
         BOOL*                                   unfinished;
         Pnt2D*                                  sampleCoordinates;
         double*                                 sampleSplattingFactor;

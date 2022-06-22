@@ -39,8 +39,8 @@ typedef enum {
 }ArTaskType;
 typedef struct {
         ArTaskType type;
-        art_tile_t* work_tile;
-        art_image_window_t* window; 
+        ArTile* work_tile;
+        ArImageWindow* window; 
         int samples;
         int sample_start;
 }ArTask;
@@ -223,14 +223,14 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 - (void)writeImage
     ;
 - (void) initTile
-    :(art_tile_t*) tile
+    :(ArTile*) tile
     :(IVec2D) size
     ;
 - (void) cleanTile
-    :(art_tile_t*) tile
+    :(ArTile*) tile
     ;
 - (void) freeTile
-    :(art_tile_t*) tile
+    :(ArTile*) tile
     ;
 - (BOOL) generateRenderTask
     :(ArTask*) tile
@@ -254,7 +254,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 @implementation ArnTiledStochasticSampler
 
 - (void) initTile
-    :(art_tile_t*) tile
+    :(ArTile*) tile
     :(IVec2D) size
 {
     tile->size = size;
@@ -272,7 +272,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
 }
 
 - (void) cleanTile
-    :(art_tile_t*) tile
+    :(ArTile*) tile
 {
     int tileArea=XC(tile->size)*YC(tile->size);
     for ( int imageIndex=0 ; imageIndex < numberOfOutputImages; imageIndex++) {
@@ -292,7 +292,7 @@ ART_NO_MODULE_SHUTDOWN_FUNCTION_NECESSARY
     }
 }
 - (void) freeTile
-    :(art_tile_t*) tile
+    :(ArTile*) tile
 {
     for (int i = 0 ; i < numberOfOutputImages; i++) {
         RELEASE_OBJECT(tile->image[i]);
@@ -636,19 +636,21 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     
     XC(tilesDimension) = div_roundup(XC(imageSize)-XC(imageOrigin), XC(tileSize));
     YC(tilesDimension) = div_roundup(YC(imageSize)-YC(imageOrigin), YC(tileSize));
-    taskWindows= ALLOC_ARRAY(art_image_window_t, XC(tilesDimension)*YC(tilesDimension));
+    taskWindows= ALLOC_ARRAY(ArImageWindow, XC(tilesDimension)*YC(tilesDimension));
 
+    int tileIndex=0;
     int yStart=YC(imageOrigin);
     for (int y=0; y<YC(tilesDimension); y++) {
         int xStart=XC(imageOrigin);
         for (int x=0; x<XC(tilesDimension); x++) {
-            art_image_window_t* curr = &taskWindows[y * XC(tilesDimension) + x];
+            ArImageWindow* curr = &taskWindows[y * XC(tilesDimension) + x];
             curr->start = IVEC2D(xStart, yStart);
             IVec2D end;
             XC(end) = MIN(xStart + XC(tileSize), XC(imageSize));
             YC(end) = MIN(yStart + YC(tileSize), YC(imageSize));
             
             curr->end = IVEC2D(XC(end), YC(end));
+            curr->tileId=tileIndex++;
             xStart = XC(end);
         }
         yStart=MIN(yStart+YC(tileSize), YC(imageSize));
@@ -663,7 +665,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
             YC(tileSize) + 2 * splattingKernelOffset);
     numberOfTilesInMemory=TILE_CONSTANT * numberOfRenderThreads;
     tilesBuffer = ALLOC_ARRAY(
-            art_tile_t,
+            ArTile,
             numberOfTilesInMemory
             );
     for ( int i = 0;
@@ -936,7 +938,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
 typedef struct ArPixelID
 {
     long   globalRandomSeed;
-    int    threadIndex;
+    int    tileIndex;
     int    sampleIndex;
     Pnt2D  pixelCoord;
 }
@@ -957,7 +959,7 @@ ArPixelID;
                 goto FREE_SAMPLE_VALUE;
             for(int sample=0;sample<task->samples;sample++){
                 ArPixelID  px_id={
-                    .threadIndex=THREAD_INDEX,
+                    .tileIndex=task->window->tileId,
                     .globalRandomSeed = arrandom_global_seed(art_gv),
                     .sampleIndex = task->sample_start  +sample,
                     .pixelCoord=PNT2D(x, y)};
@@ -1252,7 +1254,7 @@ ArPixelID;
     if(!tev->connected){
         return;
     }
-    art_image_window_t tevWindow;
+    ArImageWindow tevWindow;
     XC(tevWindow.start)=MAX(XC(task->window->start)-splattingKernelOffset,0);
     YC(tevWindow.start)=MAX(YC(task->window->start)-splattingKernelOffset,0);
     XC(tevWindow.end)=MIN(XC(task->window->end)+splattingKernelOffset,XC(imageSize));
