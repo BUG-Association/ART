@@ -40,7 +40,7 @@ typedef struct{
         IVec2D                                  tilesDimension;
         IVec2D                                  tileSize;
         IVec2D                                  paddedTileSize;
-        ArTile                              mergingImage;
+        ArTile                                  mergingImage;
         BOOL                                    useDeterministicWavelengths;
         BOOL                                    finishedGeneratingRenderTasks;
         BOOL                                    poisonedRenderThreads;
@@ -58,7 +58,7 @@ typedef struct{
         ArNode<ArpCamera>*                      camera;
         ArFreelist*                             pathspaceResultFreelist;
         ArcSampleCounter*                       sampleCounter;
-        ArTile*                             tilesBuffer;
+        ArTile*                                 tilesBuffer;
         ArImageWindow*                          taskWindows;
         BOOL*                                   unfinished;
         Pnt2D*                                  sampleCoordinates;

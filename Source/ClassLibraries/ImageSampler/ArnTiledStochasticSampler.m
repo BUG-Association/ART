@@ -935,14 +935,13 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
     pthread_barrier_wait(&renderingDone);
 }
 
-typedef struct ArPixelID
-{
+typedef struct {
     long   globalRandomSeed;
     int    tileIndex;
     int    sampleIndex;
     Pnt2D  pixelCoord;
-}
-ArPixelID;
+} ArPixelID;
+
 -(void) renderTask
     :(ArTask*) task
     : (ArcUnsignedInteger *) threadIndex
@@ -1152,7 +1151,7 @@ ArPixelID;
     while(true){
         swap_merge_queue(&merge_queue);
         ARQUEUE_TYPE(ArTask)* queue=merge_queue.inactive;
-        if(queue->length>=2){
+        if(queue->length>2){
             samplesPerEpochAdaptive=samplesPerEpoch*2;
         }
         while(queue->length>0){
