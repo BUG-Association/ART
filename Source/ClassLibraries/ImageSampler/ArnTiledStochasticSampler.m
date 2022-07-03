@@ -21,7 +21,8 @@
 #include <fcntl.h>  
 
 
-#define TILE_CONSTANT 3
+#define TILE_BUFFER_CONSTANT 1
+#define TILE_SIZE_CONSTANT 2
 #define LOCALHOST "127.0.0.1"
 #define TEV_PORT 14158
 #define SEMAPHORE_FORMAT "/art_%d"
@@ -631,7 +632,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         );
     [self initTile: &mergingImage : imageSize];
     [self cleanTile:&mergingImage];
-    tileSize=IVEC2D(16, 16);
+    tileSize=IVEC2D(TILE_SIZE_CONSTANT, TILE_SIZE_CONSTANT);
 
     
     XC(tilesDimension) = div_roundup(XC(imageSize)-XC(imageOrigin), XC(tileSize));
@@ -663,7 +664,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(ArnTiledStochasticSampler)
         IVEC2D(
             XC(tileSize) + 2 * splattingKernelOffset,
             YC(tileSize) + 2 * splattingKernelOffset);
-    numberOfTilesInMemory=TILE_CONSTANT * numberOfRenderThreads;
+    numberOfTilesInMemory=(int)(TILE_BUFFER_CONSTANT * numberOfRenderThreads);
     tilesBuffer = ALLOC_ARRAY(
             ArTile,
             numberOfTilesInMemory
