@@ -21,8 +21,8 @@
 #include <fcntl.h>  
 
 
-#define TILE_BUFFER_CONSTANT 1
-#define TILE_SIZE_CONSTANT 2
+#define TILE_BUFFER_CONSTANT 1.5
+#define TILE_SIZE_CONSTANT 32
 #define LOCALHOST "127.0.0.1"
 #define TEV_PORT 14158
 #define SEMAPHORE_FORMAT "/art_%d"
