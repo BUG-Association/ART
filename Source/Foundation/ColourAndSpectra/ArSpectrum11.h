@@ -39,7 +39,7 @@ ART_MODULE_INTERFACE(ArSpectrum11)
           (ISRs) that ART can use for all its internal calculations which
           involve light, colour and reflectance values.
           
-          This paticular ISR matches the channels used in the Hošek-Wilkie
+          This paticular ISR matches the channels used in the Hošek-Wilkie
           sky dome model, so that simulations can generate "native" spectral
           images for that model.
 ------------------------------------------------------------------------aw- */
