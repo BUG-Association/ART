@@ -103,6 +103,7 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_Add_RAW)
          we wish to create (in our case, ArfARTCSP and ArfTIFF).
     ---------------------------------------------------------------aw- */
 
+#ifdef ART_WITH_OPENEXR
     if (ART_RAW_WORKFLOW_FORMAT_IS_NATIVE) {
         [ self prepareForImageManipulation
             :   nodeStack
@@ -116,6 +117,13 @@ ARPACTION_DEFAULT_IMPLEMENTATION(Arn2xRAW_Add_RAW)
             :   [ ArfOpenEXRSpectral class ]
             ];
     }
+#else
+    [ self prepareForImageManipulation
+	:   nodeStack
+	:   [ ArfRAWRasterImage class ]
+	:   [ ArfARTRAW class ]
+        ];
+#endif // ART_WITH_OPENEXR
 
     /* ------------------------------------------------------------------
          Process all pixels in the image.

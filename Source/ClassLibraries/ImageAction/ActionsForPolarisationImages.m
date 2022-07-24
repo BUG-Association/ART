@@ -168,6 +168,7 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWLinearPolarisingFilte
              kind of source image to expect, and what kind of result image
              we wish to create (in our case, ArfARTRAW and ArfARTCSP).
         ---------------------------------------------------------------aw- */
+#ifdef ART_WITH_OPENEXR
         if (ART_RAW_WORKFLOW_FORMAT_IS_NATIVE) {
             [ self prepareForImageManipulation
                 :   nodeStack
@@ -181,6 +182,13 @@ ARPACTION_DEFAULT_SINGLE_IMAGE_ACTION_IMPLEMENTATION(ArnRAWLinearPolarisingFilte
                 :   [ ArfOpenEXRSpectral class ]
                 ];
         }
+#else
+	[ self prepareForImageManipulation
+	    :   nodeStack
+	    :   [ ArfRAWRasterImage class ]
+	    :   [ ArfARTRAW class ]
+	    ];
+#endif // ART_WITH_OPENEXR
 
         /* ------------------------------------------------------------------
              Process all pixels in the image.
