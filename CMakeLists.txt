@@ -4,8 +4,8 @@ project (ART)
 
 set ( ART_VERSION_MAJOR 2 )
 set ( ART_VERSION_MINOR 1 )
-set ( ART_VERSION_PATCH 1 )
-set ( ART_VERSION_DEVTAG -new_sampler )
+set ( ART_VERSION_PATCH 2 )
+set ( ART_VERSION_DEVTAG  )
 
 set(CMAKE_CXX_STANDARD 11)
 
