@@ -116,6 +116,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
         fgets(buffer, bufferSize, pFile);
         covariances[3*i] = strtod(buffer, &endptr);
         covariances[3*i + 1] = strtod(++endptr, &endptr);
+        strtod(++endptr, &endptr); // skip duplicated value ([0, 1] == [1, 0])
         covariances[3*i + 2] = strtod(++endptr, NULL);
     }
 

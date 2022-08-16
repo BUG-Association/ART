@@ -2416,7 +2416,7 @@ class GMM:
 
             f.write('covs:\n')
             for cov in self.covs:
-                f.write('{}, {}, {}\n'.format(cov[0,0], cov[0, 1], cov[1, 1]))
+                f.write('{}, {}, {}, {}\n'.format(cov[0,0], cov[0, 1], cov[1, 0], cov[1, 1]))
 
             f.write('weights:\n')
             for weigth in self.mixing_coefs:
