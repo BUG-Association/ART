@@ -138,7 +138,7 @@ ARPPARSER_AUXLIARY_NODE_DEFAULT_IMPLEMENTATION
         diagonal[i] = strtod(buffer, NULL);
     }
 
-    fgets(buffer, bufferSize, pFile); // scale_attenuation:
+    fgets(buffer, bufferSize, pFile); // scaling_factor:
     fgets(buffer, bufferSize, pFile);
     double scale_attenuation = strtod(buffer, NULL);
 

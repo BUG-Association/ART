@@ -2256,6 +2256,18 @@ class FluoSpectrum:
         if self.wavelength_i_sampling != self.wavelength_o_sampling:
             raise Exception("Reradiation spectrum with varying incident/outgoing sampling precisions is not supported!")
                 
+
+        start_wl = max(self.wavelength_i_start, self.wavelength_o_start)
+        start_wl_i_idx = self.idx_for_wl_in(start_wl)
+        start_wl_o_idx = self.idx_for_wl_out(start_wl)
+
+        # Surface reflectance (diagonal values) can not be negative
+        for idx_i, idx_o in zip(range(start_wl_i_idx, self.wavelength_i_n_samples), 
+                                range(start_wl_o_idx, self.wavelength_o_n_samples)):
+            if self.data[idx_o, idx_i] < 0:
+                self.data[idx_o, idx_i] = 0
+                
+
     # Returns the reradiation matrix without the reflectance data (diagonal)
     def get_pure_fluo(self):
         start_wl = max(self.wavelength_i_start, self.wavelength_o_start)
@@ -2427,7 +2439,7 @@ class GMM:
             for v in self.diagonal:
                 f.write('{}\n'.format(v))
 
-            f.write('scale_attenuation:\n')
+            f.write('scaling_factor:\n')
             f.write('{}\n'.format(self.scale_attenuation))           
 
     def eval_gmm(self, wl_i: float, wl_o: float) -> float:
